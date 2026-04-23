@@ -86,6 +86,14 @@ const initialHtaFlowState = {
   hasTargetOrganDamage: null,
 };
 
+const initialScaFlowState = {
+  step: 1,
+  stability: null,
+  syndromeType: null,
+  stemiScenario: null,
+  nsteacsRisk: null,
+};
+
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
 
 const getCalculatorResult = (calculatorId, values) => {
@@ -700,6 +708,72 @@ const getHtaFlowFocus = ({ step, hasTargetOrganDamage }) => {
   };
 };
 
+const getScaFlowFocus = ({ step, syndromeType, stability, stemiScenario, nsteacsRisk }) => {
+  if (step === 1) {
+    return {
+      current: 'Posible síndrome coronario agudo',
+      decision: '¿Hay inestabilidad o muy alto riesgo?',
+      next: 'Tipificar por ECG.',
+    };
+  }
+
+  if (step === 2) {
+    return {
+      current: 'Clasificación inicial',
+      decision: '¿SCACEST o SCASEST?',
+      next: 'Definir reperfusión o riesgo invasivo.',
+    };
+  }
+
+  if (step === 3 && syndromeType === 'stemi') {
+    return {
+      current: 'SCACEST',
+      decision: 'Elegir reperfusión inmediata o fibrinólisis.',
+      next: 'Activar código infarto y destino.',
+    };
+  }
+
+  if (step === 3) {
+    return {
+      current: 'SCASEST',
+      decision: stability === 'unstable' ? 'Confirma muy alto riesgo.' : 'Define muy alto, alto o menor riesgo.',
+      next: 'Fijar el tiempo de coronariografía.',
+    };
+  }
+
+  if (step === 4) {
+    if (syndromeType === 'stemi') {
+      return {
+        current: 'Conducta inmediata',
+        decision:
+          stemiScenario === 'pci'
+            ? 'ICP primaria urgente.'
+            : stemiScenario === 'fibrinolysis'
+              ? 'Fibrinólisis precoz y traslado.'
+              : 'Ingreso y valoración cardiológica urgente.',
+        next: 'Revisar tratamiento inicial.',
+      };
+    }
+
+    return {
+      current: 'Conducta inmediata',
+      decision:
+        nsteacsRisk === 'very-high'
+          ? 'ICP urgente < 2 h.'
+          : nsteacsRisk === 'high'
+            ? 'ICP precoz < 24 h.'
+            : 'Ingreso, monitorización y estrategia diferida.',
+      next: 'Revisar tratamiento inicial.',
+    };
+  }
+
+  return {
+    current: 'Tratamiento inicial',
+    decision: 'Analgesia, antiisquemia y antitrombosis.',
+    next: 'Confirmar ingreso y advertencias.',
+  };
+};
+
 const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral' }) => (
   <button
     type="button"
@@ -836,11 +910,17 @@ const HomeView = ({
         <DetailPanel title="Acceso directo">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
             <QuickAccessCard
+              icon={HeartPulse}
+              title="Síndrome coronario agudo"
+              meta="ECG, reperfusión y antitrombosis."
+              onClick={() => onModuleOpen('sindrome-coronario-agudo')}
+              tone="accent"
+            />
+            <QuickAccessCard
               icon={Activity}
               title="Fibrilación auricular"
               meta="Estabilidad, cardioversión y anticoagulación."
               onClick={() => onModuleOpen('fibrilacion-auricular')}
-              tone="accent"
             />
             <QuickAccessCard
               icon={HeartPulse}
@@ -853,12 +933,6 @@ const HomeView = ({
               title="CHA2DS2-VASc"
               meta="Riesgo embólico."
               onClick={() => onCalculatorOpen('cha2ds2-vasc')}
-            />
-            <QuickAccessCard
-              icon={Pill}
-              title="Apixabán"
-              meta="Anticoagulación oral."
-              onClick={() => onMedicationOpen('apixaban')}
             />
           </div>
         </DetailPanel>
@@ -957,7 +1031,6 @@ const FibrilacionAuricularFlowView = ({
 
   const updateFlow = (changes) => {
     onFaFlowChange(changes);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -1279,7 +1352,6 @@ const HipertensionUrgenciasFlowView = ({
 
   const updateFlow = (changes) => {
     onHtaFlowChange(changes);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -1498,6 +1570,416 @@ const HipertensionUrgenciasFlowView = ({
   );
 };
 
+const SindromeCoronarioAgudoFlowView = ({
+  protocol,
+  scaFlowState,
+  onScaFlowChange,
+  onScaFlowReset,
+  onMedicationOpen,
+  onMedicationsHub,
+  onBack,
+  onFinish,
+}) => {
+  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('murillo7', protocol.pdfPage);
+  const { step, stability, syndromeType, stemiScenario, nsteacsRisk } = scaFlowState;
+  const flowFocus = getScaFlowFocus({ step, syndromeType, stability, stemiScenario, nsteacsRisk });
+
+  const nsteacsRiskLabel =
+    nsteacsRisk === 'very-high' ? 'Muy alto riesgo' : nsteacsRisk === 'high' ? 'Alto riesgo' : 'Intermedio / bajo riesgo';
+
+  const stemiScenarioLabel =
+    stemiScenario === 'pci'
+      ? 'ICP primaria urgente'
+      : stemiScenario === 'fibrinolysis'
+        ? 'Fibrinólisis precoz'
+        : 'Valoración cardiológica urgente';
+
+  const stemiConductText =
+    stemiScenario === 'pci'
+      ? 'Activa código infarto y deriva a hemodinámica. No esperes troponina.'
+      : stemiScenario === 'fibrinolysis'
+        ? 'Fibrinólisis precoz si no llegas a ICP en menos de 120 min y traslado posterior para ICP.'
+        : 'Ingreso en UCI y valoración urgente si sigue con dolor, shock, insuficiencia cardíaca o dudas diagnósticas.';
+
+  const stemiDestinationText =
+    stemiScenario === 'fibrinolysis' ? 'UCI y traslado a centro con hemodinámica.' : 'UCI / hemodinámica.';
+
+  const nsteacsConductText =
+    nsteacsRisk === 'very-high'
+      ? 'Coronariografía e ICP urgente en menos de 2 h.'
+      : nsteacsRisk === 'high'
+        ? 'Coronariografía precoz en menos de 24 h.'
+        : 'Ingreso, monitorización y estrategia invasiva diferida o según evolución.';
+
+  const nsteacsDestinationText =
+    nsteacsRisk === 'low-intermediate' ? 'Observación o cardiología según evolución.' : 'UCI o cardiología monitorizada.';
+
+  const antithromboticText =
+    syndromeType === 'stemi'
+      ? 'Ácido acetilsalicílico siempre. Añade ticagrelor o clopidogrel. Si vas a ICP, utiliza heparina sódica.'
+      : nsteacsRisk === 'low-intermediate'
+        ? 'Ácido acetilsalicílico y clopidogrel si no puedes usar ticagrelor. Si no se prevé ICP inmediata, enoxaparina.'
+        : 'Ácido acetilsalicílico y ticagrelor si el riesgo es intermedio/alto. Si vas a estrategia invasiva precoz, heparina; si no, enoxaparina.';
+
+  const treatmentMedicationIds =
+    syndromeType === 'stemi'
+      ? ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'heparina-sodica', 'nitroglicerina-sca', 'morfina-sca']
+      : nsteacsRisk === 'low-intermediate'
+        ? ['acido-acetilsalicilico', 'clopidogrel', 'enoxaparina-sca', 'nitroglicerina-sca', 'morfina-sca']
+        : ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'heparina-sodica', 'enoxaparina-sca', 'nitroglicerina-sca', 'morfina-sca'];
+
+  const fibrinolysisWarnings = [
+    'Descarta ACV hemorrágico previo, disección aórtica o sangrado gastrointestinal reciente.',
+    'No fibrolises si hay traumatismo craneal, cirugía o punción no compresible reciente.',
+    'Revisa HTA grave no controlada, anticoagulación oral y embarazo reciente antes de decidir.',
+  ];
+
+  const updateFlow = (changes) => {
+    onScaFlowChange(changes);
+  };
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+      <FlowHeader
+        eyebrow="Protocolo SCA"
+        title={protocol.longTitle ?? protocol.title}
+        step={step}
+        totalSteps={5}
+        steps={['Gravedad', 'Tipo', 'Escenario', 'Conducta', 'Tratamiento']}
+        current={flowFocus.current}
+        decision={flowFocus.decision}
+        next={flowFocus.next}
+        onBack={onBack}
+        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
+      />
+
+      {step === 1 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 1" title="Cribado de gravedad" note="ECG de 12 derivaciones en los primeros 10 min." />
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Haz ahora" tone="accent">
+              <div className="space-y-1.5">
+                <p>Monitoriza, canaliza una vía y extrae troponina, bioquímica y coagulación.</p>
+                <p>Usa oxígeno solo si la SpO2 es menor del 90%.</p>
+              </div>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Piensa en Killip">
+              <div className="space-y-1.5">
+                <p>I: sin insuficiencia cardíaca.</p>
+                <p>II: crepitantes, galope o ingurgitación yugular.</p>
+                <p>III: edema agudo de pulmón. IV: shock cardiogénico.</p>
+              </div>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 grid gap-4">
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="Inestabilidad o muy alto riesgo"
+              note="Shock, edema agudo de pulmón, arritmias ventriculares o angina refractaria."
+              tone="critical"
+              onClick={() =>
+                updateFlow({
+                  step: 2,
+                  stability: 'unstable',
+                  syndromeType: null,
+                  stemiScenario: null,
+                  nsteacsRisk: null,
+                })
+              }
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title="Sin inestabilidad inmediata"
+              note="Paciente estable para tipificar el síndrome."
+              onClick={() =>
+                updateFlow({
+                  step: 2,
+                  stability: 'stable',
+                  syndromeType: null,
+                  stemiScenario: null,
+                  nsteacsRisk: null,
+                })
+              }
+            />
+          </div>
+        </section>
+      ) : null}
+
+      {step === 2 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 2" title="Clasificación inicial" note="Tipifica el síndrome con el ECG." />
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="No retrases" tone="warning">
+              {protocol.warnings[0]}
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Datos que mandan">
+              <div className="space-y-1.5">
+                <p>SCACEST: elevación persistente del ST o BCRI nuevo/presumiblemente nuevo.</p>
+                <p>SCASEST: sin elevación persistente del ST; troponina y riesgo ordenan la conducta.</p>
+              </div>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 grid gap-4">
+            <FlowChoiceCard
+              icon={HeartPulse}
+              title="SCACEST / BCRI nuevo"
+              note="Reperfusión precoz si el contexto es compatible."
+              tone="critical"
+              onClick={() =>
+                updateFlow({
+                  step: 3,
+                  syndromeType: 'stemi',
+                  stemiScenario: null,
+                  nsteacsRisk: null,
+                })
+              }
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title="SCASEST"
+              note="Define el riesgo para fijar el tiempo de coronariografía."
+              onClick={() =>
+                updateFlow({
+                  step: 3,
+                  syndromeType: 'nstemi',
+                  stemiScenario: null,
+                  nsteacsRisk: stability === 'unstable' ? 'very-high' : null,
+                })
+              }
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 1 })} className={subtleButtonClass}>
+              Volver
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 3 && syndromeType === 'stemi' ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title="Escenario de SCACEST" note="Decide la estrategia de reperfusión." />
+
+          {stability === 'unstable' ? (
+            <div className="mb-4">
+              <ProtocolGuideBlock label="Muy alto riesgo" tone="critical">
+                Shock, insuficiencia cardíaca aguda grave o arritmias malignas inclinan a ICP urgente.
+              </ProtocolGuideBlock>
+            </div>
+          ) : null}
+
+          <div className="grid gap-4">
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="< 12 h y ICP disponible en < 120 min"
+              note="Código infarto y hemodinámica urgente."
+              tone="critical"
+              onClick={() => updateFlow({ step: 4, stemiScenario: 'pci' })}
+            />
+            <FlowChoiceCard
+              icon={HeartPulse}
+              title="< 12 h y demora > 120 min"
+              note="Fibrinólisis precoz y traslado para ICP posterior."
+              onClick={() => updateFlow({ step: 4, stemiScenario: 'fibrinolysis' })}
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title="> 12 h o sin criterio claro de reperfusión inmediata"
+              note="Ingreso y valoración cardiológica urgente según síntomas y complicaciones."
+              onClick={() => updateFlow({ step: 4, stemiScenario: 'late' })}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
+              Volver
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 3 && syndromeType === 'nstemi' ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title="Riesgo en SCASEST" note="Define el tiempo de coronariografía." />
+
+          <div className="grid gap-4">
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="Muy alto riesgo"
+              note="Angina refractaria, insuficiencia cardíaca, arritmias ventriculares o inestabilidad hemodinámica."
+              tone="critical"
+              onClick={() => updateFlow({ step: 4, nsteacsRisk: 'very-high' })}
+            />
+            <FlowChoiceCard
+              icon={HeartPulse}
+              title="Alto riesgo"
+              note="Troponina dinámica, cambios ST/T o GRACE > 140."
+              onClick={() => updateFlow({ step: 4, nsteacsRisk: 'high' })}
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title="Intermedio / bajo riesgo"
+              note="Sin criterios previos; ingreso, monitorización y estrategia diferida."
+              onClick={() => updateFlow({ step: 4, nsteacsRisk: 'low-intermediate' })}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
+              Volver
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 4 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 4" title="Conducta inmediata" note="Deja fijado qué haces ahora y adónde va el paciente." />
+
+          {syndromeType === 'stemi' ? (
+            <div className="grid gap-3 lg:grid-cols-3">
+              <ProtocolGuideBlock label="Caso" tone="critical">
+                <p className="font-semibold text-[var(--text)]">SCACEST</p>
+                <p className="mt-1">{stemiScenarioLabel}.</p>
+              </ProtocolGuideBlock>
+              <ProtocolGuideBlock label="Conducta" tone={stemiScenario === 'late' ? 'warning' : 'critical'}>
+                {stemiConductText}
+              </ProtocolGuideBlock>
+              <ProtocolGuideBlock label="Destino">
+                <p className="font-semibold text-[var(--text)]">{stemiDestinationText}</p>
+                <p className="mt-1">Todos requieren ingreso.</p>
+              </ProtocolGuideBlock>
+            </div>
+          ) : (
+            <div className="grid gap-3 lg:grid-cols-3">
+              <ProtocolGuideBlock label="Caso" tone={nsteacsRisk === 'very-high' ? 'critical' : 'accent'}>
+                <p className="font-semibold text-[var(--text)]">SCASEST</p>
+                <p className="mt-1">{nsteacsRiskLabel}.</p>
+              </ProtocolGuideBlock>
+              <ProtocolGuideBlock label="Conducta" tone={nsteacsRisk === 'very-high' ? 'critical' : 'warning'}>
+                {nsteacsConductText}
+              </ProtocolGuideBlock>
+              <ProtocolGuideBlock label="Destino">
+                <p className="font-semibold text-[var(--text)]">{nsteacsDestinationText}</p>
+                <p className="mt-1">Monitoriza ECG y troponina seriada.</p>
+              </ProtocolGuideBlock>
+            </div>
+          )}
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-[1.06fr_0.94fr]">
+            <ProtocolGuideBlock label="Tiempo" tone="accent">
+              {syndromeType === 'stemi'
+                ? 'Si el SCACEST tiene menos de 12 h, reperfunde lo antes posible. Deseable FMC a ICP < 90 min; si no llegas en < 120 min, valora fibrinólisis.'
+                : 'Muy alto riesgo: < 2 h. Alto riesgo: < 24 h. Menor riesgo: estrategia tardía o según evolución.'}
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Advertencia" tone="warning">
+              {syndromeType === 'stemi' ? protocol.warnings[0] : protocol.warnings[1]}
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" onClick={() => updateFlow({ step: 5 })} className={primaryButtonClass}>
+              Ir a tratamiento
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 5 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 5" title="Tratamiento inicial" note="Ordena lo imprescindible antes de perder tiempo en matices." />
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Medidas generales" tone="accent">
+              <div className="space-y-1.5">
+                <p>Reposo, monitorización continua y vía venosa.</p>
+                <p>Troponina, hemograma, bioquímica y coagulación desde el inicio.</p>
+                <p>Oxígeno solo si la SpO2 es menor del 90%.</p>
+              </div>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Antitrombosis">
+              {antithromboticText}
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
+            <ProtocolGuideBlock label="Dolor / isquemia" tone="warning">
+              Nitroglicerina sublingual primero. Si el dolor persiste, pasa a perfusión IV y añade morfina si hace falta.
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Después">
+              {protocol.warnings[3]}
+            </ProtocolGuideBlock>
+          </div>
+
+          {stemiScenario === 'fibrinolysis' ? (
+            <div className="mt-4">
+              <ProtocolGuideBlock label="Antes de fibrinólisis" tone="critical">
+                <div className="space-y-1.5">
+                  {fibrinolysisWarnings.map((item) => (
+                    <p key={item}>{item}</p>
+                  ))}
+                </div>
+              </ProtocolGuideBlock>
+            </div>
+          ) : null}
+
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+            <div className="space-y-2">
+              {treatmentMedicationIds.map((medicationId) => (
+                <MedicationQuickRow
+                  key={medicationId}
+                  medication={getMedication(medicationId)}
+                  onOpen={() => onMedicationOpen(medicationId)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Advertencias</p>
+            <div className="space-y-2">
+              {[protocol.warnings[1], protocol.warnings[2], protocol.warnings[3]].map((warning) => (
+                <div key={warning} className={`${mutedPanelClass} px-4 py-3 text-sm text-[var(--text-soft)]`}>
+                  {warning}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 4 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" onClick={onMedicationsHub} className={subtleButtonClass}>
+              Abrir medicamentos
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onScaFlowReset();
+                onFinish();
+              }}
+              className={primaryButtonClass}
+            >
+              Finalizar
+            </button>
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+};
+
 const CalculationsView = ({ onBack, onCalculatorOpen }) => (
   <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
     <BackBar label="Inicio" onClick={onBack} />
@@ -1672,6 +2154,7 @@ const App = () => {
   const [calculatorInputs, setCalculatorInputs] = useState(initialCalculatorInputs);
   const [faFlowState, setFaFlowState] = useState(initialFaFlowState);
   const [htaFlowState, setHtaFlowState] = useState(initialHtaFlowState);
+  const [scaFlowState, setScaFlowState] = useState(initialScaFlowState);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1711,6 +2194,17 @@ const App = () => {
     }));
   };
 
+  const resetScaFlow = () => {
+    setScaFlowState(initialScaFlowState);
+  };
+
+  const updateScaFlow = (changes) => {
+    setScaFlowState((current) => ({
+      ...current,
+      ...changes,
+    }));
+  };
+
   const openModule = (moduleId, returnTo = { view: 'protocols' }) => {
     const module = getMotivoModule(moduleId);
 
@@ -1724,6 +2218,10 @@ const App = () => {
 
     if (module.id === 'hta-urgencias') {
       resetHtaFlow();
+    }
+
+    if (module.id === 'sindrome-coronario-agudo') {
+      resetScaFlow();
     }
 
     navigate({ view: 'protocol', protocolId: module.id, returnTo });
@@ -1793,6 +2291,24 @@ const App = () => {
             onBack={handleBack}
             onFinish={() => {
               resetHtaFlow();
+              navigate({ view: 'home' });
+            }}
+          />
+        );
+      }
+
+      if (protocolId === 'sindrome-coronario-agudo') {
+        return (
+          <SindromeCoronarioAgudoFlowView
+            protocol={getProtocol(protocolId)}
+            scaFlowState={scaFlowState}
+            onScaFlowChange={updateScaFlow}
+            onScaFlowReset={resetScaFlow}
+            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
+            onMedicationsHub={() => openMedications(protocolReturnTo)}
+            onBack={handleBack}
+            onFinish={() => {
+              resetScaFlow();
               navigate({ view: 'home' });
             }}
           />

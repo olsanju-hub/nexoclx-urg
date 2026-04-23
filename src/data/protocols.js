@@ -206,6 +206,92 @@ export const protocolCatalog = {
       }),
     ],
   },
+  'sindrome-coronario-agudo': {
+    id: 'sindrome-coronario-agudo',
+    title: 'Síndrome coronario agudo',
+    longTitle: 'Infarto / síndrome coronario agudo',
+    chapter: 'Cap. 26',
+    section: 'Urgencias cardiovasculares',
+    indexPage: 214,
+    verifiedPage: 214,
+    pdfPage: 239,
+    status: 'implementado',
+    summary: 'Diferenciar SCACEST y SCASEST, detectar muy alto riesgo y activar reperfusión o ingreso sin retrasos.',
+    quickChecks: [
+      'ECG de 12 derivaciones en los primeros 10 min',
+      'Descartar shock, edema agudo de pulmón o arritmias graves',
+      'Clasificar en SCACEST o SCASEST',
+      'Decidir reperfusión, ingreso y tratamiento antitrombótico inicial',
+    ],
+    quickSummary: [
+      {
+        id: 'critical',
+        title: 'Muy alto riesgo',
+        action: 'Angina refractaria, insuficiencia cardíaca, arritmias ventriculares o inestabilidad: coronariografía urgente.',
+      },
+      {
+        id: 'stemi',
+        title: 'SCACEST',
+        action: 'No esperar troponina. Reperfusión precoz con ICP primaria o fibrinólisis si no llega a tiempo.',
+      },
+      {
+        id: 'nstemi-high',
+        title: 'SCASEST alto riesgo',
+        action: 'Doble antiagregación, anticoagulación y estrategia invasiva en menos de 24 h.',
+      },
+      {
+        id: 'always',
+        title: 'Siempre',
+        action: 'Monitorizar, tratar el dolor y dejar claro el destino del paciente.',
+      },
+    ],
+    warnings: [
+      'No esperar el resultado de la troponina si la clínica y el ECG son compatibles con SCACEST.',
+      'La fibrinólisis está contraindicada en el SCASEST.',
+      'Evitar nitratos en infarto de ventrículo derecho, hipotensión o uso reciente de inhibidores de la PDE5.',
+      'Todos los pacientes con SCA requieren ingreso hospitalario.',
+    ],
+    medicationGroups: [
+      {
+        title: 'Analgesia y antiisquémico',
+        medicationIds: ['nitroglicerina-sca', 'morfina-sca'],
+      },
+      {
+        title: 'Antitrombótico inicial',
+        medicationIds: ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'heparina-sodica', 'enoxaparina-sca'],
+      },
+    ],
+    bibliography: [
+      referenceEntry({
+        id: 'sca-start',
+        indexPage: 214,
+        verifiedPage: 214,
+        pdfPage: 239,
+        note: 'Inicio real del capítulo de síndrome coronario agudo.',
+      }),
+      createBibliographyEntry({
+        id: 'sca-diagnosis',
+        referenceId: 'murillo7',
+        verifiedPages: [215, 216, 217, 218],
+        pdfPages: [240, 241, 242, 243],
+        note: 'Clasificación, clínica, ECG y biomarcadores para tipificar SCACEST y SCASEST.',
+      }),
+      createBibliographyEntry({
+        id: 'sca-risk',
+        referenceId: 'murillo7',
+        verifiedPages: [219, 220],
+        pdfPages: [244, 245],
+        note: 'Estratificación del riesgo, escala GRACE, Killip y criterios de ingreso.',
+      }),
+      createBibliographyEntry({
+        id: 'sca-treatment',
+        referenceId: 'murillo7',
+        verifiedPages: [221, 222, 223, 224, 225, 226],
+        pdfPages: [246, 247, 248, 249, 250, 251],
+        note: 'Tratamiento general, antiisquémico, antiagregación, anticoagulación y reperfusión.',
+      }),
+    ],
+  },
 };
 
 export const protocolList = Object.values(protocolCatalog);
