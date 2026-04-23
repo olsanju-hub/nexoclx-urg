@@ -1,7 +1,6 @@
 import React, { startTransition, useEffect, useState } from 'react';
 import {
   Activity,
-  AlertCircle,
   ArrowLeft,
   BookOpen,
   Calculator,
@@ -300,13 +299,6 @@ const ListActionRow = ({ title, meta, onClick, badge = null }) => (
   </button>
 );
 
-const HomeMetric = ({ label, value }) => (
-  <div className={`${mutedPanelClass} px-3.5 py-3`}>
-    <p className="eyebrow eyebrow-muted">{label}</p>
-    <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--text)]">{value}</p>
-  </div>
-);
-
 const QuickAccessCard = ({ icon: Icon, title, meta, onClick, tone = 'neutral' }) => (
   <button
     type="button"
@@ -354,11 +346,7 @@ const MedicationQuickRow = ({ medication, onOpen }) => (
 
 const BibliographyBlock = ({ entries }) => (
   <section className={`${panelClass} p-4 sm:p-5`}>
-    <SectionTitle
-      eyebrow="Referencia"
-      title="Bibliografía"
-      note="Enlaces directos a las páginas verificadas del contenido visible."
-    />
+    <SectionTitle title="Fuente" />
     <div className="space-y-3">
       {entries.map((entry) => (
         <div key={entry.internalId} className={`${mutedPanelClass} p-4`}>
@@ -608,6 +596,110 @@ const FlowStepChip = ({ index, label, active }) => (
   </div>
 );
 
+const ProtocolGuideBlock = ({ label, children, tone = 'neutral' }) => {
+  const toneClass =
+    tone === 'critical'
+      ? 'border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.9)]'
+      : tone === 'warning'
+        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.9)]'
+        : tone === 'accent'
+          ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.88)]'
+          : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.82)]';
+
+  return (
+    <div className={`rounded-[1.2rem] border px-4 py-4 ${toneClass}`}>
+      <p className="eyebrow eyebrow-muted">{label}</p>
+      <div className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">{children}</div>
+    </div>
+  );
+};
+
+const ProtocolFocusStrip = ({ current, decision, next }) => (
+  <div className="mt-5 grid gap-3 lg:grid-cols-3">
+    <ProtocolGuideBlock label="Ahora">
+      <p className="font-semibold text-[var(--text)]">{current}</p>
+    </ProtocolGuideBlock>
+    <ProtocolGuideBlock label="Decisión" tone="accent">
+      <p className="font-semibold text-[var(--text)]">{decision}</p>
+    </ProtocolGuideBlock>
+    <ProtocolGuideBlock label="Después">
+      <p className="font-semibold text-[var(--text)]">{next}</p>
+    </ProtocolGuideBlock>
+  </div>
+);
+
+const getFaFlowFocus = ({ step, stability, duration }) => {
+  if (step === 1) {
+    return {
+      current: 'Estabilidad hemodinámica',
+      decision: '¿Hay inestabilidad?',
+      next: 'Si está estable, definir contexto. Si no, actuar.',
+    };
+  }
+
+  if (step === 2 && stability === 'stable') {
+    return {
+      current: 'Duración y cardiopatía estructural',
+      decision: 'Definir si el episodio es < 48 h o > 48 h/desconocido.',
+      next: 'Pasar a conducta inicial.',
+    };
+  }
+
+  if (step === 2 && stability === 'unstable') {
+    return {
+      current: 'FA inestable',
+      decision: 'Cardioversión urgente.',
+      next: 'Después, valorar prevención de ictus.',
+    };
+  }
+
+  if (step === 3) {
+    return {
+      current: duration === 'lt48' ? 'FA estable < 48 h' : 'FA estable > 48 h o desconocida',
+      decision: 'Control de frecuencia y estrategia de cardioversión.',
+      next: 'Valorar anticoagulación.',
+    };
+  }
+
+  return {
+    current: 'Prevención de ictus',
+    decision: 'Decidir anticoagulación.',
+    next: 'Abrir cálculos o fármacos si hacen falta.',
+  };
+};
+
+const getHtaFlowFocus = ({ step, hasTargetOrganDamage }) => {
+  if (step === 1) {
+    return {
+      current: 'Cifra tensional',
+      decision: 'Registrar PAS y PAD.',
+      next: 'Buscar daño de órgano diana.',
+    };
+  }
+
+  if (step === 2) {
+    return {
+      current: 'Daño de órgano diana',
+      decision: '¿Hay emergencia hipertensiva?',
+      next: 'Clasificar el caso.',
+    };
+  }
+
+  if (step === 3) {
+    return {
+      current: 'Clasificación',
+      decision: hasTargetOrganDamage ? 'Emergencia hipertensiva.' : 'Urgencia hipertensiva.',
+      next: 'Elegir conducta y tratamiento.',
+    };
+  }
+
+  return {
+    current: 'Tratamiento',
+    decision: hasTargetOrganDamage ? 'Vía intravenosa y monitorización.' : 'Vía oral y reevaluación.',
+    next: 'Revisar fármacos y advertencias.',
+  };
+};
+
 const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral' }) => (
   <button
     type="button"
@@ -669,7 +761,7 @@ const FlowActionCard = ({ title, body, tone = 'neutral', children = null }) => {
   );
 };
 
-const FlowHeader = ({ eyebrow, title, note, step, totalSteps, steps, onBack, onOpenSource }) => (
+const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision, next, onBack, onOpenSource }) => (
   <section className={`${shellCardClass} p-5 sm:p-6`}>
     <div className="flex items-center justify-between gap-3">
       <button type="button" onClick={onBack} className={ghostButtonClass}>
@@ -690,7 +782,6 @@ const FlowHeader = ({ eyebrow, title, note, step, totalSteps, steps, onBack, onO
         <h1 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:text-[2.15rem]">
           {title}
         </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p>
       </div>
       <div className={`${mutedPanelClass} min-w-[210px] px-4 py-4 xl:max-w-[240px]`}>
         <p className="eyebrow eyebrow-muted">Paso {step} de {totalSteps}</p>
@@ -699,6 +790,8 @@ const FlowHeader = ({ eyebrow, title, note, step, totalSteps, steps, onBack, onO
         </div>
       </div>
     </div>
+
+    <ProtocolFocusStrip current={current} decision={decision} next={next} />
 
     <div className="mt-5 flex flex-wrap gap-2">
       {steps.map((item, index) => (
@@ -722,123 +815,65 @@ const HomeView = ({
 
   return (
     <div className="mx-auto max-w-7xl space-y-4 sm:space-y-5">
-      <section className="grid gap-4 xl:grid-cols-[1.25fr_0.95fr]">
-        <section className={`${shellCardClass} p-5 sm:p-6`}>
-          <p className="eyebrow">Biblioteca clínica rápida</p>
-          <div className="mt-4 flex flex-col gap-5">
-            <div className="flex items-start gap-3">
-              <img
-                src={brandMark}
-                alt="NexoClx"
-                className="mt-0.5 h-12 w-12 rounded-[1.2rem] object-cover shadow-[0_20px_44px_-28px_rgba(78,58,20,0.34)]"
-              />
-              <div className="min-w-0">
-                <div className="font-semibold tracking-[-0.05em] text-[var(--text)] sm:text-lg">
-                  <span>Nexo</span>
-                  <span className="text-[var(--accent-500)]">Clx</span>
-                </div>
-                <h1 className="mt-3 max-w-3xl text-[2rem] font-semibold tracking-[-0.06em] text-[var(--text)] sm:text-[2.45rem]">
-                  Protocolos, cálculos y fármacos listos para consulta clínica real.
-                </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--text-soft)]">
-                  Interfaz ligera, acceso directo y contexto suficiente para decidir sin convertir la home en una
-                  pantalla decorativa.
-                </p>
-              </div>
-            </div>
+      <PageHero title="Inicio">
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={onProtocolsOpen} className={primaryButtonClass}>
+            <ClipboardList className="h-4 w-4" />
+            Protocolos
+          </button>
+          <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
+            <Calculator className="h-4 w-4" />
+            Cálculos
+          </button>
+          <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
+            <Pill className="h-4 w-4" />
+            Medicamentos
+          </button>
+        </div>
+      </PageHero>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <HomeMetric label="Protocolos activos" value={`${activeModules.length}`} />
-              <HomeMetric label="Cálculos disponibles" value={`${implementedCalculators.length}`} />
-              <HomeMetric
-                label="Fichas conectadas"
-                value={`${medicationGroups.reduce((count, group) => count + group.items.length, 0)}`}
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={onProtocolsOpen} className={primaryButtonClass}>
-                <ClipboardList className="h-4 w-4" />
-                Abrir protocolos
-              </button>
-              <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
-                <Calculator className="h-4 w-4" />
-                Cálculos rápidos
-              </button>
-              <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
-                <Pill className="h-4 w-4" />
-                Medicamentos
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className={`${panelClass} p-5 sm:p-6`}>
-          <SectionTitle
-            eyebrow="Uso directo"
-            title="Rutas de guardia"
-            note="Atajos operativos para abrir el punto clínico más útil sin ruido visual."
-          />
+      <section className="grid gap-4 xl:grid-cols-[1.02fr_0.98fr]">
+        <DetailPanel title="Acceso directo">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
             <QuickAccessCard
               icon={Activity}
               title="Fibrilación auricular"
-              meta="Flujo breve por estabilidad, ritmo y anticoagulación."
+              meta="Estabilidad, cardioversión y anticoagulación."
               onClick={() => onModuleOpen('fibrilacion-auricular')}
               tone="accent"
             />
             <QuickAccessCard
               icon={HeartPulse}
               title="HTA en urgencias"
-              meta="Diferenciar urgencia y emergencia hipertensiva en pocos pasos."
+              meta="Cifra, daño diana y tratamiento."
               onClick={() => onModuleOpen('hta-urgencias')}
             />
             <QuickAccessCard
               icon={Calculator}
               title="CHA2DS2-VASc"
-              meta="Escala inmediata para prevención embólica."
+              meta="Riesgo embólico."
               onClick={() => onCalculatorOpen('cha2ds2-vasc')}
             />
             <QuickAccessCard
               icon={Pill}
               title="Apixabán"
-              meta="Ficha rápida para anticoagulación frecuente."
+              meta="Anticoagulación oral."
               onClick={() => onMedicationOpen('apixaban')}
             />
           </div>
-        </section>
-      </section>
+        </DetailPanel>
 
-      <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <DetailPanel
-          eyebrow="Prioridad"
-          title="Protocolos operativos"
-          note="Solo se muestra lo que ya está listo para uso clínico, con acceso directo a los flujos."
-          action={<StatusBadge tone="active">{activeModules.length} activos</StatusBadge>}
-        >
+        <DetailPanel title="Protocolos">
           <div className="space-y-2">
             {activeModules.map((module) => (
-              <ListActionRow
-                key={module.id}
-                title={module.title}
-                meta={module.summary}
-                badge={<StatusBadge tone="active">Activo</StatusBadge>}
-                onClick={() => onModuleOpen(module.id)}
-              />
+              <ListActionRow key={module.id} title={module.title} meta={module.summary} onClick={() => onModuleOpen(module.id)} />
             ))}
           </div>
         </DetailPanel>
+      </section>
 
-        <DetailPanel
-          eyebrow="Decisión rápida"
-          title="Cálculos listos"
-          note="Escalas ya integradas y útiles para las decisiones visibles en los protocolos activos."
-          action={
-            <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
-              Ver todos
-            </button>
-          }
-        >
+      <section className="grid gap-4 xl:grid-cols-[0.94fr_1.06fr]">
+        <DetailPanel title="Cálculos" action={<button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>Ver todos</button>}>
           <div className="space-y-2">
             {featuredCalculators.map((calculator) => (
               <ListActionRow
@@ -850,19 +885,8 @@ const HomeView = ({
             ))}
           </div>
         </DetailPanel>
-      </section>
 
-      <section className="grid gap-4 xl:grid-cols-[0.96fr_1.04fr]">
-        <DetailPanel
-          eyebrow="Consulta farmacológica"
-          title="Medicamentos frecuentes"
-          note="Fichas conectadas a los flujos más consultados, sin duplicar la navegación principal."
-          action={
-            <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
-              Ver todos
-            </button>
-          }
-        >
+        <DetailPanel title="Medicamentos" action={<button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>Ver todos</button>}>
           <div className="space-y-2">
             {featuredMedications.map((medicationId) => (
               <MedicationQuickRow
@@ -871,43 +895,6 @@ const HomeView = ({
                 onOpen={() => onMedicationOpen(medicationId)}
               />
             ))}
-          </div>
-        </DetailPanel>
-
-        <DetailPanel
-          eyebrow="Contexto útil"
-          title="Accesos que reducen pasos"
-          note="La app entra directa en lo accionable: protocolos breves, cálculos ya conectados y fichas enlazadas."
-        >
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className={`${mutedPanelClass} p-4`}>
-              <p className="eyebrow eyebrow-muted">Protocolo FA</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Frecuencia, cardioversión y riesgo embólico</p>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
-                Flujo de 4 pasos con cálculos y anticoagulación enlazados en el mismo recorrido.
-              </p>
-            </div>
-            <div className={`${mutedPanelClass} p-4`}>
-              <p className="eyebrow eyebrow-muted">Protocolo HTA</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Cifra, daño diana y tratamiento</p>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
-                Clasificación rápida con salida directa a vía oral o intravenosa sin interfaz pesada.
-              </p>
-            </div>
-            <div className={`${mutedPanelClass} p-4`}>
-              <p className="eyebrow eyebrow-muted">Cockcroft-Gault</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Ajuste renal conectado</p>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
-                Disponible como módulo aislado o como apoyo inmediato a la decisión anticoagulante.
-              </p>
-            </div>
-            <div className={`${mutedPanelClass} p-4`}>
-              <p className="eyebrow eyebrow-muted">Fichas clínicas</p>
-              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Dosis, seguridad y fuentes</p>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
-                Cada medicamento mantiene pauta, ajustes y bibliografía en la misma línea visual.
-              </p>
-            </div>
           </div>
         </DetailPanel>
       </section>
@@ -922,21 +909,15 @@ const ProtocolsView = ({ onBack, onModuleOpen }) => {
     <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
       <BackBar label="Inicio" onClick={onBack} />
 
-      <PageHero
-        eyebrow="Protocolos activos"
-        title="Protocolos"
-        note="Vista corta y limpia para abrir los recorridos clínicos operativos sin sensación de panel administrativo."
-        aside={<StatusBadge tone="active">{activeModules.length} activos</StatusBadge>}
-      />
+      <PageHero title="Protocolos" />
 
-      <DetailPanel title="Lista activa" note="Abre el protocolo solo cuando lo necesites y vuelve al contexto anterior sin fricción.">
+      <DetailPanel title="Protocolos">
         <div className="space-y-2">
           {activeModules.map((module) => (
             <ListActionRow
               key={module.id}
               title={module.title}
               meta={module.summary}
-              badge={<StatusBadge tone="active">Activo</StatusBadge>}
               onClick={() => onModuleOpen(module.id)}
             />
           ))}
@@ -963,6 +944,16 @@ const FibrilacionAuricularFlowView = ({
   const controlMedicationIds = structuralHeartDisease ? ['digoxina', 'amiodarona'] : ['metoprolol', 'verapamilo'];
   const preventionMedicationIds = ['apixaban', 'acenocumarol'];
   const quickCalculationIds = ['cha2ds2-vasc', 'has-bled', 'cockcroft-gault'];
+  const flowFocus = getFaFlowFocus({ step, stability, duration });
+  const timingLabel = duration === 'lt48' ? '< 48 h' : '> 48 h o desconocida';
+  const structuralLabel = structuralHeartDisease ? 'Con cardiopatía estructural significativa' : 'Sin cardiopatía estructural significativa';
+  const rateControlText = structuralHeartDisease
+    ? 'Prioriza digoxina. Reserva amiodarona si necesitas apoyo.'
+    : 'Prioriza betabloqueante o verapamilo/diltiazem según perfil clínico.';
+  const cardioversionText =
+    duration === 'lt48'
+      ? 'Tras controlar síntomas y frecuencia, puedes plantear cardioversión farmacológica o eléctrica.'
+      : 'Necesita anticoagulación previa o ETE antes de la cardioversión.';
 
   const updateFlow = (changes) => {
     onFaFlowChange(changes);
@@ -974,21 +965,19 @@ const FibrilacionAuricularFlowView = ({
       <FlowHeader
         eyebrow="Protocolo FA"
         title={protocol.longTitle ?? protocol.title}
-        note="Flujo clínico breve para decidir conducta inmediata sin abrir bloques largos ni perder contexto."
         step={step}
         totalSteps={4}
         steps={['Estabilidad', 'Contexto', 'Conducta', 'Ictus']}
+        current={flowFocus.current}
+        decision={flowFocus.decision}
+        next={flowFocus.next}
         onBack={onBack}
         onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle
-            eyebrow="Paso 1"
-            title="Estabilidad hemodinámica"
-            note="Evalúa shock, edema agudo de pulmón o síndrome coronario agudo antes de decidir el resto."
-          />
+          <SectionTitle eyebrow="Paso 1" title="Estabilidad hemodinámica" note="Decide si hay inestabilidad." />
           <div className="grid gap-4">
             <FlowChoiceCard
               icon={ShieldAlert}
@@ -1021,7 +1010,7 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 2 && stability === 'stable' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 2" title="Contexto del episodio" note="Completa las dos variables antes de pasar a la conducta." />
+          <SectionTitle eyebrow="Paso 2" title="Contexto del episodio" note="Define duración y cardiopatía estructural." />
 
           <div className="space-y-6">
             <div>
@@ -1067,162 +1056,162 @@ const FibrilacionAuricularFlowView = ({
       ) : null}
 
       {step === 2 && stability === 'unstable' ? (
-        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-          <FlowActionCard
-            title="Conducta inmediata: cardioversión eléctrica urgente"
-            body="Prioridad absoluta: estabilización hemodinámica. La fibrilación rápida inestable no debe esperar a un desarrollo largo del protocolo."
-            tone="critical"
-          >
-            <div className="space-y-3">
-              <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
-                <p className="eyebrow text-[rgba(255,244,238,0.72)]">Preprocedimiento</p>
-                <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
-                  Analgesia y sedación. Si el paciente toma digoxina, considera iniciar con menor energía y evita cardioversión si sospechas intoxicación digitálica.
-                </p>
-              </div>
-              <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
-                <p className="eyebrow text-[rgba(255,244,238,0.72)]">Anticoagulación aguda</p>
-                <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
-                  Si no está anticoagulado, plantea HBPM terapéutica en fase aguda y documenta el plan de continuación.
-                </p>
-              </div>
-              <div className="space-y-2">
-                {['enoxaparina', 'amiodarona'].map((medicationId) => (
-                  <MedicationQuickRow
-                    key={medicationId}
-                    medication={getMedication(medicationId)}
-                    onOpen={() => onMedicationOpen(medicationId)}
-                  />
-                ))}
-              </div>
+        <section className={`${panelClass} animate-in fade-in slide-in-from-top-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 2" title="FA inestable" note="Actúa ahora." />
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Clasificación" tone="critical">
+              <p className="font-semibold text-[var(--danger-700)]">Inestabilidad hemodinámica.</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Conducta inmediata" tone="critical">
+              <p className="font-semibold text-[var(--danger-700)]">Cardioversión eléctrica urgente.</p>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Preprocedimiento" tone="critical">
+              Analgesia y sedación. Si el paciente toma digoxina, considera iniciar con menor energía y evita cardioversión si sospechas intoxicación digitálica.
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Anticoagulación aguda" tone="critical">
+              Si no está anticoagulado, plantea HBPM terapéutica en fase aguda y documenta el plan de continuación.
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Tratamiento relacionado</p>
+            <div className="space-y-2">
+              {['enoxaparina', 'amiodarona'].map((medicationId) => (
+                <MedicationQuickRow
+                  key={medicationId}
+                  medication={getMedication(medicationId)}
+                  onOpen={() => onMedicationOpen(medicationId)}
+                />
+              ))}
             </div>
-          </FlowActionCard>
+          </div>
 
           <div className="flex flex-wrap gap-3">
             <button type="button" onClick={onFaFlowReset} className={subtleButtonClass}>
-              Reevaluar estabilidad
+              Reiniciar
             </button>
             <button type="button" onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
               <Calculator className="h-4 w-4" />
               Ir a prevención de ictus
             </button>
           </div>
-        </div>
+        </section>
       ) : null}
 
       {step === 3 && stability === 'stable' ? (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <section className={`${panelClass} overflow-hidden p-0`}>
-            <div className="border-b border-[color:var(--line)] bg-[rgba(247,241,226,0.78)] px-5 py-5 sm:px-6">
-              <p className="eyebrow">Paso 3</p>
-              <h3 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[var(--text)]">Conducta inicial</h3>
-              <p className="mt-2 text-sm text-[var(--text-soft)]">
-                Objetivo operativo: control de frecuencia y definición de cardioversión.
-              </p>
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title="Conducta" note="Clasifica el caso y trata." />
+
+          <div className="grid gap-3 lg:grid-cols-3">
+            <ProtocolGuideBlock label="Caso" tone="accent">
+              <p className="font-semibold text-[var(--text)]">{timingLabel}</p>
+              <p className="mt-1">{structuralLabel}.</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Conducta inmediata">
+              <p className="font-semibold text-[var(--text)]">Control de frecuencia.</p>
+              <p className="mt-1">{rateControlText}</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Cardioversión" tone={duration === 'lt48' ? 'accent' : 'warning'}>
+              <p className="font-semibold text-[var(--text)]">{duration === 'lt48' ? 'Urgente' : 'Electiva / diferida'}</p>
+              <p className="mt-1">{cardioversionText}</p>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Tratamiento</p>
+            <div className="space-y-2">
+              {controlMedicationIds.map((medicationId) => (
+                <MedicationQuickRow
+                  key={medicationId}
+                  medication={getMedication(medicationId)}
+                  onOpen={() => onMedicationOpen(medicationId)}
+                />
+              ))}
             </div>
+          </div>
 
-            <div className="space-y-5 px-5 py-5 sm:px-6">
-              <div className={`${mutedPanelClass} px-4 py-4`}>
-                <p className="flex items-center gap-2 text-sm font-semibold text-[var(--text)]">
-                  <Info className="h-4 w-4 text-[var(--accent-500)]" />
-                  {structuralHeartDisease
-                    ? 'Con cardiopatía estructural significativa'
-                    : 'Sin cardiopatía estructural significativa'}
-                </p>
-                <p className="mt-2 text-sm text-[var(--text-soft)]">
-                  {structuralHeartDisease
-                    ? 'Prioriza digoxina para control de frecuencia y reserva amiodarona como apoyo si la situación lo exige.'
-                    : 'Prioriza betabloqueante o verapamilo/diltiazem según perfil clínico y tolerancia.'}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                {controlMedicationIds.map((medicationId) => (
-                  <MedicationQuickRow
-                    key={medicationId}
-                    medication={getMedication(medicationId)}
-                    onOpen={() => onMedicationOpen(medicationId)}
-                  />
-                ))}
-              </div>
-
-              <FlowActionCard
-                title={duration === 'lt48' ? 'Control del ritmo: cardioversión urgente' : 'Control del ritmo: cardioversión electiva'}
-                body={
-                  duration === 'lt48'
-                    ? 'Si el episodio es menor de 48 horas, puedes plantear cardioversión farmacológica o eléctrica tras controlar síntomas y revisar el contexto clínico.'
-                    : 'Si el episodio supera 48 horas o la duración es desconocida, necesita anticoagulación previa o ETE antes de la cardioversión.'
-                }
-                tone={duration === 'lt48' ? 'neutral' : 'warning'}
-              >
-                <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => onMedicationOpen('amiodarona')} className={subtleButtonClass}>
-                    Abrir amiodarona
-                  </button>
-                  <button type="button" onClick={onMedicationsHub} className={subtleButtonClass}>
-                    Ver fármacos
-                  </button>
-                </div>
-              </FlowActionCard>
-
-              <div className="rounded-[1.2rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.92)] px-4 py-3 text-sm text-[var(--text-soft)]">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-500)]" />
-                  <span>{protocol.warnings[0]}</span>
-                </div>
-              </div>
-            </div>
-          </section>
+          <div className="mt-4 grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
+            <ProtocolGuideBlock label="Siguiente">
+              Valora prevención de ictus cuando hayas resuelto la conducta inmediata.
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Advertencia" tone="warning">
+              {protocol.warnings[0]}
+            </ProtocolGuideBlock>
+          </div>
 
           <div className="flex flex-wrap gap-3">
             <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
-              Volver al contexto
+              Volver
             </button>
             <button type="button" onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
               <Calculator className="h-4 w-4" />
               Evaluar riesgo embólico
             </button>
           </div>
-        </div>
+        </section>
       ) : null}
 
       {step === 4 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle
-            eyebrow="Paso 4"
-            title="Prevención de ictus"
-            note="Abre las escalas y enlaza la estrategia de anticoagulación sin salir de la arquitectura general."
-          />
+          <SectionTitle eyebrow="Paso 4" title="Prevención de ictus" note="Decide anticoagulación." />
 
-          <div className="rounded-[1.35rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.9)] px-5 py-5">
-            <p className="eyebrow">Criterio operativo</p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
-              Anticoagulación oral si CHA2DS2-VASc es igual o mayor de 1 en hombres o igual o mayor de 2 en mujeres. Si no hay prótesis valvular mecánica ni estenosis mitral moderada/grave, prioriza ACOD.
-            </p>
+          <div className="grid gap-3 lg:grid-cols-[1.06fr_0.94fr]">
+            <ProtocolGuideBlock label="Conducta" tone="accent">
+              <p className="font-semibold text-[var(--text)]">
+                Anticoagulación oral si CHA2DS2-VASc es igual o mayor de 1 en hombres o igual o mayor de 2 en mujeres.
+              </p>
+              <p className="mt-1">
+                Si no hay prótesis valvular mecánica ni estenosis mitral moderada/grave, prioriza ACOD.
+              </p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Advertencia" tone="warning">
+              {protocol.warnings[2]}
+            </ProtocolGuideBlock>
           </div>
 
-          <div className="mt-4 space-y-2">
-            {quickCalculationIds.map((calculatorId) => {
-              const calculator = getCalculator(calculatorId);
-              return (
-                <ListActionRow
-                  key={calculatorId}
-                  title={calculator.title}
-                  meta={calculator.summary}
-                  onClick={() => onCalculatorOpen(calculatorId)}
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Cálculos</p>
+            <div className="space-y-2">
+              {quickCalculationIds.map((calculatorId) => {
+                const calculator = getCalculator(calculatorId);
+                return (
+                  <ListActionRow
+                    key={calculatorId}
+                    title={calculator.title}
+                    meta={calculator.summary}
+                    onClick={() => onCalculatorOpen(calculatorId)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+            <div className="grid gap-2 lg:grid-cols-2">
+              {preventionMedicationIds.map((medicationId) => (
+                <MedicationQuickRow
+                  key={medicationId}
+                  medication={getMedication(medicationId)}
+                  onOpen={() => onMedicationOpen(medicationId)}
                 />
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          <div className="mt-4 grid gap-2 lg:grid-cols-2">
-            {preventionMedicationIds.map((medicationId) => (
-              <MedicationQuickRow
-                key={medicationId}
-                medication={getMedication(medicationId)}
-                onOpen={() => onMedicationOpen(medicationId)}
-              />
-            ))}
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Advertencias</p>
+            <div className="space-y-2">
+              {protocol.warnings.slice(1).map((warning) => (
+                <div key={warning} className={`${mutedPanelClass} px-4 py-3 text-sm text-[var(--text-soft)]`}>
+                  {warning}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -1250,7 +1239,6 @@ const HipertensionUrgenciasFlowView = ({
   htaFlowState,
   onHtaFlowChange,
   onHtaFlowReset,
-  onCalculationsHub,
   onMedicationOpen,
   onMedicationsHub,
   onBack,
@@ -1287,6 +1275,7 @@ const HipertensionUrgenciasFlowView = ({
             };
 
   const classification = hasTargetOrganDamage === null ? null : hasTargetOrganDamage ? 'emergencia' : 'urgencia';
+  const flowFocus = getHtaFlowFocus({ step, hasTargetOrganDamage });
 
   const updateFlow = (changes) => {
     onHtaFlowChange(changes);
@@ -1298,21 +1287,19 @@ const HipertensionUrgenciasFlowView = ({
       <FlowHeader
         eyebrow="Protocolo HTA"
         title={protocol.longTitle ?? protocol.title}
-        note="Flujo breve para separar urgencia de emergencia hipertensiva y decidir la conducta inicial con la menor fricción posible."
         step={step}
         totalSteps={4}
         steps={['Presión', 'Daño diana', 'Tipo', 'Conducta']}
+        current={flowFocus.current}
+        decision={flowFocus.decision}
+        next={flowFocus.next}
         onBack={onBack}
         onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle
-            eyebrow="Paso 1"
-            title="Registro de presión arterial"
-            note="Introduce PAS y PAD antes de decidir si el cuadro es leve, moderado o grave."
-          />
+          <SectionTitle eyebrow="Paso 1" title="Registro de presión arterial" note="Introduce PAS y PAD." />
 
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-2">
@@ -1355,11 +1342,7 @@ const HipertensionUrgenciasFlowView = ({
 
       {step === 2 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle
-            eyebrow="Paso 2"
-            title="Cribado de daño de órgano diana"
-            note="Busca datos clínicos de afectación neurológica, cardiovascular, renal, visual o gestacional."
-          />
+          <SectionTitle eyebrow="Paso 2" title="Daño de órgano diana" note="Decide si hay emergencia hipertensiva." />
 
           <div className="space-y-2">
             {[
@@ -1379,14 +1362,14 @@ const HipertensionUrgenciasFlowView = ({
             <FlowChoiceCard
               icon={ShieldAlert}
               title="Sí, hay daño de órgano diana"
-              note="Clasifica como emergencia hipertensiva y prepara monitorización con tratamiento intravenoso."
+              note="Emergencia hipertensiva."
               tone="critical"
               onClick={() => updateFlow({ hasTargetOrganDamage: true, step: 3 })}
             />
             <FlowChoiceCard
               icon={Activity}
               title="No, no hay daño agudo de órgano"
-              note="Clasifica como urgencia hipertensiva y plantea descenso gradual con vía oral."
+              note="Urgencia hipertensiva."
               onClick={() => updateFlow({ hasTargetOrganDamage: false, step: 3 })}
             />
           </div>
@@ -1400,123 +1383,100 @@ const HipertensionUrgenciasFlowView = ({
       ) : null}
 
       {step === 3 ? (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          {classification === 'emergencia' ? (
-            <FlowActionCard
-              title="Clasificación: emergencia hipertensiva"
-              body="Existe daño agudo de órgano diana. Requiere monitorización y descenso controlado de la presión arterial en 1-2 horas."
-              tone="critical"
-            >
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
-                  <p className="eyebrow text-[rgba(255,244,238,0.72)]">Objetivo</p>
-                  <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
-                    Reducir en torno al 20-25% de la presión arterial media en el intervalo inicial, salvo matices según el órgano afectado.
-                  </p>
-                </div>
-                <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
-                  <p className="eyebrow text-[rgba(255,244,238,0.72)]">Entorno</p>
-                  <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
-                    Monitorización continua, vía venosa y reevaluación periódica del estado neurológico, cardiopulmonar y renal.
-                  </p>
-                </div>
-              </div>
-            </FlowActionCard>
-          ) : (
-            <FlowActionCard
-              title="Clasificación: urgencia hipertensiva"
-              body="No hay daño agudo de órgano diana. El descenso de la presión debe ser progresivo y la vía oral suele ser suficiente."
-              tone="warning"
-            >
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.15rem] border border-[rgba(191,146,69,0.22)] bg-[rgba(255,255,255,0.68)] px-4 py-3">
-                  <p className="eyebrow">Objetivo</p>
-                  <p className="mt-2 text-sm text-[var(--text-soft)]">
-                    Descenso gradual en 24-48 h, evitando caídas bruscas y sin perseguir normalización inmediata.
-                  </p>
-                </div>
-                <div className="rounded-[1.15rem] border border-[rgba(191,146,69,0.22)] bg-[rgba(255,255,255,0.68)] px-4 py-3">
-                  <p className="eyebrow">Medidas generales</p>
-                  <p className="mt-2 text-sm text-[var(--text-soft)]">
-                    Reposo en ambiente tranquilo, control del dolor o ansiedad y nueva toma de tensión antes de escalar el tratamiento.
-                  </p>
-                </div>
-              </div>
-            </FlowActionCard>
-          )}
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title="Clasificación" note="Define urgencia o emergencia." />
 
-          <div className="flex flex-wrap gap-3">
+          <div className="grid gap-3 lg:grid-cols-3">
+            <ProtocolGuideBlock label="Cifra">
+              <p className="font-semibold text-[var(--text)]">{pressureStage.label}</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Daño de órgano diana" tone={classification === 'emergencia' ? 'critical' : 'accent'}>
+              <p className="font-semibold text-[var(--text)]">{classification === 'emergencia' ? 'Sí' : 'No'}</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Caso" tone={classification === 'emergencia' ? 'critical' : 'warning'}>
+              <p className="font-semibold text-[var(--text)]">
+                {classification === 'emergencia' ? 'Emergencia hipertensiva' : 'Urgencia hipertensiva'}
+              </p>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Conducta inmediata" tone={classification === 'emergencia' ? 'critical' : 'warning'}>
+              {classification === 'emergencia'
+                ? 'Monitorización y descenso controlado de la presión arterial en 1-2 horas.'
+                : 'Descenso progresivo de la presión arterial. La vía oral suele ser suficiente.'}
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label={classification === 'emergencia' ? 'Objetivo' : 'Medidas generales'}>
+              {classification === 'emergencia'
+                ? 'Reducir en torno al 20-25% de la presión arterial media en el intervalo inicial, salvo matices según el órgano afectado.'
+                : 'Reposo, control del dolor o ansiedad y nueva toma antes de intensificar el tratamiento.'}
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
               Volver
             </button>
             <button type="button" onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
-              Ir a conducta
+              Ir a tratamiento
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
-        </div>
+        </section>
       ) : null}
 
       {step === 4 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
           <SectionTitle
             eyebrow="Paso 4"
-            title={classification === 'emergencia' ? 'Conducta terapéutica de emergencia' : 'Conducta terapéutica de urgencia'}
-            note={
-              classification === 'emergencia'
-                ? 'Tratamiento intravenoso titulado y monitorizado.'
-                : 'Tratamiento oral corto y reevaluación posterior.'
-            }
+            title={classification === 'emergencia' ? 'Tratamiento de emergencia' : 'Tratamiento de urgencia'}
+            note={classification === 'emergencia' ? 'Empieza tratamiento intravenoso.' : 'Empieza tratamiento oral y reevaluación.'}
           />
 
-          {classification === 'emergencia' ? (
-            <div className="space-y-4">
-              <div className="rounded-[1.25rem] border border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.9)] px-4 py-4 text-sm text-[var(--danger-700)]">
-                Prioriza tratamiento intravenoso y monitorización continua. Si el contexto es coronario o edema agudo de pulmón, la nitroglicerina gana peso; si es HTA maligna o encefalopatía, el capítulo prioriza nitroprusiato.
-              </div>
+          <div className="grid gap-3 lg:grid-cols-[1.05fr_0.95fr]">
+            <ProtocolGuideBlock label="Conducta" tone={classification === 'emergencia' ? 'critical' : 'warning'}>
+              {classification === 'emergencia'
+                ? 'Prioriza tratamiento intravenoso y monitorización continua. Si el contexto es coronario o edema agudo de pulmón, la nitroglicerina gana peso; si es HTA maligna o encefalopatía, prioriza nitroprusiato.'
+                : 'Reposo, reevaluación tras 30 min y corrección de desencadenantes antes de intensificar fármacos.'}
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Advertencia" tone="warning">
+              {classification === 'emergencia' ? protocol.warnings[1] : protocol.warnings[0]}
+            </ProtocolGuideBlock>
+          </div>
 
-              <div className="space-y-2">
-                {['nitroprusiato', 'labetalol', 'nitroglicerina'].map((medicationId) => (
-                  <MedicationQuickRow
-                    key={medicationId}
-                    medication={getMedication(medicationId)}
-                    onOpen={() => onMedicationOpen(medicationId)}
-                  />
-                ))}
-              </div>
-
-              <div className="rounded-[1.2rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.9)] px-4 py-3 text-sm text-[var(--text-soft)]">
-                La bibliografía base cita urapidil como alternativa intravenosa, pero el flujo rápido se centra aquí en los fármacos que ya quedan conectados a fichas completas.
-              </div>
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Tratamiento</p>
+            <div className="space-y-2">
+              {(classification === 'emergencia'
+                ? ['nitroprusiato', 'labetalol', 'nitroglicerina']
+                : ['captopril', 'labetalol', 'amlodipino']
+              ).map((medicationId) => (
+                <MedicationQuickRow
+                  key={medicationId}
+                  medication={getMedication(medicationId)}
+                  onOpen={() => onMedicationOpen(medicationId)}
+                />
+              ))}
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-[rgba(245,240,232,0.88)] px-4 py-4 text-sm text-[var(--text-soft)]">
-                Reposo, reevaluación tras 30 min y corrección de desencadenantes como dolor, ansiedad o incumplimiento terapéutico antes de intensificar fármacos.
-              </div>
+          </div>
 
-              <div className="space-y-2">
-                {['captopril', 'labetalol', 'amlodipino'].map((medicationId) => (
-                  <MedicationQuickRow
-                    key={medicationId}
-                    medication={getMedication(medicationId)}
-                    onOpen={() => onMedicationOpen(medicationId)}
-                  />
-                ))}
-              </div>
-
-              <div className="rounded-[1.2rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.9)] px-4 py-3 text-sm text-[var(--text-soft)]">
-                No usar nifedipino sublingual por riesgo de hipotensión brusca e hipoperfusión.
-              </div>
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Advertencias</p>
+            <div className="space-y-2">
+              {(classification === 'emergencia'
+                ? [protocol.warnings[1], protocol.warnings[2]]
+                : [protocol.warnings[0], protocol.warnings[2]]
+              ).map((warning) => (
+                <div key={warning} className={`${mutedPanelClass} px-4 py-3 text-sm text-[var(--text-soft)]`}>
+                  {warning}
+                </div>
+              ))}
             </div>
-          )}
+          </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
               Volver
-            </button>
-            <button type="button" onClick={onCalculationsHub} className={subtleButtonClass}>
-              Abrir cálculos
             </button>
             <button type="button" onClick={onMedicationsHub} className={subtleButtonClass}>
               Abrir medicamentos
@@ -1542,14 +1502,9 @@ const CalculationsView = ({ onBack, onCalculatorOpen }) => (
   <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
     <BackBar label="Inicio" onClick={onBack} />
 
-    <PageHero
-      eyebrow="Herramientas rápidas"
-      title="Cálculos"
-      note="Escalas clínicas visibles, compactas y listas para abrir sin añadir ruido a la home."
-      aside={<StatusBadge tone="active">{implementedCalculators.length} activos</StatusBadge>}
-    />
+    <PageHero title="Cálculos" />
 
-    <DetailPanel title="Disponibles" note="Las mismas escalas pueden abrirse desde FA en modo rápido.">
+    <DetailPanel title="Cálculos">
       <div className="space-y-2">
         {implementedCalculators.map((calculator) => (
           <ListActionRow
@@ -1572,16 +1527,12 @@ const CalculatorDetailView = ({ calculatorId, values, onChange, onBack }) => {
       <BackBar label="Cálculos" onClick={onBack} />
 
       <PageHero
-        eyebrow="Escala activa"
         title={calculator.title}
         note={calculator.summary}
         aside={
-          <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge tone="active">Implementado</StatusBadge>
-            <span className="text-sm text-[var(--text-muted)]">
-              {calculator.chapter} · p. {calculator.verifiedPage}
-            </span>
-          </div>
+          <span className="text-sm text-[var(--text-muted)]">
+            {calculator.chapter} · p. {calculator.verifiedPage}
+          </span>
         }
       />
 
@@ -1599,16 +1550,7 @@ const MedicationsView = ({ onBack, onMedicationOpen }) => {
     <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
       <BackBar label="Inicio" onClick={onBack} />
 
-      <PageHero
-        eyebrow="Fármacos conectados"
-        title="Medicamentos"
-        note="Las fichas mantienen la información clínica completa, pero la entrada principal se simplifica en grupos claros y más ligeros."
-        aside={
-          <StatusBadge tone="active">
-            {medicationGroups.reduce((count, group) => count + group.items.length, 0)} fichas
-          </StatusBadge>
-        }
-      >
+      <PageHero title="Medicamentos">
         <div className="mt-1 flex gap-2 overflow-x-auto pb-1">
           {medicationGroups.map((group) => (
             <ProtocolSectionButton
@@ -1621,10 +1563,7 @@ const MedicationsView = ({ onBack, onMedicationOpen }) => {
         </div>
       </PageHero>
 
-      <DetailPanel
-        title={currentGroup.title}
-        note="Desde aquí puedes abrir la ficha completa y volver al contexto anterior."
-      >
+      <DetailPanel title={currentGroup.title}>
         <div className="space-y-2">
           {currentGroup.items.map((medicationId) => {
             const medication = getMedication(medicationId);
@@ -1651,7 +1590,6 @@ const MedicationDetailView = ({ medication, onBack }) => {
       <BackBar label="Medicamentos" onClick={onBack} />
 
       <PageHero
-        eyebrow="Ficha farmacológica"
         title={medication.name}
         note={medication.indication}
         aside={
@@ -1850,7 +1788,6 @@ const App = () => {
             htaFlowState={htaFlowState}
             onHtaFlowChange={updateHtaFlow}
             onHtaFlowReset={resetHtaFlow}
-            onCalculationsHub={() => openCalculations(protocolReturnTo)}
             onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
             onMedicationsHub={() => openMedications(protocolReturnTo)}
             onBack={handleBack}
