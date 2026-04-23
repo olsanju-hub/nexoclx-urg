@@ -8,11 +8,11 @@ import {
   ChevronRight,
   ClipboardList,
   ExternalLink,
+  HeartPulse,
   Info,
   LayoutDashboard,
   Pill,
   ShieldAlert,
-  Zap,
 } from 'lucide-react';
 import { buildReferenceHref } from './data/bibliography';
 import {
@@ -28,17 +28,21 @@ import { getProtocol } from './data/protocols';
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
 
-const shellBackground = {
-  backgroundImage: 'linear-gradient(180deg, #f7fafc 0%, #eef3f7 100%)',
-};
+const shellCardClass = 'shell-card';
+const panelClass = 'floating-panel';
+const mutedPanelClass = 'tonal-panel';
+const subtleButtonClass = 'soft-button';
+const primaryButtonClass = 'accent-button';
+const ghostButtonClass = 'ghost-button';
+const inputClass = 'app-input';
+const listRowClass = 'list-row group';
 
-const shellCardClass =
-  'rounded-[2rem] border border-slate-200/80 bg-white shadow-[0_28px_70px_-48px_rgba(15,23,42,0.55)]';
-const panelClass =
-  'rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_20px_45px_-40px_rgba(15,23,42,0.45)]';
-const mutedPanelClass = 'rounded-[1.35rem] border border-slate-200/80 bg-slate-50/90';
-const subtleButtonClass =
-  'inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:text-slate-950';
+const primaryNavItems = [
+  { key: 'home', label: 'Inicio', icon: LayoutDashboard },
+  { key: 'protocols', label: 'Protocolos', icon: ClipboardList },
+  { key: 'calculations', label: 'Cálculos', icon: Calculator },
+  { key: 'medications', label: 'Fármacos', icon: Pill },
+];
 
 const initialCalculatorInputs = {
   'cha2ds2-vasc': {
@@ -83,7 +87,6 @@ const initialHtaFlowState = {
   hasTargetOrganDamage: null,
 };
 
-const formatReference = (item) => `${item.chapter} · p. ${item.verifiedPage}`;
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
 
 const getCalculatorResult = (calculatorId, values) => {
@@ -160,14 +163,25 @@ const getPageLabel = (route) => {
   return 'Inicio clínico';
 };
 
+const BrandLockup = ({ label }) => (
+  <div className="flex min-w-0 items-center gap-3">
+    <img src={brandMark} alt="NexoClx" className="h-11 w-11 rounded-[1.15rem] object-cover shadow-[0_18px_38px_-24px_rgba(78,58,20,0.34)]" />
+    <div className="min-w-0">
+      <div className="font-semibold tracking-[-0.04em] text-[var(--text)]">
+        <span>Nexo</span>
+        <span className="text-[var(--accent-500)]">Clx</span>
+      </div>
+      {label ? <p className="truncate pt-0.5 text-xs font-medium text-[var(--text-muted)]">{label}</p> : null}
+    </div>
+  </div>
+);
+
 const SectionTitle = ({ eyebrow, title, note, action = null }) => (
   <div className="mb-4 flex items-start justify-between gap-3">
-    <div>
-      {eyebrow ? (
-        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-slate-400">{eyebrow}</p>
-      ) : null}
-      <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">{title}</h2>
-      {note ? <p className="mt-1.5 text-sm text-slate-500">{note}</p> : null}
+    <div className="min-w-0">
+      {eyebrow ? <p className="eyebrow eyebrow-muted">{eyebrow}</p> : null}
+      <h2 className="mt-2 text-[1.15rem] font-semibold tracking-[-0.03em] text-[var(--text)]">{title}</h2>
+      {note ? <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p> : null}
     </div>
     {action}
   </div>
@@ -176,113 +190,89 @@ const SectionTitle = ({ eyebrow, title, note, action = null }) => (
 const StatusBadge = ({ children, tone = 'neutral' }) => {
   const toneClass =
     tone === 'active'
-      ? 'border-sky-200 bg-sky-50 text-sky-700'
+      ? 'status-badge status-badge-active'
       : tone === 'pending'
-        ? 'border-amber-200 bg-amber-50 text-amber-700'
-        : 'border-slate-200 bg-slate-100 text-slate-600';
+        ? 'status-badge status-badge-pending'
+        : tone === 'critical'
+          ? 'status-badge status-badge-critical'
+          : 'status-badge';
 
-  return (
-    <span
-      className={`inline-flex rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] ${toneClass}`}
-    >
-      {children}
-    </span>
-  );
+  return <span className={toneClass}>{children}</span>;
 };
 
-const AppHeader = ({ isScrolled, pageLabel, onHome }) => (
-  <header
-    className={`fixed left-0 right-0 top-0 z-40 border-b border-slate-200/80 bg-white/88 backdrop-blur-xl lg:left-24 ${
-      isScrolled ? 'shadow-[0_16px_45px_-40px_rgba(15,23,42,0.6)]' : ''
-    }`}
-  >
-    <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-      <button type="button" onClick={onHome} className="flex min-w-0 items-center gap-3 text-left">
-        <img src={brandMark} alt="NexoClx" className="h-9 w-9 rounded-2xl object-contain" />
-        <div className="min-w-0">
-          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-slate-400">NexoClx</p>
-          <p className="truncate text-sm font-semibold tracking-tight text-slate-950">{pageLabel}</p>
-        </div>
+const PageHero = ({ eyebrow, title, note, aside = null, children = null }) => (
+  <section className={`${shellCardClass} p-5 sm:p-6`}>
+    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <div className="min-w-0">
+        {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
+        <h1 className="mt-3 text-[1.95rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:text-[2.3rem]">
+          {title}
+        </h1>
+        {note ? <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p> : null}
+      </div>
+      {aside}
+    </div>
+    {children ? <div className="mt-5">{children}</div> : null}
+  </section>
+);
+
+const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
+  <header className={`fixed inset-x-0 top-0 z-40 border-b border-[color:var(--line)] bg-[rgba(248,243,236,0.88)] backdrop-blur-xl ${isScrolled ? 'shadow-[0_22px_44px_-36px_rgba(64,49,22,0.28)]' : ''}`}>
+    <div className="mx-auto flex h-[4.6rem] max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <button type="button" onClick={onHome} className="min-w-0 text-left">
+        <BrandLockup label={pageLabel} />
       </button>
 
-      <div className="hidden text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-400 sm:block">
-        App clínica
-      </div>
+      <nav className="ml-auto hidden items-center gap-1 rounded-full border border-[color:var(--line)] bg-[rgba(255,255,255,0.68)] p-1 shadow-[0_18px_36px_-28px_rgba(64,49,22,0.18)] lg:flex">
+        {primaryNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeKey === item.key;
+
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => onSelect(item.key)}
+              className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
+            >
+              <Icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   </header>
 );
 
-const PrimaryNavigation = ({ activeKey, onSelect }) => {
-  const items = [
-    { key: 'home', label: 'Inicio', icon: LayoutDashboard },
-    { key: 'protocols', label: 'Protocolos', icon: ClipboardList },
-    { key: 'calculations', label: 'Cálculos', icon: Calculator },
-    { key: 'medications', label: 'Fármacos', icon: Pill },
-  ];
+const PrimaryNavigation = ({ activeKey, onSelect }) => (
+  <nav className="mobile-nav lg:hidden">
+    <div className="grid grid-cols-4 gap-1">
+      {primaryNavItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = activeKey === item.key;
 
-  return (
-    <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.4rem)] pt-2 backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-4 gap-1">
-          {items.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeKey === item.key;
-
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => onSelect(item.key)}
-                className={`flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[0.62rem] font-semibold uppercase tracking-[0.16em] transition-colors ${
-                  isActive ? 'bg-sky-50 text-sky-800' : 'text-slate-400'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
-
-      <aside className="fixed bottom-0 left-0 top-0 z-50 hidden w-24 border-r border-slate-200/80 bg-white/90 backdrop-blur-xl lg:flex lg:flex-col lg:items-center lg:gap-8 lg:px-3 lg:py-6">
-        <button
-          type="button"
-          onClick={() => onSelect('home')}
-          className="flex flex-col items-center gap-2 rounded-[1.6rem] px-2 py-2 text-center text-sky-800"
-        >
-          <img src={brandMark} alt="NexoClx" className="h-11 w-11 rounded-[1.2rem] object-contain" />
-          <span className="text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-slate-400">NexoClx</span>
-        </button>
-
-        <div className="flex w-full flex-1 flex-col gap-2">
-          {items.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeKey === item.key;
-
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => onSelect(item.key)}
-                className={`flex w-full flex-col items-center gap-2 rounded-[1.4rem] px-2 py-3 text-center transition-colors ${
-                  isActive ? 'bg-sky-50 text-sky-800' : 'text-slate-400 hover:text-slate-700'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-[0.62rem] font-semibold uppercase tracking-[0.18em]">{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </aside>
-    </>
-  );
-};
+        return (
+          <button
+            key={item.key}
+            type="button"
+            onClick={() => onSelect(item.key)}
+            className={`mobile-nav-pill ${isActive ? 'mobile-nav-pill-active' : ''}`}
+          >
+            <span className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
+              <Icon className="h-[1.125rem] w-[1.125rem]" />
+            </span>
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  </nav>
+);
 
 const BackBar = ({ label = 'Volver', onClick, action = null }) => (
   <div className="mb-4 flex items-center justify-between gap-3">
-    <button type="button" onClick={onClick} className={subtleButtonClass}>
+    <button type="button" onClick={onClick} className={ghostButtonClass}>
       <ArrowLeft className="h-4 w-4" />
       {label}
     </button>
@@ -298,154 +288,68 @@ const DetailPanel = ({ title, note, action = null, children, eyebrow = null }) =
 );
 
 const ListActionRow = ({ title, meta, onClick, badge = null }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="group flex w-full items-center justify-between gap-3 rounded-[1.2rem] border border-slate-200/80 bg-white px-4 py-3 text-left transition-colors hover:border-slate-300 hover:bg-slate-50"
-  >
+  <button type="button" onClick={onClick} className={listRowClass}>
     <div className="min-w-0">
-      <div className="flex min-w-0 items-center gap-2">
-        <p className="truncate text-sm font-semibold text-slate-900">{title}</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="truncate text-sm font-semibold text-[var(--text)]">{title}</p>
         {badge}
       </div>
-      {meta ? <p className="mt-1 truncate text-xs text-slate-500">{meta}</p> : null}
+      {meta ? <p className="mt-1 text-xs text-[var(--text-muted)]">{meta}</p> : null}
     </div>
-    <ChevronRight className="h-4 w-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5" />
+    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
   </button>
 );
 
-const HomeShortcutCard = ({ icon: Icon, title, meta, onClick, tone = 'light' }) => {
-  const toneClass =
-    tone === 'dark'
-      ? 'border-slate-950 bg-slate-950 text-white'
-      : tone === 'primary'
-        ? 'border-sky-200 bg-sky-50 text-slate-900'
-        : 'border-slate-200 bg-white text-slate-900';
+const HomeMetric = ({ label, value }) => (
+  <div className={`${mutedPanelClass} px-3.5 py-3`}>
+    <p className="eyebrow eyebrow-muted">{label}</p>
+    <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[var(--text)]">{value}</p>
+  </div>
+);
 
-  const iconClass =
-    tone === 'dark'
-      ? 'bg-white/10 text-white'
-      : tone === 'primary'
-        ? 'bg-white text-sky-700'
-        : 'bg-slate-100 text-slate-700';
-
-  const metaClass = tone === 'dark' ? 'text-slate-300' : 'text-slate-500';
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group flex min-h-[104px] flex-col justify-between rounded-[1.45rem] border px-4 py-4 text-left transition-colors hover:border-slate-300 ${toneClass}`}
-    >
-      <span className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl ${iconClass}`}>
-        <Icon className="h-5 w-5" />
-      </span>
-      <div className="pt-4">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-base font-semibold tracking-tight">{title}</p>
-          <ChevronRight
-            className={`h-4 w-4 transition-transform group-hover:translate-x-0.5 ${
-              tone === 'dark' ? 'text-white/60' : 'text-slate-300'
-            }`}
-          />
-        </div>
-        {meta ? <p className={`mt-1 text-xs ${metaClass}`}>{meta}</p> : null}
-      </div>
-    </button>
-  );
-};
-
-const ProtocolSectionButton = ({ label, active, onClick }) => (
+const QuickAccessCard = ({ icon: Icon, title, meta, onClick, tone = 'neutral' }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-      active
-        ? 'bg-slate-950 text-white'
-        : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-950'
+    className={`group flex items-start gap-3 rounded-[1.45rem] border px-4 py-4 text-left transition duration-200 hover:-translate-y-0.5 ${
+      tone === 'accent'
+        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.86)] shadow-[0_22px_44px_-34px_rgba(171,126,48,0.28)]'
+        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] shadow-[0_18px_38px_-30px_rgba(64,49,22,0.16)] hover:border-[rgba(191,146,69,0.24)]'
     }`}
   >
+    <span
+      className={`icon-well ${tone === 'accent' ? 'bg-[rgba(191,146,69,0.16)] text-[var(--accent-500)]' : ''}`}
+    >
+      <Icon className="h-[1.125rem] w-[1.125rem]" />
+    </span>
+    <div className="min-w-0 flex-1">
+      <p className="text-sm font-semibold text-[var(--text)]">{title}</p>
+      <p className="mt-1 text-xs leading-relaxed text-[var(--text-soft)]">{meta}</p>
+    </div>
+    <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
+  </button>
+);
+
+const ProtocolSectionButton = ({ label, active, onClick }) => (
+  <button type="button" onClick={onClick} className={`section-chip ${active ? 'section-chip-active' : ''}`}>
     {label}
   </button>
 );
 
-const SummaryActionCard = ({ title, action, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="flex min-h-[110px] flex-col justify-between rounded-[1.35rem] border border-slate-200/80 bg-white px-4 py-4 text-left transition-colors hover:border-sky-200 hover:bg-sky-50/50"
-  >
-    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">{title}</p>
-    <p className="text-sm font-medium leading-snug text-slate-900">{action}</p>
-  </button>
-);
-
-const DecisionCard = ({ card, onOpenCalculations, onOpenMedications }) => (
-  <section className={`${mutedPanelClass} p-4`}>
-    <div className="rounded-[1.1rem] border border-slate-200/80 bg-white px-4 py-3">
-      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">Situación</p>
-      <p className="mt-1.5 text-sm font-semibold text-slate-900">{card.situation}</p>
-    </div>
-    <div className="mt-3 rounded-[1.1rem] border border-slate-200/80 bg-white px-4 py-3">
-      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-sky-700">Qué hacer ahora</p>
-      <p className="mt-1.5 text-sm text-slate-800">{card.action}</p>
-    </div>
-    <div className="mt-3 rounded-[1.1rem] border border-slate-200/80 bg-white px-4 py-3">
-      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">Matiz clínico</p>
-      <p className="mt-1.5 text-sm text-slate-700">{card.nuance}</p>
-    </div>
-    <div className="mt-3 flex flex-wrap gap-2">
-      <button type="button" onClick={onOpenCalculations} className={subtleButtonClass}>
-        <Calculator className="h-4 w-4" />
-        Cálculos FA
-      </button>
-      <button type="button" onClick={onOpenMedications} className={subtleButtonClass}>
-        <Pill className="h-4 w-4" />
-        Fármacos
-      </button>
-    </div>
-  </section>
-);
-
 const MedicationQuickRow = ({ medication, onOpen }) => (
-  <button
-    type="button"
-    onClick={onOpen}
-    className="group flex w-full items-center justify-between gap-3 rounded-[1.2rem] border border-slate-200/80 bg-white px-4 py-3 text-left transition-colors hover:border-slate-300 hover:bg-slate-50"
-  >
+  <button type="button" onClick={onOpen} className={listRowClass}>
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-sm font-semibold text-slate-900">{medication.name}</p>
-        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-400">
+        <p className="text-sm font-semibold text-[var(--text)]">{medication.name}</p>
+        <span className="rounded-full bg-[rgba(191,146,69,0.12)] px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-500)]">
           {medication.family}
         </span>
       </div>
-      <p className="mt-1 text-xs text-slate-500">{compactSentence(medication.indication)}</p>
-      <p className="mt-1 text-xs text-slate-600">{compactSentence(medication.dose)}</p>
+      <p className="mt-1 text-xs text-[var(--text-muted)]">{compactSentence(medication.indication)}</p>
+      <p className="mt-1 text-xs text-[var(--text-soft)]">{compactSentence(medication.dose)}</p>
     </div>
-    <ChevronRight className="h-4 w-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5" />
+    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
   </button>
-);
-
-const CalculatorQuickRow = ({ calculator, result, isOpen, onToggle, onOpenDetail }) => (
-  <div className={`${mutedPanelClass} p-4`}>
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-slate-900">{calculator.title}</p>
-        <p className="mt-1 text-xs text-slate-500">
-          {result ? `${result.value} ${result.unit} · ${result.interpretation}` : calculator.summary}
-        </p>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={onToggle} className={subtleButtonClass}>
-          {isOpen ? 'Ocultar' : 'Rápido'}
-        </button>
-        <button type="button" onClick={onOpenDetail} className={subtleButtonClass}>
-          Abrir
-        </button>
-      </div>
-    </div>
-  </div>
 );
 
 const BibliographyBlock = ({ entries }) => (
@@ -460,12 +364,12 @@ const BibliographyBlock = ({ entries }) => (
         <div key={entry.internalId} className={`${mutedPanelClass} p-4`}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-900">{entry.shortReference}</p>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="text-sm font-semibold text-[var(--text)]">{entry.shortReference}</p>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">
                 Libro: p. {entry.verifiedPages.join(', ')}
                 {entry.pdfPages.length > 0 ? ` · PDF: p. ${entry.pdfPages.join(', ')}` : ''}
               </p>
-              {entry.note ? <p className="mt-2 text-sm text-slate-600">{entry.note}</p> : null}
+              {entry.note ? <p className="mt-2 text-sm text-[var(--text-soft)]">{entry.note}</p> : null}
             </div>
             {entry.href ? (
               <a href={entry.href} target="_blank" rel="noreferrer" className={subtleButtonClass}>
@@ -490,26 +394,26 @@ const SourceList = ({ sources }) => (
             href={source.url}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-between gap-3 rounded-[1rem] border border-slate-200/80 bg-white px-4 py-3 text-sm text-slate-700 transition-colors hover:border-slate-300 hover:text-slate-950"
+            className="list-row"
           >
-            <span>{source.label}</span>
-            <ExternalLink className="h-4 w-4 shrink-0 text-slate-300" />
+            <span className="text-sm text-[var(--text-soft)]">{source.label}</span>
+            <ExternalLink className="h-4 w-4 shrink-0 text-[var(--text-muted)]" />
           </a>
         );
       }
 
       return (
-        <div key={source.label} className="rounded-[1rem] border border-slate-200/80 bg-slate-50 px-4 py-3">
-          <p className="text-sm font-medium text-slate-900">{source.label}</p>
+        <div key={source.label} className={`${mutedPanelClass} p-4`}>
+          <p className="text-sm font-medium text-[var(--text)]">{source.label}</p>
           {source.bibliography?.note ? (
-            <p className="mt-1 text-xs text-slate-500">{source.bibliography.note}</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">{source.bibliography.note}</p>
           ) : null}
           {source.bibliography?.href ? (
             <a
               href={source.bibliography.href}
               target="_blank"
               rel="noreferrer"
-              className="mt-2 inline-flex items-center gap-2 text-xs font-medium text-sky-700"
+              className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-[var(--accent-500)]"
             >
               Abrir referencia
               <ExternalLink className="h-3.5 w-3.5" />
@@ -522,38 +426,41 @@ const SourceList = ({ sources }) => (
 );
 
 const BooleanField = ({ checked, label, onChange }) => (
-  <label className="flex items-center gap-3 rounded-[0.95rem] border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+  <label
+    className={`flex items-center gap-3 rounded-[1rem] border px-3.5 py-3 text-sm transition-colors ${
+      checked
+        ? 'border-[rgba(191,146,69,0.3)] bg-[rgba(247,241,226,0.82)] text-[var(--text)]'
+        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] text-[var(--text-soft)]'
+    }`}
+  >
     <input
       type="checkbox"
       checked={checked}
       onChange={(event) => onChange(event.target.checked)}
-      className="h-4 w-4 rounded border-slate-300 text-sky-700 focus:ring-sky-700"
+      className="h-4 w-4 rounded border-[color:var(--line-strong)]"
+      style={{ accentColor: 'var(--accent-500)' }}
     />
     <span>{label}</span>
   </label>
 );
 
 const NumberField = ({ value, label, placeholder, onChange }) => (
-  <label className="flex flex-col gap-1.5 text-sm text-slate-700">
+  <label className="flex flex-col gap-1.5 text-sm text-[var(--text-soft)]">
     <span>{label}</span>
     <input
       type="number"
       value={value}
       onChange={(event) => onChange(event.target.value)}
       placeholder={placeholder}
-      className="rounded-[0.95rem] border border-slate-200 bg-white px-3 py-2.5 text-slate-900 outline-none placeholder:text-slate-400 focus:border-sky-200"
+      className={inputClass}
     />
   </label>
 );
 
 const SelectField = ({ value, label, options, onChange }) => (
-  <label className="flex flex-col gap-1.5 text-sm text-slate-700">
+  <label className="flex flex-col gap-1.5 text-sm text-[var(--text-soft)]">
     <span>{label}</span>
-    <select
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      className="rounded-[0.95rem] border border-slate-200 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-sky-200"
-    >
+    <select value={value} onChange={(event) => onChange(event.target.value)} className={inputClass}>
       {options.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}
@@ -565,15 +472,15 @@ const SelectField = ({ value, label, options, onChange }) => (
 
 const CalculatorResult = ({ result }) =>
   result ? (
-    <div className="rounded-[1rem] border border-sky-200 bg-sky-50/80 px-4 py-3">
-      <p className="text-2xl font-semibold tracking-tight text-slate-950">
-        {result.value} <span className="text-sm font-medium text-slate-500">{result.unit}</span>
+    <div className="rounded-[1.15rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.9)] px-4 py-3">
+      <p className="text-2xl font-semibold tracking-[-0.04em] text-[var(--text)]">
+        {result.value} <span className="text-sm font-medium text-[var(--text-muted)]">{result.unit}</span>
       </p>
-      <p className="mt-1 text-sm text-slate-700">{result.interpretation}</p>
-      {result.caution ? <p className="mt-2 text-xs text-slate-500">{result.caution}</p> : null}
+      <p className="mt-1 text-sm text-[var(--text-soft)]">{result.interpretation}</p>
+      {result.caution ? <p className="mt-2 text-xs text-[var(--text-muted)]">{result.caution}</p> : null}
     </div>
   ) : (
-    <div className="rounded-[1rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+    <div className="rounded-[1.15rem] border border-[color:var(--line)] bg-[rgba(245,240,232,0.88)] px-4 py-3 text-sm text-[var(--text-muted)]">
       Completa los campos para obtener el resultado.
     </div>
   );
@@ -587,8 +494,8 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
     <section className={wrapperClass}>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold tracking-tight text-slate-950">{calculator.title}</h3>
-          <p className="mt-1 text-sm text-slate-500">{calculator.summary}</p>
+          <h3 className="text-sm font-semibold tracking-[-0.02em] text-[var(--text)]">{calculator.title}</h3>
+          <p className="mt-1 text-sm text-[var(--text-soft)]">{calculator.summary}</p>
         </div>
         {onOpenDetail ? (
           <button type="button" onClick={onOpenDetail} className={subtleButtonClass}>
@@ -601,12 +508,7 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
       {calculatorId === 'cha2ds2-vasc' ? (
         <div className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <NumberField
-              value={values.age}
-              label="Edad"
-              placeholder="Ej. 78"
-              onChange={(value) => onChange('age', value)}
-            />
+            <NumberField value={values.age} label="Edad" placeholder="Ej. 78" onChange={(value) => onChange('age', value)} />
             <SelectField
               value={values.sex}
               label="Sexo"
@@ -647,12 +549,7 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
       {calculatorId === 'has-bled' ? (
         <div className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <NumberField
-              value={values.age}
-              label="Edad"
-              placeholder="Ej. 78"
-              onChange={(value) => onChange('age', value)}
-            />
+            <NumberField value={values.age} label="Edad" placeholder="Ej. 78" onChange={(value) => onChange('age', value)} />
             <NumberField
               value={values.systolicBloodPressure}
               label="PAS máxima habitual"
@@ -680,12 +577,7 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
       {calculatorId === 'cockcroft-gault' ? (
         <div className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <NumberField
-              value={values.age}
-              label="Edad"
-              placeholder="Ej. 78"
-              onChange={(value) => onChange('age', value)}
-            />
+            <NumberField value={values.age} label="Edad" placeholder="Ej. 78" onChange={(value) => onChange('age', value)} />
             <SelectField
               value={values.sex}
               label="Sexo"
@@ -695,12 +587,7 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
               ]}
               onChange={(value) => onChange('sex', value)}
             />
-            <NumberField
-              value={values.weightKg}
-              label="Peso (kg)"
-              placeholder="Ej. 72"
-              onChange={(value) => onChange('weightKg', value)}
-            />
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 72" onChange={(value) => onChange('weightKg', value)} />
             <NumberField
               value={values.serumCreatinineMgDl}
               label="Creatinina sérica (mg/dL)"
@@ -715,77 +602,334 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
   );
 };
 
-const HomeView = ({ onProtocolsOpen, onFaOpen, onHtaOpen, onCalculationsOpen, onMedicationsOpen }) => (
-  <div className="mx-auto max-w-4xl space-y-3">
-    <button
-      type="button"
-      onClick={onProtocolsOpen}
-      className="group w-full rounded-[2rem] border border-slate-950 bg-slate-950 px-5 py-6 text-left text-white shadow-[0_28px_70px_-48px_rgba(15,23,42,0.8)] transition-colors hover:bg-slate-900 sm:px-6 sm:py-7"
-    >
-      <div className="flex items-start justify-between gap-4">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white">
-          <ClipboardList className="h-6 w-6" />
-        </span>
-        <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-white/55 transition-transform group-hover:translate-x-0.5" />
-      </div>
-      <div className="mt-7">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">Entrada principal</p>
-        <h1 className="mt-2 text-[1.9rem] font-semibold tracking-tight sm:text-[2.2rem]">Protocolos</h1>
-        <p className="mt-2 text-sm text-slate-300">Abrir protocolo activo y entrar directo en la conducta clínica.</p>
-      </div>
-    </button>
-
-    <section className="grid gap-3 sm:grid-cols-2">
-      <HomeShortcutCard
-        icon={Activity}
-        title="Fibrilación auricular"
-        meta="Abrir flujo FA"
-        onClick={onFaOpen}
-        tone="primary"
-      />
-      <HomeShortcutCard
-        icon={AlertCircle}
-        title="HTA en urgencias"
-        meta="Urgencia o emergencia"
-        onClick={onHtaOpen}
-      />
-      <HomeShortcutCard
-        icon={Calculator}
-        title="Cálculos"
-        meta="Abrir escalas activas"
-        onClick={onCalculationsOpen}
-      />
-      <HomeShortcutCard
-        icon={Pill}
-        title="Medicamentos"
-        meta="Abrir fichas activas"
-        onClick={onMedicationsOpen}
-      />
-    </section>
+const FlowStepChip = ({ index, label, active }) => (
+  <div className={`step-chip ${active ? 'step-chip-active' : ''}`}>
+    {index}. {label}
   </div>
 );
+
+const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral' }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`group flex w-full items-center gap-4 rounded-[1.55rem] border px-4 py-4 text-left transition duration-200 hover:-translate-y-0.5 sm:px-5 sm:py-5 ${
+      tone === 'critical'
+        ? 'border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.88)] hover:bg-[rgba(249,236,232,0.95)]'
+        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] hover:border-[rgba(191,146,69,0.24)]'
+    }`}
+  >
+    <span
+      className={`icon-well ${
+        tone === 'critical'
+          ? 'bg-[rgba(164,76,63,0.12)] text-[var(--danger-500)]'
+          : 'bg-[rgba(191,146,69,0.14)] text-[var(--accent-500)]'
+      }`}
+    >
+      <Icon className="h-5 w-5" />
+    </span>
+    <div className="min-w-0">
+      <p className={`text-sm font-semibold ${tone === 'critical' ? 'text-[var(--danger-700)]' : 'text-[var(--text)]'}`}>
+        {title}
+      </p>
+      <p className={`mt-1 text-xs leading-relaxed ${tone === 'critical' ? 'text-[var(--danger-600)]' : 'text-[var(--text-soft)]'}`}>
+        {note}
+      </p>
+    </div>
+    <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
+  </button>
+);
+
+const FlowSelectButton = ({ label, active, onClick }) => (
+  <button type="button" onClick={onClick} className={`choice-button ${active ? 'choice-button-active' : ''}`}>
+    {label}
+  </button>
+);
+
+const FlowActionCard = ({ title, body, tone = 'neutral', children = null }) => {
+  const toneClass =
+    tone === 'critical'
+      ? 'border-[rgba(164,76,63,0.22)] bg-[rgba(164,76,63,0.92)] text-white shadow-[0_28px_58px_-38px_rgba(139,57,44,0.42)]'
+      : tone === 'warning'
+        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.94)] text-[var(--text)]'
+        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.9)] text-[var(--text)]';
+
+  const bodyClass =
+    tone === 'critical'
+      ? 'text-[rgba(255,248,245,0.9)]'
+      : tone === 'warning'
+        ? 'text-[var(--text-soft)]'
+        : 'text-[var(--text-soft)]';
+
+  return (
+    <section className={`rounded-[1.7rem] border px-5 py-5 shadow-[0_24px_50px_-42px_rgba(64,49,22,0.2)] ${toneClass}`}>
+      <h3 className="text-lg font-semibold tracking-[-0.03em]">{title}</h3>
+      <p className={`mt-2 text-sm leading-relaxed ${bodyClass}`}>{body}</p>
+      {children ? <div className="mt-5">{children}</div> : null}
+    </section>
+  );
+};
+
+const FlowHeader = ({ eyebrow, title, note, step, totalSteps, steps, onBack, onOpenSource }) => (
+  <section className={`${shellCardClass} p-5 sm:p-6`}>
+    <div className="flex items-center justify-between gap-3">
+      <button type="button" onClick={onBack} className={ghostButtonClass}>
+        <ArrowLeft className="h-4 w-4" />
+        Cancelar
+      </button>
+      {onOpenSource ? (
+        <button type="button" onClick={onOpenSource} className={subtleButtonClass}>
+          <BookOpen className="h-4 w-4" />
+          Fuente
+        </button>
+      ) : null}
+    </div>
+
+    <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <div className="min-w-0">
+        <p className="eyebrow">{eyebrow}</p>
+        <h1 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:text-[2.15rem]">
+          {title}
+        </h1>
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p>
+      </div>
+      <div className={`${mutedPanelClass} min-w-[210px] px-4 py-4 xl:max-w-[240px]`}>
+        <p className="eyebrow eyebrow-muted">Paso {step} de {totalSteps}</p>
+        <div className="mt-3 h-2 rounded-full bg-[rgba(111,104,93,0.08)]">
+          <div className="progress-fill h-full rounded-full transition-all duration-300" style={{ width: `${(step / totalSteps) * 100}%` }} />
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-5 flex flex-wrap gap-2">
+      {steps.map((item, index) => (
+        <FlowStepChip key={item} index={index + 1} label={item} active={step === index + 1} />
+      ))}
+    </div>
+  </section>
+);
+
+const HomeView = ({
+  onProtocolsOpen,
+  onModuleOpen,
+  onCalculationsOpen,
+  onCalculatorOpen,
+  onMedicationsOpen,
+  onMedicationOpen,
+}) => {
+  const activeModules = motivoConsultaModules.filter((module) => module.implemented);
+  const featuredCalculators = implementedCalculators.slice(0, 3);
+  const featuredMedications = ['apixaban', 'labetalol', 'amiodarona'];
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-4 sm:space-y-5">
+      <section className="grid gap-4 xl:grid-cols-[1.25fr_0.95fr]">
+        <section className={`${shellCardClass} p-5 sm:p-6`}>
+          <p className="eyebrow">Biblioteca clínica rápida</p>
+          <div className="mt-4 flex flex-col gap-5">
+            <div className="flex items-start gap-3">
+              <img
+                src={brandMark}
+                alt="NexoClx"
+                className="mt-0.5 h-12 w-12 rounded-[1.2rem] object-cover shadow-[0_20px_44px_-28px_rgba(78,58,20,0.34)]"
+              />
+              <div className="min-w-0">
+                <div className="font-semibold tracking-[-0.05em] text-[var(--text)] sm:text-lg">
+                  <span>Nexo</span>
+                  <span className="text-[var(--accent-500)]">Clx</span>
+                </div>
+                <h1 className="mt-3 max-w-3xl text-[2rem] font-semibold tracking-[-0.06em] text-[var(--text)] sm:text-[2.45rem]">
+                  Protocolos, cálculos y fármacos listos para consulta clínica real.
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--text-soft)]">
+                  Interfaz ligera, acceso directo y contexto suficiente para decidir sin convertir la home en una
+                  pantalla decorativa.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <HomeMetric label="Protocolos activos" value={`${activeModules.length}`} />
+              <HomeMetric label="Cálculos disponibles" value={`${implementedCalculators.length}`} />
+              <HomeMetric
+                label="Fichas conectadas"
+                value={`${medicationGroups.reduce((count, group) => count + group.items.length, 0)}`}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button type="button" onClick={onProtocolsOpen} className={primaryButtonClass}>
+                <ClipboardList className="h-4 w-4" />
+                Abrir protocolos
+              </button>
+              <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
+                <Calculator className="h-4 w-4" />
+                Cálculos rápidos
+              </button>
+              <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
+                <Pill className="h-4 w-4" />
+                Medicamentos
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section className={`${panelClass} p-5 sm:p-6`}>
+          <SectionTitle
+            eyebrow="Uso directo"
+            title="Rutas de guardia"
+            note="Atajos operativos para abrir el punto clínico más útil sin ruido visual."
+          />
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+            <QuickAccessCard
+              icon={Activity}
+              title="Fibrilación auricular"
+              meta="Flujo breve por estabilidad, ritmo y anticoagulación."
+              onClick={() => onModuleOpen('fibrilacion-auricular')}
+              tone="accent"
+            />
+            <QuickAccessCard
+              icon={HeartPulse}
+              title="HTA en urgencias"
+              meta="Diferenciar urgencia y emergencia hipertensiva en pocos pasos."
+              onClick={() => onModuleOpen('hta-urgencias')}
+            />
+            <QuickAccessCard
+              icon={Calculator}
+              title="CHA2DS2-VASc"
+              meta="Escala inmediata para prevención embólica."
+              onClick={() => onCalculatorOpen('cha2ds2-vasc')}
+            />
+            <QuickAccessCard
+              icon={Pill}
+              title="Apixabán"
+              meta="Ficha rápida para anticoagulación frecuente."
+              onClick={() => onMedicationOpen('apixaban')}
+            />
+          </div>
+        </section>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+        <DetailPanel
+          eyebrow="Prioridad"
+          title="Protocolos operativos"
+          note="Solo se muestra lo que ya está listo para uso clínico, con acceso directo a los flujos."
+          action={<StatusBadge tone="active">{activeModules.length} activos</StatusBadge>}
+        >
+          <div className="space-y-2">
+            {activeModules.map((module) => (
+              <ListActionRow
+                key={module.id}
+                title={module.title}
+                meta={module.summary}
+                badge={<StatusBadge tone="active">Activo</StatusBadge>}
+                onClick={() => onModuleOpen(module.id)}
+              />
+            ))}
+          </div>
+        </DetailPanel>
+
+        <DetailPanel
+          eyebrow="Decisión rápida"
+          title="Cálculos listos"
+          note="Escalas ya integradas y útiles para las decisiones visibles en los protocolos activos."
+          action={
+            <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
+              Ver todos
+            </button>
+          }
+        >
+          <div className="space-y-2">
+            {featuredCalculators.map((calculator) => (
+              <ListActionRow
+                key={calculator.id}
+                title={calculator.title}
+                meta={calculator.summary}
+                onClick={() => onCalculatorOpen(calculator.id)}
+              />
+            ))}
+          </div>
+        </DetailPanel>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-[0.96fr_1.04fr]">
+        <DetailPanel
+          eyebrow="Consulta farmacológica"
+          title="Medicamentos frecuentes"
+          note="Fichas conectadas a los flujos más consultados, sin duplicar la navegación principal."
+          action={
+            <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
+              Ver todos
+            </button>
+          }
+        >
+          <div className="space-y-2">
+            {featuredMedications.map((medicationId) => (
+              <MedicationQuickRow
+                key={medicationId}
+                medication={getMedication(medicationId)}
+                onOpen={() => onMedicationOpen(medicationId)}
+              />
+            ))}
+          </div>
+        </DetailPanel>
+
+        <DetailPanel
+          eyebrow="Contexto útil"
+          title="Accesos que reducen pasos"
+          note="La app entra directa en lo accionable: protocolos breves, cálculos ya conectados y fichas enlazadas."
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className={`${mutedPanelClass} p-4`}>
+              <p className="eyebrow eyebrow-muted">Protocolo FA</p>
+              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Frecuencia, cardioversión y riesgo embólico</p>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
+                Flujo de 4 pasos con cálculos y anticoagulación enlazados en el mismo recorrido.
+              </p>
+            </div>
+            <div className={`${mutedPanelClass} p-4`}>
+              <p className="eyebrow eyebrow-muted">Protocolo HTA</p>
+              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Cifra, daño diana y tratamiento</p>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
+                Clasificación rápida con salida directa a vía oral o intravenosa sin interfaz pesada.
+              </p>
+            </div>
+            <div className={`${mutedPanelClass} p-4`}>
+              <p className="eyebrow eyebrow-muted">Cockcroft-Gault</p>
+              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Ajuste renal conectado</p>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
+                Disponible como módulo aislado o como apoyo inmediato a la decisión anticoagulante.
+              </p>
+            </div>
+            <div className={`${mutedPanelClass} p-4`}>
+              <p className="eyebrow eyebrow-muted">Fichas clínicas</p>
+              <p className="mt-2 text-sm font-semibold text-[var(--text)]">Dosis, seguridad y fuentes</p>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
+                Cada medicamento mantiene pauta, ajustes y bibliografía en la misma línea visual.
+              </p>
+            </div>
+          </div>
+        </DetailPanel>
+      </section>
+    </div>
+  );
+};
 
 const ProtocolsView = ({ onBack, onModuleOpen }) => {
   const activeModules = motivoConsultaModules.filter((module) => module.implemented);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4">
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
       <BackBar label="Inicio" onClick={onBack} />
 
-      <section className={`${shellCardClass} p-5 sm:p-6`}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">Protocolos activos</p>
-            <h1 className="mt-2 text-[1.8rem] font-semibold tracking-tight text-slate-950">Protocolos</h1>
-            <p className="mt-2 max-w-xl text-sm text-slate-500">
-              Solo se muestra lo que está operativo para evitar ruido en la navegación clínica.
-            </p>
-          </div>
-          <StatusBadge tone="active">{activeModules.length} activos</StatusBadge>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Protocolos activos"
+        title="Protocolos"
+        note="Vista corta y limpia para abrir los recorridos clínicos operativos sin sensación de panel administrativo."
+        aside={<StatusBadge tone="active">{activeModules.length} activos</StatusBadge>}
+      />
 
-      <DetailPanel title="Lista activa" note="Abre el contenido del protocolo solo cuando lo necesites.">
+      <DetailPanel title="Lista activa" note="Abre el protocolo solo cuando lo necesites y vuelve al contexto anterior sin fricción.">
         <div className="space-y-2">
           {activeModules.map((module) => (
             <ListActionRow
@@ -799,80 +943,6 @@ const ProtocolsView = ({ onBack, onModuleOpen }) => {
         </div>
       </DetailPanel>
     </div>
-  );
-};
-
-const FlowStepChip = ({ index, label, active }) => (
-  <div
-    className={`rounded-full border px-3 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.16em] ${
-      active ? 'border-sky-200 bg-sky-50 text-sky-800' : 'border-slate-200 bg-white text-slate-400'
-    }`}
-  >
-    {index}. {label}
-  </div>
-);
-
-const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral' }) => {
-  const toneClass =
-    tone === 'critical'
-      ? 'border-red-100 bg-red-50/40 hover:bg-red-50'
-      : 'border-slate-200 bg-slate-50/70 hover:border-sky-100 hover:bg-white';
-  const iconClass = tone === 'critical' ? 'text-red-600' : 'text-sky-700';
-  const titleClass = tone === 'critical' ? 'text-red-950' : 'text-slate-900';
-  const noteClass = tone === 'critical' ? 'text-red-700/70' : 'text-slate-500';
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group flex w-full items-center gap-4 rounded-[1.45rem] border px-5 py-5 text-left transition-colors ${toneClass}`}
-    >
-      <span className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white ${iconClass}`}>
-        <Icon className="h-6 w-6" />
-      </span>
-      <div className="min-w-0">
-        <p className={`text-sm font-semibold ${titleClass}`}>{title}</p>
-        <p className={`mt-1 text-xs leading-relaxed ${noteClass}`}>{note}</p>
-      </div>
-      <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5" />
-    </button>
-  );
-};
-
-const FlowSelectButton = ({ label, active, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`rounded-[1rem] border px-4 py-4 text-sm font-semibold transition-colors ${
-      active
-        ? 'border-sky-800 bg-sky-800 text-white shadow-[0_18px_35px_-26px_rgba(3,105,161,0.7)]'
-        : 'border-transparent bg-slate-50 text-slate-600'
-    }`}
-  >
-    {label}
-  </button>
-);
-
-const FlowActionCard = ({ title, body, tone = 'neutral', children = null }) => {
-  const toneClass =
-    tone === 'critical'
-      ? 'border-red-200/80 bg-red-600 text-white'
-      : tone === 'warning'
-        ? 'border-amber-200/80 bg-amber-50 text-amber-950'
-        : 'border-slate-200/80 bg-white text-slate-900';
-
-  return (
-    <section className={`rounded-[1.6rem] border px-5 py-5 shadow-[0_24px_50px_-44px_rgba(15,23,42,0.5)] ${toneClass}`}>
-      <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
-      <p
-        className={`mt-2 text-sm leading-relaxed ${
-          tone === 'critical' ? 'text-red-50/90' : tone === 'warning' ? 'text-amber-900/80' : 'text-slate-600'
-        }`}
-      >
-        {body}
-      </p>
-      {children ? <div className="mt-5">{children}</div> : null}
-    </section>
   );
 };
 
@@ -900,59 +970,17 @@ const FibrilacionAuricularFlowView = ({
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4">
-      <section className={`${shellCardClass} p-5 sm:p-6`}>
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:text-slate-800"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Cancelar
-          </button>
-          {referenceHref ? (
-            <button
-              type="button"
-              onClick={() => openPdf(referenceHref)}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-900"
-            >
-              <BookOpen className="h-3.5 w-3.5" />
-              Fuente
-            </button>
-          ) : null}
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-sky-700">Protocolo FA</p>
-            <h1 className="mt-2 text-[1.8rem] font-semibold tracking-tight text-slate-950 sm:text-[2rem]">
-              {protocol.longTitle ?? protocol.title}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Flujo clínico corto para decidir conducta inmediata, sin volver a una pantalla larga.
-            </p>
-          </div>
-          <div className="min-w-[180px]">
-            <div className="text-right text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Paso {step} de 4
-            </div>
-            <div className="mt-2 h-1.5 rounded-full bg-slate-100">
-              <div
-                className="h-full rounded-full bg-sky-600 transition-all duration-300"
-                style={{ width: `${(step / 4) * 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          <FlowStepChip index={1} label="Estabilidad" active={step === 1} />
-          <FlowStepChip index={2} label="Contexto" active={step === 2} />
-          <FlowStepChip index={3} label="Conducta" active={step === 3} />
-          <FlowStepChip index={4} label="Ictus" active={step === 4} />
-        </div>
-      </section>
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+      <FlowHeader
+        eyebrow="Protocolo FA"
+        title={protocol.longTitle ?? protocol.title}
+        note="Flujo clínico breve para decidir conducta inmediata sin abrir bloques largos ni perder contexto."
+        step={step}
+        totalSteps={4}
+        steps={['Estabilidad', 'Contexto', 'Conducta', 'Ictus']}
+        onBack={onBack}
+        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
+      />
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
@@ -993,23 +1021,13 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 2 && stability === 'stable' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle
-            eyebrow="Paso 2"
-            title="Contexto del episodio"
-            note="Completa las dos variables antes de pasar a la conducta."
-          />
+          <SectionTitle eyebrow="Paso 2" title="Contexto del episodio" note="Completa las dos variables antes de pasar a la conducta." />
 
           <div className="space-y-6">
             <div>
-              <p className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">
-                Tiempo de evolución
-              </p>
+              <p className="eyebrow eyebrow-muted mb-3">Tiempo de evolución</p>
               <div className="grid grid-cols-2 gap-3">
-                <FlowSelectButton
-                  label="< 48 horas"
-                  active={duration === 'lt48'}
-                  onClick={() => updateFlow({ duration: 'lt48' })}
-                />
+                <FlowSelectButton label="< 48 horas" active={duration === 'lt48'} onClick={() => updateFlow({ duration: 'lt48' })} />
                 <FlowSelectButton
                   label="> 48 h o desconocida"
                   active={duration === 'gt48'}
@@ -1019,15 +1037,9 @@ const FibrilacionAuricularFlowView = ({
             </div>
 
             <div>
-              <p className="mb-3 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">
-                Cardiopatía estructural significativa
-              </p>
+              <p className="eyebrow eyebrow-muted mb-3">Cardiopatía estructural significativa</p>
               <div className="grid grid-cols-2 gap-3">
-                <FlowSelectButton
-                  label="Sí"
-                  active={structuralHeartDisease === true}
-                  onClick={() => updateFlow({ structuralHeartDisease: true })}
-                />
+                <FlowSelectButton label="Sí" active={structuralHeartDisease === true} onClick={() => updateFlow({ structuralHeartDisease: true })} />
                 <FlowSelectButton
                   label="No / desconocido"
                   active={structuralHeartDisease === false}
@@ -1044,7 +1056,7 @@ const FibrilacionAuricularFlowView = ({
                 type="button"
                 disabled={!duration || structuralHeartDisease === null}
                 onClick={() => updateFlow({ step: 3 })}
-                className="inline-flex items-center gap-2 rounded-2xl bg-sky-800 px-4 py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                className={primaryButtonClass}
               >
                 Continuar
                 <ChevronRight className="h-4 w-4" />
@@ -1062,19 +1074,15 @@ const FibrilacionAuricularFlowView = ({
             tone="critical"
           >
             <div className="space-y-3">
-              <div className="rounded-[1.1rem] border border-white/15 bg-white/10 px-4 py-3">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-red-100/70">
-                  Preprocedimiento
-                </p>
-                <p className="mt-2 text-sm text-red-50/90">
+              <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
+                <p className="eyebrow text-[rgba(255,244,238,0.72)]">Preprocedimiento</p>
+                <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
                   Analgesia y sedación. Si el paciente toma digoxina, considera iniciar con menor energía y evita cardioversión si sospechas intoxicación digitálica.
                 </p>
               </div>
-              <div className="rounded-[1.1rem] border border-white/15 bg-white/10 px-4 py-3">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-red-100/70">
-                  Anticoagulación aguda
-                </p>
-                <p className="mt-2 text-sm text-red-50/90">
+              <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
+                <p className="eyebrow text-[rgba(255,244,238,0.72)]">Anticoagulación aguda</p>
+                <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
                   Si no está anticoagulado, plantea HBPM terapéutica en fase aguda y documenta el plan de continuación.
                 </p>
               </div>
@@ -1094,11 +1102,7 @@ const FibrilacionAuricularFlowView = ({
             <button type="button" onClick={onFaFlowReset} className={subtleButtonClass}>
               Reevaluar estabilidad
             </button>
-            <button
-              type="button"
-              onClick={() => updateFlow({ step: 4 })}
-              className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
-            >
+            <button type="button" onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
               <Calculator className="h-4 w-4" />
               Ir a prevención de ictus
             </button>
@@ -1108,20 +1112,24 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 3 && stability === 'stable' ? (
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <section className="overflow-hidden rounded-[1.8rem] border border-slate-200/80 bg-white shadow-[0_28px_60px_-44px_rgba(15,23,42,0.5)]">
-            <div className="bg-sky-900 px-5 py-5 text-white sm:px-6">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-sky-200">Paso 3</p>
-              <h3 className="mt-2 text-xl font-semibold tracking-tight">Conducta inicial</h3>
-              <p className="mt-1 text-sm text-sky-100/80">Objetivo operativo: control de frecuencia y definición de cardioversión.</p>
+          <section className={`${panelClass} overflow-hidden p-0`}>
+            <div className="border-b border-[color:var(--line)] bg-[rgba(247,241,226,0.78)] px-5 py-5 sm:px-6">
+              <p className="eyebrow">Paso 3</p>
+              <h3 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[var(--text)]">Conducta inicial</h3>
+              <p className="mt-2 text-sm text-[var(--text-soft)]">
+                Objetivo operativo: control de frecuencia y definición de cardioversión.
+              </p>
             </div>
 
             <div className="space-y-5 px-5 py-5 sm:px-6">
-              <div className="rounded-[1.25rem] border border-slate-200/80 bg-slate-50 px-4 py-4">
-                <p className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                  <Info className="h-4 w-4 text-sky-700" />
-                  {structuralHeartDisease ? 'Con cardiopatía estructural significativa' : 'Sin cardiopatía estructural significativa'}
+              <div className={`${mutedPanelClass} px-4 py-4`}>
+                <p className="flex items-center gap-2 text-sm font-semibold text-[var(--text)]">
+                  <Info className="h-4 w-4 text-[var(--accent-500)]" />
+                  {structuralHeartDisease
+                    ? 'Con cardiopatía estructural significativa'
+                    : 'Sin cardiopatía estructural significativa'}
                 </p>
-                <p className="mt-2 text-sm text-slate-600">
+                <p className="mt-2 text-sm text-[var(--text-soft)]">
                   {structuralHeartDisease
                     ? 'Prioriza digoxina para control de frecuencia y reserva amiodarona como apoyo si la situación lo exige.'
                     : 'Prioriza betabloqueante o verapamilo/diltiazem según perfil clínico y tolerancia.'}
@@ -1157,9 +1165,9 @@ const FibrilacionAuricularFlowView = ({
                 </div>
               </FlowActionCard>
 
-              <div className="rounded-[1.2rem] border border-amber-200/80 bg-amber-50/70 px-4 py-3 text-sm text-amber-950/80">
+              <div className="rounded-[1.2rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.92)] px-4 py-3 text-sm text-[var(--text-soft)]">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent-500)]" />
                   <span>{protocol.warnings[0]}</span>
                 </div>
               </div>
@@ -1170,11 +1178,7 @@ const FibrilacionAuricularFlowView = ({
             <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
               Volver al contexto
             </button>
-            <button
-              type="button"
-              onClick={() => updateFlow({ step: 4 })}
-              className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
-            >
+            <button type="button" onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
               <Calculator className="h-4 w-4" />
               Evaluar riesgo embólico
             </button>
@@ -1190,11 +1194,9 @@ const FibrilacionAuricularFlowView = ({
             note="Abre las escalas y enlaza la estrategia de anticoagulación sin salir de la arquitectura general."
           />
 
-          <div className="rounded-[1.4rem] bg-slate-900 px-5 py-5 text-white">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Criterio operativo
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-100">
+          <div className="rounded-[1.35rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.9)] px-5 py-5">
+            <p className="eyebrow">Criterio operativo</p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">
               Anticoagulación oral si CHA2DS2-VASc es igual o mayor de 1 en hombres o igual o mayor de 2 en mujeres. Si no hay prótesis valvular mecánica ni estenosis mitral moderada/grave, prioriza ACOD.
             </p>
           </div>
@@ -1233,11 +1235,7 @@ const FibrilacionAuricularFlowView = ({
             <button type="button" onClick={onMedicationsHub} className={subtleButtonClass}>
               Abrir medicamentos
             </button>
-            <button
-              type="button"
-              onClick={onFinish}
-              className="inline-flex items-center gap-2 rounded-2xl bg-sky-800 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-sky-700"
-            >
+            <button type="button" onClick={onFinish} className={primaryButtonClass}>
               Finalizar
             </button>
           </div>
@@ -1267,29 +1265,28 @@ const HipertensionUrgenciasFlowView = ({
     systolic >= 180 || diastolic >= 110
       ? {
           label: 'Grave · estadio 3',
-          containerClass: 'border-red-200 bg-red-50 text-red-900',
-          iconClass: 'text-red-600',
+          containerClass: 'border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.92)] text-[var(--danger-700)]',
+          iconClass: 'text-[var(--danger-500)]',
         }
       : systolic >= 160 || diastolic >= 100
         ? {
             label: 'Moderada · estadio 2',
-            containerClass: 'border-amber-200 bg-amber-50 text-amber-900',
-            iconClass: 'text-amber-600',
+            containerClass: 'border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.92)] text-[var(--accent-ink)]',
+            iconClass: 'text-[var(--accent-500)]',
           }
         : systolic >= 140 || diastolic >= 90
           ? {
               label: 'Ligera · estadio 1',
-              containerClass: 'border-sky-200 bg-sky-50 text-sky-900',
-              iconClass: 'text-sky-600',
+              containerClass: 'border-[rgba(191,146,69,0.18)] bg-[rgba(247,241,226,0.84)] text-[var(--accent-ink)]',
+              iconClass: 'text-[var(--accent-500)]',
             }
           : {
               label: 'Normal o elevación leve',
-              containerClass: 'border-slate-200 bg-slate-50 text-slate-700',
-              iconClass: 'text-slate-400',
+              containerClass: 'border-[color:var(--line)] bg-[rgba(245,240,232,0.84)] text-[var(--text-soft)]',
+              iconClass: 'text-[var(--text-muted)]',
             };
 
-  const classification =
-    hasTargetOrganDamage === null ? null : hasTargetOrganDamage ? 'emergencia' : 'urgencia';
+  const classification = hasTargetOrganDamage === null ? null : hasTargetOrganDamage ? 'emergencia' : 'urgencia';
 
   const updateFlow = (changes) => {
     onHtaFlowChange(changes);
@@ -1297,59 +1294,17 @@ const HipertensionUrgenciasFlowView = ({
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4">
-      <section className={`${shellCardClass} p-5 sm:p-6`}>
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:text-slate-800"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Cancelar
-          </button>
-          {referenceHref ? (
-            <button
-              type="button"
-              onClick={() => openPdf(referenceHref)}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-900"
-            >
-              <BookOpen className="h-3.5 w-3.5" />
-              Fuente
-            </button>
-          ) : null}
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-sky-700">Protocolo HTA</p>
-            <h1 className="mt-2 text-[1.8rem] font-semibold tracking-tight text-slate-950 sm:text-[2rem]">
-              {protocol.longTitle ?? protocol.title}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Flujo breve para separar urgencia de emergencia hipertensiva y decidir la conducta inicial sin convertirlo en una guía larga.
-            </p>
-          </div>
-          <div className="min-w-[180px]">
-            <div className="text-right text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Paso {step} de 4
-            </div>
-            <div className="mt-2 h-1.5 rounded-full bg-slate-100">
-              <div
-                className="h-full rounded-full bg-sky-600 transition-all duration-300"
-                style={{ width: `${(step / 4) * 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          <FlowStepChip index={1} label="Presión" active={step === 1} />
-          <FlowStepChip index={2} label="Daño diana" active={step === 2} />
-          <FlowStepChip index={3} label="Tipo" active={step === 3} />
-          <FlowStepChip index={4} label="Conducta" active={step === 4} />
-        </div>
-      </section>
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+      <FlowHeader
+        eyebrow="Protocolo HTA"
+        title={protocol.longTitle ?? protocol.title}
+        note="Flujo breve para separar urgencia de emergencia hipertensiva y decidir la conducta inicial con la menor fricción posible."
+        step={step}
+        totalSteps={4}
+        steps={['Presión', 'Daño diana', 'Tipo', 'Conducta']}
+        onBack={onBack}
+        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
+      />
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
@@ -1361,23 +1316,23 @@ const HipertensionUrgenciasFlowView = ({
 
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-2">
-              <span className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">PAS</span>
+              <span className="eyebrow eyebrow-muted">PAS</span>
               <input
                 type="number"
                 value={pas}
                 onChange={(event) => onHtaFlowChange({ pas: event.target.value })}
                 placeholder="180"
-                className="rounded-[1.3rem] border border-transparent bg-slate-50 px-4 py-4 text-2xl font-semibold tracking-tight text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-sky-200 focus:bg-white"
+                className={`${inputClass} text-2xl font-semibold tracking-[-0.04em]`}
               />
             </label>
             <label className="flex flex-col gap-2">
-              <span className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">PAD</span>
+              <span className="eyebrow eyebrow-muted">PAD</span>
               <input
                 type="number"
                 value={pad}
                 onChange={(event) => onHtaFlowChange({ pad: event.target.value })}
                 placeholder="110"
-                className="rounded-[1.3rem] border border-transparent bg-slate-50 px-4 py-4 text-2xl font-semibold tracking-tight text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-sky-200 focus:bg-white"
+                className={`${inputClass} text-2xl font-semibold tracking-[-0.04em]`}
               />
             </label>
           </div>
@@ -1390,12 +1345,7 @@ const HipertensionUrgenciasFlowView = ({
           ) : null}
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              type="button"
-              disabled={!pas || !pad}
-              onClick={() => updateFlow({ step: 2 })}
-              className="inline-flex items-center gap-2 rounded-2xl bg-sky-800 px-4 py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-            >
+            <button type="button" disabled={!pas || !pad} onClick={() => updateFlow({ step: 2 })} className={primaryButtonClass}>
               Continuar
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -1419,7 +1369,7 @@ const HipertensionUrgenciasFlowView = ({
               'Visual: visión borrosa, escotomas o retinopatía grave.',
               'Gestación: sospecha de preeclampsia o eclampsia.',
             ].map((item) => (
-              <div key={item} className="rounded-[1.1rem] border border-slate-200/80 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+              <div key={item} className={`${mutedPanelClass} px-4 py-3 text-sm text-[var(--text-soft)]`}>
                 {item}
               </div>
             ))}
@@ -1458,13 +1408,17 @@ const HipertensionUrgenciasFlowView = ({
               tone="critical"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.1rem] border border-white/15 bg-white/10 px-4 py-3">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-red-100/70">Objetivo</p>
-                  <p className="mt-2 text-sm text-red-50/90">Reducir en torno al 20-25% de la presión arterial media en el intervalo inicial, salvo matices según el órgano afectado.</p>
+                <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
+                  <p className="eyebrow text-[rgba(255,244,238,0.72)]">Objetivo</p>
+                  <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
+                    Reducir en torno al 20-25% de la presión arterial media en el intervalo inicial, salvo matices según el órgano afectado.
+                  </p>
                 </div>
-                <div className="rounded-[1.1rem] border border-white/15 bg-white/10 px-4 py-3">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-red-100/70">Entorno</p>
-                  <p className="mt-2 text-sm text-red-50/90">Monitorización continua, vía venosa y reevaluación periódica del estado neurológico, cardiopulmonar y renal.</p>
+                <div className="rounded-[1.15rem] border border-[rgba(255,255,255,0.16)] bg-[rgba(255,255,255,0.08)] px-4 py-3">
+                  <p className="eyebrow text-[rgba(255,244,238,0.72)]">Entorno</p>
+                  <p className="mt-2 text-sm text-[rgba(255,248,245,0.9)]">
+                    Monitorización continua, vía venosa y reevaluación periódica del estado neurológico, cardiopulmonar y renal.
+                  </p>
                 </div>
               </div>
             </FlowActionCard>
@@ -1475,13 +1429,17 @@ const HipertensionUrgenciasFlowView = ({
               tone="warning"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.1rem] border border-amber-200/80 bg-white/70 px-4 py-3">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-amber-700">Objetivo</p>
-                  <p className="mt-2 text-sm text-amber-950/80">Descenso gradual en 24-48 h, evitando caídas bruscas y sin perseguir normalización inmediata.</p>
+                <div className="rounded-[1.15rem] border border-[rgba(191,146,69,0.22)] bg-[rgba(255,255,255,0.68)] px-4 py-3">
+                  <p className="eyebrow">Objetivo</p>
+                  <p className="mt-2 text-sm text-[var(--text-soft)]">
+                    Descenso gradual en 24-48 h, evitando caídas bruscas y sin perseguir normalización inmediata.
+                  </p>
                 </div>
-                <div className="rounded-[1.1rem] border border-amber-200/80 bg-white/70 px-4 py-3">
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-amber-700">Medidas generales</p>
-                  <p className="mt-2 text-sm text-amber-950/80">Reposo en ambiente tranquilo, control del dolor o ansiedad y nueva toma de tensión antes de escalar el tratamiento.</p>
+                <div className="rounded-[1.15rem] border border-[rgba(191,146,69,0.22)] bg-[rgba(255,255,255,0.68)] px-4 py-3">
+                  <p className="eyebrow">Medidas generales</p>
+                  <p className="mt-2 text-sm text-[var(--text-soft)]">
+                    Reposo en ambiente tranquilo, control del dolor o ansiedad y nueva toma de tensión antes de escalar el tratamiento.
+                  </p>
                 </div>
               </div>
             </FlowActionCard>
@@ -1491,11 +1449,7 @@ const HipertensionUrgenciasFlowView = ({
             <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
               Volver
             </button>
-            <button
-              type="button"
-              onClick={() => updateFlow({ step: 4 })}
-              className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
-            >
+            <button type="button" onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
               Ir a conducta
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -1517,7 +1471,7 @@ const HipertensionUrgenciasFlowView = ({
 
           {classification === 'emergencia' ? (
             <div className="space-y-4">
-              <div className="rounded-[1.3rem] border border-red-200/80 bg-red-50 px-4 py-4 text-sm text-red-950/85">
+              <div className="rounded-[1.25rem] border border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.9)] px-4 py-4 text-sm text-[var(--danger-700)]">
                 Prioriza tratamiento intravenoso y monitorización continua. Si el contexto es coronario o edema agudo de pulmón, la nitroglicerina gana peso; si es HTA maligna o encefalopatía, el capítulo prioriza nitroprusiato.
               </div>
 
@@ -1531,13 +1485,13 @@ const HipertensionUrgenciasFlowView = ({
                 ))}
               </div>
 
-              <div className="rounded-[1.2rem] border border-amber-200/80 bg-amber-50/70 px-4 py-3 text-sm text-amber-950/80">
+              <div className="rounded-[1.2rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.9)] px-4 py-3 text-sm text-[var(--text-soft)]">
                 La bibliografía base cita urapidil como alternativa intravenosa, pero el flujo rápido se centra aquí en los fármacos que ya quedan conectados a fichas completas.
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="rounded-[1.3rem] border border-slate-200/80 bg-slate-50 px-4 py-4 text-sm text-slate-700">
+              <div className="rounded-[1.25rem] border border-[color:var(--line)] bg-[rgba(245,240,232,0.88)] px-4 py-4 text-sm text-[var(--text-soft)]">
                 Reposo, reevaluación tras 30 min y corrección de desencadenantes como dolor, ansiedad o incumplimiento terapéutico antes de intensificar fármacos.
               </div>
 
@@ -1551,7 +1505,7 @@ const HipertensionUrgenciasFlowView = ({
                 ))}
               </div>
 
-              <div className="rounded-[1.2rem] border border-amber-200/80 bg-amber-50/70 px-4 py-3 text-sm text-amber-950/80">
+              <div className="rounded-[1.2rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.9)] px-4 py-3 text-sm text-[var(--text-soft)]">
                 No usar nifedipino sublingual por riesgo de hipotensión brusca e hipoperfusión.
               </div>
             </div>
@@ -1573,7 +1527,7 @@ const HipertensionUrgenciasFlowView = ({
                 onHtaFlowReset();
                 onFinish();
               }}
-              className="inline-flex items-center gap-2 rounded-2xl bg-sky-800 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-sky-700"
+              className={primaryButtonClass}
             >
               Finalizar
             </button>
@@ -1585,21 +1539,15 @@ const HipertensionUrgenciasFlowView = ({
 };
 
 const CalculationsView = ({ onBack, onCalculatorOpen }) => (
-  <div className="mx-auto max-w-5xl space-y-4">
+  <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
     <BackBar label="Inicio" onClick={onBack} />
 
-    <section className={`${shellCardClass} p-5 sm:p-6`}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">Herramientas rápidas</p>
-          <h1 className="mt-2 text-[1.8rem] font-semibold tracking-tight text-slate-950">Cálculos</h1>
-          <p className="mt-2 max-w-xl text-sm text-slate-500">
-            Vista corta para abrir escalas sin invadir la home ni el protocolo principal.
-          </p>
-        </div>
-        <StatusBadge tone="active">{implementedCalculators.length} activos</StatusBadge>
-      </div>
-    </section>
+    <PageHero
+      eyebrow="Herramientas rápidas"
+      title="Cálculos"
+      note="Escalas clínicas visibles, compactas y listas para abrir sin añadir ruido a la home."
+      aside={<StatusBadge tone="active">{implementedCalculators.length} activos</StatusBadge>}
+    />
 
     <DetailPanel title="Disponibles" note="Las mismas escalas pueden abrirse desde FA en modo rápido.">
       <div className="space-y-2">
@@ -1620,19 +1568,22 @@ const CalculatorDetailView = ({ calculatorId, values, onChange, onBack }) => {
   const calculator = getCalculator(calculatorId);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4">
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
       <BackBar label="Cálculos" onClick={onBack} />
 
-      <section className={`${shellCardClass} p-5 sm:p-6`}>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusBadge tone="active">Implementado</StatusBadge>
-          <span className="text-sm text-slate-500">
-            {calculator.chapter} · p. {calculator.verifiedPage}
-          </span>
-        </div>
-        <h1 className="mt-3 text-[1.9rem] font-semibold tracking-tight text-slate-950">{calculator.title}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-600">{calculator.summary}</p>
-      </section>
+      <PageHero
+        eyebrow="Escala activa"
+        title={calculator.title}
+        note={calculator.summary}
+        aside={
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge tone="active">Implementado</StatusBadge>
+            <span className="text-sm text-[var(--text-muted)]">
+              {calculator.chapter} · p. {calculator.verifiedPage}
+            </span>
+          </div>
+        }
+      />
 
       <CalculatorPanel calculatorId={calculatorId} values={values} onChange={onChange} />
       <BibliographyBlock entries={calculator.bibliography} />
@@ -1645,22 +1596,20 @@ const MedicationsView = ({ onBack, onMedicationOpen }) => {
   const currentGroup = medicationGroups.find((group) => group.id === activeGroupId) ?? medicationGroups[0];
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4">
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
       <BackBar label="Inicio" onClick={onBack} />
 
-      <section className={`${shellCardClass} p-5 sm:p-6`}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-400">Fármacos conectados</p>
-            <h1 className="mt-2 text-[1.8rem] font-semibold tracking-tight text-slate-950">Medicamentos</h1>
-            <p className="mt-2 max-w-xl text-sm text-slate-500">
-              Se mantienen las fichas completas, pero la lista principal se reduce a accesos claros y agrupados.
-            </p>
-          </div>
-          <StatusBadge tone="active">{medicationGroups.reduce((count, group) => count + group.items.length, 0)} fichas</StatusBadge>
-        </div>
-
-        <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+      <PageHero
+        eyebrow="Fármacos conectados"
+        title="Medicamentos"
+        note="Las fichas mantienen la información clínica completa, pero la entrada principal se simplifica en grupos claros y más ligeros."
+        aside={
+          <StatusBadge tone="active">
+            {medicationGroups.reduce((count, group) => count + group.items.length, 0)} fichas
+          </StatusBadge>
+        }
+      >
+        <div className="mt-1 flex gap-2 overflow-x-auto pb-1">
           {medicationGroups.map((group) => (
             <ProtocolSectionButton
               key={group.id}
@@ -1670,61 +1619,67 @@ const MedicationsView = ({ onBack, onMedicationOpen }) => {
             />
           ))}
         </div>
-      </section>
+      </PageHero>
 
-    <DetailPanel title={currentGroup.title} note="Desde aquí puedes abrir la ficha completa y volver al contexto anterior.">
-      <div className="space-y-2">
-        {currentGroup.items.map((medicationId) => {
-          const medication = getMedication(medicationId);
+      <DetailPanel
+        title={currentGroup.title}
+        note="Desde aquí puedes abrir la ficha completa y volver al contexto anterior."
+      >
+        <div className="space-y-2">
+          {currentGroup.items.map((medicationId) => {
+            const medication = getMedication(medicationId);
 
-          return (
-            <MedicationQuickRow
-              key={medication.id}
-              medication={medication}
-              onOpen={() => onMedicationOpen(medication.id)}
-            />
-          );
-        })}
-      </div>
-    </DetailPanel>
-  </div>
-);
+            return (
+              <MedicationQuickRow
+                key={medication.id}
+                medication={medication}
+                onOpen={() => onMedicationOpen(medication.id)}
+              />
+            );
+          })}
+        </div>
+      </DetailPanel>
+    </div>
+  );
 };
 
 const MedicationDetailView = ({ medication, onBack }) => {
   const protocolLabel = medication.protocolId ? getProtocol(medication.protocolId)?.title ?? 'Módulo clínico' : 'Módulo clínico';
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4">
+    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
       <BackBar label="Medicamentos" onClick={onBack} />
 
-      <section className={`${shellCardClass} p-5 sm:p-6`}>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusBadge tone="active">{medication.family}</StatusBadge>
-          <span className="text-sm text-slate-500">{protocolLabel}</span>
-        </div>
-        <h1 className="mt-3 text-[1.9rem] font-semibold tracking-tight text-slate-950">{medication.name}</h1>
-        <p className="mt-3 max-w-3xl text-sm text-slate-600">{medication.indication}</p>
-      </section>
+      <PageHero
+        eyebrow="Ficha farmacológica"
+        title={medication.name}
+        note={medication.indication}
+        aside={
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge tone="active">{medication.family}</StatusBadge>
+            <span className="text-sm text-[var(--text-muted)]">{protocolLabel}</span>
+          </div>
+        }
+      />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <DetailPanel title="Pauta clínica">
           <div className="space-y-3">
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Dosis</p>
-              <p className="mt-2 text-sm text-slate-800">{medication.dose}</p>
+              <p className="eyebrow eyebrow-muted">Dosis</p>
+              <p className="mt-2 text-sm text-[var(--text)]">{medication.dose}</p>
             </div>
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Vía</p>
-              <p className="mt-2 text-sm text-slate-800">{medication.route}</p>
+              <p className="eyebrow eyebrow-muted">Vía</p>
+              <p className="mt-2 text-sm text-[var(--text)]">{medication.route}</p>
             </div>
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Frecuencia</p>
-              <p className="mt-2 text-sm text-slate-800">{medication.frequency}</p>
+              <p className="eyebrow eyebrow-muted">Frecuencia</p>
+              <p className="mt-2 text-sm text-[var(--text)]">{medication.frequency}</p>
             </div>
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Duración</p>
-              <p className="mt-2 text-sm text-slate-800">{medication.duration}</p>
+              <p className="eyebrow eyebrow-muted">Duración</p>
+              <p className="mt-2 text-sm text-[var(--text)]">{medication.duration}</p>
             </div>
           </div>
         </DetailPanel>
@@ -1732,34 +1687,28 @@ const MedicationDetailView = ({ medication, onBack }) => {
         <DetailPanel title="Seguridad y ajustes">
           <div className="space-y-3">
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Contraindicaciones / precauciones</p>
+              <p className="eyebrow eyebrow-muted">Contraindicaciones / precauciones</p>
               <div className="mt-3 space-y-2">
                 {medication.contraindications.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-[0.95rem] border border-slate-200/80 bg-white px-3 py-2.5 text-sm text-slate-700"
-                  >
+                  <div key={item} className="rounded-[0.95rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.82)] px-3 py-2.5 text-sm text-[var(--text-soft)]">
                     {item}
                   </div>
                 ))}
               </div>
             </div>
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Insuficiencia renal</p>
-              <p className="mt-2 text-sm text-slate-700">{medication.renalAdjustment}</p>
+              <p className="eyebrow eyebrow-muted">Insuficiencia renal</p>
+              <p className="mt-2 text-sm text-[var(--text-soft)]">{medication.renalAdjustment}</p>
             </div>
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Insuficiencia hepática</p>
-              <p className="mt-2 text-sm text-slate-700">{medication.hepaticAdjustment}</p>
+              <p className="eyebrow eyebrow-muted">Insuficiencia hepática</p>
+              <p className="mt-2 text-sm text-[var(--text-soft)]">{medication.hepaticAdjustment}</p>
             </div>
             <div className={`${mutedPanelClass} p-4`}>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-slate-500">Observaciones prácticas</p>
+              <p className="eyebrow eyebrow-muted">Observaciones prácticas</p>
               <div className="mt-3 space-y-2">
                 {medication.practicalNotes.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-[0.95rem] border border-slate-200/80 bg-white px-3 py-2.5 text-sm text-slate-700"
-                  >
+                  <div key={item} className="rounded-[0.95rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.82)] px-3 py-2.5 text-sm text-[var(--text-soft)]">
                     {item}
                   </div>
                 ))}
@@ -1771,7 +1720,7 @@ const MedicationDetailView = ({ medication, onBack }) => {
 
       <DetailPanel title="Fuentes">
         <div className="space-y-3">
-          <div className={`${mutedPanelClass} p-4 text-sm text-slate-700`}>{medication.sourceScope}</div>
+          <div className={`${mutedPanelClass} p-4 text-sm text-[var(--text-soft)]`}>{medication.sourceScope}</div>
           <SourceList sources={medication.sources} />
         </div>
       </DetailPanel>
@@ -1981,20 +1930,27 @@ const App = () => {
     return (
       <HomeView
         onProtocolsOpen={() => navigate({ view: 'protocols' })}
-        onFaOpen={() => openModule('fibrilacion-auricular', { view: 'home' })}
-        onHtaOpen={() => openModule('hta-urgencias', { view: 'home' })}
+        onModuleOpen={(moduleId) => openModule(moduleId, { view: 'home' })}
         onCalculationsOpen={() => openCalculations({ view: 'home' })}
+        onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'home' })}
         onMedicationsOpen={() => openMedications({ view: 'home' })}
+        onMedicationOpen={(medicationId) => openMedication(medicationId, { view: 'home' })}
       />
     );
   };
 
   return (
-    <div className="min-h-screen text-slate-900" style={shellBackground}>
+    <div className="min-h-screen text-[var(--text)]">
       <PrimaryNavigation activeKey={getPrimarySection(route.view)} onSelect={handlePrimaryNavigation} />
-      <AppHeader isScrolled={isScrolled} pageLabel={getPageLabel(route)} onHome={() => navigate({ view: 'home' })} />
-      <main className="pb-24 pt-20 lg:pl-24 lg:pb-10">
-        <div className="px-4 sm:px-6 lg:px-8">{renderView()}</div>
+      <AppHeader
+        isScrolled={isScrolled}
+        pageLabel={getPageLabel(route)}
+        activeKey={getPrimarySection(route.view)}
+        onHome={() => navigate({ view: 'home' })}
+        onSelect={handlePrimaryNavigation}
+      />
+      <main className="pb-28 pt-[5.6rem] lg:pb-12">
+        <div className="px-4 pb-2 sm:px-6 lg:px-8">{renderView()}</div>
       </main>
     </div>
   );
