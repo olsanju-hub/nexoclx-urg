@@ -48,10 +48,14 @@ export const medicationCatalog = {
     family: 'Control de frecuencia',
     indication:
       'Control de la frecuencia ventricular en fibrilación auricular aguda, sobre todo si FEVI > 40%; también puede usarse con FEVI ≤ 40% si la situación hemodinámica lo permite.',
-    dose:
-      'En este contexto: 100 mg VO cada 12 h o 2,5 mg IV lento; repetir cada 10 min hasta 15 mg totales si hace falta.',
-    route: 'Oral / intravenosa',
-    frequency: 'Cada 12 h por vía oral; bolos IV titulados en fase aguda.',
+    contextUse: 'FA aguda estable con respuesta ventricular rápida. Prioriza control de frecuencia si tolera la hemodinámica.',
+    contextDose: 'IV 2,5-5 mg lento; repetir cada 10 min hasta 15 mg totales si hace falta.',
+    contextRoute: 'Intravenosa en fase aguda.',
+    contextFrequency: 'Bolos titulados y reevaluación tras cada dosis.',
+    followUpPlan: 'VO solo si después se decide mantenimiento.',
+    dose: 'IV 2,5-5 mg lento; repetir cada 10 min hasta 15 mg totales si hace falta. Después, si se mantiene, VO 100 mg cada 12 h ajustado a respuesta.',
+    route: 'Intravenosa en fase aguda; oral para continuación.',
+    frequency: 'Bolos IV titulados en fase aguda; mantenimiento oral posterior según control.',
     duration: 'Uso agudo y transición posterior según respuesta clínica y plan cardiológico.',
     contraindications: [
       'Bradicardia marcada o bloqueo AV clínicamente relevante.',
@@ -68,7 +72,7 @@ export const medicationCatalog = {
       'No combinar de entrada con verapamilo o diltiazem.',
     ],
     sourceScope:
-      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta contextual IV se apoya además en Murillo y la ficha CIMA consultada corresponde a la formulación oral.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta IV contextual se apoya además en Murillo. La ficha CIMA consultada es oral y sirve como apoyo para mantenimiento, no para priorizar la vía aguda.',
     sources: [
       protocolSource(
         'ESC FA 2024 · control agudo de frecuencia',
@@ -101,10 +105,14 @@ export const medicationCatalog = {
     family: 'Control de frecuencia',
     indication:
       'Control de la frecuencia ventricular en fibrilación auricular rápida cuando no hay insuficiencia cardíaca con fracción reducida ni vía accesoria.',
-    dose:
-      'En este contexto: 40-80 mg VO cada 8 h; IV 5 mg en 10 min, repetible cada 20 min hasta 20 mg totales.',
-    route: 'Oral / intravenosa',
-    frequency: 'Cada 8 h por vía oral; bolos IV titulados en fase aguda.',
+    contextUse: 'FA aguda estable con FEVI > 40% y sin vía accesoria.',
+    contextDose: 'IV 5 mg lento en 10 min; puede repetirse cada 15-20 min hasta 20 mg totales si hace falta.',
+    contextRoute: 'Intravenosa en fase aguda.',
+    contextFrequency: 'Bolos titulados con reevaluación clínica y ECG.',
+    followUpPlan: 'VO solo si después se decide mantenimiento.',
+    dose: 'IV 5 mg lento en 10 min; puede repetirse cada 15-20 min hasta 20 mg totales si hace falta. Después, si se mantiene, VO 40-80 mg cada 8 h.',
+    route: 'Intravenosa en fase aguda; oral para continuación.',
+    frequency: 'Bolos IV titulados en fase aguda; mantenimiento oral posterior si procede.',
     duration: 'Uso agudo con reevaluación posterior del control de frecuencia.',
     contraindications: [
       'Shock cardiogénico, bloqueo AV de segundo/tercer grado o síndrome del nodo sinusal enfermo.',
@@ -112,16 +120,16 @@ export const medicationCatalog = {
       'Flutter o FA con vía accesoria (WPW / Lown-Ganong-Levine).',
     ],
     renalAdjustment:
-      'La ficha CIMA oral consultada no fija reducción estándar, pero exige uso con precaución y vigilancia estrecha si la función renal está alterada.',
+      'La ficha CIMA inyectable consultada no fija una reducción estándar, pero exige uso con precaución y vigilancia estrecha si la función renal está alterada.',
     hepaticAdjustment:
-      'La ficha CIMA oral consultada indica metabolismo más lento en insuficiencia hepática y recomienda iniciar con dosis bajas.',
+      'La ficha CIMA inyectable consultada indica metabolismo más lento en insuficiencia hepática y recomienda iniciar con dosis bajas.',
     practicalNotes: [
       'La guía ESC 2024 lo mantiene como opción de primera línea si la FEVI es > 40% y no hay vía accesoria.',
       'No asociar de entrada con betabloqueantes.',
       'Usar con precaución junto con digoxina porque puede elevar sus concentraciones.',
     ],
     sourceScope:
-      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta IV concreta del contexto FA se apoya además en Murillo y la ficha CIMA consultada corresponde a la formulación oral.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta IV concreta del contexto FA se apoya además en Murillo y la ficha CIMA consultada corresponde a la formulación inyectable.',
     sources: [
       protocolSource(
         'ESC FA 2024 · control agudo de frecuencia',
@@ -132,7 +140,7 @@ export const medicationCatalog = {
           note: 'Diltiazem o verapamilo como opciones en FA aguda si no hay FEVI reducida.',
         }),
       ),
-      cimaSource('CIMA · Manidón 80 mg comprimidos', 'https://cima.aemps.es/cima/dochtml/ft/50891'),
+      cimaSource('CIMA · Manidón 5 mg/2 ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/39784/FT_39784.html'),
       protocolSource(
         'Murillo 7.ª ed. · control de frecuencia en FA',
         referenceEntry({
@@ -151,10 +159,15 @@ export const medicationCatalog = {
     family: 'Control de frecuencia',
     indication:
       'Control de frecuencia en FA aguda, especialmente si hay FEVI ≤ 40% o insuficiencia cardíaca y no basta o no conviene otro frenador nodal.',
+    contextUse: 'FA aguda con FEVI ≤ 40% o IC, o como apoyo si no basta otro frenador nodal.',
+    contextDose: 'IV 0,25 mg cada 2 h hasta control o 1,5 mg máximos. Si ya toma digitálicos, no redigitalizar.',
+    contextRoute: 'Intravenosa en fase aguda.',
+    contextFrequency: 'Cargas fraccionadas con reevaluación clínica, ECG y función renal.',
+    followUpPlan: 'VO solo para mantenimiento si después se decide y con ajuste renal.',
     dose:
-      'En este contexto: digitalización VO 0,25 mg cada 8 h durante 48 h y luego 0,25 mg/24 h; IV 0,25 mg cada 2 h hasta control o 1,5 mg máximos.',
-    route: 'Oral / intravenosa',
-    frequency: 'Cargas fraccionadas y luego mantenimiento diario.',
+      'IV 0,25 mg cada 2 h hasta control o 1,5 mg máximos. Después, si se mantiene, VO 0,25 mg/24 h individualizado; evita redigitalizar si ya tomaba digitálicos.',
+    route: 'Intravenosa en fase aguda; oral para continuación.',
+    frequency: 'Cargas IV fraccionadas y luego mantenimiento diario si se mantiene.',
     duration: 'Ajuste individual según frecuencia, función renal y niveles séricos.',
     contraindications: [
       'Taquicardia o fibrilación ventricular.',
@@ -171,7 +184,7 @@ export const medicationCatalog = {
       'La cardioversión eléctrica requiere precaución añadida en tratamiento digitálico.',
     ],
     sourceScope:
-      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta específica de carga y mantenimiento se apoya además en Murillo y la ficha CIMA refuerza individualización y monitorización.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta específica de carga y mantenimiento se apoya además en Murillo y la ficha CIMA consultada corresponde a la formulación inyectable.',
     sources: [
       protocolSource(
         'ESC FA 2024 · control agudo de frecuencia',
@@ -182,10 +195,7 @@ export const medicationCatalog = {
           note: 'Digoxina como primera línea con FEVI reducida o como fármaco adicional según el contexto clínico.',
         }),
       ),
-      cimaSource(
-        'CIMA · Digoxina Teofarma 0,25 mg comprimidos',
-        'https://cima.aemps.es/cima/dochtml/ft/23850/FichaTecnica_23850.html',
-      ),
+      cimaSource('CIMA · Digoxina 0,25 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/25126/FichaTecnica_25126.html'),
       protocolSource(
         'Murillo 7.ª ed. · control de frecuencia en FA',
         referenceEntry({
@@ -204,10 +214,16 @@ export const medicationCatalog = {
     family: 'Control de frecuencia y ritmo',
     indication:
       'Última opción aguda para control de frecuencia o alternativa de control del ritmo cuando otras opciones no son adecuadas o existe FEVI reducida / cardiopatía significativa.',
+    contextUse:
+      'FA aguda cuando no basta el control nodal previo o si eliges ritmo en FEVI reducida / cardiopatía estructural relevante.',
+    contextDose: 'IV 5-7 mg/kg de carga, con posibilidad de completar 1,2-1,8 g en 24 h según respuesta.',
+    contextRoute: 'Intravenosa en fase aguda.',
+    contextFrequency: 'Carga inicial y perfusión con reevaluación de ritmo, QT y tolerancia.',
+    followUpPlan: 'VO solo si después se decide continuación.',
     dose:
-      'En este contexto: IV 5-7 mg/kg de carga, con posibilidad de completar 1,2-1,8 g en 24 h; VO 200 mg cada 8 h 7 días, luego cada 12 h 7 días y después 200 mg/24 h 5 días/semana.',
-    route: 'Oral / intravenosa',
-    frequency: 'Carga aguda y mantenimiento posterior según respuesta.',
+      'IV 5-7 mg/kg de carga, con posibilidad de completar 1,2-1,8 g en 24 h según respuesta. Después, si se mantiene, VO 200 mg cada 8 h 7 días, luego cada 12 h 7 días y después 200 mg/24 h 5 días/semana.',
+    route: 'Intravenosa en fase aguda; oral para continuación.',
+    frequency: 'Carga aguda IV y mantenimiento posterior según respuesta.',
     duration: 'Solo uso agudo en control de frecuencia del libro; otras indicaciones dependen de cardiología.',
     contraindications: [
       'Bradicardia sinusal, trastorno grave de conducción o enfermedad del nodo sinusal sin marcapasos.',
@@ -215,16 +231,16 @@ export const medicationCatalog = {
       'Precaución extrema con fármacos que prolongan QT o inducen torsade de pointes.',
     ],
     renalAdjustment:
-      'La ficha CIMA oral consultada no establece un ajuste renal cuantificado; recomienda empezar con la dosis más baja razonable considerando la función renal y la comorbilidad.',
+      'La ficha CIMA inyectable consultada no establece un ajuste renal cuantificado; obliga a prudencia clínica y monitorización.',
     hepaticAdjustment:
-      'La ficha CIMA oral consultada no detalla un esquema numérico de ajuste hepático; obliga a prudencia clínica y vigilancia por su perfil de toxicidad.',
+      'La ficha CIMA inyectable consultada no detalla un esquema numérico de ajuste hepático; obliga a prudencia clínica y vigilancia por su perfil de toxicidad.',
     practicalNotes: [
       'La guía ESC 2024 la reserva como última opción para control de frecuencia agudo.',
       'También puede encajar en cardioversión farmacológica si existe HFrEF, hipertrofia severa o enfermedad coronaria y se acepta una reversión más lenta.',
       'No mezclar antiarrítmicos de clase I y III en el mismo momento.',
     ],
     sourceScope:
-      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta detallada del contexto FA se apoya además en Murillo y la ficha CIMA aporta contraindicaciones y recomendaciones generales.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta detallada del contexto FA se apoya además en Murillo y la ficha CIMA consultada corresponde a la formulación inyectable.',
     sources: [
       protocolSource(
         'ESC FA 2024 · control de frecuencia y cardioversión',
@@ -232,13 +248,10 @@ export const medicationCatalog = {
           id: 'amiodarona-fa-esc',
           verifiedPages: [43, 44, 45, 46, 47, 48],
           pdfPages: [43, 44, 45, 46, 47, 48],
-          note: 'Reservada para control de frecuencia seleccionado y como opción de cardioversión/rimo en determinados perfiles estructurales.',
+          note: 'Reservada para control de frecuencia seleccionado y como opción de cardioversión/ritmo en determinados perfiles estructurales.',
         }),
       ),
-      cimaSource(
-        'CIMA · Trangorex 200 mg comprimidos',
-        'https://cima.aemps.es/cima/dochtml/ft/48048/FT_48048.html',
-      ),
+      cimaSource('CIMA · Trangorex 150 mg/3 ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/54723/FT_54723.html'),
       protocolSource(
         'Murillo 7.ª ed. · control de ritmo y frecuencia en FA',
         referenceEntry({
