@@ -35,6 +35,8 @@ const primaryButtonClass = 'accent-button';
 const ghostButtonClass = 'ghost-button';
 const inputClass = 'app-input';
 const listRowClass = 'list-row group';
+const pageClass = 'mx-auto max-w-[72rem] space-y-3 sm:space-y-5 xl:space-y-6';
+const widePageClass = 'mx-auto max-w-[76rem] space-y-3 sm:space-y-5 xl:space-y-6';
 
 const primaryNavItems = [
   { key: 'home', label: 'Inicio', icon: LayoutDashboard },
@@ -172,22 +174,26 @@ const getPageLabel = (route) => {
 
 const BrandLockup = ({ label }) => (
   <div className="flex min-w-0 items-center gap-3">
-    <img src={brandMark} alt="NexoClx" className="h-11 w-11 rounded-[1.15rem] object-cover shadow-[0_18px_38px_-24px_rgba(78,58,20,0.34)]" />
+    <img
+      src={brandMark}
+      alt="NexoClx"
+      className="h-10 w-10 rounded-[1rem] object-cover shadow-[0_18px_38px_-24px_rgba(78,58,20,0.34)] sm:h-11 sm:w-11 sm:rounded-[1.15rem]"
+    />
     <div className="min-w-0">
-      <div className="font-semibold tracking-[-0.04em] text-[var(--text)]">
+      <div className="text-[0.98rem] font-semibold tracking-[-0.04em] text-[var(--text)] sm:text-[1rem]">
         <span>Nexo</span>
         <span className="text-[var(--accent-500)]">Clx</span>
       </div>
-      {label ? <p className="truncate pt-0.5 text-xs font-medium text-[var(--text-muted)]">{label}</p> : null}
+      {label ? <p className="truncate pt-0.5 text-[0.72rem] font-medium text-[var(--text-muted)] sm:text-xs">{label}</p> : null}
     </div>
   </div>
 );
 
 const SectionTitle = ({ eyebrow, title, note, action = null }) => (
-  <div className="mb-4 flex items-start justify-between gap-3">
+  <div className="mb-3 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-start sm:justify-between">
     <div className="min-w-0">
       {eyebrow ? <p className="eyebrow eyebrow-muted">{eyebrow}</p> : null}
-      <h2 className="mt-2 text-[1.15rem] font-semibold tracking-[-0.03em] text-[var(--text)]">{title}</h2>
+      <h2 className="mt-1.5 text-[1.05rem] font-semibold tracking-[-0.03em] text-[var(--text)] sm:mt-2 sm:text-[1.15rem]">{title}</h2>
       {note ? <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p> : null}
     </div>
     {action}
@@ -209,10 +215,10 @@ const StatusBadge = ({ children, tone = 'neutral' }) => {
 
 const PageHero = ({ eyebrow, title, note, aside = null, children = null }) => (
   <section className={`${shellCardClass} p-5 sm:p-6`}>
-    <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div className="flex flex-col gap-3 sm:gap-4 xl:flex-row xl:items-end xl:justify-between">
       <div className="min-w-0">
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-        <h1 className="mt-3 text-[1.95rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:text-[2.3rem]">
+        <h1 className="mt-2.5 text-[1.68rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:mt-3 sm:text-[2.05rem] xl:text-[2.3rem]">
           {title}
         </h1>
         {note ? <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p> : null}
@@ -225,7 +231,7 @@ const PageHero = ({ eyebrow, title, note, aside = null, children = null }) => (
 
 const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
   <header className={`fixed inset-x-0 top-0 z-40 border-b border-[color:var(--line)] bg-[rgba(248,243,236,0.88)] backdrop-blur-xl ${isScrolled ? 'shadow-[0_22px_44px_-36px_rgba(64,49,22,0.28)]' : ''}`}>
-    <div className="mx-auto flex h-[4.6rem] max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto flex h-[4.2rem] max-w-[82rem] items-center gap-3 px-3.5 sm:h-[4.6rem] sm:gap-4 sm:px-6 lg:px-8 xl:px-10">
       <button type="button" onClick={onHome} className="min-w-0 text-left">
         <BrandLockup label={pageLabel} />
       </button>
@@ -278,7 +284,7 @@ const PrimaryNavigation = ({ activeKey, onSelect }) => (
 );
 
 const BackBar = ({ label = 'Volver', onClick, action = null }) => (
-  <div className="mb-4 flex items-center justify-between gap-3">
+  <div className="mb-3 flex flex-wrap items-center justify-between gap-3 sm:mb-4">
     <button type="button" onClick={onClick} className={ghostButtonClass}>
       <ArrowLeft className="h-4 w-4" />
       {label}
@@ -615,7 +621,7 @@ const ProtocolGuideBlock = ({ label, children, tone = 'neutral' }) => {
           : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.82)]';
 
   return (
-    <div className={`rounded-[1.2rem] border px-4 py-4 ${toneClass}`}>
+    <div className={`rounded-[1.15rem] border px-3.5 py-3.5 sm:rounded-[1.2rem] sm:px-4 sm:py-4 ${toneClass}`}>
       <p className="eyebrow eyebrow-muted">{label}</p>
       <div className="mt-2 text-sm leading-relaxed text-[var(--text-soft)]">{children}</div>
     </div>
@@ -623,7 +629,7 @@ const ProtocolGuideBlock = ({ label, children, tone = 'neutral' }) => {
 };
 
 const ProtocolFocusStrip = ({ current, decision, next }) => (
-  <div className="mt-5 grid gap-3 lg:grid-cols-3">
+  <div className="mt-4 grid gap-2.5 md:grid-cols-3 lg:gap-3">
     <ProtocolGuideBlock label="Ahora">
       <p className="font-semibold text-[var(--text)]">{current}</p>
     </ProtocolGuideBlock>
@@ -837,7 +843,7 @@ const FlowActionCard = ({ title, body, tone = 'neutral', children = null }) => {
 
 const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision, next, onBack, onOpenSource }) => (
   <section className={`${shellCardClass} p-5 sm:p-6`}>
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex flex-wrap items-center justify-between gap-3">
       <button type="button" onClick={onBack} className={ghostButtonClass}>
         <ArrowLeft className="h-4 w-4" />
         Cancelar
@@ -850,14 +856,14 @@ const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision
       ) : null}
     </div>
 
-    <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div className="mt-4 flex flex-col gap-3 sm:mt-5 sm:gap-4 xl:flex-row xl:items-end xl:justify-between">
       <div className="min-w-0">
         <p className="eyebrow">{eyebrow}</p>
-        <h1 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:text-[2.15rem]">
+        <h1 className="mt-2.5 text-[1.55rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:mt-3 sm:text-[1.82rem] xl:text-[2.1rem]">
           {title}
         </h1>
       </div>
-      <div className={`${mutedPanelClass} min-w-[210px] px-4 py-4 xl:max-w-[240px]`}>
+      <div className={`${mutedPanelClass} w-full min-w-0 px-4 py-3.5 sm:min-w-[210px] sm:px-4 sm:py-4 xl:max-w-[240px]`}>
         <p className="eyebrow eyebrow-muted">Paso {step} de {totalSteps}</p>
         <div className="mt-3 h-2 rounded-full bg-[rgba(111,104,93,0.08)]">
           <div className="progress-fill h-full rounded-full transition-all duration-300" style={{ width: `${(step / totalSteps) * 100}%` }} />
@@ -867,7 +873,7 @@ const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision
 
     <ProtocolFocusStrip current={current} decision={decision} next={next} />
 
-    <div className="mt-5 flex flex-wrap gap-2">
+    <div className="mt-4 flex gap-2 overflow-x-auto pb-1 md:mt-5 md:flex-wrap">
       {steps.map((item, index) => (
         <FlowStepChip key={item} index={index + 1} label={item} active={step === index + 1} />
       ))}
@@ -888,7 +894,7 @@ const HomeView = ({
   const featuredMedications = ['apixaban', 'labetalol', 'amiodarona'];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-4 sm:space-y-5">
+    <div className={widePageClass}>
       <PageHero title="Inicio">
         <div className="flex flex-wrap gap-3">
           <button type="button" onClick={onProtocolsOpen} className={primaryButtonClass}>
@@ -906,9 +912,9 @@ const HomeView = ({
         </div>
       </PageHero>
 
-      <section className="grid gap-4 xl:grid-cols-[1.02fr_0.98fr]">
+      <section className="grid gap-4 lg:grid-cols-[0.98fr_1.02fr] xl:gap-5">
         <DetailPanel title="Acceso directo">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+          <div className="grid gap-2.5 sm:grid-cols-2 xl:gap-3">
             <QuickAccessCard
               icon={HeartPulse}
               title="Síndrome coronario agudo"
@@ -946,7 +952,7 @@ const HomeView = ({
         </DetailPanel>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[0.94fr_1.06fr]">
+      <section className="grid gap-4 lg:grid-cols-[0.96fr_1.04fr] xl:gap-5">
         <DetailPanel title="Cálculos" action={<button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>Ver todos</button>}>
           <div className="space-y-2">
             {featuredCalculators.map((calculator) => (
@@ -980,13 +986,13 @@ const ProtocolsView = ({ onBack, onModuleOpen }) => {
   const activeModules = motivoConsultaModules.filter((module) => module.implemented);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className={pageClass}>
       <BackBar label="Inicio" onClick={onBack} />
 
       <PageHero title="Protocolos" />
 
       <DetailPanel title="Protocolos">
-        <div className="space-y-2">
+        <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
           {activeModules.map((module) => (
             <ListActionRow
               key={module.id}
@@ -1034,7 +1040,7 @@ const FibrilacionAuricularFlowView = ({
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className={pageClass}>
       <FlowHeader
         eyebrow="Protocolo FA"
         title={protocol.longTitle ?? protocol.title}
@@ -1355,7 +1361,7 @@ const HipertensionUrgenciasFlowView = ({
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className={pageClass}>
       <FlowHeader
         eyebrow="Protocolo HTA"
         title={protocol.longTitle ?? protocol.title}
@@ -1639,7 +1645,7 @@ const SindromeCoronarioAgudoFlowView = ({
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className={pageClass}>
       <FlowHeader
         eyebrow="Protocolo SCA"
         title={protocol.longTitle ?? protocol.title}
@@ -1981,13 +1987,13 @@ const SindromeCoronarioAgudoFlowView = ({
 };
 
 const CalculationsView = ({ onBack, onCalculatorOpen }) => (
-  <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+  <div className={pageClass}>
     <BackBar label="Inicio" onClick={onBack} />
 
     <PageHero title="Cálculos" />
 
     <DetailPanel title="Cálculos">
-      <div className="space-y-2">
+      <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
         {implementedCalculators.map((calculator) => (
           <ListActionRow
             key={calculator.id}
@@ -2005,7 +2011,7 @@ const CalculatorDetailView = ({ calculatorId, values, onChange, onBack }) => {
   const calculator = getCalculator(calculatorId);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className={pageClass}>
       <BackBar label="Cálculos" onClick={onBack} />
 
       <PageHero
@@ -2029,11 +2035,11 @@ const MedicationsView = ({ onBack, onMedicationOpen }) => {
   const currentGroup = medicationGroups.find((group) => group.id === activeGroupId) ?? medicationGroups[0];
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className={pageClass}>
       <BackBar label="Inicio" onClick={onBack} />
 
       <PageHero title="Medicamentos">
-        <div className="mt-1 flex gap-2 overflow-x-auto pb-1">
+        <div className="-mx-1 mt-1 flex gap-2 overflow-x-auto px-1 pb-1">
           {medicationGroups.map((group) => (
             <ProtocolSectionButton
               key={group.id}
@@ -2046,7 +2052,7 @@ const MedicationsView = ({ onBack, onMedicationOpen }) => {
       </PageHero>
 
       <DetailPanel title={currentGroup.title}>
-        <div className="space-y-2">
+        <div className="space-y-2 xl:grid xl:grid-cols-2 xl:gap-3 xl:space-y-0">
           {currentGroup.items.map((medicationId) => {
             const medication = getMedication(medicationId);
 
@@ -2068,7 +2074,7 @@ const MedicationDetailView = ({ medication, onBack }) => {
   const protocolLabel = medication.protocolId ? getProtocol(medication.protocolId)?.title ?? 'Módulo clínico' : 'Módulo clínico';
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4 sm:space-y-5">
+    <div className={pageClass}>
       <BackBar label="Medicamentos" onClick={onBack} />
 
       <PageHero
@@ -2402,8 +2408,8 @@ const App = () => {
         onHome={() => navigate({ view: 'home' })}
         onSelect={handlePrimaryNavigation}
       />
-      <main className="pb-28 pt-[5.6rem] lg:pb-12">
-        <div className="px-4 pb-2 sm:px-6 lg:px-8">{renderView()}</div>
+      <main className="app-main">
+        <div className="app-main-inner">{renderView()}</div>
       </main>
     </div>
   );
