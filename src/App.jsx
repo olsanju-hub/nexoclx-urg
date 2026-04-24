@@ -1,4 +1,4 @@
-import React, { startTransition, useEffect, useState } from 'react';
+import React, { startTransition, useDeferredValue, useEffect, useState } from 'react';
 import {
   Activity,
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
   Info,
   LayoutDashboard,
   Pill,
+  Search,
   ShieldAlert,
 } from 'lucide-react';
 import { buildReferenceHref } from './data/bibliography';
@@ -194,6 +195,8 @@ const getPageLabel = (route) => {
 };
 
 const uniqueByKey = (items, keyBuilder) => Array.from(new Map(items.map((item) => [keyBuilder(item), item])).values());
+const normalizeSearch = (value = '') => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const matchesSearch = (needle, ...parts) => parts.some((part) => normalizeSearch(part).includes(needle));
 
 const getModulePrimaryReferences = (moduleId) => {
   const protocol = getProtocol(moduleId);
@@ -238,6 +241,41 @@ const buildSpecialtyCollections = () =>
     };
   });
 
+const filterSpecialtyCollections = (groups, query) => {
+  const needle = normalizeSearch(query);
+
+  if (!needle) {
+    return groups;
+  }
+
+  return groups
+    .map((group) => {
+      const specialtyMatches = matchesSearch(needle, group.title, group.note);
+
+      if (specialtyMatches) {
+        return group;
+      }
+
+      const protocols = group.protocols.filter((module) => matchesSearch(needle, module.title, module.summary, module.section));
+      const calculators = group.calculators.filter((calculator) => matchesSearch(needle, calculator.title, calculator.summary, calculator.block));
+      const medications = group.medications.filter((medication) =>
+        matchesSearch(needle, medication.name, medication.family, medication.contextUse ?? medication.indication),
+      );
+      const bibliography = group.bibliography.filter((entry) =>
+        matchesSearch(needle, entry.moduleTitle, entry.shortReference, entry.note),
+      );
+
+      return {
+        ...group,
+        protocols,
+        calculators,
+        medications,
+        bibliography,
+      };
+    })
+    .filter((group) => group.protocols.length > 0 || group.calculators.length > 0 || group.medications.length > 0 || group.bibliography.length > 0);
+};
+
 const BrandLockup = ({ label }) => (
   <div className="flex min-w-0 items-center gap-3">
     <img
@@ -280,18 +318,18 @@ const StatusBadge = ({ children, tone = 'neutral' }) => {
 };
 
 const PageHero = ({ eyebrow, title, note, aside = null, children = null }) => (
-  <section className={`${shellCardClass} p-5 sm:p-6`}>
+  <section className={`${shellCardClass} overflow-hidden p-5 sm:p-6`}>
     <div className="flex flex-col gap-3 sm:gap-4 xl:flex-row xl:items-end xl:justify-between">
       <div className="min-w-0">
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
         <h1 className="mt-2.5 text-[1.68rem] font-semibold tracking-[-0.05em] text-[var(--text)] sm:mt-3 sm:text-[2.05rem] xl:text-[2.3rem]">
           {title}
         </h1>
-        {note ? <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p> : null}
+        {note ? <p className="mt-2.5 max-w-3xl text-sm leading-relaxed text-[var(--text-soft)]">{note}</p> : null}
       </div>
       {aside}
     </div>
-    {children ? <div className="mt-5">{children}</div> : null}
+    {children ? <div className="mt-4 sm:mt-5">{children}</div> : null}
   </section>
 );
 
@@ -433,24 +471,50 @@ const SpecialtyReferenceRow = ({ entry }) => (
   </a>
 );
 
-const SpecialtyAccordionList = ({ groups, onModuleOpen, onCalculatorOpen, onMedicationOpen }) => (
+const SearchField = ({ value, onChange, placeholder }) => (
+  <label className={`${mutedPanelClass} flex items-center gap-3 px-4 py-3.5`}>
+    <span className="icon-well h-10 w-10 rounded-[0.95rem] bg-[rgba(191,146,69,0.12)] text-[var(--accent-500)]">
+      <Search className="h-4 w-4" />
+    </span>
+    <div className="min-w-0 flex-1">
+      <p className="eyebrow eyebrow-muted">Buscar</p>
+      <input
+        type="search"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        className="mt-1 w-full bg-transparent text-sm font-medium text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]"
+      />
+    </div>
+  </label>
+);
+
+const EmptySearchState = ({ query }) => (
+  <div className={`${panelClass} p-5 sm:p-6`}>
+    <p className="eyebrow eyebrow-muted">Sin coincidencias</p>
+    <p className="mt-2 text-sm font-semibold text-[var(--text)]">{query}</p>
+    <p className="mt-1 text-sm text-[var(--text-soft)]">Prueba con otra especialidad, protocolo, cálculo o fármaco.</p>
+  </div>
+);
+
+const SpecialtyAccordionList = ({ groups, onModuleOpen, onCalculatorOpen, onMedicationOpen, forceOpen = false }) => (
   <div className="space-y-3">
     {groups.map((group) => (
       <details
         key={group.id}
-        className="group overflow-hidden rounded-[1.45rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.78)]"
-        {...(group.id === 'cardiologia' ? { open: true } : {})}
+        className="group overflow-hidden rounded-[1.55rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.78)] shadow-[0_24px_48px_-38px_rgba(64,49,22,0.2)]"
+        {...(forceOpen || group.id === 'cardiologia' ? { open: true } : {})}
       >
-        <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4 [&::-webkit-details-marker]:hidden">
+        <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4 sm:px-5 sm:py-4.5 [&::-webkit-details-marker]:hidden">
           <div className="min-w-0">
             <p className="eyebrow eyebrow-muted">Especialidad</p>
-            <p className="mt-1 text-base font-semibold tracking-[-0.03em] text-[var(--text)]">{group.title}</p>
-            {group.note ? <p className="mt-1 text-sm text-[var(--text-soft)]">{group.note}</p> : null}
+            <p className="mt-1 text-[1.02rem] font-semibold tracking-[-0.03em] text-[var(--text)]">{group.title}</p>
+            {group.note ? <p className="mt-1 max-w-2xl text-sm text-[var(--text-soft)]">{group.note}</p> : null}
           </div>
           <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-open:rotate-90" />
         </summary>
 
-        <div className="border-t border-[color:var(--line)] px-4 py-4">
+        <div className="border-t border-[color:var(--line)] bg-[rgba(252,249,244,0.5)] px-4 py-4 sm:px-5">
           <div className="space-y-4">
             <SpecialtySectionRows title="Protocolos">
               {group.protocols.map((module) => (
@@ -512,10 +576,10 @@ const QuickAccessCard = ({ icon: Icon, title, meta, onClick, tone = 'neutral' })
   <button
     type="button"
     onClick={onClick}
-    className={`group flex items-start gap-3 rounded-[1.45rem] border px-4 py-4 text-left transition duration-200 hover:-translate-y-0.5 ${
+    className={`group flex items-start gap-3 rounded-[1.5rem] border px-4 py-4 text-left transition duration-200 hover:-translate-y-0.5 ${
       tone === 'accent'
-        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.86)] shadow-[0_22px_44px_-34px_rgba(171,126,48,0.28)]'
-        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] shadow-[0_18px_38px_-30px_rgba(64,49,22,0.16)] hover:border-[rgba(191,146,69,0.24)]'
+        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.9)] shadow-[0_24px_48px_-34px_rgba(171,126,48,0.3)]'
+        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.88)] shadow-[0_18px_42px_-30px_rgba(64,49,22,0.16)] hover:border-[rgba(191,146,69,0.24)]'
     }`}
   >
     <span
@@ -841,23 +905,21 @@ const DisclosureBlock = ({ title, summary, children, tone = 'neutral', defaultOp
 const ProtocolFocusStrip = ({ current, decision, next }) => (
   <>
     <div className="mt-3 md:hidden">
-      <div className="rounded-[1rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.62)] px-3.5 py-2.5">
-        <div className="flex flex-wrap items-center gap-2">
-          <StatusBadge tone="active">Ahora</StatusBadge>
-          <p className="text-sm font-semibold text-[var(--text)]">{current}</p>
-        </div>
-        <p className="mt-1 text-xs leading-relaxed text-[var(--text-soft)]">{decision}</p>
+      <div className={`${mutedPanelClass} px-3.5 py-3`}>
+        <p className="eyebrow eyebrow-muted">Qué valoras</p>
+        <p className="mt-1 text-sm font-semibold text-[var(--text)]">{current}</p>
+        <p className="mt-2 text-xs leading-relaxed text-[var(--text-soft)]">{decision}</p>
       </div>
     </div>
 
     <div className="mt-4 hidden gap-2.5 md:grid md:grid-cols-3 lg:gap-3">
-      <ProtocolGuideBlock label="Ahora">
+      <ProtocolGuideBlock label="Qué valoras">
         <p className="font-semibold text-[var(--text)]">{current}</p>
       </ProtocolGuideBlock>
-      <ProtocolGuideBlock label="Decisión" tone="accent">
+      <ProtocolGuideBlock label="Qué decide" tone="accent">
         <p className="font-semibold text-[var(--text)]">{decision}</p>
       </ProtocolGuideBlock>
-      <ProtocolGuideBlock label="Después">
+      <ProtocolGuideBlock label="Qué sigue">
         <p className="font-semibold text-[var(--text)]">{next}</p>
       </ProtocolGuideBlock>
     </div>
@@ -1134,7 +1196,7 @@ const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision
     <div className="flex flex-wrap items-center justify-between gap-3">
       <button type="button" onClick={onBack} className={ghostButtonClass}>
         <ArrowLeft className="h-4 w-4" />
-        Cancelar
+        Volver
       </button>
       {onOpenSource ? (
         <button type="button" onClick={onOpenSource} className={subtleButtonClass}>
@@ -1177,26 +1239,48 @@ const HomeView = ({
   onMedicationsOpen,
   onMedicationOpen,
 }) => {
-  const specialtyCollections = buildSpecialtyCollections();
+  const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const specialtyCollections = filterSpecialtyCollections(buildSpecialtyCollections(), deferredSearchQuery);
   const featuredCalculators = implementedCalculators.slice(0, 3);
   const featuredMedications = ['adenosina', 'atropina', 'apixaban'];
+  const hasSearchResults = specialtyCollections.length > 0;
 
   return (
     <div className={widePageClass}>
-      <PageHero title="Inicio">
-        <div className="flex flex-wrap gap-3">
-          <button type="button" onClick={onProtocolsOpen} className={primaryButtonClass}>
-            <ClipboardList className="h-4 w-4" />
-            Especialidades
-          </button>
-          <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
-            <Calculator className="h-4 w-4" />
-            Cálculos
-          </button>
-          <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
-            <Pill className="h-4 w-4" />
-            Medicamentos
-          </button>
+      <PageHero eyebrow="Biblioteca clínica" title="Inicio clínico">
+        <div className="grid gap-3 xl:grid-cols-[1.08fr_0.92fr]">
+          <SearchField
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Módulo o fármaco"
+          />
+          <div className="flex flex-wrap gap-2.5">
+            <button type="button" onClick={onProtocolsOpen} className={primaryButtonClass}>
+              <ClipboardList className="h-4 w-4" />
+              Especialidades
+            </button>
+            <button type="button" onClick={() => onModuleOpen('taquiarritmias-bradicardias')} className={subtleButtonClass}>
+              <HeartPulse className="h-4 w-4" />
+              Arritmias
+            </button>
+            <button type="button" onClick={() => onModuleOpen('sindrome-coronario-agudo')} className={subtleButtonClass}>
+              <HeartPulse className="h-4 w-4" />
+              IAM / SCA
+            </button>
+            <button type="button" onClick={() => onModuleOpen('fibrilacion-auricular')} className={subtleButtonClass}>
+              <Activity className="h-4 w-4" />
+              FA
+            </button>
+            <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
+              <Calculator className="h-4 w-4" />
+              Cálculos
+            </button>
+            <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
+              <Pill className="h-4 w-4" />
+              Medicamentos
+            </button>
+          </div>
         </div>
       </PageHero>
 
@@ -1238,12 +1322,17 @@ const HomeView = ({
         </DetailPanel>
 
         <DetailPanel title="Especialidades">
-          <SpecialtyAccordionList
-            groups={specialtyCollections}
-            onModuleOpen={onModuleOpen}
-            onCalculatorOpen={onCalculatorOpen}
-            onMedicationOpen={onMedicationOpen}
-          />
+          {hasSearchResults ? (
+            <SpecialtyAccordionList
+              groups={specialtyCollections}
+              onModuleOpen={onModuleOpen}
+              onCalculatorOpen={onCalculatorOpen}
+              onMedicationOpen={onMedicationOpen}
+              forceOpen={Boolean(normalizeSearch(deferredSearchQuery))}
+            />
+          ) : (
+            <EmptySearchState query={deferredSearchQuery} />
+          )}
         </DetailPanel>
       </section>
 
@@ -1278,20 +1367,33 @@ const HomeView = ({
 };
 
 const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpen }) => {
-  const specialtyCollections = buildSpecialtyCollections();
+  const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const specialtyCollections = filterSpecialtyCollections(buildSpecialtyCollections(), deferredSearchQuery);
 
   return (
     <div className={pageClass}>
       <BackBar label="Inicio" onClick={onBack} />
 
-      <PageHero title="Especialidades" />
+      <PageHero title="Especialidades">
+        <SearchField
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Filtrar contenido"
+        />
+      </PageHero>
 
-      <SpecialtyAccordionList
-        groups={specialtyCollections}
-        onModuleOpen={onModuleOpen}
-        onCalculatorOpen={onCalculatorOpen}
-        onMedicationOpen={onMedicationOpen}
-      />
+      {specialtyCollections.length > 0 ? (
+        <SpecialtyAccordionList
+          groups={specialtyCollections}
+          onModuleOpen={onModuleOpen}
+          onCalculatorOpen={onCalculatorOpen}
+          onMedicationOpen={onMedicationOpen}
+          forceOpen={Boolean(normalizeSearch(deferredSearchQuery))}
+        />
+      ) : (
+        <EmptySearchState query={deferredSearchQuery} />
+      )}
     </div>
   );
 };
@@ -1367,7 +1469,7 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 1" title="¿Hay inestabilidad?" note="Marca solo lo que esté pasando ahora." />
+          <SectionTitle eyebrow="Paso 1" title="Pide inestabilidad" note="Marca solo lo que cambia la conducta ahora." />
 
           <div className="grid gap-2 sm:grid-cols-2">
             <BooleanField checked={hypotensionOrShock} label="TAS < 90 / shock" onChange={(value) => updateFlow({ hypotensionOrShock: value })} />
@@ -1419,7 +1521,7 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 2 && stability === 'stable' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 2" title="Datos que cambian la conducta" />
+          <SectionTitle eyebrow="Paso 2" title="Pide los datos que cambian la rama" />
 
           <div className="space-y-6">
             <div>
@@ -1513,7 +1615,7 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 3 && stability === 'stable' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="Conducta" />
+          <SectionTitle eyebrow="Paso 3" title="Conducta y tratamiento" />
 
           <div className="flex flex-wrap gap-2">
             <StatusBadge tone="active">{timingLabel}</StatusBadge>
@@ -1591,7 +1693,7 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 4 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="Anticoagulación" />
+          <SectionTitle eyebrow="Paso 4" title="Anticoagulación si cambia conducta" />
 
           <div className="grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
             <ProtocolGuideBlock label="Dato que cambia la conducta" tone="accent">
@@ -1757,7 +1859,7 @@ const HipertensionUrgenciasFlowView = ({
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 1" title="Registro de presión arterial" note="Introduce PAS y PAD." />
+          <SectionTitle eyebrow="Paso 1" title="Pide PAS y PAD" />
 
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-2">
@@ -1800,7 +1902,7 @@ const HipertensionUrgenciasFlowView = ({
 
       {step === 2 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 2" title="Daño de órgano diana" note="Decide si hay emergencia hipertensiva." />
+          <SectionTitle eyebrow="Paso 2" title="¿Hay daño de órgano diana?" />
 
           <div className="space-y-2">
             {[
@@ -1842,7 +1944,7 @@ const HipertensionUrgenciasFlowView = ({
 
       {step === 3 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="Clasificación" note="Define urgencia o emergencia." />
+          <SectionTitle eyebrow="Paso 3" title="Clasifica" />
 
           <div className="grid gap-3 lg:grid-cols-3">
             <ProtocolGuideBlock label="Cifra">
@@ -1887,12 +1989,7 @@ const HipertensionUrgenciasFlowView = ({
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
           <SectionTitle
             eyebrow="Paso 4"
-            title={classification === 'emergencia' ? 'Tratamiento de emergencia' : 'Tratamiento de urgencia'}
-            note={
-              classification === 'emergencia'
-                ? 'Ingresa, monitoriza y empieza tratamiento intravenoso titulado.'
-                : 'Empieza tratamiento oral, corrige desencadenantes y reevaluación.'
-            }
+            title={classification === 'emergencia' ? 'Trata la emergencia' : 'Trata la urgencia'}
           />
 
           <div className="grid gap-3 lg:grid-cols-[1.05fr_0.95fr]">
@@ -2064,7 +2161,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 1" title="Cribado de gravedad" note="ECG de 12 derivaciones en los primeros 10 min." />
+          <SectionTitle eyebrow="Paso 1" title="Pide ECG y datos críticos" note="ECG de 12 derivaciones en los primeros 10 min." />
 
           <div className="grid gap-3 lg:grid-cols-2">
             <ProtocolGuideBlock label="Haz ahora" tone="accent">
@@ -2119,7 +2216,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
       {step === 2 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 2" title="Clasificación inicial" note="Tipifica el síndrome con ECG y hs-cTn." />
+          <SectionTitle eyebrow="Paso 2" title="¿SCACEST o SCASEST?" note="El ECG manda; la hs-cTn ordena la rama sin elevación del ST." />
 
           <div className="grid gap-3 lg:grid-cols-2">
             <ProtocolGuideBlock label="No retrases" tone="warning">
@@ -2173,7 +2270,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
       {step === 3 && syndromeType === 'stemi' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="Escenario de SCACEST" note="Decide la estrategia de reperfusión." />
+          <SectionTitle eyebrow="Paso 3" title="Elige reperfusión" />
 
           {stability === 'unstable' ? (
             <div className="mb-4">
@@ -2215,7 +2312,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
       {step === 3 && syndromeType === 'nstemi' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="Riesgo en SCASEST" note="Define el tiempo de coronariografía." />
+          <SectionTitle eyebrow="Paso 3" title="Define el riesgo" />
 
           <div className="grid gap-4">
             <FlowChoiceCard
@@ -2249,7 +2346,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
       {step === 4 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="Conducta inmediata" note="Deja fijado qué haces ahora y adónde va el paciente." />
+          <SectionTitle eyebrow="Paso 4" title="Qué haces ahora" />
 
           {syndromeType === 'stemi' ? (
             <div className="grid gap-3 lg:grid-cols-3">
@@ -2306,7 +2403,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
       {step === 5 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 5" title="Tratamiento inicial" note="Ordena lo imprescindible antes de perder tiempo en matices." />
+          <SectionTitle eyebrow="Paso 5" title="Qué tratamiento pones" />
 
           <div className="grid gap-3 lg:grid-cols-2">
             <ProtocolGuideBlock label="Medidas generales" tone="accent">
@@ -2456,7 +2553,7 @@ const TaquiarritmiasBradicardiasFlowView = ({
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 1" title="¿Qué tienes delante?" />
+          <SectionTitle eyebrow="Paso 1" title="¿Taquicardia o bradicardia?" />
 
           <div className="grid gap-4 lg:grid-cols-2">
             <FlowChoiceCard
@@ -2486,8 +2583,8 @@ const TaquiarritmiasBradicardiasFlowView = ({
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
           <SectionTitle
             eyebrow="Paso 2"
-            title={rhythmFamily === 'bradycardia' ? '¿Hay datos de bradicardia con repercusión?' : '¿Hay taquicardia inestable?'}
-            note="Marca solo los datos que cambian la conducta ahora."
+            title={rhythmFamily === 'bradycardia' ? '¿Hay repercusión?' : '¿Hay inestabilidad?'}
+            note="Marca solo lo que cambia la conducta ahora."
           />
 
           <div className="grid gap-2 sm:grid-cols-2">
@@ -2547,7 +2644,7 @@ const TaquiarritmiasBradicardiasFlowView = ({
 
       {step === 3 && rhythmFamily === 'tachycardia' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="Clasifica la taquicardia" />
+          <SectionTitle eyebrow="Paso 3" title="Clasifica por QRS y ritmo" />
 
           <div className="grid gap-3 lg:grid-cols-2">
             <FlowChoiceCard
@@ -2597,7 +2694,7 @@ const TaquiarritmiasBradicardiasFlowView = ({
 
       {step === 3 && rhythmFamily === 'bradycardia' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="¿Hay riesgo de asistolia?" note="Pídelo solo si está sin repercusión inmediata." />
+          <SectionTitle eyebrow="Paso 3" title="¿Hay riesgo de asistolia?" note="Pídelo solo si sigue estable." />
 
           <div className="grid gap-2 sm:grid-cols-2">
             <BooleanField checked={recentAsystole} label="Asistolia reciente" onChange={(value) => updateFlow({ recentAsystole: value })} />
