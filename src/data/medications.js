@@ -10,6 +10,24 @@ const referenceEntry = ({ id, indexPage, verifiedPage = indexPage, pdfPage, note
     note,
   });
 
+const escHtaReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-hta-2024',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escScaReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-sca-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const cimaSource = (label, url) => ({ label, url, type: 'cima' });
 const protocolSource = (label, bibliography) => ({ label, bibliography, type: 'protocol' });
 
@@ -470,8 +488,17 @@ export const medicationCatalog = {
       'Si hay daño agudo de órgano diana no es la estrategia de elección.',
     ],
     sourceScope:
-      'La pauta contextual y las contraindicaciones principales proceden del capítulo 32 del Murillo.',
+      'La guía ESC 2024 manda la estrategia aguda de HTA y Murillo se mantiene como apoyo para la pauta práctica concreta de captopril.',
     sources: [
+      protocolSource(
+        'ESC HTA 2024 · manejo agudo de la HTA',
+        escHtaReferenceEntry({
+          id: 'esc-captopril-hta',
+          verifiedPages: [80],
+          pdfPages: [81],
+          note: 'La guía admite IECA de acción corta por vía oral en pacientes seleccionados y dentro de un entorno hospitalario.',
+        }),
+      ),
       protocolSource(
         'Murillo 7.ª ed. · urgencia hipertensiva',
         referenceEntry({
@@ -510,8 +537,17 @@ export const medicationCatalog = {
       'Puede mantenerse por vía oral tras estabilización.',
     ],
     sourceScope:
-      'La pauta oral procede del capítulo de urgencia hipertensiva y la pauta intravenosa del capítulo de emergencia hipertensiva.',
+      'La guía ESC 2024 marca el uso de tratamiento intravenoso de acción corta en la emergencia hipertensiva; Murillo se mantiene como apoyo para las dosis prácticas oral e intravenosa.',
     sources: [
+      protocolSource(
+        'ESC HTA 2024 · manejo agudo de la HTA',
+        escHtaReferenceEntry({
+          id: 'esc-labetalol-hta',
+          verifiedPages: [79, 80, 81],
+          pdfPages: [80, 81, 82],
+          note: 'Referencia principal del manejo agudo; incluye papel del labetalol IV en embarazo y necesidad de titulación cuidadosa.',
+        }),
+      ),
       protocolSource(
         'Murillo 7.ª ed. · urgencia hipertensiva',
         referenceEntry({
@@ -557,8 +593,17 @@ export const medicationCatalog = {
       'Encaja mejor cuando se busca un descenso progresivo en 24-48 h.',
     ],
     sourceScope:
-      'La pauta de inicio y el papel contextual proceden del capítulo 32 del Murillo.',
+      'La guía ESC 2024 fija el marco general de descenso gradual en HTA sin daño agudo; Murillo se conserva como apoyo para el uso contextual y la dosis de amlodipino.',
     sources: [
+      protocolSource(
+        'ESC HTA 2024 · descenso agudo y a corto plazo de la PA',
+        escHtaReferenceEntry({
+          id: 'esc-amlodipino-hta',
+          verifiedPages: [79, 80],
+          pdfPages: [80, 81],
+          note: 'La guía prioriza descenso gradual sin reducciones bruscas cuando no hay daño agudo de órgano diana.',
+        }),
+      ),
       protocolSource(
         'Murillo 7.ª ed. · urgencia hipertensiva',
         createBibliographyEntry({
@@ -597,8 +642,17 @@ export const medicationCatalog = {
       'Debe titularse con monitorización continua.',
     ],
     sourceScope:
-      'La indicación y la pauta de perfusión proceden del capítulo 33 del Murillo.',
+      'La guía ESC 2024 es la referencia principal para el manejo IV en HTA aguda y el uso de nitroglicerina en edema pulmonar o embarazo; Murillo aporta la pauta práctica de perfusión.',
     sources: [
+      protocolSource(
+        'ESC HTA 2024 · HTA aguda y embarazo',
+        escHtaReferenceEntry({
+          id: 'esc-nitroglicerina-hta',
+          verifiedPages: [79, 81],
+          pdfPages: [80, 82],
+          note: 'Tratamiento intravenoso en emergencia hipertensiva y nitroglicerina IV si se asocia a edema pulmonar en preeclampsia/eclampsia.',
+        }),
+      ),
       protocolSource(
         'Murillo 7.ª ed. · emergencia hipertensiva',
         referenceEntry({
@@ -636,8 +690,17 @@ export const medicationCatalog = {
       'El capítulo lo sitúa como tratamiento de elección en hipertensión maligna y encefalopatía hipertensiva.',
     ],
     sourceScope:
-      'La pauta de perfusión y las advertencias clave proceden del capítulo 33 del Murillo.',
+      'La guía ESC 2024 marca la necesidad de fármacos intravenosos de acción corta y descenso titulado; Murillo se mantiene como apoyo para la pauta concreta de nitroprusiato.',
     sources: [
+      protocolSource(
+        'ESC HTA 2024 · emergencia hipertensiva',
+        escHtaReferenceEntry({
+          id: 'esc-nitroprusiato-hta',
+          verifiedPages: [79, 80],
+          pdfPages: [80, 81],
+          note: 'La referencia principal actual prioriza tratamiento intravenoso de acción corta y evita descensos bruscos.',
+        }),
+      ),
       protocolSource(
         'Murillo 7.ª ed. · emergencia hipertensiva',
         referenceEntry({
@@ -657,7 +720,7 @@ export const medicationCatalog = {
     indication:
       'Antiagregación inicial en cualquier síndrome coronario agudo desde la sospecha clínica.',
     dose:
-      'En este contexto: 150-300 mg VO masticados como dosis de carga si no lo ha tomado en las últimas 24 h; después 100-150 mg/24 h VO.',
+      'En este contexto: 150-300 mg VO masticados como dosis de carga o 75-250 mg IV si no es posible la vía oral; después 75-100 mg/24 h.',
     route: 'Oral',
     frequency: 'Carga única y después una toma diaria.',
     duration: 'Inicio inmediato y continuación según evolución hospitalaria y cardiología.',
@@ -667,23 +730,62 @@ export const medicationCatalog = {
       'Si ya recibió ácido acetilsalicílico en las últimas 24 h, revisar antes de repetir la carga.',
     ],
     renalAdjustment:
-      'El capítulo no aporta un ajuste renal específico para la pauta inicial; la prioridad es valorar el riesgo hemorrágico y la función renal global.',
+      'La guía ESC 2023 no exige un ajuste renal específico para la carga inicial; la prioridad es valorar el riesgo hemorrágico y la función renal global.',
     hepaticAdjustment:
-      'El capítulo no define un ajuste hepático específico para la carga inicial; si existe hepatopatía con riesgo hemorrágico, individualizar.',
+      'La guía no define un ajuste hepático específico para la carga inicial; si existe hepatopatía con riesgo hemorrágico, individualizar.',
     practicalNotes: [
       'Debe administrarse lo más precozmente posible ante un SCA.',
       'La carga se realiza con preparado sin recubrimiento entérico y masticado.',
     ],
     sourceScope:
-      'La indicación y la pauta de carga y mantenimiento proceden del capítulo 26 del Murillo.',
+      'La guía ESC 2023 es la referencia principal para la antiagregación inicial con aspirina en el SCA.',
     sources: [
       protocolSource(
-        'Murillo 7.ª ed. · antiagregación inicial en SCA',
-        referenceEntry({
-          id: 'aas-sca',
-          verifiedPage: 223,
-          pdfPage: 248,
-          note: 'Ácido acetilsalicílico como tratamiento antiagregante inicial del SCA.',
+        'ESC SCA 2023 · aspirina en SCA',
+        escScaReferenceEntry({
+          id: 'aas-sca-esc',
+          verifiedPages: [33],
+          pdfPages: [34],
+          note: 'Tabla de dosis de aspirina en el síndrome coronario agudo.',
+        }),
+      ),
+    ],
+  },
+  prasugrel: {
+    id: 'prasugrel',
+    name: 'Prasugrel',
+    protocolId: 'sindrome-coronario-agudo',
+    family: 'Antiagregación',
+    indication:
+      'Inhibidor del P2Y12 para pacientes con SCA que van a intervención coronaria percutánea y no tienen contraindicación.',
+    dose:
+      'En este contexto: 60 mg VO de carga y después 10 mg/24 h. Si pesa < 60 kg o, si se decide usarlo con edad ≥ 75 años, emplear 5 mg/24 h.',
+    route: 'Oral',
+    frequency: 'Carga única y después una toma diaria.',
+    duration: 'Inicio agudo y continuación según el plan de revascularización y cardiología.',
+    contraindications: [
+      'Ictus o AIT previo.',
+      'Sangrado activo o riesgo hemorrágico no asumible.',
+      'Precaución especial en edad ≥ 75 años o peso < 60 kg.',
+    ],
+    renalAdjustment:
+      'La guía ESC 2023 no exige ajuste de dosis por insuficiencia renal.',
+    hepaticAdjustment:
+      'La guía no ofrece un ajuste numérico en hepatopatía; si el riesgo hemorrágico es relevante, individualizar.',
+    practicalNotes: [
+      'En pacientes con SCA que van a ICP suele preferirse frente a ticagrelor cuando no hay contraindicación.',
+      'No debe pretratarse de rutina en SCASEST si la anatomía coronaria es desconocida y se prevé coronariografía precoz.',
+    ],
+    sourceScope:
+      'La guía ESC 2023 es la referencia principal para indicación, dosis y contraindicaciones de prasugrel en SCA.',
+    sources: [
+      protocolSource(
+        'ESC SCA 2023 · prasugrel',
+        escScaReferenceEntry({
+          id: 'prasugrel-sca-esc',
+          verifiedPages: [33, 40],
+          pdfPages: [34, 41],
+          note: 'Tabla de dosis y recomendaciones de elección del inhibidor P2Y12 en el SCA.',
         }),
       ),
     ],
@@ -694,35 +796,35 @@ export const medicationCatalog = {
     protocolId: 'sindrome-coronario-agudo',
     family: 'Antiagregación',
     indication:
-      'Segundo antiagregante junto con ácido acetilsalicílico en SCACEST y en SCASEST de riesgo isquémico intermedio o alto.',
+      'Inhibidor del P2Y12 junto con ácido acetilsalicílico en SCACEST o SCASEST cuando no se usa prasugrel como opción preferente para ICP.',
     dose:
       'En este contexto: 180 mg VO de carga y después 90 mg VO cada 12 h.',
     route: 'Oral',
     frequency: 'Carga única y después cada 12 h.',
     duration: 'Inicio agudo y continuación según estrategia invasiva y plan cardiológico.',
     contraindications: [
-      'Contraindicado en pacientes sometidos a diálisis según el capítulo.',
       'Revisar el riesgo hemorrágico antes de asociarlo a ácido acetilsalicílico.',
       'No usarlo como sustituto aislado del tratamiento antitrombótico completo.',
+      'Si el paciente va a ICP y puede usarse prasugrel, este suele ser la opción preferida.',
     ],
     renalAdjustment:
-      'El capítulo señala que no precisa ajuste de dosis en insuficiencia renal, pero lo contraindica en pacientes en diálisis.',
+      'La guía ESC 2023 no exige ajuste de dosis por insuficiencia renal.',
     hepaticAdjustment:
-      'La obra base no detalla un ajuste hepático concreto en este contexto agudo; si existe hepatopatía significativa, individualizar.',
+      'La guía no ofrece un ajuste numérico en hepatopatía; si existe hepatopatía significativa o riesgo hemorrágico alto, individualizar.',
     practicalNotes: [
-      'En SCASEST se prioriza cuando el riesgo isquémico es intermedio o alto.',
-      'También está indicado en SCACEST asociado a ácido acetilsalicílico.',
+      'Está recomendado con independencia de la estrategia invasiva si no se escoge prasugrel como opción preferente para ICP.',
+      'No debe usarse como pretratamiento rutinario en SCASEST cuando se prevé coronariografía en < 24 h y la anatomía es desconocida.',
     ],
     sourceScope:
-      'La indicación, dosis de carga y mantenimiento proceden del capítulo 26 del Murillo.',
+      'La guía ESC 2023 es la referencia principal para la carga, mantenimiento y momento de uso de ticagrelor en SCA.',
     sources: [
       protocolSource(
-        'Murillo 7.ª ed. · ticagrelor en SCA',
-        referenceEntry({
-          id: 'ticagrelor-sca',
-          verifiedPage: 223,
-          pdfPage: 248,
-          note: 'Uso de ticagrelor asociado a ácido acetilsalicílico en el síndrome coronario agudo.',
+        'ESC SCA 2023 · ticagrelor',
+        escScaReferenceEntry({
+          id: 'ticagrelor-sca-esc',
+          verifiedPages: [33, 40],
+          pdfPages: [34, 41],
+          note: 'Dosis y recomendaciones de uso del ticagrelor en síndrome coronario agudo.',
         }),
       ),
     ],
@@ -733,35 +835,35 @@ export const medicationCatalog = {
     protocolId: 'sindrome-coronario-agudo',
     family: 'Antiagregación',
     indication:
-      'Alternativa antiagregante asociada a ácido acetilsalicílico en SCASEST de menor riesgo o cuando no pueden utilizarse ticagrelor o prasugrel.',
+      'Alternativa antiagregante asociada a ácido acetilsalicílico cuando prasugrel o ticagrelor no están disponibles, no se toleran o están contraindicados; también en fibrinólisis.',
     dose:
-      'En este contexto: 300-600 mg VO de carga y después 75 mg/24 h VO.',
+      'En este contexto: 300-600 mg VO de carga y después 75 mg/24 h. Si se usa con fibrinólisis, 300 mg de carga o 75 mg si la persona tiene > 75 años.',
     route: 'Oral',
     frequency: 'Carga única y después una toma diaria.',
     duration: 'Inicio agudo y continuación según la estrategia de revascularización y el plan cardiológico.',
     contraindications: [
       'Sangrado activo clínicamente relevante.',
       'No es la opción preferente si puede usarse ticagrelor en SCASEST de riesgo intermedio o alto.',
-      'No se recomienda asociarlo con omeprazol según el capítulo.',
+      'Evitar interacciones que reduzcan su efecto antiagregante.',
     ],
     renalAdjustment:
-      'La obra base no aporta un ajuste renal específico para la pauta aguda; vigilar riesgo hemorrágico y la estrategia de revascularización.',
+      'La guía ESC 2023 no exige un ajuste renal específico para la pauta aguda; vigilar riesgo hemorrágico y la estrategia de revascularización.',
     hepaticAdjustment:
-      'El capítulo no define un ajuste hepático numérico en este contexto; si existe hepatopatía significativa, individualizar.',
+      'La guía no define un ajuste hepático numérico en este contexto; si existe hepatopatía significativa, individualizar.',
     practicalNotes: [
-      'Es la alternativa cuando no puedes usar ticagrelor o prasugrel.',
-      'Puede utilizarse en SCACEST junto con ácido acetilsalicílico si así se decide antes de la ICP.',
+      'Es la alternativa cuando no puedes usar prasugrel o ticagrelor.',
+      'Mantiene un papel claro si el SCACEST se trata con fibrinólisis.',
     ],
     sourceScope:
-      'La indicación y la pauta de carga y mantenimiento proceden del capítulo 26 del Murillo.',
+      'La guía ESC 2023 es la referencia principal para el uso de clopidogrel en SCA y fibrinólisis.',
     sources: [
       protocolSource(
-        'Murillo 7.ª ed. · clopidogrel en SCA',
-        referenceEntry({
-          id: 'clopidogrel-sca',
-          verifiedPage: 223,
-          pdfPage: 248,
-          note: 'Clopidogrel como alternativa antiagregante inicial en síndrome coronario agudo.',
+        'ESC SCA 2023 · clopidogrel',
+        escScaReferenceEntry({
+          id: 'clopidogrel-sca-esc',
+          verifiedPages: [33],
+          pdfPages: [34],
+          note: 'Dosis de carga y mantenimiento de clopidogrel en SCA.',
         }),
       ),
     ],
@@ -772,9 +874,9 @@ export const medicationCatalog = {
     protocolId: 'sindrome-coronario-agudo',
     family: 'Anticoagulación',
     indication:
-      'Anticoagulación inicial cuando se prevé una intervención coronaria percutánea urgente o precoz en SCACEST o SCASEST.',
+      'Anticoagulación parenteral cuando el SCA va a una intervención coronaria percutánea urgente o precoz.',
     dose:
-      'En este contexto: 100 UI/kg IV iniciales, con máximo de 5.000 UI.',
+      'En este contexto: bolo IV ajustado al peso de 70-100 UI/kg durante la ICP. Si se usa como tratamiento inicial, puede continuarse en perfusión ajustada para mantener un aPTT de 60-80 s.',
     route: 'Intravenosa',
     frequency: 'Bolo inicial según estrategia invasiva.',
     duration: 'Uso agudo al inicio del proceso y durante la estrategia invasiva.',
@@ -784,23 +886,23 @@ export const medicationCatalog = {
       'Revisar que realmente se prevea ICP urgente o precoz antes de elegirla.',
     ],
     renalAdjustment:
-      'El capítulo no aporta un ajuste renal específico para la dosis inicial; controlar sangrado y la respuesta anticoagulante según evolución.',
+      'La guía ESC 2023 no exige un ajuste renal específico para la dosis inicial; controlar sangrado y la respuesta anticoagulante según evolución.',
     hepaticAdjustment:
-      'La obra base no define un ajuste hepático cuantificado en este escenario agudo; individualizar si existe hepatopatía con coagulopatía.',
+      'La guía no define un ajuste hepático cuantificado en este escenario agudo; individualizar si existe hepatopatía con coagulopatía.',
     practicalNotes: [
       'Es la opción descrita cuando vas a ICP primaria o precoz.',
       'Si no se prevé ICP inmediata en SCASEST, el capítulo dirige hacia fondaparinux o enoxaparina.',
     ],
     sourceScope:
-      'La indicación y la dosis inicial proceden del capítulo 26 del Murillo.',
+      'La guía ESC 2023 es la referencia principal para la anticoagulación con heparina no fraccionada en SCA.',
     sources: [
       protocolSource(
-        'Murillo 7.ª ed. · heparina sódica en SCA',
-        referenceEntry({
-          id: 'heparina-sca',
-          verifiedPage: 223,
-          pdfPage: 248,
-          note: 'Heparina sódica como anticoagulación inicial cuando se prevé estrategia invasiva.',
+        'ESC SCA 2023 · heparina no fraccionada',
+        escScaReferenceEntry({
+          id: 'heparina-sca-esc',
+          verifiedPages: [33, 40],
+          pdfPages: [34, 41],
+          note: 'Tabla de dosis y recomendación de bolo de HNF durante la ICP.',
         }),
       ),
     ],
@@ -811,9 +913,9 @@ export const medicationCatalog = {
     protocolId: 'sindrome-coronario-agudo',
     family: 'Anticoagulación',
     indication:
-      'Anticoagulación en SCASEST cuando no se prevé una intervención coronaria percutánea primaria inmediata.',
+      'Anticoagulación alternativa en SCA, sobre todo si en SCASEST se prevé coronariografía precoz (< 24 h) o como alternativa a HNF en IAMCEST con ICP.',
     dose:
-      'En este contexto: 30 mg IV iniciales y, a los 15 min, 1 mg/kg SC; después 1 mg/kg/12 h. Si la persona es mayor de 75 años, omitir el bolo inicial y usar 0,75 mg/kg/12 h. Si el aclaramiento de creatinina es < 30 mL/min, 1 mg/kg/24 h.',
+      'En este contexto: 1 mg/kg SC cada 12 h durante al menos 2 días y hasta la estabilización clínica. Si el aclaramiento de creatinina es < 30 mL/min, 1 mg/kg/24 h. Si la última dosis SC fue > 8 h antes de la ICP, añadir 0,3 mg/kg IV.',
     route: 'Intravenosa / subcutánea',
     frequency: 'Bolo inicial y mantenimiento cada 12 h, o cada 24 h si hay insuficiencia renal grave.',
     duration: 'Uso agudo mientras se completa el estudio y la estrategia invasiva diferida.',
@@ -825,21 +927,60 @@ export const medicationCatalog = {
     renalAdjustment:
       'Si el aclaramiento de creatinina es inferior a 30 mL/min, la pauta de mantenimiento pasa a 1 mg/kg/24 h.',
     hepaticAdjustment:
-      'La obra base no define un ajuste hepático concreto; si existe hepatopatía con riesgo hemorrágico, individualizar y vigilar.',
+      'La guía no define un ajuste hepático concreto; si existe hepatopatía con riesgo hemorrágico, individualizar y vigilar.',
     practicalNotes: [
-      'El libro la reserva para SCASEST cuando no se prevé ICP primaria inmediata.',
-      'En personas mayores de 75 años se omite el bolo inicial intravenoso.',
+      'En SCASEST con coronariografía prevista en < 24 h es alternativa a la HNF.',
+      'En IAMCEST con ICP puede considerarse alternativa a la HNF.',
     ],
     sourceScope:
-      'La indicación, la pauta completa y las contraindicaciones proceden del capítulo 26 del Murillo.',
+      'La guía ESC 2023 es la referencia principal para la pauta de enoxaparina en SCA.',
     sources: [
       protocolSource(
-        'Murillo 7.ª ed. · enoxaparina en SCASEST',
-        referenceEntry({
-          id: 'enoxaparina-sca',
-          verifiedPage: 224,
-          pdfPage: 249,
-          note: 'Pauta de enoxaparina y ajustes por edad y función renal en SCASEST.',
+        'ESC SCA 2023 · enoxaparina',
+        escScaReferenceEntry({
+          id: 'enoxaparina-sca-esc',
+          verifiedPages: [33, 40],
+          pdfPages: [34, 41],
+          note: 'Dosis de enoxaparina y papel como alternativa a HNF según la estrategia invasiva.',
+        }),
+      ),
+    ],
+  },
+  'fondaparinux-sca': {
+    id: 'fondaparinux-sca',
+    name: 'Fondaparinux',
+    protocolId: 'sindrome-coronario-agudo',
+    family: 'Anticoagulación',
+    indication:
+      'Anticoagulación de elección en SCASEST cuando no se prevé coronariografía invasiva temprana (< 24 h).',
+    dose:
+      'En este contexto: 2,5 mg SC cada 24 h. Si finalmente se realiza ICP, administrar además un bolo único de HNF. Evitar si el aclaramiento de creatinina es < 20 mL/min.',
+    route: 'Subcutánea',
+    frequency: 'Una vez al día.',
+    duration: 'Uso agudo mientras se completa el estudio y la estrategia invasiva diferida o selectiva.',
+    contraindications: [
+      'Sangrado activo o riesgo hemorrágico no asumible.',
+      'Aclaramiento de creatinina < 20 mL/min.',
+      'No usar como anticoagulante de elección en IAMCEST con ICP primaria.',
+    ],
+    renalAdjustment:
+      'La guía ESC 2023 indica evitarlo si el aclaramiento de creatinina es < 20 mL/min.',
+    hepaticAdjustment:
+      'La guía no aporta un ajuste hepático numérico; si existe hepatopatía con riesgo hemorrágico, individualizar.',
+    practicalNotes: [
+      'Es la opción recomendada en SCASEST si no se prevé coronariografía en < 24 h.',
+      'Si el paciente acaba en ICP, añade un bolo de HNF para evitar trombosis del catéter.',
+    ],
+    sourceScope:
+      'La guía ESC 2023 es la referencia principal para el uso de fondaparinux en SCASEST.',
+    sources: [
+      protocolSource(
+        'ESC SCA 2023 · fondaparinux',
+        escScaReferenceEntry({
+          id: 'fondaparinux-sca-esc',
+          verifiedPages: [33, 40],
+          pdfPages: [34, 41],
+          note: 'Dosis de fondaparinux y recomendación como anticoagulación de elección cuando no se prevé angiografía < 24 h.',
         }),
       ),
     ],
@@ -850,7 +991,7 @@ export const medicationCatalog = {
     protocolId: 'sindrome-coronario-agudo',
     family: 'Antiisquémico',
     indication:
-      'Tratamiento antiisquémico y analgésico inicial de elección cuando el paciente con SCA presenta dolor torácico en el momento de la valoración.',
+      'Tratamiento antiisquémico para aliviar síntomas cuando el paciente con SCA presenta dolor torácico en el momento de la valoración.',
     dose:
       'En este contexto: 0,8-1 mg sublinguales cada 5 min hasta 3 dosis. Si persiste el dolor o existe IAM anterior extenso, insuficiencia cardíaca o isquemia persistente con hipertensión, iniciar perfusión IV desde 10 microg/min y titular.',
     route: 'Sublingual / intravenosa',
@@ -862,16 +1003,25 @@ export const medicationCatalog = {
       'Uso reciente de sildenafilo, vardenafilo o tadalafilo.',
     ],
     renalAdjustment:
-      'El capítulo no describe un ajuste renal específico; la titulación se guía por la respuesta hemodinámica.',
+      'No requiere un ajuste renal específico en esta pauta aguda; la titulación se guía por la respuesta hemodinámica.',
     hepaticAdjustment:
-      'La obra base no define un ajuste hepático específico en la fase aguda; vigilar tolerancia y presión arterial.',
+      'No hay un ajuste hepático numérico establecido para esta pauta aguda; vigilar tolerancia y presión arterial.',
     practicalNotes: [
-      'Es el analgésico antiisquémico inicial de elección si hay dolor de probable origen coronario.',
+      'Puede aliviar la isquemia, pero no debe usarse como maniobra diagnóstica.',
       'No sustituye a la analgesia opioide si el dolor persiste.',
     ],
     sourceScope:
-      'Las pautas sublingual e intravenosa y sus contraindicaciones proceden del capítulo 26 del Murillo.',
+      'La guía ESC 2023 es la referencia principal para indicación y contraindicaciones; Murillo se mantiene como apoyo para la pauta sublingual e intravenosa práctica.',
     sources: [
+      protocolSource(
+        'ESC SCA 2023 · nitratos en SCA',
+        escScaReferenceEntry({
+          id: 'nitroglicerina-sca-esc',
+          verifiedPages: [25],
+          pdfPages: [26],
+          note: 'Uso sintomático de nitratos y contraindicaciones principales en la fase aguda.',
+        }),
+      ),
       protocolSource(
         'Murillo 7.ª ed. · nitroglicerina en SCA',
         referenceEntry({
@@ -889,35 +1039,35 @@ export const medicationCatalog = {
     protocolId: 'sindrome-coronario-agudo',
     family: 'Analgesia',
     indication:
-      'Analgesia cuando ha fracasado la nitroglicerina sublingual para controlar el dolor, sobre todo en angina inestable, IAM anterior o simpaticotonía.',
+      'Analgesia intravenosa cuando persiste dolor torácico intenso a pesar de nitratos y medidas iniciales.',
     dose:
-      'En este contexto: 2 mg/min IV hasta control del dolor o 10 mg totales. Si a los 10 min continúa el dolor, puede repetirse la dosis. Si hace falta, perfusión continua a 40 microg/min.',
+      'En este contexto: 5-10 mg IV, titulando según control del dolor y tolerancia hemodinámica.',
     route: 'Intravenosa',
     frequency: 'Bolos titulados y, si hace falta, perfusión continua.',
     duration: 'Uso agudo mientras persista dolor isquémico no controlado.',
     contraindications: [
-      'En IAM inferior o inferoposterior, vagotonía o bloqueo AV debe usarse con precaución y asociar atropina o valorar meperidina.',
       'Precaución si existe depresión respiratoria o deterioro hemodinámico.',
+      'Usar con cuidado si hay bradicardia o predominio vagal.',
       'No sustituye al tratamiento de reperfusión ni al antitrombótico.',
     ],
     renalAdjustment:
-      'El capítulo no fija un ajuste renal específico para esta pauta aguda; si la función renal está muy comprometida, vigilar acumulación y depresión respiratoria.',
+      'La guía no fija un ajuste renal específico para esta pauta aguda; si la función renal está muy comprometida, vigilar acumulación y depresión respiratoria.',
     hepaticAdjustment:
-      'La obra base no establece un ajuste hepático numérico; si existe hepatopatía avanzada, extremar la vigilancia clínica.',
+      'La guía no establece un ajuste hepático numérico; si existe hepatopatía avanzada, extremar la vigilancia clínica.',
     practicalNotes: [
-      'Se emplea cuando la nitroglicerina no controla el dolor.',
-      'En IAM inferior o con vagotonía el propio capítulo aconseja precaución y valorar alternativas.',
+      'Se usa cuando el dolor sigue siendo intenso pese a nitratos y medidas iniciales.',
+      'Puede retrasar la absorción y el efecto de los antiagregantes orales.',
     ],
     sourceScope:
-      'La indicación y la pauta intravenosa proceden del capítulo 26 del Murillo.',
+      'La guía ESC 2023 es la referencia principal para la analgesia opioide en el SCA.',
     sources: [
       protocolSource(
-        'Murillo 7.ª ed. · morfina en SCA',
-        referenceEntry({
-          id: 'morfina-sca',
-          verifiedPage: 221,
-          pdfPage: 246,
-          note: 'Pauta de morfina intravenosa para el control del dolor coronario.',
+        'ESC SCA 2023 · opiáceos en SCA',
+        escScaReferenceEntry({
+          id: 'morfina-sca-esc',
+          verifiedPages: [25],
+          pdfPages: [26],
+          note: 'La guía contempla opiáceos IV como morfina 5-10 mg para dolor torácico intenso.',
         }),
       ),
     ],
@@ -960,7 +1110,15 @@ export const medicationGroups = [
   {
     id: 'sca-antitrombotico',
     title: 'SCA · antitrombótico',
-    items: ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'heparina-sodica', 'enoxaparina-sca'],
+    items: [
+      'acido-acetilsalicilico',
+      'prasugrel',
+      'ticagrelor',
+      'clopidogrel',
+      'heparina-sodica',
+      'enoxaparina-sca',
+      'fondaparinux-sca',
+    ],
   },
 ];
 

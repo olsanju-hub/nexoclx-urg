@@ -1481,13 +1481,13 @@ const HipertensionUrgenciasFlowView = ({
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             <ProtocolGuideBlock label="Conducta inmediata" tone={classification === 'emergencia' ? 'critical' : 'warning'}>
               {classification === 'emergencia'
-                ? 'Monitorización y descenso controlado de la presión arterial en 1-2 horas.'
-                : 'Descenso progresivo de la presión arterial. La vía oral suele ser suficiente.'}
+                ? 'Ingreso, monitorización y descenso controlado con fármaco intravenoso de acción corta.'
+                : 'Confirma cifras, corrige desencadenantes y baja la presión de forma progresiva. La vía oral suele ser suficiente.'}
             </ProtocolGuideBlock>
             <ProtocolGuideBlock label={classification === 'emergencia' ? 'Objetivo' : 'Medidas generales'}>
               {classification === 'emergencia'
-                ? 'Reducir en torno al 20-25% de la presión arterial media en el intervalo inicial, salvo matices según el órgano afectado.'
-                : 'Reposo, control del dolor o ansiedad y nueva toma antes de intensificar el tratamiento.'}
+                ? 'Titula según el órgano afectado y evita caídas bruscas o excesivas de la presión arterial.'
+                : 'Reposo, control del dolor o la ansiedad y nueva toma antes de intensificar el tratamiento.'}
             </ProtocolGuideBlock>
           </div>
 
@@ -1508,14 +1508,18 @@ const HipertensionUrgenciasFlowView = ({
           <SectionTitle
             eyebrow="Paso 4"
             title={classification === 'emergencia' ? 'Tratamiento de emergencia' : 'Tratamiento de urgencia'}
-            note={classification === 'emergencia' ? 'Empieza tratamiento intravenoso.' : 'Empieza tratamiento oral y reevaluación.'}
+            note={
+              classification === 'emergencia'
+                ? 'Ingresa, monitoriza y empieza tratamiento intravenoso titulado.'
+                : 'Empieza tratamiento oral, corrige desencadenantes y reevaluación.'
+            }
           />
 
           <div className="grid gap-3 lg:grid-cols-[1.05fr_0.95fr]">
             <ProtocolGuideBlock label="Conducta" tone={classification === 'emergencia' ? 'critical' : 'warning'}>
               {classification === 'emergencia'
-                ? 'Prioriza tratamiento intravenoso y monitorización continua. Si el contexto es coronario o edema agudo de pulmón, la nitroglicerina gana peso; si es HTA maligna o encefalopatía, prioriza nitroprusiato.'
-                : 'Reposo, reevaluación tras 30 min y corrección de desencadenantes antes de intensificar fármacos.'}
+                ? 'Prioriza fármaco intravenoso de acción corta y monitorización continua. Si hay contexto coronario o edema agudo de pulmón, la nitroglicerina gana peso; el resto depende del órgano afectado y del escenario.'
+                : 'Reposo, control del dolor o la ansiedad, repetición de la toma y ajuste oral si la elevación persiste.'}
             </ProtocolGuideBlock>
             <ProtocolGuideBlock label="Advertencia" tone="warning">
               {classification === 'emergencia' ? protocol.warnings[1] : protocol.warnings[0]}
@@ -1526,7 +1530,7 @@ const HipertensionUrgenciasFlowView = ({
             <p className="eyebrow eyebrow-muted mb-2">Tratamiento</p>
             <div className="space-y-2">
               {(classification === 'emergencia'
-                ? ['nitroprusiato', 'labetalol', 'nitroglicerina']
+                ? ['labetalol', 'nitroglicerina', 'nitroprusiato']
                 : ['captopril', 'labetalol', 'amlodipino']
               ).map((medicationId) => (
                 <MedicationQuickRow
@@ -1605,34 +1609,53 @@ const SindromeCoronarioAgudoFlowView = ({
       ? 'Activa código infarto y deriva a hemodinámica. No esperes troponina.'
       : stemiScenario === 'fibrinolysis'
         ? 'Fibrinólisis precoz si no llegas a ICP en menos de 120 min y traslado posterior para ICP.'
-        : 'Ingreso en UCI y valoración urgente si sigue con dolor, shock, insuficiencia cardíaca o dudas diagnósticas.';
+        : 'Si han pasado más de 12 h, valora ICP si persiste isquemia, shock, insuficiencia cardíaca o arritmias graves; si no, ingreso y valoración cardiológica durante el ingreso.';
 
   const stemiDestinationText =
     stemiScenario === 'fibrinolysis' ? 'UCI y traslado a centro con hemodinámica.' : 'UCI / hemodinámica.';
 
   const nsteacsConductText =
     nsteacsRisk === 'very-high'
-      ? 'Coronariografía e ICP urgente en menos de 2 h.'
+      ? 'Coronariografía inmediata, idealmente en menos de 2 h.'
       : nsteacsRisk === 'high'
         ? 'Coronariografía precoz en menos de 24 h.'
-        : 'Ingreso, monitorización y estrategia invasiva diferida o según evolución.';
+        : 'Observación monitorizada, hs-cTn seriada y estrategia invasiva durante el ingreso o selectiva según la sospecha clínica.';
 
   const nsteacsDestinationText =
-    nsteacsRisk === 'low-intermediate' ? 'Observación o cardiología según evolución.' : 'UCI o cardiología monitorizada.';
+    nsteacsRisk === 'low-intermediate' ? 'Observación monitorizada o cardiología según dolor, ECG y troponina.' : 'UCI o cardiología monitorizada.';
 
   const antithromboticText =
     syndromeType === 'stemi'
-      ? 'Ácido acetilsalicílico siempre. Añade ticagrelor o clopidogrel. Si vas a ICP, utiliza heparina sódica.'
+      ? 'Aspirina siempre. Añade prasugrel o ticagrelor si va a ICP; clopidogrel si no puedes usar un inhibidor potente o si fibrinolizas. Anticoagula con HNF durante la ICP; enoxaparina es alternativa.'
       : nsteacsRisk === 'low-intermediate'
-        ? 'Ácido acetilsalicílico y clopidogrel si no puedes usar ticagrelor. Si no se prevé ICP inmediata, enoxaparina.'
-        : 'Ácido acetilsalicílico y ticagrelor si el riesgo es intermedio/alto. Si vas a estrategia invasiva precoz, heparina; si no, enoxaparina.';
+        ? 'Aspirina desde el inicio. Si no se prevé coronariografía < 24 h y no hay alto riesgo hemorrágico, valora inhibidor del P2Y12. Fondaparinux es la anticoagulación de elección; si acaba en ICP, añade HNF.'
+        : 'Aspirina desde el inicio. Si se define ICP, prasugrel suele preferirse; ticagrelor es alternativa. Si se prevé coronariografía < 24 h, HNF o enoxaparina; si no, fondaparinux.';
 
   const treatmentMedicationIds =
     syndromeType === 'stemi'
-      ? ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'heparina-sodica', 'nitroglicerina-sca', 'morfina-sca']
+      ? [
+          'acido-acetilsalicilico',
+          'prasugrel',
+          'ticagrelor',
+          'clopidogrel',
+          'heparina-sodica',
+          'enoxaparina-sca',
+          'nitroglicerina-sca',
+          'morfina-sca',
+        ]
       : nsteacsRisk === 'low-intermediate'
-        ? ['acido-acetilsalicilico', 'clopidogrel', 'enoxaparina-sca', 'nitroglicerina-sca', 'morfina-sca']
-        : ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'heparina-sodica', 'enoxaparina-sca', 'nitroglicerina-sca', 'morfina-sca'];
+        ? ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'fondaparinux-sca', 'nitroglicerina-sca', 'morfina-sca']
+        : [
+            'acido-acetilsalicilico',
+            'prasugrel',
+            'ticagrelor',
+            'clopidogrel',
+            'heparina-sodica',
+            'enoxaparina-sca',
+            'fondaparinux-sca',
+            'nitroglicerina-sca',
+            'morfina-sca',
+          ];
 
   const fibrinolysisWarnings = [
     'Descarta ACV hemorrágico previo, disección aórtica o sangrado gastrointestinal reciente.',
@@ -1666,7 +1689,8 @@ const SindromeCoronarioAgudoFlowView = ({
           <div className="grid gap-3 lg:grid-cols-2">
             <ProtocolGuideBlock label="Haz ahora" tone="accent">
               <div className="space-y-1.5">
-                <p>Monitoriza, canaliza una vía y extrae troponina, bioquímica y coagulación.</p>
+                <p>Monitoriza, canaliza una vía y pide hs-cTn, hemograma, bioquímica y coagulación.</p>
+                <p>Si no hay SCACEST, aplica 0 h/1 h o 0 h/2 h para la troponina.</p>
                 <p>Usa oxígeno solo si la SpO2 es menor del 90%.</p>
               </div>
             </ProtocolGuideBlock>
@@ -1715,7 +1739,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
       {step === 2 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 2" title="Clasificación inicial" note="Tipifica el síndrome con el ECG." />
+          <SectionTitle eyebrow="Paso 2" title="Clasificación inicial" note="Tipifica el síndrome con ECG y hs-cTn." />
 
           <div className="grid gap-3 lg:grid-cols-2">
             <ProtocolGuideBlock label="No retrases" tone="warning">
@@ -1724,7 +1748,7 @@ const SindromeCoronarioAgudoFlowView = ({
             <ProtocolGuideBlock label="Datos que mandan">
               <div className="space-y-1.5">
                 <p>SCACEST: elevación persistente del ST o BCRI nuevo/presumiblemente nuevo.</p>
-                <p>SCASEST: sin elevación persistente del ST; troponina y riesgo ordenan la conducta.</p>
+                <p>SCASEST: sin elevación persistente del ST; hs-cTn 0 h/1 h o 0 h/2 h y el riesgo ordenan la conducta.</p>
               </div>
             </ProtocolGuideBlock>
           </div>
@@ -1747,7 +1771,7 @@ const SindromeCoronarioAgudoFlowView = ({
             <FlowChoiceCard
               icon={Activity}
               title="SCASEST"
-              note="Define el riesgo para fijar el tiempo de coronariografía."
+              note="Usa hs-cTn y el riesgo para fijar el tiempo de coronariografía."
               onClick={() =>
                 updateFlow({
                   step: 3,
@@ -1830,7 +1854,7 @@ const SindromeCoronarioAgudoFlowView = ({
             <FlowChoiceCard
               icon={Activity}
               title="Intermedio / bajo riesgo"
-              note="Sin criterios previos; ingreso, monitorización y estrategia diferida."
+              note="Sin criterios previos; observación monitorizada y estrategia selectiva según clínica, ECG y troponina."
               onClick={() => updateFlow({ step: 4, nsteacsRisk: 'low-intermediate' })}
             />
           </div>
@@ -1881,7 +1905,7 @@ const SindromeCoronarioAgudoFlowView = ({
             <ProtocolGuideBlock label="Tiempo" tone="accent">
               {syndromeType === 'stemi'
                 ? 'Si el SCACEST tiene menos de 12 h, reperfunde lo antes posible. Deseable FMC a ICP < 90 min; si no llegas en < 120 min, valora fibrinólisis.'
-                : 'Muy alto riesgo: < 2 h. Alto riesgo: < 24 h. Menor riesgo: estrategia tardía o según evolución.'}
+                : 'Muy alto riesgo: inmediata, idealmente < 2 h. Alto riesgo: < 24 h. Menor riesgo: durante el ingreso o estrategia selectiva.'}
             </ProtocolGuideBlock>
             <ProtocolGuideBlock label="Advertencia" tone="warning">
               {syndromeType === 'stemi' ? protocol.warnings[0] : protocol.warnings[1]}
@@ -1919,7 +1943,7 @@ const SindromeCoronarioAgudoFlowView = ({
 
           <div className="mt-4 grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
             <ProtocolGuideBlock label="Dolor / isquemia" tone="warning">
-              Nitroglicerina sublingual primero. Si el dolor persiste, pasa a perfusión IV y añade morfina si hace falta.
+              Nitroglicerina sublingual si no hay contraindicaciones. Si el dolor sigue siendo intenso, valora perfusión IV y añade morfina.
             </ProtocolGuideBlock>
             <ProtocolGuideBlock label="Después">
               {protocol.warnings[3]}

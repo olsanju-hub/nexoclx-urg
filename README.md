@@ -17,7 +17,7 @@ Debe mantenerse actualizado en cuatro capas:
 
 ## Qué es NexoClx
 
-NexoClx busca ofrecer una interfaz clínica breve, usable en móvil y basada en fuentes reales. La app parte de una obra base auditada y avanza módulo por módulo.
+NexoClx busca ofrecer una interfaz clínica breve, usable en móvil y basada en fuentes reales. La app parte de bibliografía auditada y avanza módulo por módulo.
 
 Principios actuales del proyecto:
 
@@ -32,11 +32,11 @@ Principios actuales del proyecto:
 
 - Home simplificada a: logo, bibliografía, buscador, accesos a `Protocolos`, `Cálculos`, `Medicamentos` y `Actividad reciente`.
 - Pantalla propia de `Protocolos` como entrada a módulos clínicos auditados.
-- Primer protocolo real operativo: `fibrilación auricular`, dividido en vistas cortas: `Resumen`, `Decisión`, `Cálculos`, `Medicación` y `Seguridad`.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias` y `síndrome coronario agudo`.
 - Cálculos activos del módulo FA: `CHA2DS2-VASc`, `HAS-BLED` y `Cockcroft-Gault`.
-- Fichas farmacológicas activas del módulo FA enlazadas desde el protocolo y desde `Medicamentos`.
+- Fichas farmacológicas activas para FA, HTA y SCA enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
-- Bibliografía base activa: `Murillo 7.ª ed.` auditada con separación entre `página índice`, `página real` y `página PDF`.
+- Bibliografía activa: `Murillo 7.ª ed.` como obra base general, `ESC HTA 2024` como referencia principal de HTA y `ESC SCA 2023` como referencia principal de IAM/SCA.
 - Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`.
 - Despliegue activo en GitHub Pages: `https://olsanju-hub.github.io/NexoClx/`.
 
@@ -131,7 +131,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `src/data/protocols.js`
   - protocolos clínicos reales
-  - actualmente contiene `fibrilación auricular`
+  - actualmente contiene `fibrilación auricular`, `HTA en urgencias` y `síndrome coronario agudo`
 
 - `src/data/calculators.js`
   - catálogo de cálculos implementados
@@ -148,6 +148,12 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 - `public/biblio/urgencias-murillo-7ma.pdf`
   - obra base activa auditada y enlazada por la app
 
+- `public/biblio/HTA 2024.pdf`
+  - guía principal actual para `HTA en urgencias`
+
+- `public/biblio/SCA 2023.pdf`
+  - guía principal actual para `IAM / síndrome coronario agudo`
+
 ## Índice funcional del proyecto
 
 ### Módulos clínicos
@@ -155,6 +161,8 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Módulo | Capítulo | Página real | Estado | Qué existe hoy |
 | --- | --- | ---: | --- | --- |
 | Fibrilación auricular | Cap. 23 | 185 | Creado | Protocolo real dividido en `Resumen`, `Decisión`, `Cálculos`, `Medicación` y `Seguridad`, con bibliografía interna discreta. |
+| HTA en urgencias | Caps. 32-33 | 246 | Creado | Flujo real para separar urgencia de emergencia hipertensiva, con conducta, tratamiento y bibliografía principal `ESC HTA 2024`. |
+| Síndrome coronario agudo | Cap. 26 | 214 | Creado | Flujo real para ECG, hs-cTn, riesgo, reperfusión y antitrombosis, con bibliografía principal `ESC SCA 2023`. |
 | Shock | Cap. 18 | 154 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Dolor torácico agudo | Cap. 25 | 207 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Ictus | Cap. 64 | 442 | Solo indexado | Tema auditado, sin protocolo operativo. |
@@ -209,6 +217,8 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fuente | Ubicación | Estado | Observaciones |
 | --- | --- | --- | --- |
+| *Guía ESC 2024 sobre el manejo de la presión arterial elevada y la hipertensión* | `public/biblio/HTA 2024.pdf` | Activa · principal en HTA | Referencia principal actual del protocolo de HTA en urgencias. |
+| *Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos* | `public/biblio/SCA 2023.pdf` | Activa · principal en IAM/SCA | Referencia principal actual del protocolo de IAM / SCA. |
 | *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | `public/biblio/urgencias-murillo-7ma.pdf` | Activa | Obra base auditada y usada por la app. |
 | Bibliografía específica de radiología | No detectada en este workspace | No disponible en workspace | Sigue pendiente de incorporación real al repositorio. |
 
@@ -246,6 +256,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fecha | Cambio realizado | Sección afectada | Breve explicación |
 | --- | --- | --- | --- |
+| 2026-04-24 | Reindexación bibliográfica de HTA e IAM/SCA | Bibliografía / protocolos / medicamentos | Se añadieron `ESC HTA 2024` y `ESC SCA 2023` como referencias principales reales, se ajustaron enlaces y se revisó el contenido clínico relacionado. |
 | 2026-04-05 | Montaje base del proyecto | Base técnica | Se creó la app con `Vite + React + Tailwind` y se dejó lista para build estático. |
 | 2026-04-05 | Preparación de despliegue | Infraestructura | Se configuró publicación continua en GitHub Pages. |
 | 2026-04-05 | Revisión de jerarquía visual | Home / shell | Se compactó la interfaz y se eliminó parte del aspecto de demo o dashboard genérico. |
@@ -264,14 +275,14 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 ### Pendiente funcional
 
-- Construir el siguiente protocolo real a partir de los temas ya auditados.
+- Construir el siguiente protocolo real a partir de los temas ya auditados después de FA, HTA y SCA.
 - Hacer que la búsqueda evolucione de filtro simple a entrada clínica más útil.
-- Ampliar `Medicamentos` más allá del módulo de fibrilación auricular.
+- Seguir ampliando `Medicamentos` hacia los próximos módulos clínicos reales.
 - Mantener la regla de no implementar cálculos fuera de contexto de módulo.
 
 ### Pendiente clínico
 
-- Desarrollar protocolos reales para `ictus`, `sepsis`, `shock` o `síndrome coronario agudo`.
+- Desarrollar protocolos reales para `ictus`, `sepsis`, `shock` o `ICC`.
 - Mantener en cada nuevo protocolo la misma conexión entre decisión clínica, cálculos, medicación y bibliografía.
 - Evitar siempre que la interfaz prometa una funcionalidad aún no implementada.
 

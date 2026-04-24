@@ -10,6 +10,24 @@ const referenceEntry = ({ id, indexPage, verifiedPage = indexPage, pdfPage, note
     note,
   });
 
+const escHtaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-hta-2024',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escScaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-sca-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const protocolCatalog = {
   'fibrilacion-auricular': {
     id: 'fibrilacion-auricular',
@@ -131,39 +149,39 @@ export const protocolCatalog = {
     verifiedPage: 246,
     pdfPage: 271,
     status: 'implementado',
-    summary: 'Clasificar daño de órgano diana y decidir tratamiento oral o intravenoso sin convertirlo en una guía larga.',
+    summary: 'Separar urgencia y emergencia, reconocer daño agudo de órgano diana y bajar la presión de forma segura.',
     quickChecks: [
-      'Registrar PAS y PAD',
+      'Confirmar PAS y PAD',
       'Buscar daño agudo de órgano diana',
-      'Definir si es urgencia o emergencia',
-      'Elegir vía oral o intravenosa y monitorización',
+      'Decidir si precisa ingreso y monitorización',
+      'Elegir descenso gradual u hospitalario titulado',
     ],
     quickSummary: [
       {
         id: 'medicion',
         title: 'Registro inicial',
-        action: 'Tomar PAS/PAD y estimar si la elevación es ligera, moderada o grave.',
+        action: 'Tomar PAS/PAD y reevaluar la cifra en contexto clínico.',
       },
       {
         id: 'dod',
         title: 'Daño diana',
-        action: 'Buscar focalidad neurológica, dolor torácico, edema pulmonar, disfunción renal o contexto gestacional.',
+        action: 'Buscar focalidad, dolor torácico, edema pulmonar, deterioro renal o contexto gestacional.',
       },
       {
         id: 'urgencia',
         title: 'Urgencia hipertensiva',
-        action: 'Sin daño agudo de órgano. Reposo, reevaluación y descenso gradual con vía oral.',
+        action: 'Sin daño agudo de órgano. Reposo, reevaluación y descenso progresivo; no suele requerir ingreso.',
       },
       {
         id: 'emergencia',
         title: 'Emergencia hipertensiva',
-        action: 'Con daño agudo de órgano. Monitorización y tratamiento intravenoso titulado.',
+        action: 'Con daño agudo de órgano. Ingreso, monitorización y tratamiento intravenoso titulado.',
       },
     ],
     warnings: [
-      'No usar nifedipino sublingual por riesgo de hipotensión brusca e hipoperfusión.',
-      'La vía intravenosa se reserva para emergencia hipertensiva o imposibilidad de vía oral.',
-      'La presión debe descender de forma controlada; no trates solo la cifra.',
+      'Evita reducciones rápidas, no controladas o excesivas de la presión arterial.',
+      'La vía intravenosa y la monitorización continua se reservan para la emergencia hipertensiva o el manejo hospitalario seleccionado.',
+      'La cifra aislada no basta: manda el daño de órgano diana y el contexto clínico.',
     ],
     medicationGroups: [
       {
@@ -172,10 +190,22 @@ export const protocolCatalog = {
       },
       {
         title: 'Emergencia hipertensiva',
-        medicationIds: ['nitroprusiato', 'labetalol', 'nitroglicerina'],
+        medicationIds: ['labetalol', 'nitroglicerina', 'nitroprusiato'],
       },
     ],
     bibliography: [
+      escHtaEntry({
+        id: 'esc-hta-acute-management',
+        verifiedPages: [79, 80],
+        pdfPages: [80, 81],
+        note: 'Referencia principal: descenso agudo y manejo hospitalario de la emergencia hipertensiva.',
+      }),
+      escHtaEntry({
+        id: 'esc-hta-pregnancy',
+        verifiedPages: [81],
+        pdfPages: [82],
+        note: 'HTA grave del embarazo, preeclampsia y edema pulmonar en el contexto hipertensivo agudo.',
+      }),
       referenceEntry({
         id: 'hta-urgency-start',
         indexPage: 246,
@@ -216,40 +246,41 @@ export const protocolCatalog = {
     verifiedPage: 214,
     pdfPage: 239,
     status: 'implementado',
-    summary: 'Diferenciar SCACEST y SCASEST, detectar muy alto riesgo y activar reperfusión o ingreso sin retrasos.',
+    summary: 'ECG, hs-cTn y riesgo para decidir reperfusión, coronariografía y antitrombosis sin retrasos.',
     quickChecks: [
       'ECG de 12 derivaciones en los primeros 10 min',
-      'Descartar shock, edema agudo de pulmón o arritmias graves',
+      'Detectar shock, edema agudo de pulmón o arritmias graves',
+      'Pedir hs-cTn y aplicar 0 h/1 h o 0 h/2 h si no hay SCACEST',
       'Clasificar en SCACEST o SCASEST',
-      'Decidir reperfusión, ingreso y tratamiento antitrombótico inicial',
+      'Decidir reperfusión, coronariografía e ingreso monitorizado',
     ],
     quickSummary: [
       {
         id: 'critical',
         title: 'Muy alto riesgo',
-        action: 'Angina refractaria, insuficiencia cardíaca, arritmias ventriculares o inestabilidad: coronariografía urgente.',
+        action: 'Shock, edema pulmonar, arritmias malignas o dolor refractario: angiografía inmediata.',
       },
       {
         id: 'stemi',
         title: 'SCACEST',
-        action: 'No esperar troponina. Reperfusión precoz con ICP primaria o fibrinólisis si no llega a tiempo.',
+        action: 'No esperar hs-cTn. Reperfusión inmediata con ICP primaria o fibrinólisis si no llegas a tiempo.',
       },
       {
         id: 'nstemi-high',
-        title: 'SCASEST alto riesgo',
-        action: 'Doble antiagregación, anticoagulación y estrategia invasiva en menos de 24 h.',
+        title: 'SCASEST',
+        action: 'Usa hs-cTn 0 h/1 h o 0 h/2 h y el riesgo para decidir angiografía inmediata, < 24 h o durante el ingreso.',
       },
       {
         id: 'always',
         title: 'Siempre',
-        action: 'Monitorizar, tratar el dolor y dejar claro el destino del paciente.',
+        action: 'Monitorizar, tratar el dolor y dejar definido el destino del paciente.',
       },
     ],
     warnings: [
-      'No esperar el resultado de la troponina si la clínica y el ECG son compatibles con SCACEST.',
-      'La fibrinólisis está contraindicada en el SCASEST.',
-      'Evitar nitratos en infarto de ventrículo derecho, hipotensión o uso reciente de inhibidores de la PDE5.',
-      'Todos los pacientes con SCA requieren ingreso hospitalario.',
+      'No esperes hs-cTn si la clínica y el ECG encajan con SCACEST o con SCASEST de muy alto riesgo.',
+      'La fibrinólisis no tiene lugar en el SCASEST.',
+      'Evita nitratos en infarto de ventrículo derecho, hipotensión o uso reciente de inhibidores de la PDE5.',
+      'No uses oxígeno de rutina si la SpO2 es > 90%; todos los SCA requieren monitorización e ingreso.',
     ],
     medicationGroups: [
       {
@@ -258,16 +289,41 @@ export const protocolCatalog = {
       },
       {
         title: 'Antitrombótico inicial',
-        medicationIds: ['acido-acetilsalicilico', 'ticagrelor', 'clopidogrel', 'heparina-sodica', 'enoxaparina-sca'],
+        medicationIds: [
+          'acido-acetilsalicilico',
+          'prasugrel',
+          'ticagrelor',
+          'clopidogrel',
+          'heparina-sodica',
+          'enoxaparina-sca',
+          'fondaparinux-sca',
+        ],
       },
     ],
     bibliography: [
-      referenceEntry({
-        id: 'sca-start',
-        indexPage: 214,
-        verifiedPage: 214,
-        pdfPage: 239,
-        note: 'Inicio real del capítulo de síndrome coronario agudo.',
+      escScaEntry({
+        id: 'esc-sca-triage',
+        verifiedPages: [16, 19],
+        pdfPages: [17, 20],
+        note: 'Referencia principal: triaje, ECG precoz y algoritmos de hs-cTn 0 h/1 h o 0 h/2 h.',
+      }),
+      escScaEntry({
+        id: 'esc-sca-initial-treatment',
+        verifiedPages: [25],
+        pdfPages: [26],
+        note: 'Monitorización, oxígeno, nitratos y analgesia en la fase aguda.',
+      }),
+      escScaEntry({
+        id: 'esc-sca-invasive-strategy',
+        verifiedPages: [32],
+        pdfPages: [33],
+        note: 'Tiempos de estrategia invasiva en SCASEST y marco del tratamiento antitrombótico.',
+      }),
+      escScaEntry({
+        id: 'esc-sca-antithrombotic',
+        verifiedPages: [33, 40],
+        pdfPages: [34, 41],
+        note: 'Dosis y recomendaciones de antiagregación y anticoagulación en SCA.',
       }),
       createBibliographyEntry({
         id: 'sca-diagnosis',
@@ -275,13 +331,6 @@ export const protocolCatalog = {
         verifiedPages: [215, 216, 217, 218],
         pdfPages: [240, 241, 242, 243],
         note: 'Clasificación, clínica, ECG y biomarcadores para tipificar SCACEST y SCASEST.',
-      }),
-      createBibliographyEntry({
-        id: 'sca-risk',
-        referenceId: 'murillo7',
-        verifiedPages: [219, 220],
-        pdfPages: [244, 245],
-        note: 'Estratificación del riesgo, escala GRACE, Killip y criterios de ingreso.',
       }),
       createBibliographyEntry({
         id: 'sca-treatment',

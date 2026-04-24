@@ -10,6 +10,24 @@ const referenceEntry = ({ id, indexPage, verifiedPage = indexPage, pdfPage, note
     note,
   });
 
+const escHtaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-hta-2024',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escScaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-sca-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const coreReference = bibliographyCatalog.murillo7;
 
 export const clinicalIndexAudit = [
@@ -245,8 +263,14 @@ export const motivoConsultaModules = [
     pdfPage: 271,
     status: 'implementado',
     implemented: true,
-    summary: 'Diferenciar urgencia y emergencia hipertensiva y tratar sin perder tiempo.',
+    summary: 'Separar urgencia de emergencia y bajar la PA sin descensos bruscos.',
     bibliography: [
+      escHtaEntry({
+        id: 'esc-hta-acute-management-module',
+        verifiedPages: [79, 80],
+        pdfPages: [80, 81],
+        note: 'Referencia principal actual para el manejo agudo de HTA.',
+      }),
       referenceEntry({
         id: 'hta-urgencia-start',
         indexPage: 246,
@@ -273,14 +297,19 @@ export const motivoConsultaModules = [
     pdfPage: 239,
     status: 'implementado',
     implemented: true,
-    summary: 'ECG, gravedad, reperfusión y antitrombosis ordenados para decidir rápido.',
+    summary: 'ECG, hs-cTn, riesgo y reperfusión ordenados para decidir rápido.',
     bibliography: [
-      referenceEntry({
-        id: 'sca-cap26',
-        indexPage: 214,
-        verifiedPage: 214,
-        pdfPage: 239,
-        note: 'Inicio real del capítulo de síndrome coronario agudo.',
+      escScaEntry({
+        id: 'esc-sca-triage-module',
+        verifiedPages: [16, 19],
+        pdfPages: [17, 20],
+        note: 'Referencia principal actual para triaje y diagnóstico inicial del SCA.',
+      }),
+      escScaEntry({
+        id: 'esc-sca-treatment-module',
+        verifiedPages: [25, 32, 40],
+        pdfPages: [26, 33, 41],
+        note: 'Tratamiento inicial, estrategia invasiva y antitrombosis según guía ESC 2023.',
       }),
       referenceEntry({
         id: 'sca-treatment-cap26',
@@ -448,12 +477,28 @@ export const recentActivity = [
 
 export const bibliographyBaseUsed = [
   {
+    id: 'esc-hta-2024',
+    title: bibliographyCatalog['esc-hta-2024'].title,
+    shortTitle: bibliographyCatalog['esc-hta-2024'].shortTitle,
+    filePath: bibliographyCatalog['esc-hta-2024'].filePath,
+    status: 'activa · principal en HTA',
+    note: 'Guía principal para HTA en urgencias y manejo agudo de la presión arterial.',
+  },
+  {
+    id: 'esc-sca-2023',
+    title: bibliographyCatalog['esc-sca-2023'].title,
+    shortTitle: bibliographyCatalog['esc-sca-2023'].shortTitle,
+    filePath: bibliographyCatalog['esc-sca-2023'].filePath,
+    status: 'activa · principal en IAM/SCA',
+    note: 'Guía principal para síndrome coronario agudo, triaje, reperfusión y antitrombosis.',
+  },
+  {
     id: 'murillo7',
     title: bibliographyCatalog.murillo7.title,
     shortTitle: bibliographyCatalog.murillo7.shortTitle,
     filePath: bibliographyCatalog.murillo7.filePath,
     status: 'activa',
-    note: 'Obra base auditada y utilizada en la app.',
+    note: 'Obra base general y apoyo práctico; ya no es la referencia principal en HTA ni en IAM/SCA.',
   },
   {
     id: 'radiologia-pendiente',

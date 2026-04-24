@@ -1,11 +1,24 @@
 const baseUrl = import.meta.env.BASE_URL;
+const buildFilePath = (relativePath) => encodeURI(`${baseUrl}${relativePath}`);
 
 export const bibliographyCatalog = {
   murillo7: {
     id: 'murillo7',
     title: 'Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición',
     shortTitle: 'Murillo 7.ª ed.',
-    filePath: `${baseUrl}biblio/urgencias-murillo-7ma.pdf`,
+    filePath: buildFilePath('biblio/urgencias-murillo-7ma.pdf'),
+  },
+  'esc-hta-2024': {
+    id: 'esc-hta-2024',
+    title: 'Guía ESC 2024 sobre el manejo de la presión arterial elevada y la hipertensión',
+    shortTitle: 'ESC HTA 2024',
+    filePath: buildFilePath('biblio/HTA 2024.pdf'),
+  },
+  'esc-sca-2023': {
+    id: 'esc-sca-2023',
+    title: 'Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos',
+    shortTitle: 'ESC SCA 2023',
+    filePath: buildFilePath('biblio/SCA 2023.pdf'),
   },
 };
 
