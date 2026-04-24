@@ -30,11 +30,11 @@ Principios actuales del proyecto:
 
 ## Estado actual
 
-- Home simplificada a: accesos rápidos, protocolos activos agrupados por especialidad, `Cálculos` y `Medicamentos`.
-- Pantalla propia de `Protocolos` agrupada por especialidades para evitar una lista plana interminable.
-- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias` y `síndrome coronario agudo`.
+- Home simplificada a: accesos rápidos, acceso principal por `Especialidades`, `Cálculos` y `Medicamentos`.
+- Pantalla propia de `Especialidades` con acordeones por bloque clínico para evitar una lista plana interminable.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo` y `taquiarritmias y bradicardias`.
 - Cálculos activos del módulo FA: `CHA2DS2-VA`, `HAS-BLED` y `Cockcroft-Gault`.
-- Fichas farmacológicas activas para FA, HTA y SCA enlazadas desde protocolo y desde `Medicamentos`.
+- Fichas farmacológicas activas para FA, HTA, SCA y arritmias agudas enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
 - Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
 - Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`.
@@ -46,9 +46,10 @@ Principios actuales del proyecto:
 
 | Sección | Estado | Función real hoy | Relación con el resto |
 | --- | --- | --- | --- |
-| Home | Activa | Punto de entrada con accesos rápidos, protocolos activos agrupados por especialidad, cálculos y medicamentos. | Lleva a protocolos, cálculos y medicamentos sin pasos intermedios largos. |
-| Protocolos | Activa | Índice de módulos clínicos agrupados por especialidad. | Abre protocolo real o deja visible el tema pendiente dentro de su bloque clínico. |
+| Home | Activa | Punto de entrada con accesos rápidos, acordeones por especialidad, cálculos y medicamentos. | Lleva a especialidades, cálculos y medicamentos sin pasos intermedios largos. |
+| Especialidades | Activa | Índice clínico principal con acordeones por bloque y recursos relacionados. | Abre protocolo real, cálculo relacionado, medicamento relacionado o fuente principal desde la misma especialidad. |
 | Módulo FA | Activo | Flujo clínico dividido en `Estabilidad`, `Contexto`, `Conducta` y `Anticoagulación`. | Embebe o enlaza cálculos, medicación y fuente principal sin saturar una sola pantalla. |
+| Módulo de taquiarritmias y bradicardias | Activo | Árbol de decisión para taquicardia o bradicardia, inestabilidad, patrón del QRS y conducta inmediata. | Embebe procedimientos desplegables y enlaza medicación útil de urgencias. |
 | Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo. |
 | Medicamentos | Activa | Reúne fichas farmacológicas completas del módulo activo. | Cada ficha puede abrirse desde el protocolo y volver a él. |
 | Bibliografía | Activa | Da acceso a la obra base y a referencias estructuradas. | Cada módulo guarda sus referencias y páginas verificadas. |
@@ -57,8 +58,8 @@ Principios actuales del proyecto:
 ### Lógica de navegación entre módulos
 
 1. La `Home` funciona como entrada principal.
-2. Desde `Home` se entra a `Protocolos`, `Cálculos` o `Medicamentos` sin pasar por una pantalla larga.
-3. La pantalla `Protocolos` agrupa los módulos por especialidad para que el crecimiento no se convierta en una lista plana.
+2. Desde `Home` se entra a `Especialidades`, `Cálculos` o `Medicamentos` sin pasar por una pantalla larga.
+3. La pantalla `Especialidades` agrupa los módulos por bloque clínico y muestra recursos relacionados para que el crecimiento no se convierta en una lista plana.
 4. Al abrir `fibrilación auricular`, la navegación prioriza vistas cortas y no una página continua.
 5. Desde el protocolo se puede abrir un cálculo concreto o una ficha farmacológica concreta.
 6. Si un cálculo o un medicamento se abre desde el protocolo, la interfaz conserva botón claro de retorno al protocolo y a la subsección de origen.
@@ -69,7 +70,7 @@ Principios actuales del proyecto:
 ### Cómo se conectan los módulos
 
 - `Home` prioriza navegación, no lectura.
-- `Protocolos` es la puerta de entrada a módulos clínicos concretos.
+- `Especialidades` es la puerta de entrada a módulos clínicos concretos.
 - `Módulo FA` ya no se resuelve como pantalla única; se reparte en subpantallas cortas.
 - `Cálculos` solo se implementan cuando un protocolo real los necesita.
 - `Medicamentos` se construyen a partir de los fármacos realmente usados en un protocolo activo.
@@ -101,10 +102,11 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `src/App.jsx`
   - shell principal de la app
-  - navegación entre `Home`, `Protocolos`, `Cálculos` y `Medicamentos`
+  - navegación entre `Home`, `Especialidades`, `Cálculos` y `Medicamentos`
   - retorno contextual al origen cuando se abre cálculo o fármaco desde protocolo
-  - agrupación de protocolos por especialidad
+  - agrupación y navegación por especialidad con acordeones
   - control de subpantallas cortas dentro del módulo de `fibrilación auricular`
+  - flujo operativo del módulo `taquiarritmias y bradicardias`
 
 - `src/main.jsx`
   - arranque de React
@@ -132,7 +134,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `src/data/protocols.js`
   - protocolos clínicos reales
-  - actualmente contiene `fibrilación auricular`, `HTA en urgencias` y `síndrome coronario agudo`
+  - actualmente contiene `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo` y `taquiarritmias y bradicardias`
 
 - `src/data/calculators.js`
   - catálogo de cálculos implementados
@@ -176,10 +178,11 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Fibrilación auricular | Guía ESC 2024 + Cap. 23 | 185 | Creado | Flujo real por `Estabilidad`, `Contexto`, `Conducta` y `Anticoagulación`, con `ESC FA 2024` como referencia principal y Murillo como apoyo práctico. |
 | HTA en urgencias | Caps. 32-33 | 246 | Creado | Flujo real para separar urgencia de emergencia hipertensiva, con conducta, tratamiento y bibliografía principal `ESC HTA 2024`. |
 | Síndrome coronario agudo | Cap. 26 | 214 | Creado | Flujo real para ECG, hs-cTn, riesgo, reperfusión y antitrombosis, con bibliografía principal `ESC SCA 2023`. |
+| Taquiarritmias y bradicardias | Guías ESC 2019 / 2021 / 2022 | 1 | Creado | Árbol real de guardia para taquicardia o bradicardia, con ramas de QRS estrecho regular, estrecho irregular, QRS ancho y bradicardia sintomática o con riesgo de asistolia. |
 | Insuficiencia cardiaca | Cap. 19 | 161 | Solo indexado | Tema auditado para futura integración del protocolo de `ICC`. |
-| Taquicardia supraventricular | Guía ESC 2019 | 1 | Solo indexado | Referencia principal ya fijada en `ESC TSV 2019`; protocolo pendiente. |
-| Bradicardias | Documento ESC 2021 | 1 | Solo indexado | Referencia principal ya fijada en el documento `ESC 2021` disponible en el repo; protocolo pendiente. |
-| Arritmias ventriculares | Documento ESC 2022 | 1 | Solo indexado | Referencia principal ya fijada en el documento `ESC 2022` disponible en el repo; protocolo pendiente. |
+| Taquicardia supraventricular | Guía ESC 2019 | 1 | Solo indexado | Referencia integrada ya en el módulo `Taquiarritmias y bradicardias`. |
+| Bradicardias | Documento ESC 2021 | 1 | Solo indexado | Referencia integrada ya en el módulo `Taquiarritmias y bradicardias`. |
+| Arritmias ventriculares | Documento ESC 2022 | 1 | Solo indexado | Referencia integrada ya en el módulo `Taquiarritmias y bradicardias`. |
 | Shock | Cap. 18 | 154 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Dolor torácico agudo | Cap. 25 | 207 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Ictus | Cap. 64 | 442 | Solo indexado | Tema auditado, sin protocolo operativo. |
@@ -223,6 +226,9 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Rivaroxabán | Anticoagulación | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
 | Acenocumarol | Puente o AVK | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
 | Enoxaparina | Puente o AVK | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Adenosina | TSV · conversión aguda | Taquiarritmias y bradicardias | Implementado | ESC TSV 2019 + CIMA. |
+| Atropina | Bradicardia sintomática | Taquiarritmias y bradicardias | Implementado | ESC Bradicardias 2021 + CIMA. |
+| Amiodarona IV | QRS ancho / TV | Taquiarritmias y bradicardias | Implementado | ESC Arritmias ventriculares 2022 + CIMA. |
 
 ### Plantillas de imagen
 
@@ -237,9 +243,9 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | *Guía ESC 2024 sobre el manejo de la fibrilación auricular* | `public/biblio/FA 2024.pdf` | Activa · principal en FA | Referencia principal actual del protocolo de FA. |
 | *Guía ESC 2024 sobre el manejo de la presión arterial elevada y la hipertensión* | `public/biblio/HTA 2024.pdf` | Activa · principal en HTA | Referencia principal actual del protocolo de HTA en urgencias. |
 | *Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos* | `public/biblio/SCA 2023.pdf` | Activa · principal en IAM/SCA | Referencia principal actual del protocolo de IAM / SCA. |
-| *Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular* | `public/biblio/TSV 2019.pdf` | Activa · principal en TSV | Referencia principal actual indexada para TSV. |
-| *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | `public/biblio/est car 2021.pdf` | Activa · principal en bradicardias | Documento actualmente disponible en el repo para bradicardias / estimulación. |
-| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Documento actualmente disponible en el repo para arritmias ventriculares. |
+| *Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular* | `public/biblio/TSV 2019.pdf` | Activa · principal en TSV | Referencia principal de la rama supraventricular del módulo `Taquiarritmias y bradicardias`. |
+| *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | `public/biblio/est car 2021.pdf` | Activa · principal en bradicardias | Referencia principal de la rama de bradicardias / estimulación del módulo `Taquiarritmias y bradicardias`. |
+| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Referencia principal de la rama de QRS ancho / arritmias ventriculares del módulo `Taquiarritmias y bradicardias`. |
 | *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | `public/biblio/urgencias-murillo-7ma.pdf` | Activa | Obra base auditada y usada por la app. |
 | Bibliografía específica de radiología | No detectada en este workspace | No disponible en workspace | Sigue pendiente de incorporación real al repositorio. |
 

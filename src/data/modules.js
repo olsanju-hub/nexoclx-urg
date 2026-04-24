@@ -389,6 +389,39 @@ export const motivoConsultaModules = [
     ],
   },
   {
+    id: 'taquiarritmias-bradicardias',
+    title: 'Taquiarritmias y bradicardias',
+    shortTitle: 'Arritmias agudas',
+    chapter: 'Guías ESC 2019 / 2021 / 2022',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    implemented: true,
+    summary: 'Árbol práctico de guardia para taquicardia o bradicardia, inestabilidad y conducta inmediata.',
+    bibliography: [
+      escTsvEntry({
+        id: 'arritmias-tsv-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para la rama de taquicardia supraventricular.',
+      }),
+      escBradyEntry({
+        id: 'arritmias-brady-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para la rama de bradicardias y trastornos de conducción.',
+      }),
+      escVentricularEntry({
+        id: 'arritmias-ventricular-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para la rama de taquicardia de QRS ancho / arritmias ventriculares.',
+      }),
+    ],
+  },
+  {
     id: 'insuficiencia-cardiaca',
     title: 'Insuficiencia cardiaca',
     shortTitle: 'ICC',
@@ -421,7 +454,7 @@ export const motivoConsultaModules = [
     pdfPage: 1,
     status: 'auditado',
     implemented: false,
-    summary: 'Guía indexada. Protocolo operativo pendiente.',
+    summary: 'Bibliografía ya integrada en el módulo operativo de taquiarritmias y bradicardias.',
     bibliography: [
       escTsvEntry({
         id: 'tsv-esc-module',
@@ -442,7 +475,7 @@ export const motivoConsultaModules = [
     pdfPage: 1,
     status: 'auditado',
     implemented: false,
-    summary: 'Documento indexado. Protocolo operativo pendiente.',
+    summary: 'Bibliografía ya integrada en el módulo operativo de taquiarritmias y bradicardias.',
     bibliography: [
       escBradyEntry({
         id: 'brady-esc-module',
@@ -463,7 +496,7 @@ export const motivoConsultaModules = [
     pdfPage: 1,
     status: 'auditado',
     implemented: false,
-    summary: 'Documento indexado. Protocolo operativo pendiente.',
+    summary: 'Bibliografía ya integrada en el módulo operativo de taquiarritmias y bradicardias.',
     bibliography: [
       escVentricularEntry({
         id: 'ventricular-esc-module',
@@ -685,7 +718,7 @@ export const bibliographyBaseUsed = [
     shortTitle: bibliographyCatalog['esc-tsv-2019'].shortTitle,
     filePath: bibliographyCatalog['esc-tsv-2019'].filePath,
     status: 'activa · principal en TSV',
-    note: 'Guía principal actual indexada para taquicardia supraventricular.',
+    note: 'Guía principal actual para la rama supraventricular del módulo de taquiarritmias y bradicardias.',
   },
   {
     id: 'esc-bradicardias-2021',
@@ -693,7 +726,7 @@ export const bibliographyBaseUsed = [
     shortTitle: bibliographyCatalog['esc-bradicardias-2021'].shortTitle,
     filePath: bibliographyCatalog['esc-bradicardias-2021'].filePath,
     status: 'activa · principal en bradicardias',
-    note: 'Documento actualmente disponible en el repo como referencia principal de bradicardias/estimulación.',
+    note: 'Referencia principal de la rama de bradicardias/estimulación del módulo de taquiarritmias y bradicardias.',
   },
   {
     id: 'esc-arritmias-ventriculares-2022',
@@ -701,7 +734,7 @@ export const bibliographyBaseUsed = [
     shortTitle: bibliographyCatalog['esc-arritmias-ventriculares-2022'].shortTitle,
     filePath: bibliographyCatalog['esc-arritmias-ventriculares-2022'].filePath,
     status: 'activa · principal en arritmias ventriculares',
-    note: 'Documento actualmente disponible en el repo como referencia principal de arritmias ventriculares.',
+    note: 'Referencia principal de la rama de QRS ancho / arritmias ventriculares del módulo de taquiarritmias y bradicardias.',
   },
   {
     id: 'murillo7',

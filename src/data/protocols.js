@@ -37,6 +37,33 @@ const escFaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escTsvEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-tsv-2019',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escBradyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-bradicardias-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escVentricularEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-arritmias-ventriculares-2022',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const protocolCatalog = {
   'fibrilacion-auricular': {
     id: 'fibrilacion-auricular',
@@ -373,6 +400,113 @@ export const protocolCatalog = {
         verifiedPages: [221, 222, 223, 224, 225, 226],
         pdfPages: [246, 247, 248, 249, 250, 251],
         note: 'Tratamiento general, antiisquémico, antiagregación, anticoagulación y reperfusión.',
+      }),
+    ],
+  },
+  'taquiarritmias-bradicardias': {
+    id: 'taquiarritmias-bradicardias',
+    title: 'Taquiarritmias y bradicardias',
+    longTitle: 'Taquiarritmias y bradicardias',
+    chapter: 'Guías ESC 2019 / 2021 / 2022',
+    section: 'Urgencias cardiovasculares',
+    indexPage: 71,
+    verifiedPage: 71,
+    pdfPage: 96,
+    status: 'implementado',
+    summary: '¿Taquicardia o bradicardia? Inestabilidad, patrón del QRS y conducta eléctrica o farmacológica inmediata.',
+    quickChecks: [
+      'ECG, pulsioximetría, presión arterial y vía venosa',
+      'Shock, síncope, isquemia o insuficiencia cardíaca',
+      'Si es taquicardia: QRS estrecho o ancho, regular o irregular',
+      'Si es bradicardia: síntomas y riesgo de asistolia',
+      'Abrir procedimiento o fármaco solo cuando cambia la conducta',
+    ],
+    quickSummary: [
+      {
+        id: 'unstable-tachy',
+        title: 'Taquicardia inestable',
+        action: 'Cardioversión sincronizada inmediata.',
+      },
+      {
+        id: 'narrow-regular',
+        title: 'QRS estrecho regular',
+        action: 'Maniobras vagales y adenosina; si no revierte, siguiente escalón.',
+      },
+      {
+        id: 'wide',
+        title: 'QRS ancho',
+        action: 'Si hay duda, manejar como TV y preparar cardioversión.',
+      },
+      {
+        id: 'brady',
+        title: 'Bradicardia sintomática',
+        action: 'Atropina y, si no responde o hay alto riesgo, marcapasos transcutáneo.',
+      },
+    ],
+    decisionCards: [
+      {
+        id: 'tachy-unstable',
+        situation: 'Taquicardia con shock, síncope, isquemia o insuficiencia cardíaca',
+        action: 'Cardioversión sincronizada inmediata. No retrases el choque por clasificar el ritmo.',
+        nuance: 'Si no revierte y persiste la inestabilidad, repetir choque tras optimizar sedación/sincronía y considerar amiodarona IV.',
+      },
+      {
+        id: 'narrow-regular-stable',
+        situation: 'Taquicardia regular de QRS estrecho, estable',
+        action: 'Empieza por maniobras vagales y continúa con adenosina IV rápida si no revierte.',
+        nuance: 'Si no revierte, reevalúa el ritmo y considera verapamilo o betabloqueante solo si sigue estable y el contexto lo permite.',
+      },
+      {
+        id: 'wide-stable',
+        situation: 'Taquicardia de QRS ancho, estable',
+        action: 'Si no tienes certeza de TSV con aberrancia, trata como TV.',
+        nuance: 'La irregularidad obliga a pensar en fibrilación auricular preexcitada o TV polimórfica y evita bloqueadores nodales.',
+      },
+      {
+        id: 'brady-symptomatic',
+        situation: 'Bradicardia con síntomas o alto riesgo de asistolia',
+        action: 'Atropina IV y preparación de marcapasos transcutáneo si no hay respuesta adecuada.',
+        nuance: 'Mobitz II, bloqueo completo con QRS ancho o pausas > 3 s obligan a ayuda experta y vía de estimulación temporal.',
+      },
+    ],
+    warnings: [
+      'No uses bloqueadores nodales si sospechas fibrilación auricular preexcitada.',
+      'En toda taquicardia inestable manda la cardioversión sincronizada, no la clasificación fina del ECG.',
+      'Si el QRS es ancho y no estás seguro, trátalo como taquicardia ventricular.',
+      'La atropina no debe retrasar el marcapasos externo en bloqueo de alto grado o inestabilidad persistente.',
+    ],
+    medicationGroups: [
+      {
+        title: 'Taquicardia regular de QRS estrecho',
+        medicationIds: ['adenosina', 'verapamilo', 'metoprolol'],
+      },
+      {
+        title: 'QRS ancho o TV',
+        medicationIds: ['amiodarona-vt'],
+      },
+      {
+        title: 'Bradicardia sintomática',
+        medicationIds: ['atropina'],
+      },
+    ],
+    bibliography: [
+      escTsvEntry({
+        id: 'tsv-acute-esc-2019',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para taquicardia regular de QRS estrecho y abordaje inicial de taquicardias supraventriculares.',
+      }),
+      escBradyEntry({
+        id: 'brady-acute-esc-2021',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para bradicardias, trastornos de conducción y necesidad de estimulación.',
+      }),
+      escVentricularEntry({
+        id: 'ventricular-acute-esc-2022',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para taquicardia de QRS ancho y arritmias ventriculares.',
       }),
     ],
   },

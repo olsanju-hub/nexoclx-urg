@@ -37,6 +37,34 @@ const escFaReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escTsvReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-tsv-2019',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escBradyReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-bradicardias-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escVentricularReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-arritmias-ventriculares-2022',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const externalSource = (label, url) => ({ label, url, type: 'external' });
 const cimaSource = (label, url) => ({ label, url, type: 'cima' });
 const protocolSource = (label, bibliography) => ({ label, bibliography, type: 'protocol' });
 
@@ -260,6 +288,162 @@ export const medicationCatalog = {
           pdfPage: 213,
           note: 'Cuadro 23.3 con pauta de cardioversión y mantenimiento.',
         }),
+      ),
+    ],
+  },
+  adenosina: {
+    id: 'adenosina',
+    name: 'Adenosina',
+    protocolId: 'taquiarritmias-bradicardias',
+    family: 'TSV · conversión aguda',
+    indication:
+      'Conversión rápida de la taquicardia regular de QRS estrecho dependiente del nodo AV cuando las maniobras vagales no revierten el episodio.',
+    contextUse: 'Taquicardia regular de QRS estrecho, estable, tras maniobras vagales inefectivas.',
+    contextDose: 'IV rápida en bolo: 6 mg, luego 12 mg y después 18 mg si no revierte en 1-2 min.',
+    contextRoute: 'Intravenosa rápida en bolo, seguida de lavado rápido con suero.',
+    contextFrequency: 'Escalado en bolos separados 1-2 min con monitorización ECG continua.',
+    followUpPlan: 'Si no revierte, reevalúa el ritmo y pasa al siguiente escalón terapéutico.',
+    dose:
+      'IV rápida en bolo: 6 mg inicial; si no revierte en 1-2 min, 12 mg; si persiste, 18 mg con monitorización continua.',
+    route: 'Intravenosa rápida en bolo.',
+    frequency: 'Bolos escalonados con reevaluación inmediata tras cada dosis.',
+    duration: 'Uso agudo puntual.',
+    contraindications: [
+      'No usar para terminar fibrilación auricular, flutter auricular o taquicardia ventricular.',
+      'Precaución en asma o broncoespasmo y en hipotensión relevante.',
+      'Evitar si sospechas fibrilación auricular preexcitada.',
+    ],
+    renalAdjustment:
+      'No requiere ajuste renal específico para el bolo agudo según la ficha consultada.',
+    hepaticAdjustment:
+      'No requiere ajuste hepático específico para el bolo agudo según la ficha consultada.',
+    practicalNotes: [
+      'Debe administrarse con monitorización y equipo de reanimación disponible.',
+      'Usa una vena proximal o una cánula periférica grande y sigue siempre con lavado rápido.',
+      'Si enlentece transitoriamente la respuesta ventricular sin revertir, puede ayudar a identificar flutter o actividad auricular.',
+    ],
+    sourceScope:
+      'La rama de TSV sigue la guía ESC 2019. Para el uso práctico de guardia se prioriza la pauta operativa del algoritmo de taquicardia del adulto, manteniendo la ficha CIMA como apoyo para administración y precauciones.',
+    sources: [
+      protocolSource(
+        'ESC TSV 2019 · manejo agudo de TSV',
+        escTsvReferenceEntry({
+          id: 'adenosina-tsv-esc',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Vagal y adenosina IV como eje del manejo agudo de la taquicardia regular supraventricular.',
+        }),
+      ),
+      cimaSource(
+        'CIMA · Adenosina Accord 6 mg/2 ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/81545/FichaTecnica_81545.html',
+      ),
+      externalSource(
+        'Resuscitation Council UK · Adult tachycardia algorithm 2021',
+        'https://www.resus.org.uk/sites/default/files/2021-04/Tachycardia%20Algorithm%202021.pdf',
+      ),
+    ],
+  },
+  atropina: {
+    id: 'atropina',
+    name: 'Atropina',
+    protocolId: 'taquiarritmias-bradicardias',
+    family: 'Bradicardia sintomática',
+    indication:
+      'Tratamiento inicial de la bradicardia sintomática o con rasgos de inestabilidad mientras se corrigen causas y se prepara estimulación si hace falta.',
+    contextUse: 'Bradicardia con shock, síncope, isquemia o insuficiencia cardíaca.',
+    contextDose: '0,5 mg IV; repetir cada 3-5 min hasta 3 mg si hace falta.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Bolos repetidos según respuesta clínica y del ECG.',
+    followUpPlan: 'Si no hay respuesta adecuada o hay bloqueo de alto grado, no retrasar marcapasos transcutáneo.',
+    dose:
+      'Bradicardia sinusal: 0,5 mg IV cada 2-5 min. Bloqueo AV: 0,5 mg IV cada 3-5 min. Dosis máxima total: 3 mg.',
+    route: 'Intravenosa o intramuscular, pero en este contexto la vía útil es IV.',
+    frequency: 'Bolos repetidos hasta respuesta o dosis máxima.',
+    duration: 'Uso agudo puntual.',
+    contraindications: [
+      'En urgencia vital, las contraindicaciones habituales pierden relevancia práctica.',
+      'Precaución en isquemia miocárdica aguda porque el aumento de frecuencia puede empeorarla.',
+      'No debe retrasar el marcapasos externo si el paciente sigue inestable o hay bloqueo de alto grado.',
+    ],
+    renalAdjustment:
+      'La ficha consultada aconseja precaución en insuficiencia renal, sin un ajuste numérico fijo para esta pauta aguda.',
+    hepaticAdjustment:
+      'La ficha consultada aconseja precaución en insuficiencia hepática, sin un ajuste numérico fijo para esta pauta aguda.',
+    practicalNotes: [
+      'Dosis menores de 0,5 mg pueden empeorar la bradicardia.',
+      'Si sospechas bloqueo AV de alto grado, prepara estimulación aunque estés administrando atropina.',
+      'En trasplante cardíaco puede ser ineficaz o paradójica.',
+    ],
+    sourceScope:
+      'La estrategia de bradicardia sigue la guía ESC 2021 disponible en el proyecto; la pauta concreta se apoya en la ficha CIMA de atropina y en algoritmos de soporte vital para el escalado con pacing.',
+    sources: [
+      protocolSource(
+        'ESC Bradicardias 2021 · bradicardia y estimulación',
+        escBradyReferenceEntry({
+          id: 'atropina-brady-esc',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Bradicardia sintomática y necesidad de estimulación temporal si el tratamiento inicial es insuficiente.',
+        }),
+      ),
+      cimaSource(
+        'CIMA · Atropina 1 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/pdfs/es/ft/85535/FT_85535.html.pdf',
+      ),
+      externalSource(
+        'Resuscitation Council UK · ALS chapter 11 bradycardia',
+        'https://lms.resus.org.uk/modules/m10-v2-cardiac-arrest/10346/resources/chapter_11.pdf',
+      ),
+    ],
+  },
+  'amiodarona-vt': {
+    id: 'amiodarona-vt',
+    name: 'Amiodarona IV',
+    protocolId: 'taquiarritmias-bradicardias',
+    family: 'QRS ancho / TV',
+    indication:
+      'Taquicardia regular de QRS ancho tratada como ventricular cuando el paciente sigue estable y no hay certeza de TSV con aberrancia.',
+    contextUse: 'Taquicardia regular de QRS ancho, estable, manejada como TV.',
+    contextDose: '300 mg IV en 10-60 min; después 900 mg IV en 24 h si hace falta continuación.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Carga única inicial y perfusión de continuación según respuesta y monitorización.',
+    followUpPlan: 'Si empeora o no revierte, cardioversión sincronizada y ayuda experta.',
+    dose:
+      '300 mg IV en 10-60 min para taquicardia regular de QRS ancho estable tratada como TV. Si se mantiene la indicación, continuar con 900 mg IV en 24 h.',
+    route: 'Intravenosa.',
+    frequency: 'Carga inicial seguida de perfusión si se decide mantener.',
+    duration: 'Uso agudo con reevaluación estrecha.',
+    contraindications: [
+      'Bradicardia marcada, bloqueo avanzado o enfermedad del nodo sin marcapasos.',
+      'Precaución extrema si el QT está prolongado o hay otros fármacos proarrítmicos.',
+      'No sustituye a la cardioversión si aparece inestabilidad.',
+    ],
+    renalAdjustment:
+      'La ficha CIMA inyectable consultada no establece un ajuste renal cuantificado para esta pauta aguda.',
+    hepaticAdjustment:
+      'La ficha CIMA inyectable consultada obliga a prudencia clínica y vigilancia si existe hepatopatía relevante.',
+    practicalNotes: [
+      'Si no estás seguro del mecanismo del QRS ancho, es más seguro tratarlo como ventricular.',
+      'Requiere monitorización continua de ECG, presión arterial y QT.',
+      'En TV polimórfica o torsades, el fármaco clave cambia y debes corregir electrolitos y valorar magnesio.',
+    ],
+    sourceScope:
+      'La rama de QRS ancho se apoya en la guía ESC 2022 disponible en el proyecto; la pauta de administración IV se completa con la ficha CIMA inyectable y algoritmos de soporte vital para el contexto periagudo.',
+    sources: [
+      protocolSource(
+        'ESC Arritmias ventriculares 2022 · manejo agudo',
+        escVentricularReferenceEntry({
+          id: 'amiodarona-vt-esc',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Referencia principal para taquicardia de QRS ancho y arritmias ventriculares en el módulo.',
+        }),
+      ),
+      cimaSource('CIMA · Trangorex 150 mg/3 ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/54723/FT_54723.html'),
+      externalSource(
+        'Resuscitation Council UK · Adult tachycardia algorithm 2021',
+        'https://www.resus.org.uk/sites/default/files/2021-04/Tachycardia%20Algorithm%202021.pdf',
       ),
     ],
   },
@@ -1235,6 +1419,11 @@ export const medicationGroups = [
       'enoxaparina-sca',
       'fondaparinux-sca',
     ],
+  },
+  {
+    id: 'arritmias-agudas',
+    title: 'Arritmias agudas',
+    items: ['adenosina', 'atropina', 'amiodarona-vt'],
   },
 ];
 
