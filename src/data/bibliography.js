@@ -8,6 +8,12 @@ export const bibliographyCatalog = {
     shortTitle: 'Murillo 7.ª ed.',
     filePath: buildFilePath('biblio/urgencias-murillo-7ma.pdf'),
   },
+  'esc-fa-2024': {
+    id: 'esc-fa-2024',
+    title: 'Guía ESC 2024 sobre el manejo de la fibrilación auricular',
+    shortTitle: 'ESC FA 2024',
+    filePath: buildFilePath('biblio/FA 2024.pdf'),
+  },
   'esc-hta-2024': {
     id: 'esc-hta-2024',
     title: 'Guía ESC 2024 sobre el manejo de la presión arterial elevada y la hipertensión',
@@ -19,6 +25,24 @@ export const bibliographyCatalog = {
     title: 'Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos',
     shortTitle: 'ESC SCA 2023',
     filePath: buildFilePath('biblio/SCA 2023.pdf'),
+  },
+  'esc-tsv-2019': {
+    id: 'esc-tsv-2019',
+    title: 'Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular',
+    shortTitle: 'ESC TSV 2019',
+    filePath: buildFilePath('biblio/TSV 2019.pdf'),
+  },
+  'esc-bradicardias-2021': {
+    id: 'esc-bradicardias-2021',
+    title: 'Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización',
+    shortTitle: 'ESC Bradicardias 2021',
+    filePath: buildFilePath('biblio/est car 2021.pdf'),
+  },
+  'esc-arritmias-ventriculares-2022': {
+    id: 'esc-arritmias-ventriculares-2022',
+    title: 'Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita',
+    shortTitle: 'ESC Arritmias ventriculares 2022',
+    filePath: buildFilePath('biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf'),
   },
 };
 

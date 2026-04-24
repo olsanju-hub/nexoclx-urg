@@ -15,14 +15,14 @@ import {
 } from 'lucide-react';
 import { buildReferenceHref } from './data/bibliography';
 import {
-  calculateCha2ds2Vasc,
+  calculateCha2ds2Va,
   calculateCockcroftGault,
   calculateHasBled,
   getCalculator,
   implementedCalculators,
 } from './data/calculators';
 import { getMedication, medicationGroups } from './data/medications';
-import { getMotivoModule, motivoConsultaModules } from './data/modules';
+import { getMotivoModule, groupModulesBySpecialty, motivoConsultaModules } from './data/modules';
 import { getProtocol } from './data/protocols';
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
@@ -46,9 +46,8 @@ const primaryNavItems = [
 ];
 
 const initialCalculatorInputs = {
-  'cha2ds2-vasc': {
+  'cha2ds2-va': {
     age: '',
-    sex: 'male',
     heartFailure: false,
     hypertension: false,
     diabetes: false,
@@ -78,7 +77,7 @@ const initialFaFlowState = {
   step: 1,
   stability: null,
   duration: null,
-  structuralHeartDisease: null,
+  reducedEjectionFraction: null,
 };
 
 const initialHtaFlowState = {
@@ -99,8 +98,8 @@ const initialScaFlowState = {
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
 
 const getCalculatorResult = (calculatorId, values) => {
-  if (calculatorId === 'cha2ds2-vasc') {
-    return calculateCha2ds2Vasc(values);
+  if (calculatorId === 'cha2ds2-va') {
+    return calculateCha2ds2Va(values);
   }
 
   if (calculatorId === 'has-bled') {
@@ -300,8 +299,13 @@ const DetailPanel = ({ title, note, action = null, children, eyebrow = null }) =
   </section>
 );
 
-const ListActionRow = ({ title, meta, onClick, badge = null }) => (
-  <button type="button" onClick={onClick} className={listRowClass}>
+const ListActionRow = ({ title, meta, onClick, badge = null, disabled = false }) => (
+  <button
+    type="button"
+    onClick={disabled ? undefined : onClick}
+    disabled={disabled}
+    className={`${listRowClass} ${disabled ? 'cursor-default opacity-70' : ''}`}
+  >
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-2">
         <p className="truncate text-sm font-semibold text-[var(--text)]">{title}</p>
@@ -309,8 +313,37 @@ const ListActionRow = ({ title, meta, onClick, badge = null }) => (
       </div>
       {meta ? <p className="mt-1 text-xs text-[var(--text-muted)]">{meta}</p> : null}
     </div>
-    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
+    <ChevronRight
+      className={`h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 ${
+        disabled ? '' : 'group-hover:translate-x-0.5'
+      }`}
+    />
   </button>
+);
+
+const ProtocolSpecialtyList = ({ groups, onModuleOpen }) => (
+  <div className="space-y-4">
+    {groups.map((group) => (
+      <div key={group.id}>
+        <div className="mb-2">
+          <p className="eyebrow eyebrow-muted">{group.title}</p>
+          {group.note ? <p className="mt-1 text-xs text-[var(--text-muted)]">{group.note}</p> : null}
+        </div>
+        <div className="space-y-2">
+          {group.modules.map((module) => (
+            <ListActionRow
+              key={module.id}
+              title={module.title}
+              meta={module.summary}
+              badge={!module.implemented ? <StatusBadge tone="pending">Pendiente</StatusBadge> : null}
+              disabled={!module.implemented}
+              onClick={() => onModuleOpen(module.id)}
+            />
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
 );
 
 const QuickAccessCard = ({ icon: Icon, title, meta, onClick, tone = 'neutral' }) => (
@@ -507,19 +540,10 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
         ) : null}
       </div>
 
-      {calculatorId === 'cha2ds2-vasc' ? (
+      {calculatorId === 'cha2ds2-va' ? (
         <div className="space-y-3">
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3">
             <NumberField value={values.age} label="Edad" placeholder="Ej. 78" onChange={(value) => onChange('age', value)} />
-            <SelectField
-              value={values.sex}
-              label="Sexo"
-              options={[
-                { value: 'male', label: 'Hombre' },
-                { value: 'female', label: 'Mujer' },
-              ]}
-              onChange={(value) => onChange('sex', value)}
-            />
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             <BooleanField
@@ -653,8 +677,8 @@ const getFaFlowFocus = ({ step, stability, duration }) => {
 
   if (step === 2 && stability === 'stable') {
     return {
-      current: 'Duración y cardiopatía estructural',
-      decision: 'Definir si el episodio es < 48 h o > 48 h/desconocido.',
+      current: 'Inicio del episodio y FEVI',
+      decision: 'Definir si el episodio actual empezó hace < 24 h o ≥ 24 h / desconocido.',
       next: 'Pasar a conducta inicial.',
     };
   }
@@ -669,15 +693,15 @@ const getFaFlowFocus = ({ step, stability, duration }) => {
 
   if (step === 3) {
     return {
-      current: duration === 'lt48' ? 'FA estable < 48 h' : 'FA estable > 48 h o desconocida',
+      current: duration === 'lt24' ? 'FA estable < 24 h' : 'FA estable ≥ 24 h o desconocida',
       decision: 'Control de frecuencia y estrategia de cardioversión.',
       next: 'Valorar anticoagulación.',
     };
   }
 
   return {
-    current: 'Prevención de ictus',
-    decision: 'Decidir anticoagulación.',
+    current: 'Prevención de ictus y anticoagulación',
+    decision: 'Decidir anticoagulación con CHA2DS2-VA y riesgo hemorrágico.',
     next: 'Abrir cálculos o fármacos si hacen falta.',
   };
 };
@@ -889,7 +913,7 @@ const HomeView = ({
   onMedicationsOpen,
   onMedicationOpen,
 }) => {
-  const activeModules = motivoConsultaModules.filter((module) => module.implemented);
+  const activeProtocolGroups = groupModulesBySpecialty(motivoConsultaModules, { implementedOnly: true });
   const featuredCalculators = implementedCalculators.slice(0, 3);
   const featuredMedications = ['apixaban', 'labetalol', 'amiodarona'];
 
@@ -936,19 +960,15 @@ const HomeView = ({
             />
             <QuickAccessCard
               icon={Calculator}
-              title="CHA2DS2-VASc"
-              meta="Riesgo embólico."
-              onClick={() => onCalculatorOpen('cha2ds2-vasc')}
+              title="CHA2DS2-VA"
+              meta="Riesgo tromboembólico."
+              onClick={() => onCalculatorOpen('cha2ds2-va')}
             />
           </div>
         </DetailPanel>
 
-        <DetailPanel title="Protocolos">
-          <div className="space-y-2">
-            {activeModules.map((module) => (
-              <ListActionRow key={module.id} title={module.title} meta={module.summary} onClick={() => onModuleOpen(module.id)} />
-            ))}
-          </div>
+        <DetailPanel title="Protocolos activos">
+          <ProtocolSpecialtyList groups={activeProtocolGroups} onModuleOpen={onModuleOpen} />
         </DetailPanel>
       </section>
 
@@ -983,26 +1003,32 @@ const HomeView = ({
 };
 
 const ProtocolsView = ({ onBack, onModuleOpen }) => {
-  const activeModules = motivoConsultaModules.filter((module) => module.implemented);
+  const protocolGroups = groupModulesBySpecialty(motivoConsultaModules);
 
   return (
     <div className={pageClass}>
       <BackBar label="Inicio" onClick={onBack} />
 
-      <PageHero title="Protocolos" />
+      <PageHero title="Protocolos" note="Agrupados por especialidad para crecer sin mezclarse ni volverse una lista interminable." />
 
-      <DetailPanel title="Protocolos">
-        <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
-          {activeModules.map((module) => (
-            <ListActionRow
-              key={module.id}
-              title={module.title}
-              meta={module.summary}
-              onClick={() => onModuleOpen(module.id)}
-            />
-          ))}
-        </div>
-      </DetailPanel>
+      <div className="grid gap-4 xl:grid-cols-2">
+        {protocolGroups.map((group) => (
+          <DetailPanel key={group.id} eyebrow="Especialidad" title={group.title} note={group.note}>
+            <div className="space-y-2">
+              {group.modules.map((module) => (
+                <ListActionRow
+                  key={module.id}
+                  title={module.title}
+                  meta={module.summary}
+                  badge={!module.implemented ? <StatusBadge tone="pending">Pendiente</StatusBadge> : null}
+                  disabled={!module.implemented}
+                  onClick={() => onModuleOpen(module.id)}
+                />
+              ))}
+            </div>
+          </DetailPanel>
+        ))}
+      </div>
     </div>
   );
 };
@@ -1019,21 +1045,21 @@ const FibrilacionAuricularFlowView = ({
   onBack,
   onFinish,
 }) => {
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('murillo7', protocol.pdfPage);
-  const { step, stability, duration, structuralHeartDisease } = faFlowState;
-  const controlMedicationIds = structuralHeartDisease ? ['digoxina', 'amiodarona'] : ['metoprolol', 'verapamilo'];
+  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('esc-fa-2024');
+  const { step, stability, duration, reducedEjectionFraction } = faFlowState;
+  const controlMedicationIds = reducedEjectionFraction ? ['metoprolol', 'digoxina', 'amiodarona'] : ['metoprolol', 'verapamilo', 'digoxina'];
   const preventionMedicationIds = ['apixaban', 'acenocumarol'];
-  const quickCalculationIds = ['cha2ds2-vasc', 'has-bled', 'cockcroft-gault'];
+  const quickCalculationIds = ['cha2ds2-va', 'has-bled', 'cockcroft-gault'];
   const flowFocus = getFaFlowFocus({ step, stability, duration });
-  const timingLabel = duration === 'lt48' ? '< 48 h' : '> 48 h o desconocida';
-  const structuralLabel = structuralHeartDisease ? 'Con cardiopatía estructural significativa' : 'Sin cardiopatía estructural significativa';
-  const rateControlText = structuralHeartDisease
-    ? 'Prioriza digoxina. Reserva amiodarona si necesitas apoyo.'
-    : 'Prioriza betabloqueante o verapamilo/diltiazem según perfil clínico.';
+  const timingLabel = duration === 'lt24' ? '< 24 h' : '≥ 24 h o desconocida';
+  const ventricularFunctionLabel = reducedEjectionFraction ? 'FEVI ≤ 40% / insuficiencia cardiaca sistólica' : 'FEVI > 40% o sin HFrEF conocida';
+  const rateControlText = reducedEjectionFraction
+    ? 'Prioriza betabloqueante y/o digoxina si la hemodinámica lo permite. Reserva amiodarona como última opción aguda.'
+    : 'Betabloqueante, verapamilo/diltiazem o digoxina según perfil clínico y respuesta.';
   const cardioversionText =
-    duration === 'lt48'
-      ? 'Tras controlar síntomas y frecuencia, puedes plantear cardioversión farmacológica o eléctrica.'
-      : 'Necesita anticoagulación previa o ETE antes de la cardioversión.';
+    duration === 'lt24'
+      ? 'Si sigue sintomático o interesa control precoz del ritmo, puedes plantear cardioversión eléctrica o farmacológica.'
+      : 'Antes de cardioversión precoz necesita 3 semanas de anticoagulación terapéutica o ETE.';
 
   const updateFlow = (changes) => {
     onFaFlowChange(changes);
@@ -1046,7 +1072,7 @@ const FibrilacionAuricularFlowView = ({
         title={protocol.longTitle ?? protocol.title}
         step={step}
         totalSteps={4}
-        steps={['Estabilidad', 'Contexto', 'Conducta', 'Ictus']}
+        steps={['Estabilidad', 'Contexto', 'Conducta', 'Anticoagulación']}
         current={flowFocus.current}
         decision={flowFocus.decision}
         next={flowFocus.next}
@@ -1068,7 +1094,7 @@ const FibrilacionAuricularFlowView = ({
                   step: 2,
                   stability: 'unstable',
                   duration: null,
-                  structuralHeartDisease: null,
+                  reducedEjectionFraction: null,
                 })
               }
             />
@@ -1089,29 +1115,29 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 2 && stability === 'stable' ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 2" title="Contexto del episodio" note="Define duración y cardiopatía estructural." />
+          <SectionTitle eyebrow="Paso 2" title="Contexto del episodio" note="Define inicio del episodio y FEVI." />
 
           <div className="space-y-6">
             <div>
-              <p className="eyebrow eyebrow-muted mb-3">Tiempo de evolución</p>
+              <p className="eyebrow eyebrow-muted mb-3">Inicio del episodio actual</p>
               <div className="grid grid-cols-2 gap-3">
-                <FlowSelectButton label="< 48 horas" active={duration === 'lt48'} onClick={() => updateFlow({ duration: 'lt48' })} />
+                <FlowSelectButton label="< 24 horas" active={duration === 'lt24'} onClick={() => updateFlow({ duration: 'lt24' })} />
                 <FlowSelectButton
-                  label="> 48 h o desconocida"
-                  active={duration === 'gt48'}
-                  onClick={() => updateFlow({ duration: 'gt48' })}
+                  label="≥ 24 h o desconocido"
+                  active={duration === 'gte24'}
+                  onClick={() => updateFlow({ duration: 'gte24' })}
                 />
               </div>
             </div>
 
             <div>
-              <p className="eyebrow eyebrow-muted mb-3">Cardiopatía estructural significativa</p>
+              <p className="eyebrow eyebrow-muted mb-3">FEVI ≤ 40% / insuficiencia cardiaca sistólica</p>
               <div className="grid grid-cols-2 gap-3">
-                <FlowSelectButton label="Sí" active={structuralHeartDisease === true} onClick={() => updateFlow({ structuralHeartDisease: true })} />
+                <FlowSelectButton label="Sí" active={reducedEjectionFraction === true} onClick={() => updateFlow({ reducedEjectionFraction: true })} />
                 <FlowSelectButton
                   label="No / desconocido"
-                  active={structuralHeartDisease === false}
-                  onClick={() => updateFlow({ structuralHeartDisease: false })}
+                  active={reducedEjectionFraction === false}
+                  onClick={() => updateFlow({ reducedEjectionFraction: false })}
                 />
               </div>
             </div>
@@ -1122,7 +1148,7 @@ const FibrilacionAuricularFlowView = ({
               </button>
               <button
                 type="button"
-                disabled={!duration || structuralHeartDisease === null}
+                disabled={!duration || reducedEjectionFraction === null}
                 onClick={() => updateFlow({ step: 3 })}
                 className={primaryButtonClass}
               >
@@ -1152,7 +1178,7 @@ const FibrilacionAuricularFlowView = ({
               Analgesia y sedación. Si el paciente toma digoxina, considera iniciar con menor energía y evita cardioversión si sospechas intoxicación digitálica.
             </ProtocolGuideBlock>
             <ProtocolGuideBlock label="Anticoagulación aguda" tone="critical">
-              Si no está anticoagulado, plantea HBPM terapéutica en fase aguda y documenta el plan de continuación.
+              Verifica cuanto antes la situación de anticoagulación y deja definido el plan de continuación tras la estabilización.
             </ProtocolGuideBlock>
           </div>
 
@@ -1188,14 +1214,14 @@ const FibrilacionAuricularFlowView = ({
           <div className="grid gap-3 lg:grid-cols-3">
             <ProtocolGuideBlock label="Caso" tone="accent">
               <p className="font-semibold text-[var(--text)]">{timingLabel}</p>
-              <p className="mt-1">{structuralLabel}.</p>
+              <p className="mt-1">{ventricularFunctionLabel}.</p>
             </ProtocolGuideBlock>
             <ProtocolGuideBlock label="Conducta inmediata">
               <p className="font-semibold text-[var(--text)]">Control de frecuencia.</p>
               <p className="mt-1">{rateControlText}</p>
             </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Cardioversión" tone={duration === 'lt48' ? 'accent' : 'warning'}>
-              <p className="font-semibold text-[var(--text)]">{duration === 'lt48' ? 'Urgente' : 'Electiva / diferida'}</p>
+            <ProtocolGuideBlock label="Cardioversión" tone={duration === 'lt24' ? 'accent' : 'warning'}>
+              <p className="font-semibold text-[var(--text)]">{duration === 'lt24' ? 'Precoz si interesa' : 'Diferida o guiada por ETE'}</p>
               <p className="mt-1">{cardioversionText}</p>
             </ProtocolGuideBlock>
           </div>
@@ -1236,19 +1262,20 @@ const FibrilacionAuricularFlowView = ({
 
       {step === 4 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="Prevención de ictus" note="Decide anticoagulación." />
+          <SectionTitle eyebrow="Paso 4" title="Prevención de ictus y anticoagulación" note="Decide anticoagulación y revisa el riesgo hemorrágico." />
 
           <div className="grid gap-3 lg:grid-cols-[1.06fr_0.94fr]">
             <ProtocolGuideBlock label="Conducta" tone="accent">
-              <p className="font-semibold text-[var(--text)]">
-                Anticoagulación oral si CHA2DS2-VASc es igual o mayor de 1 en hombres o igual o mayor de 2 en mujeres.
-              </p>
+              <p className="font-semibold text-[var(--text)]">Anticoagulación oral si CHA2DS2-VA ≥ 2; considerar si CHA2DS2-VA = 1.</p>
               <p className="mt-1">
                 Si no hay prótesis valvular mecánica ni estenosis mitral moderada/grave, prioriza ACOD.
               </p>
             </ProtocolGuideBlock>
             <ProtocolGuideBlock label="Advertencia" tone="warning">
-              {protocol.warnings[2]}
+              {protocol.warnings[3]}
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Cardioversión y continuación">
+              Si se cardioverte, mantener anticoagulación 4 semanas salvo situaciones muy seleccionadas con inicio &lt; 24 h y riesgo tromboembólico muy bajo.
             </ProtocolGuideBlock>
           </div>
 
@@ -1285,7 +1312,7 @@ const FibrilacionAuricularFlowView = ({
           <div className="mt-4">
             <p className="eyebrow eyebrow-muted mb-2">Advertencias</p>
             <div className="space-y-2">
-              {protocol.warnings.slice(1).map((warning) => (
+              {protocol.warnings.slice(0, 3).concat(protocol.warnings.slice(4)).map((warning) => (
                 <div key={warning} className={`${mutedPanelClass} px-4 py-3 text-sm text-[var(--text-soft)]`}>
                   {warning}
                 </div>

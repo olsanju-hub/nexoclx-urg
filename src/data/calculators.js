@@ -10,6 +10,15 @@ const referenceEntry = ({ id, indexPage, verifiedPage = indexPage, pdfPage, note
     note,
   });
 
+const escFaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-fa-2024',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const roundToOne = (value) => Math.round(value * 10) / 10;
 
 export const calculateCockcroftGault = ({ age, sex, weightKg, serumCreatinineMgDl }) => {
@@ -40,9 +49,8 @@ export const calculateCockcroftGault = ({ age, sex, weightKg, serumCreatinineMgD
   };
 };
 
-export const calculateCha2ds2Vasc = ({
+export const calculateCha2ds2Va = ({
   age,
-  sex,
   heartFailure,
   hypertension,
   diabetes,
@@ -72,24 +80,20 @@ export const calculateCha2ds2Vasc = ({
   if (vascularDisease) {
     score += 1;
   }
-  if (sex === 'female') {
-    score += 1;
-  }
 
-  let recommendation = 'Sin indicación de anticoagulación crónica en la tabla del libro.';
+  let recommendation = 'Sin indicación de anticoagulación por CHA2DS2-VA si no hay otros motivos clínicos.';
 
-  if (score === 1 && sex === 'male') {
-    recommendation = 'La tabla del libro orienta a anticoagulación oral si es hombre.';
-  } else if (score > 1) {
-    recommendation = 'La tabla del libro orienta a anticoagulación oral.';
-  } else if (score === 1 && sex === 'female') {
-    recommendation = 'Si el único punto es sexo femenino, la tabla del libro no indica anticoagulación crónica.';
+  if (score === 1) {
+    recommendation = 'Considerar anticoagulación oral según riesgo tromboembólico, sangrado y contexto clínico.';
+  } else if (score >= 2) {
+    recommendation = 'La guía ESC 2024 recomienda anticoagulación oral si no hay contraindicación.';
   }
 
   return {
     value: score,
     unit: 'puntos',
     interpretation: recommendation,
+    caution: 'No sustituye la revisión de estenosis mitral moderada/grave, prótesis mecánica, función renal y factores de sangrado.',
   };
 };
 
@@ -141,29 +145,30 @@ export const calculateHasBled = ({
     unit: 'puntos',
     interpretation:
       score >= 3
-        ? 'Riesgo hemorrágico elevado. El libro indica control más estricto, no contraindicación automática.'
-        : 'Riesgo hemorrágico bajo según la tabla del libro.',
+        ? 'Riesgo hemorrágico alto. Úsalo para corregir factores modificables y vigilar más de cerca, no para negar anticoagulación por sí solo.'
+        : 'No hay riesgo hemorrágico alto por HAS-BLED, pero sigue revisando factores modificables antes y durante la anticoagulación.',
+    caution: 'La guía ESC 2024 desaconseja usar escalas de sangrado de forma aislada para iniciar o suspender anticoagulación.',
   };
 };
 
 export const calculatorCatalog = {
-  'cha2ds2-vasc': {
-    id: 'cha2ds2-vasc',
-    title: 'CHA2DS2-VASc',
-    shortTitle: 'CHA2DS2-VASc',
+  'cha2ds2-va': {
+    id: 'cha2ds2-va',
+    title: 'CHA2DS2-VA',
+    shortTitle: 'CHA2DS2-VA',
     moduleId: 'fibrilacion-auricular',
     block: 'Fibrilación auricular',
-    chapter: 'Cap. 23 · Fibrilación y flúter auriculares',
-    verifiedPage: 189,
-    pdfPage: 214,
+    chapter: 'Guía ESC 2024 · Fibrilación auricular',
+    verifiedPage: 32,
+    pdfPage: 32,
     status: 'implementado',
     summary: 'Riesgo tromboembólico en FA sin estenosis mitral moderada/severa ni prótesis valvular mecánica.',
     bibliography: [
-      referenceEntry({
-        id: 'cha2ds2-vasc-fa',
-        verifiedPage: 189,
-        pdfPage: 214,
-        note: 'Tabla 23.2 de riesgo tromboembólico.',
+      escFaEntry({
+        id: 'cha2ds2-va-fa',
+        verifiedPages: [32],
+        pdfPages: [32],
+        note: 'La guía ESC 2024 usa CHA2DS2-VA para estratificar riesgo tromboembólico y decidir anticoagulación.',
       }),
     ],
   },
@@ -173,17 +178,17 @@ export const calculatorCatalog = {
     shortTitle: 'HAS-BLED',
     moduleId: 'fibrilacion-auricular',
     block: 'Fibrilación auricular',
-    chapter: 'Cap. 23 · Fibrilación y flúter auriculares',
-    verifiedPage: 190,
-    pdfPage: 215,
+    chapter: 'Guía ESC 2024 · Fibrilación auricular',
+    verifiedPage: 40,
+    pdfPage: 40,
     status: 'implementado',
-    summary: 'Riesgo hemorrágico para individualizar el seguimiento de la anticoagulación.',
+    summary: 'Riesgo hemorrágico para vigilar y corregir factores modificables durante la anticoagulación.',
     bibliography: [
-      referenceEntry({
+      escFaEntry({
         id: 'has-bled-fa',
-        verifiedPage: 190,
-        pdfPage: 215,
-        note: 'Tabla 23.3 de riesgo hemorrágico.',
+        verifiedPages: [39, 40],
+        pdfPages: [39, 40],
+        note: 'La guía ESC 2024 recuerda que las escalas de sangrado ayudan a vigilar, pero no deben decidir por sí solas iniciar o retirar ACO.',
       }),
     ],
   },
@@ -240,22 +245,22 @@ export const calculationAudit = [
     note: 'Fórmula citada en la obra. Queda fuera del primer protocolo real.',
   },
   {
-    id: 'cha2ds2-vasc',
-    title: 'CHA2DS2-VASc',
-    chapter: 'Cap. 23 · Fibrilación y flúter auriculares',
-    verifiedPage: 189,
-    pdfPage: 214,
+    id: 'cha2ds2-va',
+    title: 'CHA2DS2-VA',
+    chapter: 'Guía ESC 2024 · Fibrilación auricular',
+    verifiedPage: 32,
+    pdfPage: 32,
     status: 'implementado',
-    note: 'Escala integrada en el módulo de fibrilación auricular.',
+    note: 'Escala integrada en el módulo de fibrilación auricular y usada como referencia principal actual.',
   },
   {
     id: 'has-bled',
     title: 'HAS-BLED',
-    chapter: 'Cap. 23 · Fibrilación y flúter auriculares',
-    verifiedPage: 190,
-    pdfPage: 215,
+    chapter: 'Guía ESC 2024 · Fibrilación auricular',
+    verifiedPage: 40,
+    pdfPage: 40,
     status: 'implementado',
-    note: 'Escala integrada en el módulo de fibrilación auricular.',
+    note: 'Escala integrada en FA para revisar riesgo hemorrágico y factores corregibles, no para vetar ACO por sí sola.',
   },
   {
     id: 'grace',

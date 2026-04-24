@@ -30,13 +30,13 @@ Principios actuales del proyecto:
 
 ## Estado actual
 
-- Home simplificada a: logo, bibliografía, buscador, accesos a `Protocolos`, `Cálculos`, `Medicamentos` y `Actividad reciente`.
-- Pantalla propia de `Protocolos` como entrada a módulos clínicos auditados.
+- Home simplificada a: accesos rápidos, protocolos activos agrupados por especialidad, `Cálculos` y `Medicamentos`.
+- Pantalla propia de `Protocolos` agrupada por especialidades para evitar una lista plana interminable.
 - Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias` y `síndrome coronario agudo`.
-- Cálculos activos del módulo FA: `CHA2DS2-VASc`, `HAS-BLED` y `Cockcroft-Gault`.
+- Cálculos activos del módulo FA: `CHA2DS2-VA`, `HAS-BLED` y `Cockcroft-Gault`.
 - Fichas farmacológicas activas para FA, HTA y SCA enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
-- Bibliografía activa: `Murillo 7.ª ed.` como obra base general, `ESC HTA 2024` como referencia principal de HTA y `ESC SCA 2023` como referencia principal de IAM/SCA.
+- Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
 - Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`.
 - Despliegue activo en GitHub Pages: `https://olsanju-hub.github.io/NexoClx/`.
 
@@ -46,9 +46,9 @@ Principios actuales del proyecto:
 
 | Sección | Estado | Función real hoy | Relación con el resto |
 | --- | --- | --- | --- |
-| Home | Activa | Punto de entrada con buscador, accesos rápidos y actividad reciente. | Lleva a protocolos, cálculos, medicamentos y bibliografía. |
-| Protocolos | Activa | Lista de módulos clínicos auditados y acceso al protocolo real disponible. | Abre protocolo real o temas auditados sin desarrollo completo. |
-| Módulo FA | Activo | Flujo clínico dividido en vistas cortas: `Resumen`, `Decisión`, `Cálculos`, `Medicación` y `Seguridad`. | Embebe o enlaza cálculos, medicación y bibliografía sin saturar una sola pantalla. |
+| Home | Activa | Punto de entrada con accesos rápidos, protocolos activos agrupados por especialidad, cálculos y medicamentos. | Lleva a protocolos, cálculos y medicamentos sin pasos intermedios largos. |
+| Protocolos | Activa | Índice de módulos clínicos agrupados por especialidad. | Abre protocolo real o deja visible el tema pendiente dentro de su bloque clínico. |
+| Módulo FA | Activo | Flujo clínico dividido en `Estabilidad`, `Contexto`, `Conducta` y `Anticoagulación`. | Embebe o enlaza cálculos, medicación y fuente principal sin saturar una sola pantalla. |
 | Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo. |
 | Medicamentos | Activa | Reúne fichas farmacológicas completas del módulo activo. | Cada ficha puede abrirse desde el protocolo y volver a él. |
 | Bibliografía | Activa | Da acceso a la obra base y a referencias estructuradas. | Cada módulo guarda sus referencias y páginas verificadas. |
@@ -58,14 +58,13 @@ Principios actuales del proyecto:
 
 1. La `Home` funciona como entrada principal.
 2. Desde `Home` se entra a `Protocolos`, `Cálculos` o `Medicamentos` sin pasar por una pantalla larga.
-3. El buscador actual filtra módulos clínicos auditados y puede abrirlos directamente.
-4. La pantalla `Protocolos` concentra el acceso a módulos activos y temas solo auditados.
-5. Al abrir `fibrilación auricular`, la navegación prioriza vistas cortas y no una página continua.
-6. Desde el protocolo se puede abrir un cálculo concreto o una ficha farmacológica concreta.
-7. Si un cálculo o un medicamento se abre desde el protocolo, la interfaz conserva botón claro de retorno al protocolo y a la subsección de origen.
-8. Los mismos cálculos siguen existiendo en la sección general de `Cálculos`.
-9. Las mismas fichas siguen existiendo en la sección general de `Medicamentos`.
-10. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
+3. La pantalla `Protocolos` agrupa los módulos por especialidad para que el crecimiento no se convierta en una lista plana.
+4. Al abrir `fibrilación auricular`, la navegación prioriza vistas cortas y no una página continua.
+5. Desde el protocolo se puede abrir un cálculo concreto o una ficha farmacológica concreta.
+6. Si un cálculo o un medicamento se abre desde el protocolo, la interfaz conserva botón claro de retorno al protocolo y a la subsección de origen.
+7. Los mismos cálculos siguen existiendo en la sección general de `Cálculos`.
+8. Las mismas fichas siguen existiendo en la sección general de `Medicamentos`.
+9. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
 
 ### Cómo se conectan los módulos
 
@@ -102,8 +101,9 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `src/App.jsx`
   - shell principal de la app
-  - navegación entre `Home`, `Protocolos`, `Cálculos`, `Medicamentos` y bibliografía
+  - navegación entre `Home`, `Protocolos`, `Cálculos` y `Medicamentos`
   - retorno contextual al origen cuando se abre cálculo o fármaco desde protocolo
+  - agrupación de protocolos por especialidad
   - control de subpantallas cortas dentro del módulo de `fibrilación auricular`
 
 - `src/main.jsx`
@@ -126,6 +126,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 - `src/data/modules.js`
   - índice clínico auditado
   - módulos visibles en `Protocolos`
+  - agrupación por especialidad
   - actividad reciente
   - bibliografía base usada
 
@@ -154,15 +155,31 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 - `public/biblio/SCA 2023.pdf`
   - guía principal actual para `IAM / síndrome coronario agudo`
 
+- `public/biblio/FA 2024.pdf`
+  - guía principal actual para `fibrilación auricular`
+
+- `public/biblio/TSV 2019.pdf`
+  - guía principal actual indexada para `TSV`
+
+- `public/biblio/est car 2021.pdf`
+  - documento principal actual indexado para `bradicardias`
+
+- `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf`
+  - documento principal actual indexado para `arritmias ventriculares`
+
 ## Índice funcional del proyecto
 
 ### Módulos clínicos
 
 | Módulo | Capítulo | Página real | Estado | Qué existe hoy |
 | --- | --- | ---: | --- | --- |
-| Fibrilación auricular | Cap. 23 | 185 | Creado | Protocolo real dividido en `Resumen`, `Decisión`, `Cálculos`, `Medicación` y `Seguridad`, con bibliografía interna discreta. |
+| Fibrilación auricular | Guía ESC 2024 + Cap. 23 | 185 | Creado | Flujo real por `Estabilidad`, `Contexto`, `Conducta` y `Anticoagulación`, con `ESC FA 2024` como referencia principal y Murillo como apoyo práctico. |
 | HTA en urgencias | Caps. 32-33 | 246 | Creado | Flujo real para separar urgencia de emergencia hipertensiva, con conducta, tratamiento y bibliografía principal `ESC HTA 2024`. |
 | Síndrome coronario agudo | Cap. 26 | 214 | Creado | Flujo real para ECG, hs-cTn, riesgo, reperfusión y antitrombosis, con bibliografía principal `ESC SCA 2023`. |
+| Insuficiencia cardiaca | Cap. 19 | 161 | Solo indexado | Tema auditado para futura integración del protocolo de `ICC`. |
+| Taquicardia supraventricular | Guía ESC 2019 | 1 | Solo indexado | Referencia principal ya fijada en `ESC TSV 2019`; protocolo pendiente. |
+| Bradicardias | Documento ESC 2021 | 1 | Solo indexado | Referencia principal ya fijada en el documento `ESC 2021` disponible en el repo; protocolo pendiente. |
+| Arritmias ventriculares | Documento ESC 2022 | 1 | Solo indexado | Referencia principal ya fijada en el documento `ESC 2022` disponible en el repo; protocolo pendiente. |
 | Shock | Cap. 18 | 154 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Dolor torácico agudo | Cap. 25 | 207 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Ictus | Cap. 64 | 442 | Solo indexado | Tema auditado, sin protocolo operativo. |
@@ -175,8 +192,8 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Cálculo / escala | Bloque clínico | Página real verificada | Estado | Observaciones |
 | --- | --- | ---: | --- | --- |
 | Aclaramiento de creatinina (Cockcroft-Gault) | Cap. 5 · Bioquímica sanguínea | 39 | Implementado | Se usa ya para revisar ajuste renal de anticoagulantes en FA. |
-| CHA2DS2-VASc | Cap. 23 · Fibrilación y flúter auriculares | 189 | Implementado | Integrado dentro del protocolo FA y también accesible desde `Cálculos`. |
-| HAS-BLED | Cap. 23 · Fibrilación y flúter auriculares | 190 | Implementado | Integrado dentro del protocolo FA y también accesible desde `Cálculos`. |
+| CHA2DS2-VA | Guía ESC 2024 · Fibrilación auricular | 32 | Implementado | Integrado dentro del protocolo FA y también accesible desde `Cálculos`. |
+| HAS-BLED | Guía ESC 2024 · Fibrilación auricular | 40 | Implementado | Integrado dentro del protocolo FA para vigilar riesgo hemorrágico y también accesible desde `Cálculos`. |
 | TFG estimado (CKD-EPI) | Cap. 5 · Bioquímica sanguínea | 39 | Pendiente | Auditado, pero fuera del alcance del primer módulo real. |
 | Diferencia alveoloarterial de O2 (∆AaPO2) | Cap. 8 · Gasometría, pulsioximetría y capnografía | 66 | Pendiente | Detectado en bibliografía, no implementado. |
 | GRACE | Cap. 26 · Síndrome coronario agudo | 220 | Pendiente | Escala detectada para futuro módulo. |
@@ -196,16 +213,16 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fármaco | Familia | Módulo | Estado | Fuente principal |
 | --- | --- | --- | --- | --- |
-| Metoprolol | Control de frecuencia | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Verapamilo | Control de frecuencia | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Digoxina | Control de frecuencia | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Amiodarona | Control de frecuencia y ritmo | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Apixabán | Anticoagulación | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Dabigatrán | Anticoagulación | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Edoxabán | Anticoagulación | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Rivaroxabán | Anticoagulación | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Acenocumarol | Puente o AVK | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
-| Enoxaparina | Puente o AVK | Fibrilación auricular | Implementado | CIMA + Murillo 7.ª ed. |
+| Metoprolol | Control de frecuencia | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Verapamilo | Control de frecuencia | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Digoxina | Control de frecuencia | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Amiodarona | Control de frecuencia y ritmo | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Apixabán | Anticoagulación | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Dabigatrán | Anticoagulación | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Edoxabán | Anticoagulación | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Rivaroxabán | Anticoagulación | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Acenocumarol | Puente o AVK | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
+| Enoxaparina | Puente o AVK | Fibrilación auricular | Implementado | ESC FA 2024 + CIMA + Murillo 7.ª ed. |
 
 ### Plantillas de imagen
 
@@ -217,8 +234,12 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fuente | Ubicación | Estado | Observaciones |
 | --- | --- | --- | --- |
+| *Guía ESC 2024 sobre el manejo de la fibrilación auricular* | `public/biblio/FA 2024.pdf` | Activa · principal en FA | Referencia principal actual del protocolo de FA. |
 | *Guía ESC 2024 sobre el manejo de la presión arterial elevada y la hipertensión* | `public/biblio/HTA 2024.pdf` | Activa · principal en HTA | Referencia principal actual del protocolo de HTA en urgencias. |
 | *Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos* | `public/biblio/SCA 2023.pdf` | Activa · principal en IAM/SCA | Referencia principal actual del protocolo de IAM / SCA. |
+| *Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular* | `public/biblio/TSV 2019.pdf` | Activa · principal en TSV | Referencia principal actual indexada para TSV. |
+| *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | `public/biblio/est car 2021.pdf` | Activa · principal en bradicardias | Documento actualmente disponible en el repo para bradicardias / estimulación. |
+| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Documento actualmente disponible en el repo para arritmias ventriculares. |
 | *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | `public/biblio/urgencias-murillo-7ma.pdf` | Activa | Obra base auditada y usada por la app. |
 | Bibliografía específica de radiología | No detectada en este workspace | No disponible en workspace | Sigue pendiente de incorporación real al repositorio. |
 
@@ -256,6 +277,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fecha | Cambio realizado | Sección afectada | Breve explicación |
 | --- | --- | --- | --- |
+| 2026-04-24 | FA como guía principal y protocolos por especialidad | Protocolos / bibliografía / cálculos | Se indexó `ESC FA 2024`, se pasó FA a `CHA2DS2-VA`, se revisó el flujo clínico y se agrupó la lista de protocolos por especialidad. |
 | 2026-04-24 | Reindexación bibliográfica de HTA e IAM/SCA | Bibliografía / protocolos / medicamentos | Se añadieron `ESC HTA 2024` y `ESC SCA 2023` como referencias principales reales, se ajustaron enlaces y se revisó el contenido clínico relacionado. |
 | 2026-04-05 | Montaje base del proyecto | Base técnica | Se creó la app con `Vite + React + Tailwind` y se dejó lista para build estático. |
 | 2026-04-05 | Preparación de despliegue | Infraestructura | Se configuró publicación continua en GitHub Pages. |

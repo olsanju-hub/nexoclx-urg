@@ -28,6 +28,15 @@ const escScaReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =
     note,
   });
 
+const escFaReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-fa-2024',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const cimaSource = (label, url) => ({ label, url, type: 'cima' });
 const protocolSource = (label, bibliography) => ({ label, bibliography, type: 'protocol' });
 
@@ -38,7 +47,7 @@ export const medicationCatalog = {
     protocolId: 'fibrilacion-auricular',
     family: 'Control de frecuencia',
     indication:
-      'Control de la frecuencia ventricular en fibrilación auricular rápida sin insuficiencia cardíaca manifiesta.',
+      'Control de la frecuencia ventricular en fibrilación auricular aguda, sobre todo si FEVI > 40%; también puede usarse con FEVI ≤ 40% si la situación hemodinámica lo permite.',
     dose:
       'En este contexto: 100 mg VO cada 12 h o 2,5 mg IV lento; repetir cada 10 min hasta 15 mg totales si hace falta.',
     route: 'Oral / intravenosa',
@@ -54,12 +63,22 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'La ficha CIMA oral consultada señala aumento de exposición en cirrosis hepática grave o derivación portocava; conviene empezar bajo y vigilar.',
     practicalNotes: [
-      'En FA el libro lo sitúa como primera opción si no hay insuficiencia cardíaca.',
+      'La guía ESC 2024 lo sitúa entre las opciones de primera línea para control agudo de frecuencia.',
+      'Si la FEVI es ≤ 40%, puede usarse junto con digoxina según tolerancia y contexto clínico.',
       'No combinar de entrada con verapamilo o diltiazem.',
     ],
     sourceScope:
-      'La pauta IV específica del contexto FA procede del capítulo 23 del Murillo; la ficha técnica CIMA consultada corresponde a la formulación oral.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta contextual IV se apoya además en Murillo y la ficha CIMA consultada corresponde a la formulación oral.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · control agudo de frecuencia',
+        escFaReferenceEntry({
+          id: 'metoprolol-fa-esc',
+          verifiedPages: [43, 44, 45],
+          pdfPages: [43, 44, 45],
+          note: 'Betabloqueantes como primera línea de control agudo de frecuencia en FA según FEVI y estabilidad.',
+        }),
+      ),
       cimaSource(
         'CIMA · Beloken 100 mg comprimidos',
         'https://cima.aemps.es/cima/dochtml/ft/55748/FichaTecnica_55748.html',
@@ -97,13 +116,22 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'La ficha CIMA oral consultada indica metabolismo más lento en insuficiencia hepática y recomienda iniciar con dosis bajas.',
     practicalNotes: [
-      'En la obra se reserva para FA rápida sin insuficiencia cardíaca.',
+      'La guía ESC 2024 lo mantiene como opción de primera línea si la FEVI es > 40% y no hay vía accesoria.',
       'No asociar de entrada con betabloqueantes.',
       'Usar con precaución junto con digoxina porque puede elevar sus concentraciones.',
     ],
     sourceScope:
-      'La pauta IV concreta del contexto FA procede del capítulo 23 del Murillo; la ficha CIMA consultada corresponde a la formulación oral.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta IV concreta del contexto FA se apoya además en Murillo y la ficha CIMA consultada corresponde a la formulación oral.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · control agudo de frecuencia',
+        escFaReferenceEntry({
+          id: 'verapamilo-fa-esc',
+          verifiedPages: [43, 44, 45],
+          pdfPages: [43, 44, 45],
+          note: 'Diltiazem o verapamilo como opciones en FA aguda si no hay FEVI reducida.',
+        }),
+      ),
       cimaSource('CIMA · Manidón 80 mg comprimidos', 'https://cima.aemps.es/cima/dochtml/ft/50891'),
       protocolSource(
         'Murillo 7.ª ed. · control de frecuencia en FA',
@@ -122,7 +150,7 @@ export const medicationCatalog = {
     protocolId: 'fibrilacion-auricular',
     family: 'Control de frecuencia',
     indication:
-      'Control de frecuencia en FA cuando no se toleran betabloqueantes/verapamilo o cuando existe insuficiencia cardíaca.',
+      'Control de frecuencia en FA aguda, especialmente si hay FEVI ≤ 40% o insuficiencia cardíaca y no basta o no conviene otro frenador nodal.',
     dose:
       'En este contexto: digitalización VO 0,25 mg cada 8 h durante 48 h y luego 0,25 mg/24 h; IV 0,25 mg cada 2 h hasta control o 1,5 mg máximos.',
     route: 'Oral / intravenosa',
@@ -138,13 +166,22 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'La ficha CIMA consultada no aporta un ajuste hepático cerrado. Mantener individualización y vigilancia clínica si hay disfunción multiorgánica.',
     practicalNotes: [
-      'En la obra es fármaco de elección si hay insuficiencia cardíaca, aunque pierde eficacia cuando predomina la activación simpática.',
+      'La guía ESC 2024 la sitúa entre las primeras opciones si la FEVI es ≤ 40% o si se necesita apoyo adicional al control de frecuencia.',
       'Si el paciente ya toma digitálicos no debe redigitalizarse.',
       'La cardioversión eléctrica requiere precaución añadida en tratamiento digitálico.',
     ],
     sourceScope:
-      'La pauta específica de carga y mantenimiento en FA procede del capítulo 23 del Murillo; la ficha CIMA consultada refuerza individualización y monitorización.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta específica de carga y mantenimiento se apoya además en Murillo y la ficha CIMA refuerza individualización y monitorización.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · control agudo de frecuencia',
+        escFaReferenceEntry({
+          id: 'digoxina-fa-esc',
+          verifiedPages: [43, 44, 45],
+          pdfPages: [43, 44, 45],
+          note: 'Digoxina como primera línea con FEVI reducida o como fármaco adicional según el contexto clínico.',
+        }),
+      ),
       cimaSource(
         'CIMA · Digoxina Teofarma 0,25 mg comprimidos',
         'https://cima.aemps.es/cima/dochtml/ft/23850/FichaTecnica_23850.html',
@@ -166,7 +203,7 @@ export const medicationCatalog = {
     protocolId: 'fibrilacion-auricular',
     family: 'Control de frecuencia y ritmo',
     indication:
-      'Última opción aguda para control de frecuencia o alternativa de control del ritmo cuando no hay opciones más limpias o existe insuficiencia cardíaca moderada-grave.',
+      'Última opción aguda para control de frecuencia o alternativa de control del ritmo cuando otras opciones no son adecuadas o existe FEVI reducida / cardiopatía significativa.',
     dose:
       'En este contexto: IV 5-7 mg/kg de carga, con posibilidad de completar 1,2-1,8 g en 24 h; VO 200 mg cada 8 h 7 días, luego cada 12 h 7 días y después 200 mg/24 h 5 días/semana.',
     route: 'Oral / intravenosa',
@@ -182,12 +219,22 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'La ficha CIMA oral consultada no detalla un esquema numérico de ajuste hepático; obliga a prudencia clínica y vigilancia por su perfil de toxicidad.',
     practicalNotes: [
-      'En la obra solo se usa como última opción en control de frecuencia agudo o como fármaco de ritmo en determinados escenarios.',
+      'La guía ESC 2024 la reserva como última opción para control de frecuencia agudo.',
+      'También puede encajar en cardioversión farmacológica si existe HFrEF, hipertrofia severa o enfermedad coronaria y se acepta una reversión más lenta.',
       'No mezclar antiarrítmicos de clase I y III en el mismo momento.',
     ],
     sourceScope:
-      'La pauta detallada de FA procede del capítulo 23 del Murillo; la ficha CIMA oral consultada aporta contraindicaciones y recomendaciones generales de inicio.',
+      'La estrategia clínica de FA aguda sigue la guía ESC 2024; la pauta detallada del contexto FA se apoya además en Murillo y la ficha CIMA aporta contraindicaciones y recomendaciones generales.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · control de frecuencia y cardioversión',
+        escFaReferenceEntry({
+          id: 'amiodarona-fa-esc',
+          verifiedPages: [43, 44, 45, 46, 47, 48],
+          pdfPages: [43, 44, 45, 46, 47, 48],
+          note: 'Reservada para control de frecuencia seleccionado y como opción de cardioversión/rimo en determinados perfiles estructurales.',
+        }),
+      ),
       cimaSource(
         'CIMA · Trangorex 200 mg comprimidos',
         'https://cima.aemps.es/cima/dochtml/ft/48048/FT_48048.html',
@@ -225,12 +272,21 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'CIMA: contraindicado si hay hepatopatía con coagulopatía y riesgo de sangrado; no recomendado en insuficiencia hepática grave.',
     practicalNotes: [
-      'En el libro se incluye como anti-Xa de referencia para FA no valvular.',
+      'La guía ESC 2024 prioriza ACOD frente a AVK salvo prótesis mecánica o estenosis mitral moderada/grave.',
       'Revisar el Cockcroft-Gault antes de decidir dosis si la función renal es dudosa.',
     ],
     sourceScope:
-      'La indicación contextual procede del capítulo 23 del Murillo y la dosificación estructural principal de la ficha técnica CIMA.',
+      'La indicación estratégica en FA y la preferencia por ACOD siguen la guía ESC 2024; la dosificación detallada se contrasta con CIMA y Murillo aporta apoyo práctico.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · anticoagulación oral',
+        escFaReferenceEntry({
+          id: 'apixaban-fa-esc',
+          verifiedPages: [32, 33, 34, 35, 36],
+          pdfPages: [32, 33, 34, 35, 36],
+          note: 'Anticoagulación oral recomendada con preferencia por ACOD en FA no valvular.',
+        }),
+      ),
       cimaSource(
         'CIMA · Eliquis 5 mg comprimidos',
         'https://cima.aemps.es/cima/dochtml/ft/111691014/FT_111691014.html',
@@ -268,12 +324,21 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'No he podido extraer de forma fiable una pauta hepática cuantificada de la ficha CIMA consultada; debe revisarse la ficha completa si existe hepatopatía relevante antes de indicar el fármaco.',
     practicalNotes: [
-      'El libro lo sitúa entre los ACOD anti-IIa para FA no valvular.',
+      'La guía ESC 2024 prioriza ACOD frente a AVK salvo prótesis mecánica o estenosis mitral moderada/grave.',
       'Si se pauta, documentar siempre aclaramiento de creatinina previo.',
     ],
     sourceScope:
-      'La posología de FA está respaldada por la ficha CIMA; el uso contextual dentro del protocolo proviene del capítulo 23 del Murillo.',
+      'La indicación estratégica en FA y la preferencia por ACOD siguen la guía ESC 2024; la posología se apoya en CIMA y Murillo queda como apoyo práctico.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · anticoagulación oral',
+        escFaReferenceEntry({
+          id: 'dabigatran-fa-esc',
+          verifiedPages: [32, 33, 34, 35, 36],
+          pdfPages: [32, 33, 34, 35, 36],
+          note: 'Uso de ACOD como estrategia preferente en FA no valvular.',
+        }),
+      ),
       cimaSource(
         'CIMA · Pradaxa 150 mg cápsulas duras',
         'https://cima.aemps.es/cima/dochtml/ft/08442011/FichaTecnica_08442011.html',
@@ -311,12 +376,21 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'Contraindicado si existe hepatopatía con coagulopatía y riesgo hemorrágico. Si hay insuficiencia hepática leve o moderada sin coagulopatía, la ficha debe revisarse completa antes de prescribir.',
     practicalNotes: [
-      'El libro lo cita entre los anti-Xa disponibles para FA no valvular.',
+      'La guía ESC 2024 prioriza ACOD frente a AVK salvo prótesis mecánica o estenosis mitral moderada/grave.',
       'En este módulo conviene apoyarse en Cockcroft-Gault antes de seleccionar dosis.',
     ],
     sourceScope:
-      'La dosis principal procede de la ficha CIMA consultada; el encaje clínico dentro de FA viene del capítulo 23 del Murillo.',
+      'La indicación estratégica en FA y la preferencia por ACOD siguen la guía ESC 2024; la dosificación detallada se apoya en CIMA y Murillo queda como apoyo práctico.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · anticoagulación oral',
+        escFaReferenceEntry({
+          id: 'edoxaban-fa-esc',
+          verifiedPages: [32, 33, 34, 35, 36],
+          pdfPages: [32, 33, 34, 35, 36],
+          note: 'Uso de ACOD como estrategia preferente en FA no valvular.',
+        }),
+      ),
       cimaSource(
         'CIMA · Lixiana 30 mg comprimidos',
         'https://cima.aemps.es/cima/dochtml/ft/115993015/FT_115993015.html',
@@ -355,11 +429,20 @@ export const medicationCatalog = {
       'La ficha CIMA contraindica rivaroxabán si existe hepatopatía con coagulopatía y riesgo de sangrado clínicamente relevante, incluidos Child-Pugh B y C.',
     practicalNotes: [
       'Debe tomarse con alimentos para asegurar exposición adecuada.',
-      'En este módulo el libro lo incluye como anti-Xa para FA no valvular.',
+      'La guía ESC 2024 prioriza ACOD frente a AVK salvo prótesis mecánica o estenosis mitral moderada/grave.',
     ],
     sourceScope:
-      'La pauta base procede de CIMA y el uso contextual en FA de la bibliografía de Murillo.',
+      'La indicación estratégica en FA y la preferencia por ACOD siguen la guía ESC 2024; la dosificación se apoya en CIMA y Murillo queda como apoyo práctico.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · anticoagulación oral',
+        escFaReferenceEntry({
+          id: 'rivaroxaban-fa-esc',
+          verifiedPages: [32, 33, 34, 35, 36],
+          pdfPages: [32, 33, 34, 35, 36],
+          note: 'Uso de ACOD como estrategia preferente en FA no valvular.',
+        }),
+      ),
       cimaSource(
         'CIMA · Xarelto 20 mg comprimidos',
         'https://cima.aemps.es/cima/dochtml/ft/08472018/FT_08472018.html',
@@ -398,11 +481,21 @@ export const medicationCatalog = {
       'La ficha CIMA contraindica insuficiencia hepática grave y pide especial precaución en insuficiencia hepática leve-moderada por alteración de síntesis de factores y riesgo de sangrado.',
     practicalNotes: [
       'Requiere control estrecho de INR.',
-      'El libro orienta a INR 2,5-3,5 si FA con estenosis mitral moderada/grave o prótesis mecánica; INR 2-3 en otros contextos con AVK.',
+      'La guía ESC 2024 lo reserva sobre todo para prótesis mecánica o estenosis mitral moderada/grave.',
+      'Murillo orienta a INR 2,5-3,5 si FA con estenosis mitral moderada/grave o prótesis mecánica; INR 2-3 en otros contextos con AVK.',
     ],
     sourceScope:
-      'La pauta de inicio específica del protocolo FA y los objetivos de INR proceden del Murillo; la individualización detallada por INR procede de la ficha CIMA.',
+      'La indicación estratégica en FA sigue la guía ESC 2024; la pauta de inicio y objetivos de INR se completan con Murillo y la individualización detallada procede de CIMA.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · AVK en FA valvular',
+        escFaReferenceEntry({
+          id: 'acenocumarol-fa-esc',
+          verifiedPages: [32, 33, 34, 35, 36],
+          pdfPages: [32, 33, 34, 35, 36],
+          note: 'Los AVK siguen siendo la referencia si hay prótesis mecánica o estenosis mitral moderada/grave.',
+        }),
+      ),
       cimaSource(
         'CIMA · Sintrom 4 mg comprimidos',
         'https://cima.aemps.es/cima/dochtml/ft/25670/ft_25670.html',
@@ -440,12 +533,22 @@ export const medicationCatalog = {
     hepaticAdjustment:
       'CIMA: datos limitados; usar con precaución en insuficiencia hepática por aumento potencial del riesgo hemorrágico.',
     practicalNotes: [
+      'No es la referencia principal crónica del protocolo FA, pero sigue siendo apoyo práctico en escenarios puente o peri-cardioversión seleccionados.',
       'La ficha CIMA no lista FA como indicación literal; en este proyecto se usa como puente anticoagulante porque así aparece en el capítulo 23 del Murillo.',
       'Si se usa como puente con AVK, documentar claramente el plan de suspensión y el primer control de coagulación.',
     ],
     sourceScope:
-      'El uso en FA es protocolario y procede del Murillo; la ficha CIMA aporta la base de seguridad, presentación y ajuste renal de la HBPM.',
+      'La guía ESC 2024 ordena la estrategia anticoagulante peri-cardioversión; el uso concreto de HBPM como apoyo práctico en este proyecto sigue apoyándose en Murillo y CIMA.',
     sources: [
+      protocolSource(
+        'ESC FA 2024 · cardioversión y anticoagulación',
+        escFaReferenceEntry({
+          id: 'enoxaparina-fa-esc',
+          verifiedPages: [46, 47, 48, 49],
+          pdfPages: [46, 47, 48, 49],
+          note: 'Marco general de anticoagulación alrededor de la cardioversión en FA aguda.',
+        }),
+      ),
       cimaSource(
         'CIMA · Clexane 10.000 UI (100 mg)/1 ml',
         'https://cima.aemps.es/cima/dochtml/ft/62472/FT_62472.html',

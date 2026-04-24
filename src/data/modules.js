@@ -28,6 +28,42 @@ const escScaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escFaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-fa-2024',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escTsvEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-tsv-2019',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escBradyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-bradicardias-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const escVentricularEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-arritmias-ventriculares-2022',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const coreReference = bibliographyCatalog.murillo7;
 
 export const clinicalIndexAudit = [
@@ -231,25 +267,55 @@ export const clinicalIndexAudit = [
   },
 ];
 
+export const protocolSpecialties = [
+  {
+    id: 'cardiologia',
+    title: 'Cardiología',
+    note: 'Arritmias, hipertensión, insuficiencia cardiaca y síndrome coronario agudo.',
+  },
+  {
+    id: 'neurologia',
+    title: 'Neurología',
+    note: 'Ictus y alteración del nivel de consciencia.',
+  },
+  {
+    id: 'digestivo',
+    title: 'Digestivo',
+    note: 'Patología abdominal y hemorragia digestiva cuando se incorpore.',
+  },
+  {
+    id: 'infecciosas',
+    title: 'Infecciosas',
+    note: 'Sepsis y otros síndromes infecciosos.',
+  },
+];
+
 export const motivoConsultaModules = [
   {
     id: 'fibrilacion-auricular',
     title: 'Fibrilación auricular',
     shortTitle: 'Fibrilación auricular',
-    chapter: 'Cap. 23',
-    section: 'Urgencias cardiovasculares',
+    chapter: 'Guía ESC 2024',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
     verifiedPage: 184,
     pdfPage: 209,
     status: 'implementado',
     implemented: true,
-    summary: 'Arritmia rápida: estabilidad, control de frecuencia y anticoagulación.',
+    summary: 'Estabilidad, inicio < 24 h o ≥ 24 h, control de frecuencia y anticoagulación.',
     bibliography: [
+      escFaEntry({
+        id: 'fa-esc-module',
+        verifiedPages: [75, 76],
+        pdfPages: [75, 76],
+        note: 'Referencia principal actual del módulo de FA.',
+      }),
       referenceEntry({
-        id: 'fa-start',
+        id: 'fa-murillo-support',
         indexPage: 184,
         verifiedPage: 184,
         pdfPage: 209,
-        note: 'Inicio real del capítulo de fibrilación y flúter auriculares verificado en el PDF.',
+        note: 'Apoyo práctico secundario en la obra base.',
       }),
     ],
   },
@@ -258,7 +324,8 @@ export const motivoConsultaModules = [
     title: 'HTA en urgencias',
     shortTitle: 'HTA en urgencias',
     chapter: 'Caps. 32-33',
-    section: 'Urgencias cardiovasculares',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
     verifiedPage: 246,
     pdfPage: 271,
     status: 'implementado',
@@ -292,7 +359,8 @@ export const motivoConsultaModules = [
     title: 'Síndrome coronario agudo',
     shortTitle: 'Síndrome coronario agudo',
     chapter: 'Cap. 26',
-    section: 'Urgencias cardiovasculares',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
     verifiedPage: 214,
     pdfPage: 239,
     status: 'implementado',
@@ -321,11 +389,97 @@ export const motivoConsultaModules = [
     ],
   },
   {
+    id: 'insuficiencia-cardiaca',
+    title: 'Insuficiencia cardiaca',
+    shortTitle: 'ICC',
+    chapter: 'Cap. 19',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
+    verifiedPage: 161,
+    pdfPage: 186,
+    status: 'auditado',
+    implemented: false,
+    summary: 'Tema auditado. Protocolo operativo pendiente.',
+    bibliography: [
+      referenceEntry({
+        id: 'icc-cap19',
+        indexPage: 161,
+        verifiedPage: 161,
+        pdfPage: 186,
+        note: 'Capítulo base auditado para futura integración del protocolo de ICC.',
+      }),
+    ],
+  },
+  {
+    id: 'taquicardia-supraventricular',
+    title: 'Taquicardia supraventricular',
+    shortTitle: 'TSV',
+    chapter: 'Guía ESC 2019',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'auditado',
+    implemented: false,
+    summary: 'Guía indexada. Protocolo operativo pendiente.',
+    bibliography: [
+      escTsvEntry({
+        id: 'tsv-esc-module',
+        verifiedPages: [1, 2],
+        pdfPages: [1, 2],
+        note: 'Referencia principal actual para TSV.',
+      }),
+    ],
+  },
+  {
+    id: 'bradicardias',
+    title: 'Bradicardias',
+    shortTitle: 'Bradicardias',
+    chapter: 'Documento ESC 2021',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'auditado',
+    implemented: false,
+    summary: 'Documento indexado. Protocolo operativo pendiente.',
+    bibliography: [
+      escBradyEntry({
+        id: 'brady-esc-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal actual disponible en el repo para bradicardias/estimulación.',
+      }),
+    ],
+  },
+  {
+    id: 'arritmias-ventriculares',
+    title: 'Arritmias ventriculares',
+    shortTitle: 'Arritmias ventriculares',
+    chapter: 'Documento ESC 2022',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'auditado',
+    implemented: false,
+    summary: 'Documento indexado. Protocolo operativo pendiente.',
+    bibliography: [
+      escVentricularEntry({
+        id: 'ventricular-esc-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal actual disponible en el repo para arritmias ventriculares.',
+      }),
+    ],
+  },
+  {
     id: 'shock',
     title: 'Shock',
     shortTitle: 'Shock',
     chapter: 'Cap. 18',
-    section: 'Urgencias cardiovasculares',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
     verifiedPage: 154,
     pdfPage: 179,
     status: 'auditado',
@@ -345,7 +499,8 @@ export const motivoConsultaModules = [
     title: 'Dolor torácico agudo',
     shortTitle: 'Dolor torácico agudo',
     chapter: 'Cap. 25',
-    section: 'Urgencias cardiovasculares',
+    section: 'Cardiología',
+    specialtyId: 'cardiologia',
     verifiedPage: 207,
     pdfPage: 232,
     status: 'auditado',
@@ -365,7 +520,8 @@ export const motivoConsultaModules = [
     title: 'Ictus',
     shortTitle: 'Ictus',
     chapter: 'Cap. 64',
-    section: 'Urgencias neurológicas',
+    section: 'Neurología',
+    specialtyId: 'neurologia',
     verifiedPage: 442,
     pdfPage: 467,
     status: 'auditado',
@@ -385,7 +541,8 @@ export const motivoConsultaModules = [
     title: 'Sepsis',
     shortTitle: 'Sepsis',
     chapter: 'Cap. 107',
-    section: 'Infecciones en medicina de urgencias',
+    section: 'Infecciosas',
+    specialtyId: 'infecciosas',
     verifiedPage: 640,
     pdfPage: 665,
     status: 'auditado',
@@ -405,7 +562,8 @@ export const motivoConsultaModules = [
     title: 'Coma',
     shortTitle: 'Coma',
     chapter: 'Cap. 62',
-    section: 'Urgencias neurológicas',
+    section: 'Neurología',
+    specialtyId: 'neurologia',
     verifiedPage: 428,
     pdfPage: 453,
     status: 'auditado',
@@ -425,7 +583,8 @@ export const motivoConsultaModules = [
     title: 'Dolor abdominal agudo',
     shortTitle: 'Dolor abdominal agudo',
     chapter: 'Cap. 50',
-    section: 'Urgencias del aparato digestivo',
+    section: 'Digestivo',
+    specialtyId: 'digestivo',
     verifiedPage: 340,
     pdfPage: 365,
     status: 'auditado',
@@ -442,6 +601,26 @@ export const motivoConsultaModules = [
   },
 ];
 
+const sortModules = (left, right) => {
+  const implementedDelta = Number(right.implemented) - Number(left.implemented);
+
+  if (implementedDelta !== 0) {
+    return implementedDelta;
+  }
+
+  return left.title.localeCompare(right.title, 'es');
+};
+
+export const groupModulesBySpecialty = (modules = motivoConsultaModules, { implementedOnly = false } = {}) =>
+  protocolSpecialties
+    .map((specialty) => ({
+      ...specialty,
+      modules: modules
+        .filter((module) => module.specialtyId === specialty.id && (!implementedOnly || module.implemented))
+        .sort(sortModules),
+    }))
+    .filter((specialty) => specialty.modules.length > 0);
+
 export const recentActivity = [
   {
     time: 'FA',
@@ -451,9 +630,9 @@ export const recentActivity = [
   },
   {
     time: 'CAL',
-    title: 'CHA2DS2-VASc',
+    title: 'CHA2DS2-VA',
     meta: 'Módulo FA',
-    target: { type: 'calculator', id: 'cha2ds2-vasc' },
+    target: { type: 'calculator', id: 'cha2ds2-va' },
   },
   {
     time: 'CAL',
@@ -477,6 +656,14 @@ export const recentActivity = [
 
 export const bibliographyBaseUsed = [
   {
+    id: 'esc-fa-2024',
+    title: bibliographyCatalog['esc-fa-2024'].title,
+    shortTitle: bibliographyCatalog['esc-fa-2024'].shortTitle,
+    filePath: bibliographyCatalog['esc-fa-2024'].filePath,
+    status: 'activa · principal en FA',
+    note: 'Guía principal para fibrilación auricular, cardioversión, control de frecuencia y anticoagulación.',
+  },
+  {
     id: 'esc-hta-2024',
     title: bibliographyCatalog['esc-hta-2024'].title,
     shortTitle: bibliographyCatalog['esc-hta-2024'].shortTitle,
@@ -491,6 +678,30 @@ export const bibliographyBaseUsed = [
     filePath: bibliographyCatalog['esc-sca-2023'].filePath,
     status: 'activa · principal en IAM/SCA',
     note: 'Guía principal para síndrome coronario agudo, triaje, reperfusión y antitrombosis.',
+  },
+  {
+    id: 'esc-tsv-2019',
+    title: bibliographyCatalog['esc-tsv-2019'].title,
+    shortTitle: bibliographyCatalog['esc-tsv-2019'].shortTitle,
+    filePath: bibliographyCatalog['esc-tsv-2019'].filePath,
+    status: 'activa · principal en TSV',
+    note: 'Guía principal actual indexada para taquicardia supraventricular.',
+  },
+  {
+    id: 'esc-bradicardias-2021',
+    title: bibliographyCatalog['esc-bradicardias-2021'].title,
+    shortTitle: bibliographyCatalog['esc-bradicardias-2021'].shortTitle,
+    filePath: bibliographyCatalog['esc-bradicardias-2021'].filePath,
+    status: 'activa · principal en bradicardias',
+    note: 'Documento actualmente disponible en el repo como referencia principal de bradicardias/estimulación.',
+  },
+  {
+    id: 'esc-arritmias-ventriculares-2022',
+    title: bibliographyCatalog['esc-arritmias-ventriculares-2022'].title,
+    shortTitle: bibliographyCatalog['esc-arritmias-ventriculares-2022'].shortTitle,
+    filePath: bibliographyCatalog['esc-arritmias-ventriculares-2022'].filePath,
+    status: 'activa · principal en arritmias ventriculares',
+    note: 'Documento actualmente disponible en el repo como referencia principal de arritmias ventriculares.',
   },
   {
     id: 'murillo7',
