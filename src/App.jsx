@@ -102,20 +102,28 @@ const initialScaFlowState = {
   nsteacsRisk: null,
 };
 
-const initialArrhythmiaFlowState = {
+const initialBradycardiaFlowState = {
   step: 1,
-  rhythmFamily: null,
   shock: false,
   syncope: false,
   ischemia: false,
   heartFailure: false,
-  tachyPattern: null,
-  adenosineResponse: null,
+  bradyPattern: null,
   recentAsystole: false,
   mobitzTwo: false,
   completeBlockBroad: false,
   ventricularPause: false,
   atropineResponse: null,
+};
+
+const initialVentricularArrhythmiaFlowState = {
+  step: 1,
+  hasPulse: null,
+  shock: false,
+  syncope: false,
+  ischemia: false,
+  heartFailure: false,
+  ventricularPattern: null,
 };
 
 const initialIschemicStrokeFlowState = {
@@ -217,11 +225,6 @@ const matchesSearch = (needle, ...parts) => parts.some((part) => normalizeSearch
 const getModulePrimaryReferences = (moduleId) => {
   const protocol = getProtocol(moduleId);
   const entries = protocol?.bibliography ?? getMotivoModule(moduleId).bibliography ?? [];
-
-  if (moduleId === 'taquiarritmias-bradicardias') {
-    return entries.slice(0, 3);
-  }
-
   return entries.slice(0, 1);
 };
 
@@ -1104,69 +1107,86 @@ const getScaFlowFocus = ({ step, syndromeType, stability, stemiScenario, nsteacs
   };
 };
 
-const getArrhythmiaFlowFocus = ({ step, rhythmFamily, tachyPattern }) => {
+const getBradycardiaFlowFocus = ({ step, isUnstable, bradyPattern, hasAsystoleRisk }) => {
   if (step === 1) {
     return {
-      current: 'Arritmia aguda',
-      decision: '¿Es una taquicardia o una bradicardia?',
-      next: 'Después, busca inestabilidad.',
+      current: 'Bradicardia',
+      decision: '¿Hay repercusión hemodinámica o clínica?',
+      next: 'Si no la hay, clasifica el hallazgo que cambia la conducta.',
     };
   }
 
   if (step === 2) {
     return {
-      current: rhythmFamily === 'bradycardia' ? 'Bradicardia' : 'Taquicardia',
-      decision: '¿Hay shock, síncope, isquemia o insuficiencia cardíaca?',
-      next: 'Si está estable, clasifica mejor el ritmo.',
+      current: isUnstable ? 'Bradicardia con repercusión' : 'Bradicardia estable',
+      decision: isUnstable ? 'Atropina ahora y pacing si no responde.' : '¿Es sinusal / nodo o un bloqueo AV / conducción?',
+      next: isUnstable ? 'Después, comprueba respuesta y deja lista la vía de estimulación.' : 'Después, decide si basta vigilar o si debes preparar estimulación.',
     };
   }
 
-  if (step === 3 && rhythmFamily === 'tachycardia') {
+  if (bradyPattern === 'av-block' || hasAsystoleRisk) {
     return {
-      current: 'Taquicardia estable',
-      decision: '¿QRS estrecho regular, estrecho irregular o ancho?',
-      next: 'La conducta cambia según esa rama.',
+      current: 'Bloqueo / alto riesgo',
+      decision: 'Ayuda experta y vía de estimulación aunque siga estable.',
+      next: 'Después, vigila progresión y causa reversible.',
     };
   }
-
-  if (step === 3 && rhythmFamily === 'bradycardia') {
-    return {
-      current: 'Bradicardia sin datos de inestabilidad',
-      decision: '¿Hay riesgo de asistolia o bloqueo de alto grado?',
-      next: 'Si lo hay, acelera la vía de estimulación.',
-    };
-  }
-
-  if (rhythmFamily === 'bradycardia') {
-    return {
-      current: 'Conducta en bradicardia',
-      decision: 'Atropina si hay síntomas; pacing si no responde o hay alto riesgo.',
-      next: 'Después, deja resuelta la causa y la vía de estimulación.',
-    };
-  }
-
-  const tachyLabel =
-    tachyPattern === 'narrow-regular'
-      ? 'QRS estrecho regular'
-      : tachyPattern === 'narrow-irregular'
-        ? 'QRS estrecho irregular'
-        : tachyPattern === 'wide-regular'
-          ? 'QRS ancho regular'
-          : tachyPattern === 'wide-irregular'
-            ? 'QRS ancho irregular'
-            : 'Taquicardia';
 
   return {
-    current: tachyLabel,
+    current: 'Bradicardia sinusal / nodo',
+    decision: 'Corrige causa, ECG y no trates por inercia si sigue estable.',
+    next: 'Después, reentra si aparecen síntomas o empeora la conducción.',
+  };
+};
+
+const getVentricularArrhythmiaFlowFocus = ({ step, hasPulse, isUnstable, ventricularPattern }) => {
+  if (step === 1) {
+    return {
+      current: 'Arritmia ventricular',
+      decision: '¿Tiene pulso?',
+      next: 'Si lo tiene, decide enseguida si está inestable.',
+    };
+  }
+
+  if (step === 2) {
+    return {
+      current: 'Arritmia ventricular con pulso',
+      decision: '¿Hay shock, síncope, isquemia o insuficiencia cardíaca?',
+      next: 'Si sigue estable, clasifica monomorfa frente a polimórfica.',
+    };
+  }
+
+  if (step === 3) {
+    return {
+      current: 'Arritmia ventricular estable',
+      decision: '¿TV monomorfa o TV polimórfica / torsades?',
+      next: 'La conducta y el fármaco cambian con esa rama.',
+    };
+  }
+
+  if (hasPulse === false) {
+    return {
+      current: 'Sin pulso',
+      decision: 'Desfibrilación y algoritmo de parada.',
+      next: 'Este módulo se detiene ahí y no sustituye un ALS completo.',
+    };
+  }
+
+  if (isUnstable) {
+    return {
+      current: 'TV con pulso inestable',
+      decision: 'Electricidad inmediata.',
+      next: 'Si es polimórfica o no sincroniza, desfibrila.',
+    };
+  }
+
+  return {
+    current: ventricularPattern === 'polymorphic' ? 'TV polimórfica / torsades' : 'TV monomorfa',
     decision:
-      tachyPattern === 'narrow-regular'
-        ? 'Vagales y adenosina primero.'
-        : tachyPattern === 'narrow-irregular'
-          ? 'Piensa en FA/flutter y evita perder tiempo en ramas que no cambian la conducta.'
-          : tachyPattern === 'wide-irregular'
-            ? 'Si dudas, evita bloqueadores nodales y trata el contexto de mayor riesgo.'
-            : 'Si no estás seguro, trata como TV.',
-    next: 'Abre el procedimiento o el fármaco solo si hace falta.',
+      ventricularPattern === 'polymorphic'
+        ? 'Magnesio IV, corregir causas y no retrasar electricidad si empeora.'
+        : 'Si dudas del mecanismo, trátala como ventricular y usa amiodarona IV.',
+    next: 'Después, reevalúa estabilidad, QT y desencadenantes.',
   };
 };
 
@@ -2503,63 +2523,33 @@ const SindromeCoronarioAgudoFlowView = ({
   );
 };
 
-const TaquiarritmiasBradicardiasFlowView = ({
+const BradicardiasFlowView = ({
   protocol,
-  arrhythmiaFlowState,
-  onArrhythmiaFlowChange,
-  onArrhythmiaFlowReset,
-  onModuleOpen,
+  bradycardiaFlowState,
+  onBradycardiaFlowChange,
+  onBradycardiaFlowReset,
   onMedicationOpen,
   onBack,
 }) => {
-  const {
-    step,
-    rhythmFamily,
-    shock,
-    syncope,
-    ischemia,
-    heartFailure,
-    tachyPattern,
-    adenosineResponse,
-    recentAsystole,
-    mobitzTwo,
-    completeBlockBroad,
-    ventricularPause,
-    atropineResponse,
-  } = arrhythmiaFlowState;
+  const { step, shock, syncope, ischemia, heartFailure, bradyPattern, recentAsystole, mobitzTwo, completeBlockBroad, ventricularPause, atropineResponse } =
+    bradycardiaFlowState;
   const isUnstable = shock || syncope || ischemia || heartFailure;
   const hasAsystoleRisk = recentAsystole || mobitzTwo || completeBlockBroad || ventricularPause;
-  const flowFocus = getArrhythmiaFlowFocus({ step, rhythmFamily, tachyPattern });
-  const referenceHref =
-    rhythmFamily === 'bradycardia'
-      ? buildReferenceHref('esc-bradicardias-2021')
-      : tachyPattern === 'wide-regular' || tachyPattern === 'wide-irregular'
-        ? buildReferenceHref('esc-arritmias-ventriculares-2022')
-        : buildReferenceHref('esc-tsv-2019');
+  const flowFocus = getBradycardiaFlowFocus({ step, isUnstable, bradyPattern, hasAsystoleRisk });
+  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('esc-bradicardias-2021');
 
   const updateFlow = (changes) => {
-    onArrhythmiaFlowChange(changes);
+    onBradycardiaFlowChange(changes);
   };
-
-  const resetForNextBranch = () =>
-    updateFlow({
-      tachyPattern: null,
-      adenosineResponse: null,
-      recentAsystole: false,
-      mobitzTwo: false,
-      completeBlockBroad: false,
-      ventricularPause: false,
-      atropineResponse: null,
-    });
 
   return (
     <div className={pageClass}>
       <FlowHeader
-        eyebrow="Arritmias agudas"
+        eyebrow="Cardiología · urgencias"
         title={protocol.longTitle ?? protocol.title}
         step={step}
-        totalSteps={4}
-        steps={['Ritmo', 'Riesgo', 'Clasificación', 'Conducta']}
+        totalSteps={3}
+        steps={['Repercusión', 'Hallazgo', 'Conducta']}
         current={flowFocus.current}
         decision={flowFocus.decision}
         next={flowFocus.next}
@@ -2569,39 +2559,7 @@ const TaquiarritmiasBradicardiasFlowView = ({
 
       {step === 1 ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 1" title="¿Taquicardia o bradicardia?" />
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            <FlowChoiceCard
-              icon={HeartPulse}
-              title="Taquicardia"
-              note="Frecuencia rápida con pulso. Decide primero si hay inestabilidad."
-              tone="critical"
-              onClick={() => updateFlow({ rhythmFamily: 'tachycardia', step: 2 })}
-            />
-            <FlowChoiceCard
-              icon={Activity}
-              title="Bradicardia"
-              note="Frecuencia lenta. Decide si está causando síntomas o riesgo inmediato."
-              onClick={() => updateFlow({ rhythmFamily: 'bradycardia', step: 2 })}
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={onArrhythmiaFlowReset} className={subtleButtonClass}>
-              Reiniciar
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 2 ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle
-            eyebrow="Paso 2"
-            title={rhythmFamily === 'bradycardia' ? '¿Hay repercusión?' : '¿Hay inestabilidad?'}
-            note="Marca solo lo que cambia la conducta ahora."
-          />
+          <SectionTitle eyebrow="Paso 1" title="¿Hay repercusión?" note="Marca solo lo que cambia la conducta ahora." />
 
           <div className="grid gap-2 sm:grid-cols-2">
             <BooleanField checked={shock} label="Shock / hipotensión relevante" onChange={(value) => updateFlow({ shock: value })} />
@@ -2613,363 +2571,33 @@ const TaquiarritmiasBradicardiasFlowView = ({
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             <FlowChoiceCard
               icon={ShieldAlert}
-              title={rhythmFamily === 'bradycardia' ? 'Bradicardia con repercusión' : 'Paciente inestable'}
-              note={
-                rhythmFamily === 'bradycardia'
-                  ? 'Atropina ahora. Si no responde o hay alto riesgo, pacing.'
-                  : 'Cardioversión sincronizada inmediata.'
-              }
+              title="Bradicardia con repercusión"
+              note="Atropina ahora. Si no responde o el bloqueo es alto, pacing."
               tone="critical"
               disabled={!isUnstable}
-              onClick={() => {
-                resetForNextBranch();
-                updateFlow({ step: 4 });
-              }}
+              onClick={() => updateFlow({ step: 2, bradyPattern: null, recentAsystole: false, mobitzTwo: false, completeBlockBroad: false, ventricularPause: false, atropineResponse: null })}
             />
             <FlowChoiceCard
               icon={Activity}
-              title={rhythmFamily === 'bradycardia' ? 'Sin repercusión inmediata' : 'Paciente estable'}
-              note={
-                rhythmFamily === 'bradycardia'
-                  ? 'Valora riesgo de asistolia y causa reversible.'
-                  : 'Pasa a QRS estrecho o ancho, regular o irregular.'
-              }
+              title="Sin repercusión inmediata"
+              note="Clasifica si es sinusal / nodo o un bloqueo de conducción."
               disabled={isUnstable}
-              onClick={() => {
-                resetForNextBranch();
-                updateFlow({ step: 3 });
-              }}
+              onClick={() => updateFlow({ step: 2, atropineResponse: null })}
             />
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <StatusBadge tone={isUnstable ? 'critical' : 'active'}>
-              {isUnstable ? 'Con repercusión / inestable' : 'Sin datos de inestabilidad'}
-            </StatusBadge>
-            <button
-              type="button"
-              onClick={() =>
-                updateFlow({
-                  step: 1,
-                  rhythmFamily: null,
-                  shock: false,
-                  syncope: false,
-                  ischemia: false,
-                  heartFailure: false,
-                })
-              }
-              className={subtleButtonClass}
-            >
-              Volver
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 3 && rhythmFamily === 'tachycardia' ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="Clasifica por QRS y ritmo" />
-
-          <div className="grid gap-3 lg:grid-cols-2">
-            <FlowChoiceCard
-              icon={Activity}
-              title="QRS estrecho regular"
-              note="TSV reentrante hasta que no se demuestre lo contrario."
-              onClick={() => updateFlow({ tachyPattern: 'narrow-regular' })}
-            />
-            <FlowChoiceCard
-              icon={Activity}
-              title="QRS estrecho irregular"
-              note="Piensa antes en FA / flutter con conducción variable."
-              onClick={() => updateFlow({ tachyPattern: 'narrow-irregular' })}
-            />
-            <FlowChoiceCard
-              icon={ShieldAlert}
-              title="QRS ancho regular"
-              note="Si dudas, manéjalo como TV."
-              tone="critical"
-              onClick={() => updateFlow({ tachyPattern: 'wide-regular' })}
-            />
-            <FlowChoiceCard
-              icon={ShieldAlert}
-              title="QRS ancho irregular"
-              note="Piensa en FA preexcitada o TV polimórfica."
-              tone="critical"
-              onClick={() => updateFlow({ tachyPattern: 'wide-irregular' })}
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
-              Volver
-            </button>
-            <button
-              type="button"
-              disabled={!tachyPattern}
-              onClick={() => updateFlow({ step: 4 })}
-              className={primaryButtonClass}
-            >
-              Ver conducta
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 3 && rhythmFamily === 'bradycardia' ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 3" title="¿Hay riesgo de asistolia?" note="Pídelo solo si sigue estable." />
-
-          <div className="grid gap-2 sm:grid-cols-2">
-            <BooleanField checked={recentAsystole} label="Asistolia reciente" onChange={(value) => updateFlow({ recentAsystole: value })} />
-            <BooleanField checked={mobitzTwo} label="Bloqueo AV Mobitz II" onChange={(value) => updateFlow({ mobitzTwo: value })} />
-            <BooleanField
-              checked={completeBlockBroad}
-              label="Bloqueo AV completo con QRS ancho"
-              onChange={(value) => updateFlow({ completeBlockBroad: value })}
-            />
-            <BooleanField checked={ventricularPause} label="Pausa ventricular > 3 s" onChange={(value) => updateFlow({ ventricularPause: value })} />
-          </div>
-
-          <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            <ProtocolGuideBlock label="Si marcas alguno" tone="warning">
-              Ayuda experta, monitorización estrecha y deja preparada la vía de estimulación.
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Si no marcas ninguno">Observa, identifica causas y no trates por inercia.</ProtocolGuideBlock>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <StatusBadge tone={hasAsystoleRisk ? 'critical' : 'active'}>{hasAsystoleRisk ? 'Riesgo de asistolia' : 'Sin alto riesgo inmediato'}</StatusBadge>
-            <button type="button" onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
-              Ver conducta
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
-              Volver
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 4 && rhythmFamily === 'tachycardia' && isUnstable ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-top-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="Taquicardia inestable" />
-
-          <div className="grid gap-3 lg:grid-cols-[1.08fr_0.92fr]">
-            <ProtocolGuideBlock label="Haz ahora" tone="critical">
-              <p className="font-semibold text-[var(--danger-700)]">Cardioversión eléctrica sincronizada inmediata.</p>
-              <p className="mt-1">No retrasarla para terminar de etiquetar el ritmo.</p>
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Si falla">
-              <p className="font-semibold text-[var(--text)]">Repite choque y valora amiodarona IV.</p>
-              <p className="mt-1">Si persiste la inestabilidad, la electricidad sigue mandando.</p>
-            </ProtocolGuideBlock>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <DisclosureBlock title="Cómo cardiovertir" summary="Solo lo imprescindible del procedimiento." tone="critical" defaultOpen>
-              <div className="space-y-2">
-                <p>Activa modo sincronizado y confirma marcas sobre cada QRS.</p>
-                <p>Si está consciente, analgesia y sedación si la situación lo permite.</p>
-                <p>Taquicardia de QRS ancho o fibrilación auricular: empieza con 120-150 J bipásica y escala si falla.</p>
-                <p>Flutter o regular de QRS estrecho: suele bastar con 70-120 J bipásica.</p>
-                <p>Da hasta 3 intentos, reactivando la sincronía si el equipo la pierde tras cada choque.</p>
-              </div>
-            </DisclosureBlock>
-
-            <DisclosureBlock title="Si no revierte" summary="Siguiente escalón sin salir del flujo.">
-              <div className="space-y-2">
-                <p>Amiodarona 300 mg IV en 10-20 min y nuevo intento de cardioversión si la inestabilidad persiste.</p>
-                <p>Monitoriza ECG, tensión arterial y prepara ayuda experta inmediata.</p>
-              </div>
-            </DisclosureBlock>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => onMedicationOpen('amiodarona-vt')} className={subtleButtonClass}>
-              Ver amiodarona IV
-            </button>
-            <button type="button" onClick={onArrhythmiaFlowReset} className={subtleButtonClass}>
+            <StatusBadge tone={isUnstable ? 'critical' : 'active'}>{isUnstable ? 'Con repercusión' : 'Sin repercusión inmediata'}</StatusBadge>
+            <button type="button" onClick={onBradycardiaFlowReset} className={subtleButtonClass}>
               Reiniciar
             </button>
           </div>
         </section>
       ) : null}
 
-      {step === 4 && rhythmFamily === 'tachycardia' && !isUnstable && tachyPattern === 'narrow-regular' ? (
+      {step === 2 && isUnstable ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="QRS estrecho regular" />
-
-          <div className="grid gap-3 lg:grid-cols-2">
-            <ProtocolGuideBlock label="Haz ahora" tone="accent">
-              <p className="font-semibold text-[var(--text)]">Maniobras vagales y después adenosina IV rápida si no revierte.</p>
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Si no revierte">
-              <p className="font-semibold text-[var(--text)]">Reevalúa el ECG y pasa al siguiente escalón solo si sigue estable.</p>
-            </ProtocolGuideBlock>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <DisclosureBlock title="Cómo dar adenosina" summary="Dosis y técnica útiles en urgencias." defaultOpen>
-              <div className="space-y-2">
-                <p>Bolo IV rápido: 6 mg; si no revierte en 1-2 min, 12 mg; si persiste, 18 mg.</p>
-                <p>Usa una vena proximal o una cánula grande y sigue con lavado rápido de suero.</p>
-                <p>Monitoriza ECG continuo y avisa de que el malestar será breve.</p>
-                <p>No la uses para intentar terminar FA, flutter o TV.</p>
-              </div>
-            </DisclosureBlock>
-
-            <div className={`${mutedPanelClass} p-4`}>
-              <p className="eyebrow eyebrow-muted">¿Revirtió con vagales / adenosina?</p>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <FlowSelectButton label="Sí" active={adenosineResponse === 'yes'} onClick={() => updateFlow({ adenosineResponse: 'yes' })} />
-                <FlowSelectButton label="No" active={adenosineResponse === 'no'} onClick={() => updateFlow({ adenosineResponse: 'no' })} />
-              </div>
-            </div>
-
-            {adenosineResponse === 'yes' ? (
-              <ProtocolGuideBlock label="Después">
-                <p className="font-semibold text-[var(--text)]">Registra ECG en sinusal, busca la causa y deja plan si recurre.</p>
-              </ProtocolGuideBlock>
-            ) : null}
-
-            {adenosineResponse === 'no' ? (
-              <div className="space-y-3">
-                <ProtocolGuideBlock label="Siguiente escalón" tone="warning">
-                  Si sigue estable, considera verapamilo o betabloqueante según contexto clínico. Si deteriora, cardiovertir.
-                </ProtocolGuideBlock>
-                <div className="space-y-2">
-                  {['adenosina', 'verapamilo', 'metoprolol'].map((medicationId) => (
-                    <MedicationQuickRow
-                      key={medicationId}
-                      medication={getMedication(medicationId)}
-                      onOpen={() => onMedicationOpen(medicationId)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => updateFlow({ step: 3, adenosineResponse: null })} className={subtleButtonClass}>
-              Volver
-            </button>
-            <button type="button" onClick={onArrhythmiaFlowReset} className={subtleButtonClass}>
-              Reiniciar
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 4 && rhythmFamily === 'tachycardia' && !isUnstable && tachyPattern === 'narrow-irregular' ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="QRS estrecho irregular" />
-
-          <div className="grid gap-3 lg:grid-cols-[1.06fr_0.94fr]">
-            <ProtocolGuideBlock label="Haz ahora" tone="accent">
-              <p className="font-semibold text-[var(--text)]">Piensa antes en FA o flutter con conducción variable.</p>
-              <p className="mt-1">ECG de 12 derivaciones, tratamiento del desencadenante y control de frecuencia si sigue estable.</p>
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Evita" tone="warning">
-              <p className="font-semibold text-[var(--text)]">No pierdas tiempo con ramas que no cambian la conducta.</p>
-              <p className="mt-1">Si sospechas preexcitación, evita bloqueadores nodales y cardioverte si deteriora.</p>
-            </ProtocolGuideBlock>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <DisclosureBlock title="Cuándo abrir FA" summary="La decisión principal de esta rama suele estar allí." defaultOpen>
-              <div className="space-y-2">
-                <p>Si el ECG o el contexto encajan con fibrilación auricular, abre el protocolo de FA para estabilidad, frecuencia, ritmo y anticoagulación.</p>
-                <p>Si la duración es incierta o el episodio lleva &gt; 24 h, no pases a cardioversión precoz sin anticoagulación o ETE.</p>
-              </div>
-            </DisclosureBlock>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => onModuleOpen('fibrilacion-auricular')} className={primaryButtonClass}>
-              Abrir FA
-            </button>
-            <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
-              Volver
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 4 && rhythmFamily === 'tachycardia' && !isUnstable && tachyPattern === 'wide-regular' ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="QRS ancho regular" />
-
-          <div className="grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
-            <ProtocolGuideBlock label="Haz ahora" tone="critical">
-              <p className="font-semibold text-[var(--danger-700)]">Si no tienes certeza de TSV con aberrancia, trátala como TV.</p>
-              <p className="mt-1">Ayuda experta, monitorización continua y preparación de cardioversión.</p>
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Fármaco" tone="warning">
-              <p className="font-semibold text-[var(--text)]">Amiodarona IV si sigue estable.</p>
-              <p className="mt-1">Si empeora, la conducta vuelve a ser cardioversión sincronizada.</p>
-            </ProtocolGuideBlock>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <DisclosureBlock title="Cuándo pensar en TSV con aberrancia" summary="No lo asumas si no tienes una certeza razonable.">
-              <div className="space-y-2">
-                <p>Si existe un diagnóstico previo cierto de TSV con aberrancia o bloqueo de rama conocido, puedes tratarla como una regular estrecha.</p>
-                <p>Si no, el enfoque más seguro delante del paciente es manejarla como ventricular.</p>
-              </div>
-            </DisclosureBlock>
-
-            <MedicationQuickRow medication={getMedication('amiodarona-vt')} onOpen={() => onMedicationOpen('amiodarona-vt')} />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
-              Volver
-            </button>
-            <button type="button" onClick={onArrhythmiaFlowReset} className={subtleButtonClass}>
-              Reiniciar
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 4 && rhythmFamily === 'tachycardia' && !isUnstable && tachyPattern === 'wide-irregular' ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="QRS ancho irregular" />
-
-          <div className="grid gap-3 lg:grid-cols-2">
-            <ProtocolGuideBlock label="Haz ahora" tone="critical">
-              <p className="font-semibold text-[var(--danger-700)]">Piensa en FA preexcitada o TV polimórfica.</p>
-              <p className="mt-1">Monitorización, ayuda experta y cardioversión si aparece cualquier deterioro.</p>
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Evita" tone="warning">
-              <p className="font-semibold text-[var(--text)]">No uses bloqueadores nodales si sospechas preexcitación.</p>
-              <p className="mt-1">No mezcles decisiones de FA estable con esta rama.</p>
-            </ProtocolGuideBlock>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <DisclosureBlock title="Si parece torsades / TV polimórfica" summary="Qué hacer sin cargar la pantalla principal." tone="critical" defaultOpen>
-              <div className="space-y-2">
-                <p>Corrige causas reversibles y suspende fármacos que prolonguen QT.</p>
-                <p>Magnesio 2 g IV en 10 min si el contexto encaja con torsades.</p>
-                <p>Si deteriora o no puedes sostenerlo estable, cardiovertir / desfibrilar según la situación clínica.</p>
-              </div>
-            </DisclosureBlock>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
-              Volver
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      {step === 4 && rhythmFamily === 'bradycardia' && isUnstable ? (
-        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="Bradicardia sintomática" />
+          <SectionTitle eyebrow="Paso 2" title="Bradicardia sintomática" />
 
           <div className="grid gap-3 lg:grid-cols-[1.05fr_0.95fr]">
             <ProtocolGuideBlock label="Haz ahora" tone="accent">
@@ -3000,7 +2628,7 @@ const TaquiarritmiasBradicardiasFlowView = ({
             {atropineResponse === 'no' ? (
               <div className="space-y-3">
                 <ProtocolGuideBlock label="Siguiente escalón" tone="critical">
-                  Marcapasos transcutáneo. Si no está disponible de inmediato, pide ayuda y valora adrenalina o isoprenalina como puente.
+                  Marcapasos transcutáneo. Si no está disponible de inmediato, ayuda experta y soporte de perfusión como puente.
                 </ProtocolGuideBlock>
                 <DisclosureBlock title="Cómo hacer marcapasos transcutáneo" summary="Parámetros prácticos y comprobación de captura." tone="critical" defaultOpen>
                   <div className="space-y-2">
@@ -3016,53 +2644,373 @@ const TaquiarritmiasBradicardiasFlowView = ({
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => updateFlow({ step: 2, atropineResponse: null })} className={subtleButtonClass}>
+            <button type="button" onClick={() => updateFlow({ step: 1, atropineResponse: null })} className={subtleButtonClass}>
               Volver
             </button>
-            <button type="button" onClick={onArrhythmiaFlowReset} className={subtleButtonClass}>
+            <button type="button" onClick={onBradycardiaFlowReset} className={subtleButtonClass}>
               Reiniciar
             </button>
           </div>
         </section>
       ) : null}
 
-      {step === 4 && rhythmFamily === 'bradycardia' && !isUnstable ? (
+      {step === 2 && !isUnstable ? (
         <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
-          <SectionTitle eyebrow="Paso 4" title="Bradicardia sin repercusión inmediata" />
+          <SectionTitle eyebrow="Paso 2" title="¿Qué hallazgo cambia la conducta?" note="Pide solo el dato que de verdad mueve la siguiente rama." />
 
-          <div className="grid gap-3 lg:grid-cols-[1.06fr_0.94fr]">
-            <ProtocolGuideBlock label="Conducta" tone={hasAsystoleRisk ? 'warning' : 'accent'}>
-              <p className="font-semibold text-[var(--text)]">
-                {hasAsystoleRisk
-                  ? 'Monitorización estrecha, ayuda experta y prepara vía de estimulación temporal.'
-                  : 'Observa, registra ECG de 12 derivaciones y corrige la causa antes de tratar por reflejo.'}
-              </p>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <FlowChoiceCard
+              icon={Activity}
+              title="Bradicardia sinusal / nodo"
+              note="Si sigue estable, manda la causa reversible y la observación clínica."
+              onClick={() => updateFlow({ bradyPattern: 'sinus-node', recentAsystole: false, mobitzTwo: false, completeBlockBroad: false, ventricularPause: false })}
+            />
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="Bloqueo AV / trastorno de conducción"
+              note="Decide si hay rasgos de alto riesgo para acelerar la estimulación."
+              tone="critical"
+              onClick={() => updateFlow({ bradyPattern: 'av-block' })}
+            />
+          </div>
+
+          {bradyPattern === 'av-block' ? (
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <BooleanField checked={recentAsystole} label="Asistolia reciente" onChange={(value) => updateFlow({ recentAsystole: value })} />
+              <BooleanField checked={mobitzTwo} label="Bloqueo AV Mobitz II" onChange={(value) => updateFlow({ mobitzTwo: value })} />
+              <BooleanField checked={completeBlockBroad} label="Bloqueo AV completo con QRS ancho" onChange={(value) => updateFlow({ completeBlockBroad: value })} />
+              <BooleanField checked={ventricularPause} label="Pausa ventricular > 3 s" onChange={(value) => updateFlow({ ventricularPause: value })} />
+            </div>
+          ) : null}
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <StatusBadge tone={hasAsystoleRisk ? 'critical' : 'active'}>
+              {bradyPattern === 'av-block' ? (hasAsystoleRisk ? 'Con alto riesgo de asistolia' : 'Bloqueo sin alto riesgo inmediato') : 'Rama sinusal / nodo'}
+            </StatusBadge>
+            <button type="button" onClick={() => updateFlow({ step: 1, bradyPattern: null })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" disabled={!bradyPattern} onClick={() => updateFlow({ step: 3 })} className={primaryButtonClass}>
+              Ver conducta
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 3 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title={bradyPattern === 'av-block' ? 'Bloqueo / conducción' : 'Bradicardia sinusal / nodo'} />
+
+          {bradyPattern === 'av-block' ? (
+            <>
+              <div className="grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
+                <ProtocolGuideBlock label="Conducta" tone={hasAsystoleRisk ? 'warning' : 'accent'}>
+                  <p className="font-semibold text-[var(--text)]">
+                    {hasAsystoleRisk
+                      ? 'Monitorización estrecha, ayuda experta y deja preparada la vía de estimulación temporal.'
+                      : 'ECG, observación, corrección de causas y revaluación de progresión del bloqueo.'}
+                  </p>
+                </ProtocolGuideBlock>
+                <ProtocolGuideBlock label="Después">
+                  <p className="font-semibold text-[var(--text)]">
+                    {hasAsystoleRisk
+                      ? 'Si aparecen síntomas o empeora la perfusión, pacing sin retraso.'
+                      : 'Si aparece repercusión o el bloqueo progresa, vuelve a la rama sintomática.'}
+                  </p>
+                </ProtocolGuideBlock>
+              </div>
+
+              {hasAsystoleRisk ? (
+                <div className="mt-4">
+                  <DisclosureBlock title="Qué no retrasar" summary="Claves prácticas si el bloqueo es de alto riesgo." tone="warning" defaultOpen>
+                    <div className="space-y-2">
+                      <p>Mobitz II, bloqueo AV completo con QRS ancho o pausas &gt; 3 s obligan a resolver la vía de estimulación.</p>
+                      <p>No esperes a que la bradicardia se haga inestable para pedir ayuda experta.</p>
+                    </div>
+                  </DisclosureBlock>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
+              <ProtocolGuideBlock label="Conducta" tone="accent">
+                <p className="font-semibold text-[var(--text)]">Observa, registra ECG de 12 derivaciones y corrige la causa antes de tratar por reflejo.</p>
+              </ProtocolGuideBlock>
+              <ProtocolGuideBlock label="Revisa">
+                <p className="font-semibold text-[var(--text)]">Fármacos bradicardizantes, tono vagal, hiperkaliemia, isquemia e hipotiroidismo según contexto.</p>
+              </ProtocolGuideBlock>
+            </div>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" onClick={onBradycardiaFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+};
+
+const ArritmiasVentricularesFlowView = ({
+  protocol,
+  ventricularArrhythmiaFlowState,
+  onVentricularArrhythmiaFlowChange,
+  onVentricularArrhythmiaFlowReset,
+  onMedicationOpen,
+  onBack,
+}) => {
+  const { step, hasPulse, shock, syncope, ischemia, heartFailure, ventricularPattern } = ventricularArrhythmiaFlowState;
+  const isUnstable = shock || syncope || ischemia || heartFailure;
+  const flowFocus = getVentricularArrhythmiaFlowFocus({ step, hasPulse, isUnstable, ventricularPattern });
+  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('esc-arritmias-ventriculares-2022');
+
+  const updateFlow = (changes) => {
+    onVentricularArrhythmiaFlowChange(changes);
+  };
+
+  return (
+    <div className={pageClass}>
+      <FlowHeader
+        eyebrow="Cardiología · urgencias"
+        title={protocol.longTitle ?? protocol.title}
+        step={step}
+        totalSteps={4}
+        steps={['Pulso', 'Riesgo', 'Tipo', 'Conducta']}
+        current={flowFocus.current}
+        decision={flowFocus.decision}
+        next={flowFocus.next}
+        onBack={onBack}
+        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
+      />
+
+      {step === 1 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 1" title="¿Tiene pulso?" />
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <FlowChoiceCard
+              icon={HeartPulse}
+              title="Sí, tiene pulso"
+              note="Decide enseguida si hay inestabilidad clínica."
+              tone="critical"
+              onClick={() => updateFlow({ hasPulse: true, step: 2 })}
+            />
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="No / no claro"
+              note="Salida directa a desfibrilación y algoritmo de parada."
+              tone="critical"
+              onClick={() => updateFlow({ hasPulse: false, step: 4, ventricularPattern: null, shock: false, syncope: false, ischemia: false, heartFailure: false })}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={onVentricularArrhythmiaFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 2 && hasPulse ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 2" title="¿Hay inestabilidad?" note="Marca solo lo que cambia la conducta inmediata." />
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={shock} label="Shock / hipotensión relevante" onChange={(value) => updateFlow({ shock: value })} />
+            <BooleanField checked={syncope} label="Síncope o presíncope grave" onChange={(value) => updateFlow({ syncope: value })} />
+            <BooleanField checked={ischemia} label="Isquemia / dolor torácico" onChange={(value) => updateFlow({ ischemia: value })} />
+            <BooleanField checked={heartFailure} label="Insuficiencia cardíaca / edema agudo" onChange={(value) => updateFlow({ heartFailure: value })} />
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="Paciente inestable"
+              note="Electricidad urgente. No retrases la cardioversión."
+              tone="critical"
+              disabled={!isUnstable}
+              onClick={() => updateFlow({ step: 4, ventricularPattern: null })}
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title="Paciente estable"
+              note="Clasifica TV monomorfa frente a polimórfica / torsades."
+              disabled={isUnstable}
+              onClick={() => updateFlow({ step: 3 })}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <StatusBadge tone={isUnstable ? 'critical' : 'active'}>{isUnstable ? 'Inestable' : 'Sin criterios de inestabilidad'}</StatusBadge>
+            <button type="button" onClick={() => updateFlow({ step: 1, hasPulse: null, shock: false, syncope: false, ischemia: false, heartFailure: false })} className={subtleButtonClass}>
+              Volver
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 3 && hasPulse ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title="¿Qué patrón ventricular tienes?" />
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="TV monomorfa / QRS ancho regular"
+              note="Si dudas del mecanismo, trátala como ventricular."
+              tone="critical"
+              onClick={() => updateFlow({ ventricularPattern: 'monomorphic' })}
+            />
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="TV polimórfica / torsades"
+              note="QT largo, electrolitos o desencadenante farmacológico cambian la rama."
+              tone="critical"
+              onClick={() => updateFlow({ ventricularPattern: 'polymorphic' })}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" disabled={!ventricularPattern} onClick={() => updateFlow({ step: 4 })} className={primaryButtonClass}>
+              Ver conducta
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 4 && hasPulse === false ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 4" title="Arritmia ventricular sin pulso" />
+
+          <div className="grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
+            <ProtocolGuideBlock label="Haz ahora" tone="critical">
+              <p className="font-semibold text-[var(--danger-700)]">Desfibrilación inmediata y algoritmo de parada cardiorrespiratoria.</p>
+              <p className="mt-1">No pierdas tiempo intentando afinar más la arritmia en esta pantalla.</p>
             </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Después">
-              <p className="font-semibold text-[var(--text)]">
-                {hasAsystoleRisk
-                  ? 'Si aparecen síntomas o empeora el bloqueo, pasa a atropina y pacing.'
-                  : 'Si aparecen síntomas o datos de alto grado, reentra en la rama sintomática.'}
-              </p>
+            <ProtocolGuideBlock label="Límite de este módulo" tone="warning">
+              <p className="font-semibold text-[var(--text)]">Aquí solo se deja clara la salida clínica correcta.</p>
+              <p className="mt-1">No sustituye un módulo completo de ALS/ERC para parada, porque esa bibliografía no es la base principal cargada aquí.</p>
             </ProtocolGuideBlock>
           </div>
 
-          {hasAsystoleRisk ? (
-            <div className="mt-4">
-              <DisclosureBlock title="Qué vigilar" summary="Claves para no retrasar la estimulación." tone="warning" defaultOpen>
-                <div className="space-y-2">
-                  <p>Mobitz II, bloqueo AV completo con QRS ancho o pausas &gt; 3 s obligan a dejar resuelta la vía de estimulación.</p>
-                  <p>No esperes a que la bradicardia se haga inestable para pedir ayuda experta.</p>
-                </div>
-              </DisclosureBlock>
-            </div>
-          ) : null}
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={onVentricularArrhythmiaFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 4 && hasPulse === true && isUnstable ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-top-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 4" title="TV con pulso inestable" />
+
+          <div className="grid gap-3 lg:grid-cols-[1.06fr_0.94fr]">
+            <ProtocolGuideBlock label="Haz ahora" tone="critical">
+              <p className="font-semibold text-[var(--danger-700)]">Cardioversión inmediata.</p>
+              <p className="mt-1">Si el ritmo es polimórfico o la sincronía no es posible, desfibrila.</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Si persiste">
+              <p className="font-semibold text-[var(--text)]">Repite electricidad y pide ayuda experta.</p>
+              <p className="mt-1">La electricidad manda sobre el detalle fino del subtipo de TV.</p>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4">
+            <DisclosureBlock title="Cómo cardiovertir / desfibrilar" summary="Solo la instrucción práctica esencial." tone="critical" defaultOpen>
+              <div className="space-y-2">
+                <p>Si es TV monomorfa con pulso y regular, usa modo sincronizado y confirma marcas sobre cada QRS.</p>
+                <p>Si es polimórfica o el monitor no sincroniza de forma fiable, pasa a choque no sincronizado / desfibrilación.</p>
+                <p>Analgesia y sedación si está consciente y la situación lo permite, sin retrasar la descarga.</p>
+                <p>Tras cada intento, reevalúa pulso, perfusión y estabilidad antes de decidir el siguiente paso.</p>
+              </div>
+            </DisclosureBlock>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => onMedicationOpen('amiodarona-vt')} className={subtleButtonClass}>
+              Ver amiodarona IV
+            </button>
+            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" onClick={onVentricularArrhythmiaFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 4 && hasPulse === true && !isUnstable && ventricularPattern === 'monomorphic' ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 4" title="TV monomorfa estable" />
+
+          <div className="grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
+            <ProtocolGuideBlock label="Haz ahora" tone="critical">
+              <p className="font-semibold text-[var(--danger-700)]">Si no estás seguro del mecanismo del QRS ancho, trátala como ventricular.</p>
+              <p className="mt-1">Monitorización continua y preparación de cardioversión si cambia la perfusión.</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Fármaco">
+              <p className="font-semibold text-[var(--text)]">Amiodarona IV si sigue estable.</p>
+              <p className="mt-1">Si empeora, vuelves a la rama eléctrica urgente.</p>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <MedicationQuickRow medication={getMedication('amiodarona-vt')} onOpen={() => onMedicationOpen('amiodarona-vt')} />
+          </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
               Volver
             </button>
-            <button type="button" onClick={onArrhythmiaFlowReset} className={subtleButtonClass}>
+            <button type="button" onClick={onVentricularArrhythmiaFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 4 && hasPulse === true && !isUnstable && ventricularPattern === 'polymorphic' ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 4" title="TV polimórfica / torsades" />
+
+          <div className="grid gap-3 lg:grid-cols-[1.04fr_0.96fr]">
+            <ProtocolGuideBlock label="Haz ahora" tone="critical">
+              <p className="font-semibold text-[var(--danger-700)]">Sulfato de magnesio IV, corrección de electrolitos y retirada del desencadenante.</p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Si se sostiene mal">
+              <p className="font-semibold text-[var(--text)]">Si deteriora o no puedes mantener estabilidad, electricidad inmediata.</p>
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <DisclosureBlock title="Qué corregir en paralelo" summary="Solo lo que cambia la recurrencia." tone="warning" defaultOpen>
+              <div className="space-y-2">
+                <p>Busca QT largo, hipopotasemia, hipomagnesemia y fármacos que prolonguen QT.</p>
+                <p>Si recurre, revalora necesidad de nueva dosis de magnesio y soporte experto.</p>
+              </div>
+            </DisclosureBlock>
+
+            <MedicationQuickRow medication={getMedication('magnesio-torsades')} onOpen={() => onMedicationOpen('magnesio-torsades')} />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" onClick={onVentricularArrhythmiaFlowReset} className={subtleButtonClass}>
               Reiniciar
             </button>
           </div>
@@ -3755,7 +3703,8 @@ const App = () => {
   const [faFlowState, setFaFlowState] = useState(initialFaFlowState);
   const [htaFlowState, setHtaFlowState] = useState(initialHtaFlowState);
   const [scaFlowState, setScaFlowState] = useState(initialScaFlowState);
-  const [arrhythmiaFlowState, setArrhythmiaFlowState] = useState(initialArrhythmiaFlowState);
+  const [bradycardiaFlowState, setBradycardiaFlowState] = useState(initialBradycardiaFlowState);
+  const [ventricularArrhythmiaFlowState, setVentricularArrhythmiaFlowState] = useState(initialVentricularArrhythmiaFlowState);
   const [ischemicStrokeFlowState, setIschemicStrokeFlowState] = useState(initialIschemicStrokeFlowState);
   const [hemorrhagicStrokeFlowState, setHemorrhagicStrokeFlowState] = useState(initialHemorrhagicStrokeFlowState);
 
@@ -3808,12 +3757,23 @@ const App = () => {
     }));
   };
 
-  const resetArrhythmiaFlow = () => {
-    setArrhythmiaFlowState(initialArrhythmiaFlowState);
+  const resetBradycardiaFlow = () => {
+    setBradycardiaFlowState(initialBradycardiaFlowState);
   };
 
-  const updateArrhythmiaFlow = (changes) => {
-    setArrhythmiaFlowState((current) => ({
+  const updateBradycardiaFlow = (changes) => {
+    setBradycardiaFlowState((current) => ({
+      ...current,
+      ...changes,
+    }));
+  };
+
+  const resetVentricularArrhythmiaFlow = () => {
+    setVentricularArrhythmiaFlowState(initialVentricularArrhythmiaFlowState);
+  };
+
+  const updateVentricularArrhythmiaFlow = (changes) => {
+    setVentricularArrhythmiaFlowState((current) => ({
       ...current,
       ...changes,
     }));
@@ -3860,8 +3820,12 @@ const App = () => {
       resetScaFlow();
     }
 
-    if (module.id === 'taquiarritmias-bradicardias') {
-      resetArrhythmiaFlow();
+    if (module.id === 'bradicardias') {
+      resetBradycardiaFlow();
+    }
+
+    if (module.id === 'arritmias-ventriculares') {
+      resetVentricularArrhythmiaFlow();
     }
 
     if (module.id === 'ictus-isquemico') {
@@ -3967,20 +3931,28 @@ const App = () => {
         );
       }
 
-      if (protocolId === 'taquiarritmias-bradicardias') {
+      if (protocolId === 'bradicardias') {
         return (
-          <TaquiarritmiasBradicardiasFlowView
+          <BradicardiasFlowView
             protocol={getProtocol(protocolId)}
-            arrhythmiaFlowState={arrhythmiaFlowState}
-            onArrhythmiaFlowChange={updateArrhythmiaFlow}
-            onArrhythmiaFlowReset={resetArrhythmiaFlow}
-            onModuleOpen={(moduleId) => openModule(moduleId, protocolReturnTo)}
+            bradycardiaFlowState={bradycardiaFlowState}
+            onBradycardiaFlowChange={updateBradycardiaFlow}
+            onBradycardiaFlowReset={resetBradycardiaFlow}
             onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
             onBack={handleBack}
-            onFinish={() => {
-              resetArrhythmiaFlow();
-              navigate({ view: 'home' });
-            }}
+          />
+        );
+      }
+
+      if (protocolId === 'arritmias-ventriculares') {
+        return (
+          <ArritmiasVentricularesFlowView
+            protocol={getProtocol(protocolId)}
+            ventricularArrhythmiaFlowState={ventricularArrhythmiaFlowState}
+            onVentricularArrhythmiaFlowChange={updateVentricularArrhythmiaFlow}
+            onVentricularArrhythmiaFlowReset={resetVentricularArrhythmiaFlow}
+            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
+            onBack={handleBack}
           />
         );
       }

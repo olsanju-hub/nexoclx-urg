@@ -366,7 +366,7 @@ export const medicationCatalog = {
   adenosina: {
     id: 'adenosina',
     name: 'Adenosina',
-    protocolId: 'taquiarritmias-bradicardias',
+    protocolId: 'taquicardia-supraventricular',
     family: 'TSV · conversión aguda',
     indication:
       'Conversión rápida de la taquicardia regular de QRS estrecho dependiente del nodo AV cuando las maniobras vagales no revierten el episodio.',
@@ -395,7 +395,7 @@ export const medicationCatalog = {
       'Si enlentece transitoriamente la respuesta ventricular sin revertir, puede ayudar a identificar flutter o actividad auricular.',
     ],
     sourceScope:
-      'La rama de TSV sigue la guía ESC 2019. Para el uso práctico de guardia se prioriza la pauta operativa del algoritmo de taquicardia del adulto, manteniendo la ficha CIMA como apoyo para administración y precauciones.',
+      'La guía ESC 2019 sigue siendo la referencia principal para TSV. La pauta operativa se completa con la ficha CIMA y con algoritmos de soporte vital como apoyo práctico.',
     sources: [
       protocolSource(
         'ESC TSV 2019 · manejo agudo de TSV',
@@ -419,7 +419,7 @@ export const medicationCatalog = {
   atropina: {
     id: 'atropina',
     name: 'Atropina',
-    protocolId: 'taquiarritmias-bradicardias',
+    protocolId: 'bradicardias',
     family: 'Bradicardia sintomática',
     indication:
       'Tratamiento inicial de la bradicardia sintomática o con rasgos de inestabilidad mientras se corrigen causas y se prepara estimulación si hace falta.',
@@ -472,7 +472,7 @@ export const medicationCatalog = {
   'amiodarona-vt': {
     id: 'amiodarona-vt',
     name: 'Amiodarona IV',
-    protocolId: 'taquiarritmias-bradicardias',
+    protocolId: 'arritmias-ventriculares',
     family: 'QRS ancho / TV',
     indication:
       'Taquicardia regular de QRS ancho tratada como ventricular cuando el paciente sigue estable y no hay certeza de TSV con aberrancia.',
@@ -501,7 +501,7 @@ export const medicationCatalog = {
       'En TV polimórfica o torsades, el fármaco clave cambia y debes corregir electrolitos y valorar magnesio.',
     ],
     sourceScope:
-      'La rama de QRS ancho se apoya en la guía ESC 2022 disponible en el proyecto; la pauta de administración IV se completa con la ficha CIMA inyectable y algoritmos de soporte vital para el contexto periagudo.',
+      'La guía ESC 2022 es la referencia principal del módulo de arritmias ventriculares; la pauta de administración IV se completa con la ficha CIMA inyectable y algoritmos de soporte vital como apoyo práctico.',
     sources: [
       protocolSource(
         'ESC Arritmias ventriculares 2022 · manejo agudo',
@@ -517,6 +517,58 @@ export const medicationCatalog = {
         'Resuscitation Council UK · Adult tachycardia algorithm 2021',
         'https://www.resus.org.uk/sites/default/files/2021-04/Tachycardia%20Algorithm%202021.pdf',
       ),
+    ],
+  },
+  'magnesio-torsades': {
+    id: 'magnesio-torsades',
+    name: 'Sulfato de magnesio IV',
+    protocolId: 'arritmias-ventriculares',
+    family: 'TV polimórfica / torsades',
+    indication:
+      'Tratamiento inicial de la torsades de pointes o de la taquicardia ventricular polimórfica cuando el contexto sugiere QT largo o desencadenante eléctrico reversible.',
+    contextUse: 'TV polimórfica / torsades con pulso o episodio recurrente mientras se corrigen causas.',
+    contextDose: '2 g IV en 10-15 min; si recurre o persiste, reevaluar y considerar nueva dosis o perfusión según respuesta.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Bolo agudo con reevaluación del ritmo, QT y estabilidad clínica.',
+    followUpPlan: 'Corregir potasio y magnesio, retirar fármacos que prolonguen QT y preparar electricidad si hay deterioro.',
+    dose:
+      '2 g IV en 10-15 min como pauta aguda inicial en torsades / TV polimórfica con sospecha de QT largo. Reevaluar necesidad de repetición o perfusión según respuesta y contexto.',
+    route: 'Intravenosa.',
+    frequency: 'Bolo agudo inicial con reevaluación inmediata.',
+    duration: 'Uso agudo puntual y posible continuación corta según recurrencia.',
+    contraindications: [
+      'Precaución en insuficiencia renal avanzada por riesgo de acumulación.',
+      'La hipotensión o la depresión respiratoria obligan a vigilancia estrecha durante la administración.',
+      'No sustituye a la electricidad si la arritmia no se mantiene estable.',
+    ],
+    renalAdjustment:
+      'No hay un ajuste numérico breve y uniforme para este contexto agudo; en insuficiencia renal avanzada, extremar vigilancia clínica y de magnesemia.',
+    hepaticAdjustment:
+      'No requiere ajuste hepático específico para el bolo agudo en torsades.',
+    practicalNotes: [
+      'Piensa en QT largo, hipopotasemia, hipomagnesemia o fármacos desencadenantes mientras administras el bolo.',
+      'Si la arritmia recurre o se hace inestable, la electricidad pasa a primer plano.',
+      'No retrases la corrección de electrolitos ni la retirada del desencadenante esperando solo a la respuesta del magnesio.',
+    ],
+    sourceScope:
+      'La guía ESC 2022 es la referencia principal del módulo de arritmias ventriculares; esta ficha prioriza la torsades y la TV polimórfica dentro del contexto urgente.',
+    sources: [
+      protocolSource(
+        'ESC Arritmias ventriculares 2022 · TV polimórfica / torsades',
+        escVentricularReferenceEntry({
+          id: 'magnesio-torsades-esc',
+          verifiedPages: [1, 2],
+          pdfPages: [1, 2],
+          note: 'Referencia principal para torsades, QT largo y arritmias ventriculares polimórficas en agudo.',
+        }),
+      ),
+      referenceEntry({
+        id: 'magnesio-murillo',
+        indexPage: 186,
+        verifiedPage: 186,
+        pdfPage: 211,
+        note: 'Apoyo práctico secundario de arritmias agudas en la obra base.',
+      }),
     ],
   },
   apixaban: {
@@ -1549,7 +1601,7 @@ export const medicationGroups = [
   {
     id: 'arritmias-agudas',
     title: 'Arritmias agudas',
-    items: ['adenosina', 'atropina', 'amiodarona-vt'],
+    items: ['adenosina', 'atropina', 'amiodarona-vt', 'magnesio-torsades'],
   },
   {
     id: 'ictus',
