@@ -64,6 +64,24 @@ const escVentricularEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const ahaIschemicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-isquemico-2026',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const ahaHemorrhagicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-hemorragico-2022',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const coreReference = bibliographyCatalog.murillo7;
 
 export const clinicalIndexAudit = [
@@ -549,23 +567,56 @@ export const motivoConsultaModules = [
     ],
   },
   {
-    id: 'ictus',
-    title: 'Ictus',
-    shortTitle: 'Ictus',
-    chapter: 'Cap. 64',
+    id: 'ictus-isquemico',
+    title: 'Ictus isquémico',
+    shortTitle: 'Ictus isquémico',
+    chapter: 'AHA 2026',
     section: 'Neurología',
     specialtyId: 'neurologia',
-    verifiedPage: 442,
-    pdfPage: 467,
-    status: 'auditado',
-    implemented: false,
-    summary: 'Tema auditado. Sin protocolo operativo en esta fase.',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    implemented: true,
+    summary: 'Código ictus, TAC sin sangrado, trombólisis y trombectomía ordenados para decidir rápido.',
     bibliography: [
+      ahaIschemicStrokeEntry({
+        id: 'ictus-isquemico-aha-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal del módulo de ictus isquémico.',
+      }),
       referenceEntry({
-        id: 'ictus-cap64',
+        id: 'ictus-isquemico-murillo-module',
         indexPage: 442,
         pdfPage: 467,
-        note: 'Inicio verificado del capítulo base.',
+        note: 'Apoyo práctico secundario del capítulo de ictus en la obra base.',
+      }),
+    ],
+  },
+  {
+    id: 'ictus-hemorragico',
+    title: 'Ictus hemorrágico',
+    shortTitle: 'Ictus hemorrágico',
+    chapter: 'AHA 2022',
+    section: 'Neurología',
+    specialtyId: 'neurologia',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    implemented: true,
+    summary: 'TAC, control de PA, reversión de anticoagulación y neurocirugía/UCI sin rodeos.',
+    bibliography: [
+      ahaHemorrhagicStrokeEntry({
+        id: 'ictus-hemorragico-aha-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal del módulo de ictus hemorrágico.',
+      }),
+      referenceEntry({
+        id: 'ictus-hemorragico-murillo-module',
+        indexPage: 442,
+        pdfPage: 467,
+        note: 'Apoyo práctico secundario del capítulo de ictus en la obra base.',
       }),
     ],
   },

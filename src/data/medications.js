@@ -64,6 +64,24 @@ const escVentricularReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], n
     note,
   });
 
+const ahaIschemicStrokeReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-isquemico-2026',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const ahaHemorrhagicStrokeReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-hemorragico-2022',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const externalSource = (label, url) => ({ label, url, type: 'external' });
 const cimaSource = (label, url) => ({ label, url, type: 'cima' });
 const protocolSource = (label, bibliography) => ({ label, bibliography, type: 'protocol' });
@@ -287,6 +305,60 @@ export const medicationCatalog = {
           verifiedPage: 188,
           pdfPage: 213,
           note: 'Cuadro 23.3 con pauta de cardioversión y mantenimiento.',
+        }),
+      ),
+    ],
+  },
+  'alteplasa-ictus': {
+    id: 'alteplasa-ictus',
+    name: 'Alteplasa IV',
+    protocolId: 'ictus-isquemico',
+    family: 'Trombólisis en ictus',
+    indication:
+      'Trombólisis intravenosa en ictus isquémico agudo cuando la neuroimagen descarta sangrado y el paciente es candidato dentro de la ventana y sin contraindicación mayor.',
+    contextUse: 'Ictus isquémico agudo con última vez bien compatible con trombólisis IV y TAC sin sangrado.',
+    contextDose: '0,9 mg/kg IV, máximo 90 mg: 10% en bolo y 90% en perfusión durante 60 min.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Bolo inicial único y perfusión única durante 60 min.',
+    followUpPlan: 'Monitoriza PA y sangrado. Evita antiagregación o anticoagulación en las primeras 24 h y repite imagen antes de iniciarlas.',
+    dose:
+      '0,9 mg/kg IV, máximo 90 mg: 10% en bolo inicial y el resto en perfusión durante 60 min.',
+    route: 'Intravenosa.',
+    frequency: 'Administración única.',
+    duration: 'Uso agudo puntual.',
+    contraindications: [
+      'No usar si la neuroimagen muestra hemorragia intracraneal.',
+      'Controla la PA antes de iniciar: no trombolizar si no consigues situarla por debajo de 185/110 mmHg.',
+      'Evita si existe contraindicación mayor de sangrado o si no puedes definir una ventana razonable de tratamiento.',
+    ],
+    renalAdjustment:
+      'La pauta aguda no suele ajustarse por función renal, pero el riesgo hemorrágico y la comorbilidad obligan a individualizar.',
+    hepaticAdjustment:
+      'No existe un ajuste estándar de urgencias; la hepatopatía relevante incrementa el riesgo hemorrágico y puede contraindicar la estrategia.',
+    practicalNotes: [
+      'No retrases la trombólisis IV por esperar estudios que no cambian la candidatura inmediata.',
+      'Si además hay oclusión de gran vaso, la trombólisis no debe retrasar la trombectomía cuando esté indicada.',
+      'Tras la trombólisis, el objetivo tensional cambia y exige vigilancia estrecha.',
+    ],
+    sourceScope:
+      'El módulo de ictus isquémico usa como referencia principal la guía AHA 2026 cargada en el proyecto; la obra base aporta apoyo práctico complementario sobre el manejo urgente del ictus.',
+    sources: [
+      protocolSource(
+        'AHA ictus isquémico 2026 · trombólisis IV y selección de reperfusión',
+        ahaIschemicStrokeReferenceEntry({
+          id: 'alteplasa-ictus-aha',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Referencia principal del módulo para trombólisis y reperfusión en ictus isquémico agudo.',
+        }),
+      ),
+      protocolSource(
+        'Murillo 7.ª ed. · ictus agudo',
+        referenceEntry({
+          id: 'alteplasa-ictus-murillo',
+          verifiedPage: 442,
+          pdfPage: 467,
+          note: 'Apoyo práctico secundario para manejo urgente del ictus.',
         }),
       ),
     ],
@@ -916,6 +988,60 @@ export const medicationCatalog = {
       ),
     ],
   },
+  'labetalol-ictus': {
+    id: 'labetalol-ictus',
+    name: 'Labetalol IV',
+    protocolId: 'ictus-hemorragico',
+    family: 'Control tensional en ictus',
+    indication:
+      'Control rápido y titulado de la presión arterial en ictus hemorrágico y en ictus isquémico cuando la PA impide trombólisis o precisa control estrecho.',
+    contextUse: 'Ictus hemorrágico con necesidad de descenso controlado de PAS, o ictus isquémico candidato a reperfusión con PA por encima del objetivo.',
+    contextDose: '10-20 mg IV lento; repetir o titular según respuesta. Si la situación lo requiere, perfusión 0,5-2 mg/min con monitorización continua.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Bolos titulados o perfusión continua según objetivo tensional.',
+    followUpPlan: 'Reevalúa objetivo de PA según el tipo de ictus y la estrategia de reperfusión o de control del sangrado.',
+    dose:
+      '10-20 mg IV lento y repetir según respuesta. Si hace falta control sostenido, perfusión IV 0,5-2 mg/min con monitorización continua.',
+    route: 'Intravenosa.',
+    frequency: 'Bolos repetidos o perfusión titulada.',
+    duration: 'Uso agudo con reevaluación hemodinámica continua.',
+    contraindications: [
+      'Asma o broncoespasmo activo.',
+      'Bloqueo AV avanzado o bradicardia significativa.',
+      'Shock cardiogénico o insuficiencia cardíaca descompensada donde no tolere betabloqueo.',
+    ],
+    renalAdjustment:
+      'No existe un ajuste renal de urgencias cerrado; la titulación debe seguir la respuesta hemodinámica.',
+    hepaticAdjustment:
+      'La hepatopatía relevante obliga a prudencia clínica, pero el uso agudo se guía por respuesta y seguridad.',
+    practicalNotes: [
+      'Antes de trombólisis IV en ictus isquémico, controla la PA por debajo de 185/110 mmHg.',
+      'En ictus hemorrágico con PAS 150-220 mmHg y sin contraindicación, busca un descenso suave y mantenido, no brusco.',
+      'La variabilidad tensional importa tanto como la cifra absoluta: evita oscilaciones grandes.',
+    ],
+    sourceScope:
+      'La indicación se reparte entre la guía AHA 2026 para ictus isquémico y la guía AHA 2022 para ictus hemorrágico; Murillo queda como apoyo complementario del manejo urgente.',
+    sources: [
+      protocolSource(
+        'AHA ictus hemorrágico 2022 · control agudo de PA',
+        ahaHemorrhagicStrokeReferenceEntry({
+          id: 'labetalol-ictus-hemorragico-aha',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Referencia principal para descenso agudo y sostenido de la PA en hemorragia intracerebral.',
+        }),
+      ),
+      protocolSource(
+        'AHA ictus isquémico 2026 · objetivos tensionales previos a trombólisis',
+        ahaIschemicStrokeReferenceEntry({
+          id: 'labetalol-ictus-isquemico-aha',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Referencia principal para control de PA antes y después de la trombólisis en ictus isquémico.',
+        }),
+      ),
+    ],
+  },
   nitroglicerina: {
     id: 'nitroglicerina',
     name: 'Nitroglicerina',
@@ -1424,6 +1550,11 @@ export const medicationGroups = [
     id: 'arritmias-agudas',
     title: 'Arritmias agudas',
     items: ['adenosina', 'atropina', 'amiodarona-vt'],
+  },
+  {
+    id: 'ictus',
+    title: 'Ictus',
+    items: ['alteplasa-ictus', 'labetalol-ictus'],
   },
 ];
 

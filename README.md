@@ -30,13 +30,13 @@ Principios actuales del proyecto:
 
 ## Estado actual
 
-- Home simplificada a: accesos rápidos, acceso principal por `Especialidades`, `Cálculos` y `Medicamentos`.
+- Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Especialidades` con acordeones por bloque clínico para evitar una lista plana interminable.
-- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo` y `taquiarritmias y bradicardias`.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `taquiarritmias y bradicardias`, `ictus isquémico` e `ictus hemorrágico`.
 - Cálculos activos del módulo FA: `CHA2DS2-VA`, `HAS-BLED` y `Cockcroft-Gault`.
-- Fichas farmacológicas activas para FA, HTA, SCA y arritmias agudas enlazadas desde protocolo y desde `Medicamentos`.
+- Fichas farmacológicas activas para FA, HTA, SCA, arritmias agudas e ictus enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
-- Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
+- Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
 - Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`.
 - Despliegue activo en GitHub Pages: `https://olsanju-hub.github.io/NexoClx/`.
 
@@ -46,10 +46,11 @@ Principios actuales del proyecto:
 
 | Sección | Estado | Función real hoy | Relación con el resto |
 | --- | --- | --- | --- |
-| Home | Activa | Punto de entrada con accesos rápidos, acordeones por especialidad, cálculos y medicamentos. | Lleva a especialidades, cálculos y medicamentos sin pasos intermedios largos. |
+| Home | Activa | Punto de entrada mínimo con `buscador` y rejilla de `especialidades`. | Lleva a la especialidad o al resultado buscado sin pasos intermedios ni bloques redundantes. |
 | Especialidades | Activa | Índice clínico principal con acordeones por bloque y recursos relacionados. | Abre protocolo real, cálculo relacionado, medicamento relacionado o fuente principal desde la misma especialidad. |
 | Módulo FA | Activo | Flujo clínico dividido en `Estabilidad`, `Contexto`, `Conducta` y `Anticoagulación`. | Embebe o enlaza cálculos, medicación y fuente principal sin saturar una sola pantalla. |
 | Módulo de taquiarritmias y bradicardias | Activo | Árbol de decisión para taquicardia o bradicardia, inestabilidad, patrón del QRS y conducta inmediata. | Embebe procedimientos desplegables y enlaza medicación útil de urgencias. |
+| Módulos de ictus | Activos | `Ictus isquémico` e `ictus hemorrágico` con flujo corto de ventana, imagen, reperfusión, PA y reversión. | Quedan agrupados en `Neurología` y enlazan medicación y fuente principal. |
 | Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo. |
 | Medicamentos | Activa | Reúne fichas farmacológicas completas del módulo activo. | Cada ficha puede abrirse desde el protocolo y volver a él. |
 | Bibliografía | Activa | Da acceso a la obra base y a referencias estructuradas. | Cada módulo guarda sus referencias y páginas verificadas. |
@@ -58,20 +59,22 @@ Principios actuales del proyecto:
 ### Lógica de navegación entre módulos
 
 1. La `Home` funciona como entrada principal.
-2. Desde `Home` se entra a `Especialidades`, `Cálculos` o `Medicamentos` sin pasar por una pantalla larga.
+2. Desde `Home` se entra directamente a una `especialidad` o a un resultado concreto del `buscador`.
 3. La pantalla `Especialidades` agrupa los módulos por bloque clínico y muestra recursos relacionados para que el crecimiento no se convierta en una lista plana.
 4. Al abrir `fibrilación auricular`, la navegación prioriza vistas cortas y no una página continua.
-5. Desde el protocolo se puede abrir un cálculo concreto o una ficha farmacológica concreta.
-6. Si un cálculo o un medicamento se abre desde el protocolo, la interfaz conserva botón claro de retorno al protocolo y a la subsección de origen.
-7. Los mismos cálculos siguen existiendo en la sección general de `Cálculos`.
-8. Las mismas fichas siguen existiendo en la sección general de `Medicamentos`.
-9. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
+5. Los módulos de `ictus` entran por `Neurología` y se resuelven como flujo corto de manejo urgente, no como capítulo de estudio.
+6. Desde el protocolo se puede abrir un cálculo concreto o una ficha farmacológica concreta.
+7. Si un cálculo o un medicamento se abre desde el protocolo, la interfaz conserva botón claro de retorno al protocolo y a la subsección de origen.
+8. Los mismos cálculos siguen existiendo en la sección general de `Cálculos`.
+9. Las mismas fichas siguen existiendo en la sección general de `Medicamentos`.
+10. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
 
 ### Cómo se conectan los módulos
 
 - `Home` prioriza navegación, no lectura.
 - `Especialidades` es la puerta de entrada a módulos clínicos concretos.
 - `Módulo FA` ya no se resuelve como pantalla única; se reparte en subpantallas cortas.
+- `Módulos de ictus` siguen la misma lógica: dato clave, clasificación, conducta y tratamiento.
 - `Cálculos` solo se implementan cuando un protocolo real los necesita.
 - `Medicamentos` se construyen a partir de los fármacos realmente usados en un protocolo activo.
 - `Bibliografía` no vive como texto suelto al final: cada módulo guarda referencias estructuradas.
@@ -107,6 +110,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
   - agrupación y navegación por especialidad con acordeones
   - control de subpantallas cortas dentro del módulo de `fibrilación auricular`
   - flujo operativo del módulo `taquiarritmias y bradicardias`
+  - flujos operativos de `ictus isquémico` e `ictus hemorrágico`
 
 - `src/main.jsx`
   - arranque de React
@@ -134,7 +138,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `src/data/protocols.js`
   - protocolos clínicos reales
-  - actualmente contiene `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo` y `taquiarritmias y bradicardias`
+  - actualmente contiene `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `taquiarritmias y bradicardias`, `ictus isquémico` e `ictus hemorrágico`
 
 - `src/data/calculators.js`
   - catálogo de cálculos implementados
@@ -310,7 +314,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 ### Pendiente clínico
 
-- Desarrollar protocolos reales para `ictus`, `sepsis`, `shock` o `ICC`.
+- Desarrollar protocolos reales para `sepsis`, `shock` o `ICC`.
 - Mantener en cada nuevo protocolo la misma conexión entre decisión clínica, cálculos, medicación y bibliografía.
 - Evitar siempre que la interfaz prometa una funcionalidad aún no implementada.
 

@@ -64,6 +64,24 @@ const escVentricularEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const ahaIschemicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-isquemico-2026',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const ahaHemorrhagicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-hemorragico-2022',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const protocolCatalog = {
   'fibrilacion-auricular': {
     id: 'fibrilacion-auricular',
@@ -507,6 +525,96 @@ export const protocolCatalog = {
         verifiedPages: [1],
         pdfPages: [1],
         note: 'Referencia principal para taquicardia de QRS ancho y arritmias ventriculares.',
+      }),
+    ],
+  },
+  'ictus-isquemico': {
+    id: 'ictus-isquemico',
+    title: 'Ictus isquémico',
+    longTitle: 'Ictus isquémico',
+    chapter: 'AHA 2026',
+    section: 'Urgencias neurológicas',
+    indexPage: 442,
+    verifiedPage: 442,
+    pdfPage: 467,
+    status: 'implementado',
+    summary: 'Código ictus, TAC sin sangrado, ventana terapéutica y reperfusión ordenados para actuar.',
+    quickChecks: [
+      'Hora de última vez bien y glucemia capilar',
+      'TAC craneal sin sangrado y angio-TC si sospecha de gran vaso',
+      'Déficit discapacitante oclusión de gran vaso sí/no',
+      'Candidatura a trombólisis IV y a trombectomía',
+      'Control de PA y destino a centro con capacidad de reperfusión',
+    ],
+    warnings: [
+      'No retrases el TAC ni la activación del código ictus por completar estudios secundarios.',
+      'Antes de trombólisis IV, controla la PA por debajo de 185/110 mmHg; después, mantén < 180/105 mmHg.',
+      'Si sospechas oclusión de gran vaso, la trombectomía manda sobre el detalle secundario del protocolo local.',
+    ],
+    medicationGroups: [
+      {
+        title: 'Reperfusión y control tensional',
+        medicationIds: ['alteplasa-ictus', 'labetalol-ictus'],
+      },
+    ],
+    bibliography: [
+      ahaIschemicStrokeEntry({
+        id: 'ictus-isquemico-aha-2026',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal del módulo: manejo inicial, trombólisis IV y trombectomía.',
+      }),
+      createBibliographyEntry({
+        id: 'ictus-isquemico-murillo',
+        referenceId: 'murillo7',
+        verifiedPages: [442, 443, 444, 445],
+        pdfPages: [467, 468, 469, 470],
+        note: 'Apoyo práctico secundario para ictus agudo en la obra base.',
+      }),
+    ],
+  },
+  'ictus-hemorragico': {
+    id: 'ictus-hemorragico',
+    title: 'Ictus hemorrágico',
+    longTitle: 'Ictus hemorrágico',
+    chapter: 'AHA 2022',
+    section: 'Urgencias neurológicas',
+    indexPage: 442,
+    verifiedPage: 442,
+    pdfPage: 467,
+    status: 'implementado',
+    summary: 'TAC, control de PA, reversión de anticoagulación y destino neurocrítico sin texto sobrante.',
+    quickChecks: [
+      'TAC craneal urgente y valoración de vía aérea / Glasgow',
+      'PAS actual y necesidad de control tensional rápido',
+      'Anticoagulación activa o antiagregación relevante',
+      'Signos de herniación, hidrocefalia o hemorragia cerebelosa',
+      'Destino a UCI / neurocirugía y medidas de neuroprotección',
+    ],
+    warnings: [
+      'La neuroimagen urgente y la reversión de anticoagulación no deben retrasarse.',
+      'No uses transfusión de plaquetas de rutina en ICH asociada a antiagregación si no hay cirugía urgente o trombocitopenia grave.',
+      'La hemorragia cerebelosa con deterioro, compresión de tronco o hidrocefalia requiere valoración neuroquirúrgica inmediata.',
+    ],
+    medicationGroups: [
+      {
+        title: 'Control tensional inicial',
+        medicationIds: ['labetalol-ictus'],
+      },
+    ],
+    bibliography: [
+      ahaHemorrhagicStrokeEntry({
+        id: 'ictus-hemorragico-aha-2022',
+        verifiedPages: [1, 2],
+        pdfPages: [1, 2],
+        note: 'Referencia principal del módulo: control de PA, reversión y criterios de neurocirugía / UCI.',
+      }),
+      createBibliographyEntry({
+        id: 'ictus-hemorragico-murillo',
+        referenceId: 'murillo7',
+        verifiedPages: [442, 443, 444, 445],
+        pdfPages: [467, 468, 469, 470],
+        note: 'Apoyo práctico secundario del capítulo de ictus en la obra base.',
       }),
     ],
   },

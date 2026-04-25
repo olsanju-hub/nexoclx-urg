@@ -44,6 +44,18 @@ export const bibliographyCatalog = {
     shortTitle: 'ESC Arritmias ventriculares 2022',
     filePath: buildFilePath('biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf'),
   },
+  'aha-ictus-isquemico-2026': {
+    id: 'aha-ictus-isquemico-2026',
+    title: '2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke',
+    shortTitle: 'AHA Ictus isquémico 2026',
+    filePath: buildFilePath('biblio/Ictus isquemico aha.pdf'),
+  },
+  'aha-ictus-hemorragico-2022': {
+    id: 'aha-ictus-hemorragico-2022',
+    title: '2022 Guideline for the Management of Patients With Spontaneous Intracerebral Hemorrhage',
+    shortTitle: 'AHA Ictus hemorrágico 2022',
+    filePath: buildFilePath('biblio/Ictus hemorragico AHA 2022.pdf'),
+  },
 };
 
 export const buildReferenceHref = (referenceId, pdfPage) => {

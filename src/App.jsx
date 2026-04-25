@@ -118,6 +118,22 @@ const initialArrhythmiaFlowState = {
   atropineResponse: null,
 };
 
+const initialIschemicStrokeFlowState = {
+  step: 1,
+  lastKnownWell: null,
+  ctWithoutBleed: null,
+  thrombolysisContraindication: null,
+  largeVesselOcclusion: null,
+};
+
+const initialHemorrhagicStrokeFlowState = {
+  step: 1,
+  airwayCompromise: null,
+  anticoagulated: null,
+  systolicBand: null,
+  massEffectOrHydrocephalus: null,
+};
+
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
 
 const getCalculatorResult = (calculatorId, values) => {
@@ -497,18 +513,24 @@ const EmptySearchState = ({ query }) => (
   </div>
 );
 
-const SpecialtyAccordionList = ({ groups, onModuleOpen, onCalculatorOpen, onMedicationOpen, forceOpen = false }) => (
+const SpecialtyAccordionList = ({
+  groups,
+  onModuleOpen,
+  onCalculatorOpen,
+  onMedicationOpen,
+  forceOpen = false,
+  preferredOpenId = null,
+}) => (
   <div className="space-y-3">
     {groups.map((group) => (
       <details
         key={group.id}
         className="group overflow-hidden rounded-[1.55rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.78)] shadow-[0_24px_48px_-38px_rgba(64,49,22,0.2)]"
-        {...(forceOpen || group.id === 'cardiologia' ? { open: true } : {})}
+        {...(forceOpen || group.id === preferredOpenId || (!preferredOpenId && group.id === 'cardiologia') ? { open: true } : {})}
       >
         <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4 sm:px-5 sm:py-4.5 [&::-webkit-details-marker]:hidden">
           <div className="min-w-0">
-            <p className="eyebrow eyebrow-muted">Especialidad</p>
-            <p className="mt-1 text-[1.02rem] font-semibold tracking-[-0.03em] text-[var(--text)]">{group.title}</p>
+            <p className="text-[1.02rem] font-semibold tracking-[-0.03em] text-[var(--text)]">{group.title}</p>
             {group.note ? <p className="mt-1 max-w-2xl text-sm text-[var(--text-soft)]">{group.note}</p> : null}
           </div>
           <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-open:rotate-90" />
@@ -516,18 +538,20 @@ const SpecialtyAccordionList = ({ groups, onModuleOpen, onCalculatorOpen, onMedi
 
         <div className="border-t border-[color:var(--line)] bg-[rgba(252,249,244,0.5)] px-4 py-4 sm:px-5">
           <div className="space-y-4">
-            <SpecialtySectionRows title="Protocolos">
-              {group.protocols.map((module) => (
-                <ListActionRow
-                  key={module.id}
-                  title={module.title}
-                  meta={module.summary}
-                  badge={!module.implemented ? <StatusBadge tone="pending">Pendiente</StatusBadge> : null}
-                  disabled={!module.implemented}
-                  onClick={() => onModuleOpen(module.id)}
-                />
-              ))}
-            </SpecialtySectionRows>
+            {group.protocols.length > 0 ? (
+              <SpecialtySectionRows title="Protocolos">
+                {group.protocols.map((module) => (
+                  <ListActionRow
+                    key={module.id}
+                    title={module.title}
+                    meta={module.summary}
+                    badge={!module.implemented ? <StatusBadge tone="pending">Pendiente</StatusBadge> : null}
+                    disabled={!module.implemented}
+                    onClick={() => onModuleOpen(module.id)}
+                  />
+                ))}
+              </SpecialtySectionRows>
+            ) : null}
 
             {group.calculators.length > 0 ? (
               <SpecialtySectionRows title="Cálculos relacionados">
@@ -568,6 +592,22 @@ const SpecialtyAccordionList = ({ groups, onModuleOpen, onCalculatorOpen, onMedi
           </div>
         </div>
       </details>
+    ))}
+  </div>
+);
+
+const SpecialtyLandingGrid = ({ groups, onOpen }) => (
+  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    {groups.map((group) => (
+      <button
+        key={group.id}
+        type="button"
+        onClick={() => onOpen(group.id)}
+        className="group flex items-center justify-between rounded-[1.45rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] px-4 py-4 text-left shadow-[0_18px_38px_-30px_rgba(64,49,22,0.14)] transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(191,146,69,0.24)]"
+      >
+        <span className="text-sm font-semibold text-[var(--text)]">{group.title}</span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
+      </button>
     ))}
   </div>
 );
@@ -1130,14 +1170,82 @@ const getArrhythmiaFlowFocus = ({ step, rhythmFamily, tachyPattern }) => {
   };
 };
 
-const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral' }) => (
+const getIschemicStrokeFlowFocus = ({ step, lastKnownWell, ctWithoutBleed, largeVesselOcclusion }) => {
+  if (step === 1) {
+    return {
+      current: 'Código ictus',
+      decision: '¿Cuándo fue la última vez bien?',
+      next: 'Después, decide si la TAC descarta sangrado.',
+    };
+  }
+
+  if (step === 2) {
+    return {
+      current: 'Neuroimagen inicial',
+      decision: '¿La TAC descarta sangrado y hay datos de gran vaso o contraindicación mayor?',
+      next: 'Con eso decides reperfusión o rama conservadora.',
+    };
+  }
+
+  return {
+    current:
+      ctWithoutBleed === false
+        ? 'No es una rama isquémica'
+        : lastKnownWell === 'lt4h30'
+          ? 'Ventana de trombólisis IV'
+          : largeVesselOcclusion
+            ? 'Valora trombectomía'
+            : 'Manejo sin reperfusión inmediata',
+    decision:
+      ctWithoutBleed === false
+        ? 'Si hay sangre en la TAC, cambia a ictus hemorrágico.'
+        : lastKnownWell === 'lt4h30'
+          ? 'Trombólisis IV si no hay contraindicación mayor; trombectomía si hay gran vaso.'
+          : largeVesselOcclusion
+            ? 'Traslado / trombectomía si cumple criterios temporales y de imagen.'
+            : 'Si no hay reperfusión, controla causa, PA y prevención secundaria.',
+    next: 'Abre tratamiento o cambia de rama solo cuando modifica la conducta.',
+  };
+};
+
+const getHemorrhagicStrokeFlowFocus = ({ step, airwayCompromise, anticoagulated, massEffectOrHydrocephalus }) => {
+  if (step === 1) {
+    return {
+      current: 'Ictus hemorrágico',
+      decision: '¿Hay deterioro de conciencia, vía aérea comprometida o herniación?',
+      next: 'Después, revisa anticoagulación, PA y masa / hidrocefalia.',
+    };
+  }
+
+  if (step === 2) {
+    return {
+      current: 'Datos que cambian la conducta',
+      decision: '¿Hay anticoagulación activa, PAS que exige descenso o criterio neuroquirúrgico?',
+      next: 'Con eso defines tratamiento y destino.',
+    };
+  }
+
+  return {
+    current: airwayCompromise ? 'Hemorragia grave / neurocrítica' : 'Hemorragia intracerebral estable',
+    decision:
+      anticoagulated
+        ? 'Reversión ahora, control de PA y destino neurocrítico.'
+        : massEffectOrHydrocephalus
+          ? 'Neurocirugía / drenaje si hay efecto masa o hidrocefalia.'
+          : 'Control de PA, vigilancia y UCI / neuro según evolución.',
+    next: 'Después, reevaluar expansión, complicaciones y prevención secundaria.',
+  };
+};
+
+const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral', disabled = false }) => (
   <button
     type="button"
-    onClick={onClick}
-    className={`group flex w-full items-center gap-4 rounded-[1.55rem] border px-4 py-4 text-left transition duration-200 hover:-translate-y-0.5 sm:px-5 sm:py-5 ${
+    onClick={disabled ? undefined : onClick}
+    disabled={disabled}
+    className={`group flex w-full items-center gap-4 rounded-[1.55rem] border px-4 py-4 text-left transition duration-200 sm:px-5 sm:py-5 ${
       tone === 'critical'
-        ? 'border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.88)] hover:bg-[rgba(249,236,232,0.95)]'
-        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] hover:border-[rgba(191,146,69,0.24)]'
+        ? `border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.88)] ${disabled ? 'opacity-55' : 'hover:-translate-y-0.5 hover:bg-[rgba(249,236,232,0.95)]'}`
+        : `border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] ${disabled ? 'opacity-55' : 'hover:-translate-y-0.5 hover:border-[rgba(191,146,69,0.24)]'}`
     }`}
   >
     <span
@@ -1157,7 +1265,7 @@ const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral' }) 
         {note}
       </p>
     </div>
-    <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
+    <ChevronRight className={`ml-auto h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 ${disabled ? '' : 'group-hover:translate-x-0.5'}`} />
   </button>
 );
 
@@ -1232,96 +1340,26 @@ const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision
 );
 
 const HomeView = ({
-  onProtocolsOpen,
+  onSpecialtyOpen,
   onModuleOpen,
-  onCalculationsOpen,
   onCalculatorOpen,
-  onMedicationsOpen,
   onMedicationOpen,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  const specialtyCollections = filterSpecialtyCollections(buildSpecialtyCollections(), deferredSearchQuery);
-  const featuredCalculators = implementedCalculators.slice(0, 3);
-  const featuredMedications = ['adenosina', 'atropina', 'apixaban'];
+  const specialtyCollectionsBase = buildSpecialtyCollections();
+  const specialtyCollections = filterSpecialtyCollections(specialtyCollectionsBase, deferredSearchQuery);
+  const hasSearchQuery = Boolean(normalizeSearch(deferredSearchQuery));
   const hasSearchResults = specialtyCollections.length > 0;
 
   return (
-    <div className={widePageClass}>
-      <PageHero eyebrow="Biblioteca clínica" title="Inicio clínico">
-        <div className="grid gap-3 xl:grid-cols-[1.08fr_0.92fr]">
-          <SearchField
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Módulo o fármaco"
-          />
-          <div className="flex flex-wrap gap-2.5">
-            <button type="button" onClick={onProtocolsOpen} className={primaryButtonClass}>
-              <ClipboardList className="h-4 w-4" />
-              Especialidades
-            </button>
-            <button type="button" onClick={() => onModuleOpen('taquiarritmias-bradicardias')} className={subtleButtonClass}>
-              <HeartPulse className="h-4 w-4" />
-              Arritmias
-            </button>
-            <button type="button" onClick={() => onModuleOpen('sindrome-coronario-agudo')} className={subtleButtonClass}>
-              <HeartPulse className="h-4 w-4" />
-              IAM / SCA
-            </button>
-            <button type="button" onClick={() => onModuleOpen('fibrilacion-auricular')} className={subtleButtonClass}>
-              <Activity className="h-4 w-4" />
-              FA
-            </button>
-            <button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>
-              <Calculator className="h-4 w-4" />
-              Cálculos
-            </button>
-            <button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>
-              <Pill className="h-4 w-4" />
-              Medicamentos
-            </button>
-          </div>
-        </div>
+    <div className={pageClass}>
+      <PageHero title="Inicio clínico">
+        <SearchField value={searchQuery} onChange={setSearchQuery} placeholder="Módulo o fármaco" />
       </PageHero>
 
-      <section className="grid gap-4 lg:grid-cols-[0.98fr_1.02fr] xl:gap-5">
-        <DetailPanel title="Guardia rápida">
-          <div className="grid gap-2.5 sm:grid-cols-2 xl:gap-3">
-            <QuickAccessCard
-              icon={HeartPulse}
-              title="Taquiarritmias y bradicardias"
-              meta="Taquicardia o bradicardia, inestabilidad y conducta inmediata."
-              onClick={() => onModuleOpen('taquiarritmias-bradicardias')}
-              tone="accent"
-            />
-            <QuickAccessCard
-              icon={HeartPulse}
-              title="Síndrome coronario agudo"
-              meta="ECG, reperfusión y antitrombosis."
-              onClick={() => onModuleOpen('sindrome-coronario-agudo')}
-            />
-            <QuickAccessCard
-              icon={Activity}
-              title="Fibrilación auricular"
-              meta="Estabilidad, cardioversión y anticoagulación."
-              onClick={() => onModuleOpen('fibrilacion-auricular')}
-            />
-            <QuickAccessCard
-              icon={HeartPulse}
-              title="HTA en urgencias"
-              meta="Cifra, daño diana y tratamiento."
-              onClick={() => onModuleOpen('hta-urgencias')}
-            />
-            <QuickAccessCard
-              icon={Calculator}
-              title="CHA2DS2-VA"
-              meta="Riesgo tromboembólico."
-              onClick={() => onCalculatorOpen('cha2ds2-va')}
-            />
-          </div>
-        </DetailPanel>
-
-        <DetailPanel title="Especialidades">
+      {hasSearchQuery ? (
+        <DetailPanel title="Resultados">
           {hasSearchResults ? (
             <SpecialtyAccordionList
               groups={specialtyCollections}
@@ -1334,39 +1372,16 @@ const HomeView = ({
             <EmptySearchState query={deferredSearchQuery} />
           )}
         </DetailPanel>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-[0.96fr_1.04fr] xl:gap-5">
-        <DetailPanel title="Cálculos" action={<button type="button" onClick={onCalculationsOpen} className={subtleButtonClass}>Ver todos</button>}>
-          <div className="space-y-2">
-            {featuredCalculators.map((calculator) => (
-              <ListActionRow
-                key={calculator.id}
-                title={calculator.title}
-                meta={calculator.summary}
-                onClick={() => onCalculatorOpen(calculator.id)}
-              />
-            ))}
-          </div>
+      ) : (
+        <DetailPanel title="Especialidades">
+          <SpecialtyLandingGrid groups={specialtyCollectionsBase} onOpen={onSpecialtyOpen} />
         </DetailPanel>
-
-        <DetailPanel title="Medicamentos" action={<button type="button" onClick={onMedicationsOpen} className={subtleButtonClass}>Ver todos</button>}>
-          <div className="space-y-2">
-            {featuredMedications.map((medicationId) => (
-              <MedicationQuickRow
-                key={medicationId}
-                medication={getMedication(medicationId)}
-                onOpen={() => onMedicationOpen(medicationId)}
-              />
-            ))}
-          </div>
-        </DetailPanel>
-      </section>
+      )}
     </div>
   );
 };
 
-const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpen }) => {
+const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpen, focusSpecialtyId = null }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const specialtyCollections = filterSpecialtyCollections(buildSpecialtyCollections(), deferredSearchQuery);
@@ -1390,6 +1405,7 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpe
           onCalculatorOpen={onCalculatorOpen}
           onMedicationOpen={onMedicationOpen}
           forceOpen={Boolean(normalizeSearch(deferredSearchQuery))}
+          preferredOpenId={focusSpecialtyId}
         />
       ) : (
         <EmptySearchState query={deferredSearchQuery} />
@@ -2183,7 +2199,7 @@ const SindromeCoronarioAgudoFlowView = ({
           <div className="mt-4 grid gap-4">
             <FlowChoiceCard
               icon={ShieldAlert}
-              title="Inestabilidad o muy alto riesgo"
+              title="Paciente inestable / muy alto riesgo"
               note="Shock, edema agudo de pulmón, arritmias ventriculares o angina refractaria."
               tone="critical"
               onClick={() =>
@@ -2198,8 +2214,8 @@ const SindromeCoronarioAgudoFlowView = ({
             />
             <FlowChoiceCard
               icon={Activity}
-              title="Sin inestabilidad inmediata"
-              note="Paciente estable para tipificar el síndrome."
+              title="Paciente estable"
+              note="Sin inestabilidad inmediata. Tipifica el síndrome."
               onClick={() =>
                 updateFlow({
                   step: 2,
@@ -2595,33 +2611,41 @@ const TaquiarritmiasBradicardiasFlowView = ({
           </div>
 
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            <ProtocolGuideBlock label="Si marcas alguno" tone="critical">
-              {rhythmFamily === 'bradycardia'
-                ? 'Trátalo como bradicardia con repercusión: atropina y pacing si no responde.'
-                : 'Trátalo como taquicardia inestable: cardioversión sincronizada inmediata.'}
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Si no marcas ninguno">
-              {rhythmFamily === 'bradycardia'
-                ? 'Sigue con riesgo de asistolia o causas reversibles.'
-                : 'Sigue con el patrón del ECG para decidir la siguiente rama.'}
-            </ProtocolGuideBlock>
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title={rhythmFamily === 'bradycardia' ? 'Bradicardia con repercusión' : 'Paciente inestable'}
+              note={
+                rhythmFamily === 'bradycardia'
+                  ? 'Atropina ahora. Si no responde o hay alto riesgo, pacing.'
+                  : 'Cardioversión sincronizada inmediata.'
+              }
+              tone="critical"
+              disabled={!isUnstable}
+              onClick={() => {
+                resetForNextBranch();
+                updateFlow({ step: 4 });
+              }}
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title={rhythmFamily === 'bradycardia' ? 'Sin repercusión inmediata' : 'Paciente estable'}
+              note={
+                rhythmFamily === 'bradycardia'
+                  ? 'Valora riesgo de asistolia y causa reversible.'
+                  : 'Pasa a QRS estrecho o ancho, regular o irregular.'
+              }
+              disabled={isUnstable}
+              onClick={() => {
+                resetForNextBranch();
+                updateFlow({ step: 3 });
+              }}
+            />
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <StatusBadge tone={isUnstable ? 'critical' : 'active'}>
               {isUnstable ? 'Con repercusión / inestable' : 'Sin datos de inestabilidad'}
             </StatusBadge>
-            <button
-              type="button"
-              onClick={() => {
-                resetForNextBranch();
-                updateFlow({ step: isUnstable ? 4 : 3 });
-              }}
-              className={primaryButtonClass}
-            >
-              Continuar
-              <ChevronRight className="h-4 w-4" />
-            </button>
             <button
               type="button"
               onClick={() =>
@@ -3048,6 +3072,473 @@ const TaquiarritmiasBradicardiasFlowView = ({
   );
 };
 
+const IctusIsquemicoFlowView = ({
+  protocol,
+  ischemicStrokeFlowState,
+  onIschemicStrokeFlowChange,
+  onIschemicStrokeFlowReset,
+  onMedicationOpen,
+  onModuleOpen,
+  onBack,
+}) => {
+  const { step, lastKnownWell, ctWithoutBleed, thrombolysisContraindication, largeVesselOcclusion } = ischemicStrokeFlowState;
+  const flowFocus = getIschemicStrokeFlowFocus({ step, lastKnownWell, ctWithoutBleed, largeVesselOcclusion });
+  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('aha-ictus-isquemico-2026');
+  const inThrombolysisWindow = lastKnownWell === 'lt4h30';
+  const inThrombectomyWindow = lastKnownWell === 'lt4h30' || lastKnownWell === '4h30-24h';
+  const isThrombolysisCandidate = ctWithoutBleed === true && inThrombolysisWindow && thrombolysisContraindication === false;
+  const isThrombectomyCandidate = ctWithoutBleed === true && largeVesselOcclusion === true && inThrombectomyWindow;
+
+  const updateFlow = (changes) => {
+    onIschemicStrokeFlowChange(changes);
+  };
+
+  return (
+    <div className={pageClass}>
+      <FlowHeader
+        eyebrow="Neurología · ictus"
+        title={protocol.longTitle ?? protocol.title}
+        step={step}
+        totalSteps={3}
+        steps={['Ventana', 'Neuroimagen', 'Conducta']}
+        current={flowFocus.current}
+        decision={flowFocus.decision}
+        next={flowFocus.next}
+        onBack={onBack}
+        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
+      />
+
+      {step === 1 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 1" title="¿Cuándo fue la última vez bien?" />
+
+          <div className="grid gap-4">
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="< 4,5 h"
+              note="Todavía puede entrar en trombólisis IV si la TAC no muestra sangrado y no hay contraindicación mayor."
+              tone="critical"
+              onClick={() => updateFlow({ lastKnownWell: 'lt4h30' })}
+            />
+            <FlowChoiceCard
+              icon={HeartPulse}
+              title="4,5-24 h"
+              note="La trombólisis IV ya no suele mandar; piensa sobre todo en trombectomía si hay gran vaso."
+              onClick={() => updateFlow({ lastKnownWell: '4h30-24h' })}
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title="> 24 h o desconocido"
+              note="La reperfusión inmediata pierde peso salvo selección avanzada; ordena la conducta por imagen y déficit."
+              onClick={() => updateFlow({ lastKnownWell: 'gt24h' })}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={onIschemicStrokeFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+            <button
+              type="button"
+              disabled={!lastKnownWell}
+              onClick={() => updateFlow({ step: 2, ctWithoutBleed: null, thrombolysisContraindication: null, largeVesselOcclusion: null })}
+              className={primaryButtonClass}
+            >
+              Continuar
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 2 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 2" title="Pide la TAC y los datos que cambian la conducta" />
+
+          <div className="space-y-5">
+            <div>
+              <p className="eyebrow eyebrow-muted mb-3">¿La TAC descarta sangrado?</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FlowSelectButton label="Sí" active={ctWithoutBleed === true} onClick={() => updateFlow({ ctWithoutBleed: true })} />
+                <FlowSelectButton label="No" active={ctWithoutBleed === false} onClick={() => updateFlow({ ctWithoutBleed: false })} />
+              </div>
+            </div>
+
+            {ctWithoutBleed === true ? (
+              <>
+                <div>
+                  <p className="eyebrow eyebrow-muted mb-3">¿Hay oclusión de gran vaso o déficit claramente discapacitante?</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <FlowSelectButton label="Sí" active={largeVesselOcclusion === true} onClick={() => updateFlow({ largeVesselOcclusion: true })} />
+                    <FlowSelectButton label="No" active={largeVesselOcclusion === false} onClick={() => updateFlow({ largeVesselOcclusion: false })} />
+                  </div>
+                </div>
+
+                <div>
+                  <p className="eyebrow eyebrow-muted mb-3">¿Hay contraindicación mayor para trombólisis IV?</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <FlowSelectButton
+                      label="Sí"
+                      active={thrombolysisContraindication === true}
+                      onClick={() => updateFlow({ thrombolysisContraindication: true })}
+                    />
+                    <FlowSelectButton
+                      label="No"
+                      active={thrombolysisContraindication === false}
+                      onClick={() => updateFlow({ thrombolysisContraindication: false })}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Si la TAC tiene sangre" tone="critical">
+              Cambia a la guía de ictus hemorrágico.
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Si la TAC no tiene sangre">
+              Con la ventana temporal, la contraindicación y el gran vaso ya puedes decidir reperfusión.
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 1 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button
+              type="button"
+              disabled={ctWithoutBleed === null || (ctWithoutBleed === true && (largeVesselOcclusion === null || thrombolysisContraindication === null))}
+              onClick={() => updateFlow({ step: 3 })}
+              className={primaryButtonClass}
+            >
+              Ver conducta
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 3 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title="Qué haces ahora" />
+
+          {ctWithoutBleed === false ? (
+            <div className="space-y-4">
+              <ProtocolGuideBlock label="Hallazgo" tone="critical">
+                La TAC no descarta sangrado. Esta rama deja de ser isquémica.
+              </ProtocolGuideBlock>
+              <ProtocolGuideBlock label="Conducta">
+                Cambia al módulo de ictus hemorrágico para control de PA, reversión y destino neurocrítico.
+              </ProtocolGuideBlock>
+              <div className="flex flex-wrap gap-3">
+                <button type="button" onClick={() => onModuleOpen('ictus-hemorragico')} className={primaryButtonClass}>
+                  Abrir ictus hemorrágico
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-3 lg:grid-cols-2">
+                <ProtocolGuideBlock label="Conducta" tone={isThrombolysisCandidate || isThrombectomyCandidate ? 'critical' : 'accent'}>
+                  <p className="font-semibold text-[var(--text)]">
+                    {isThrombolysisCandidate
+                      ? 'Activa reperfusión ahora.'
+                      : isThrombectomyCandidate
+                        ? 'Prioriza traslado / trombectomía.'
+                        : 'No hay reperfusión inmediata clara.'}
+                  </p>
+                  <p className="mt-1">
+                    {isThrombolysisCandidate
+                      ? 'Si no hay contraindicación mayor, trombólisis IV. Si además hay gran vaso, la trombectomía se añade.'
+                      : isThrombectomyCandidate
+                        ? 'La oclusión de gran vaso mantiene opción de trombectomía en ventana ampliada si la selección es favorable.'
+                        : 'Controla causa, deglución, prevención secundaria y monitorización neurológica.'}
+                  </p>
+                </ProtocolGuideBlock>
+                <ProtocolGuideBlock label="Tratamiento" tone="warning">
+                  {isThrombolysisCandidate
+                    ? 'Controla la PA antes de trombólisis. Después vigila sangrado, déficit y objetivo tensional.'
+                    : 'Si no trombolizas, no conviertas la pantalla en teoría: deja definida la rama, el destino y el siguiente tratamiento.'}
+                </ProtocolGuideBlock>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {isThrombolysisCandidate ? (
+                  <DisclosureBlock title="Cómo trombolizar" summary="Solo la instrucción práctica esencial." tone="critical" defaultOpen>
+                    <div className="space-y-2">
+                      <p>Alteplasa 0,9 mg/kg IV, máximo 90 mg: 10% en bolo y 90% en perfusión durante 60 min.</p>
+                      <p>Antes de empezar, baja la PA por debajo de 185/110 mmHg si está elevada.</p>
+                      <p>Después mantén la PA por debajo de 180/105 mmHg y evita antiagregación o anticoagulación en las primeras 24 h.</p>
+                    </div>
+                  </DisclosureBlock>
+                ) : null}
+
+                {isThrombectomyCandidate ? (
+                  <DisclosureBlock title="Cuándo activar trombectomía" summary="Qué no debe retrasarse." tone="accent" defaultOpen>
+                    <div className="space-y-2">
+                      <p>Si hay oclusión de gran vaso y ventana compatible, organiza traslado o acceso a hemodinámica neurovascular de inmediato.</p>
+                      <p>La trombólisis IV no debe retrasar la trombectomía cuando las dos están indicadas.</p>
+                    </div>
+                  </DisclosureBlock>
+                ) : null}
+              </div>
+
+              <div className="mt-4">
+                <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+                <div className="space-y-2">
+                  {['alteplasa-ictus', 'labetalol-ictus'].map((medicationId) => (
+                    <MedicationQuickRow
+                      key={medicationId}
+                      medication={getMedication(medicationId)}
+                      onOpen={() => onMedicationOpen(medicationId)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <p className="eyebrow eyebrow-muted mb-2">Advertencias</p>
+                <div className="space-y-2">
+                  {protocol.warnings.map((warning) => (
+                    <div key={warning} className={`${mutedPanelClass} px-4 py-3 text-sm text-[var(--text-soft)]`}>
+                      {warning}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" onClick={onIschemicStrokeFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+};
+
+const IctusHemorragicoFlowView = ({
+  protocol,
+  hemorrhagicStrokeFlowState,
+  onHemorrhagicStrokeFlowChange,
+  onHemorrhagicStrokeFlowReset,
+  onMedicationOpen,
+  onBack,
+}) => {
+  const { step, airwayCompromise, anticoagulated, systolicBand, massEffectOrHydrocephalus } = hemorrhagicStrokeFlowState;
+  const flowFocus = getHemorrhagicStrokeFlowFocus({ step, airwayCompromise, anticoagulated, massEffectOrHydrocephalus });
+  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('aha-ictus-hemorragico-2022');
+
+  const updateFlow = (changes) => {
+    onHemorrhagicStrokeFlowChange(changes);
+  };
+
+  const bpTargetText =
+    systolicBand === '150-220'
+      ? 'Si la PAS está entre 150 y 220 mmHg, busca un descenso suave y mantenido hacia 140 mmHg si el contexto es leve-moderado.'
+      : systolicBand === 'gt220'
+        ? 'Si la PAS supera 220 mmHg o la situación es muy inestable, usa control IV intensivo con monitorización continua.'
+        : 'Si la PAS ya es baja o no elevada, evita descensos innecesarios.';
+
+  return (
+    <div className={pageClass}>
+      <FlowHeader
+        eyebrow="Neurología · ictus"
+        title={protocol.longTitle ?? protocol.title}
+        step={step}
+        totalSteps={3}
+        steps={['Gravedad', 'Datos clave', 'Conducta']}
+        current={flowFocus.current}
+        decision={flowFocus.decision}
+        next={flowFocus.next}
+        onBack={onBack}
+        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
+      />
+
+      {step === 1 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 1" title="¿Hay deterioro neurológico grave?" />
+
+          <div className="grid gap-4">
+            <FlowChoiceCard
+              icon={ShieldAlert}
+              title="Sí"
+              note="Glasgow en caída, vía aérea amenazada, herniación o rápido deterioro."
+              tone="critical"
+              onClick={() => updateFlow({ airwayCompromise: true })}
+            />
+            <FlowChoiceCard
+              icon={Activity}
+              title="No"
+              note="Mantiene vía aérea y no hay signos inmediatos de herniación."
+              onClick={() => updateFlow({ airwayCompromise: false })}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={onHemorrhagicStrokeFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+            <button
+              type="button"
+              disabled={airwayCompromise === null}
+              onClick={() => updateFlow({ step: 2, anticoagulated: null, systolicBand: null, massEffectOrHydrocephalus: null })}
+              className={primaryButtonClass}
+            >
+              Continuar
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 2 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-right-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 2" title="Pide solo los datos que cambian la conducta" />
+
+          <div className="space-y-5">
+            <div>
+              <p className="eyebrow eyebrow-muted mb-3">¿Toma anticoagulación activa?</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FlowSelectButton label="Sí" active={anticoagulated === true} onClick={() => updateFlow({ anticoagulated: true })} />
+                <FlowSelectButton label="No" active={anticoagulated === false} onClick={() => updateFlow({ anticoagulated: false })} />
+              </div>
+            </div>
+
+            <div>
+              <p className="eyebrow eyebrow-muted mb-3">PAS actual</p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <FlowSelectButton label="< 150" active={systolicBand === 'lt150'} onClick={() => updateFlow({ systolicBand: 'lt150' })} />
+                <FlowSelectButton label="150-220" active={systolicBand === '150-220'} onClick={() => updateFlow({ systolicBand: '150-220' })} />
+                <FlowSelectButton label="> 220" active={systolicBand === 'gt220'} onClick={() => updateFlow({ systolicBand: 'gt220' })} />
+              </div>
+            </div>
+
+            <div>
+              <p className="eyebrow eyebrow-muted mb-3">¿Hay hidrocefalia, compresión o hemorragia cerebelosa con efecto masa?</p>
+              <div className="grid grid-cols-2 gap-3">
+                <FlowSelectButton
+                  label="Sí"
+                  active={massEffectOrHydrocephalus === true}
+                  onClick={() => updateFlow({ massEffectOrHydrocephalus: true })}
+                />
+                <FlowSelectButton
+                  label="No"
+                  active={massEffectOrHydrocephalus === false}
+                  onClick={() => updateFlow({ massEffectOrHydrocephalus: false })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 1 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button
+              type="button"
+              disabled={anticoagulated === null || !systolicBand || massEffectOrHydrocephalus === null}
+              onClick={() => updateFlow({ step: 3 })}
+              className={primaryButtonClass}
+            >
+              Ver conducta
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {step === 3 ? (
+        <section className={`${panelClass} animate-in fade-in slide-in-from-bottom-4 p-5 duration-300 sm:p-6`}>
+          <SectionTitle eyebrow="Paso 3" title="Qué haces ahora" />
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Conducta" tone={airwayCompromise ? 'critical' : 'accent'}>
+              <p className="font-semibold text-[var(--text)]">
+                {airwayCompromise ? 'Activa manejo neurocrítico inmediato.' : 'Mantén vigilancia estrecha y control dirigido.'}
+              </p>
+              <p className="mt-1">
+                {airwayCompromise
+                  ? 'Vía aérea, UCI/neurocríticos, TAC urgente repetida si empeora y valoración neuroquirúrgica inmediata.'
+                  : 'Control tensional, monitorización neurológica y destino a unidad con capacidad neurocrítica.'}
+              </p>
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="PA">
+              {bpTargetText}
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Anticoagulación" tone={anticoagulated ? 'critical' : 'warning'}>
+              {anticoagulated
+                ? 'Reversión inmediata según el fármaco: PCC para AVK, idarucizumab si dabigatrán, andexanet alfa o estrategia equivalente si anti-Xa.'
+                : 'Si no hay anticoagulación activa, no inventes reversión: céntrate en PA, neuroimagen, UCI y cirugía si procede.'}
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Neurocirugía" tone={massEffectOrHydrocephalus ? 'critical' : 'warning'}>
+              {massEffectOrHydrocephalus
+                ? 'Hidrocefalia, compresión de tronco o hemorragia cerebelosa con deterioro obligan a valoración neuroquirúrgica inmediata.'
+                : 'Si no hay masa ni hidrocefalia, sigue ordenando PA, causa y complicaciones sin cargar la pantalla principal.'}
+            </ProtocolGuideBlock>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {anticoagulated ? (
+              <DisclosureBlock title="Cómo revertir rápido" summary="Solo el marco práctico que cambia conducta." tone="critical" defaultOpen>
+                <div className="space-y-2">
+                  <p>AVK: PCC de 4 factores + vitamina K IV.</p>
+                  <p>Dabigatrán: idarucizumab si está disponible.</p>
+                  <p>Anti-Xa: andexanet alfa o estrategia local equivalente si procede.</p>
+                </div>
+              </DisclosureBlock>
+            ) : null}
+
+            <DisclosureBlock title="Qué no hacer" summary="Puntos de seguridad del manejo urgente." tone="warning">
+              <div className="space-y-2">
+                <p>No uses transfusión de plaquetas de rutina si no hay cirugía urgente o trombocitopenia grave.</p>
+                <p>No bajes la PA a golpes; importa la estabilidad del control, no solo la cifra final.</p>
+              </div>
+            </DisclosureBlock>
+          </div>
+
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+            <div className="space-y-2">
+              <MedicationQuickRow medication={getMedication('labetalol-ictus')} onOpen={() => onMedicationOpen('labetalol-ictus')} />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <p className="eyebrow eyebrow-muted mb-2">Advertencias</p>
+            <div className="space-y-2">
+              {protocol.warnings.map((warning) => (
+                <div key={warning} className={`${mutedPanelClass} px-4 py-3 text-sm text-[var(--text-soft)]`}>
+                  {warning}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
+              Volver
+            </button>
+            <button type="button" onClick={onHemorrhagicStrokeFlowReset} className={subtleButtonClass}>
+              Reiniciar
+            </button>
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+};
+
 const CalculationsView = ({ onBack, onCalculatorOpen }) => (
   <div className={pageClass}>
     <BackBar label="Inicio" onClick={onBack} />
@@ -3265,6 +3756,8 @@ const App = () => {
   const [htaFlowState, setHtaFlowState] = useState(initialHtaFlowState);
   const [scaFlowState, setScaFlowState] = useState(initialScaFlowState);
   const [arrhythmiaFlowState, setArrhythmiaFlowState] = useState(initialArrhythmiaFlowState);
+  const [ischemicStrokeFlowState, setIschemicStrokeFlowState] = useState(initialIschemicStrokeFlowState);
+  const [hemorrhagicStrokeFlowState, setHemorrhagicStrokeFlowState] = useState(initialHemorrhagicStrokeFlowState);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -3326,6 +3819,28 @@ const App = () => {
     }));
   };
 
+  const resetIschemicStrokeFlow = () => {
+    setIschemicStrokeFlowState(initialIschemicStrokeFlowState);
+  };
+
+  const updateIschemicStrokeFlow = (changes) => {
+    setIschemicStrokeFlowState((current) => ({
+      ...current,
+      ...changes,
+    }));
+  };
+
+  const resetHemorrhagicStrokeFlow = () => {
+    setHemorrhagicStrokeFlowState(initialHemorrhagicStrokeFlowState);
+  };
+
+  const updateHemorrhagicStrokeFlow = (changes) => {
+    setHemorrhagicStrokeFlowState((current) => ({
+      ...current,
+      ...changes,
+    }));
+  };
+
   const openModule = (moduleId, returnTo = { view: 'protocols' }) => {
     const module = getMotivoModule(moduleId);
 
@@ -3349,7 +3864,19 @@ const App = () => {
       resetArrhythmiaFlow();
     }
 
+    if (module.id === 'ictus-isquemico') {
+      resetIschemicStrokeFlow();
+    }
+
+    if (module.id === 'ictus-hemorragico') {
+      resetHemorrhagicStrokeFlow();
+    }
+
     navigate({ view: 'protocol', protocolId: module.id, returnTo });
+  };
+
+  const openSpecialty = (specialtyId) => {
+    navigate({ view: 'protocols', focusSpecialtyId: specialtyId });
   };
 
   const openCalculations = (returnTo = { view: 'home' }) => {
@@ -3458,6 +3985,33 @@ const App = () => {
         );
       }
 
+      if (protocolId === 'ictus-isquemico') {
+        return (
+          <IctusIsquemicoFlowView
+            protocol={getProtocol(protocolId)}
+            ischemicStrokeFlowState={ischemicStrokeFlowState}
+            onIschemicStrokeFlowChange={updateIschemicStrokeFlow}
+            onIschemicStrokeFlowReset={resetIschemicStrokeFlow}
+            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
+            onModuleOpen={(moduleId) => openModule(moduleId, protocolReturnTo)}
+            onBack={handleBack}
+          />
+        );
+      }
+
+      if (protocolId === 'ictus-hemorragico') {
+        return (
+          <IctusHemorragicoFlowView
+            protocol={getProtocol(protocolId)}
+            hemorrhagicStrokeFlowState={hemorrhagicStrokeFlowState}
+            onHemorrhagicStrokeFlowChange={updateHemorrhagicStrokeFlow}
+            onHemorrhagicStrokeFlowReset={resetHemorrhagicStrokeFlow}
+            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
+            onBack={handleBack}
+          />
+        );
+      }
+
       return (
         <FibrilacionAuricularFlowView
           protocol={getProtocol(protocolId)}
@@ -3484,6 +4038,7 @@ const App = () => {
           onModuleOpen={(moduleId) => openModule(moduleId, { view: 'protocols' })}
           onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'protocols' })}
           onMedicationOpen={(medicationId) => openMedication(medicationId, { view: 'protocols' })}
+          focusSpecialtyId={route.focusSpecialtyId ?? null}
         />
       );
     }
@@ -3527,11 +4082,9 @@ const App = () => {
 
     return (
       <HomeView
-        onProtocolsOpen={() => navigate({ view: 'protocols' })}
+        onSpecialtyOpen={openSpecialty}
         onModuleOpen={(moduleId) => openModule(moduleId, { view: 'home' })}
-        onCalculationsOpen={() => openCalculations({ view: 'home' })}
         onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'home' })}
-        onMedicationsOpen={() => openMedications({ view: 'home' })}
         onMedicationOpen={(medicationId) => openMedication(medicationId, { view: 'home' })}
       />
     );
