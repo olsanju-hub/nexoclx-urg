@@ -42,7 +42,7 @@ export const bibliographyCatalog = {
     id: 'esc-arritmias-ventriculares-2022',
     title: 'Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita',
     shortTitle: 'ESC Arritmias ventriculares 2022',
-    filePath: buildFilePath('biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf'),
+    filePath: buildFilePath('biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf'),
   },
   'aha-ictus-isquemico-2026': {
     id: 'aha-ictus-isquemico-2026',

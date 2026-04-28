@@ -171,7 +171,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 - `public/biblio/est car 2021.pdf`
   - documento principal actual indexado para `bradicardias`
 
-- `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf`
+- `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf`
   - documento principal actual indexado para `arritmias ventriculares`
 
 ## Índice funcional del proyecto
@@ -253,7 +253,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | *Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos* | `public/biblio/SCA 2023.pdf` | Activa · principal en IAM/SCA | Referencia principal actual del protocolo de IAM / SCA. |
 | *Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular* | `public/biblio/TSV 2019.pdf` | Activa · principal en TSV | Referencia principal actual para TSV, pendiente de módulo independiente. |
 | *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | `public/biblio/est car 2021.pdf` | Activa · principal en bradicardias | Referencia principal del módulo de `Bradicardias`. |
-| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Referencia principal del módulo de `Arritmias ventriculares`. |
+| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Referencia principal del módulo de `Arritmias ventriculares`. |
 | *NICE NG250: Neumonía: diagnóstico y manejo* | `public/biblio/neumonia-nice-ng250-2025.pdf` | Activa · principal en neumonía | Referencia principal actualizada para diagnóstico, destino, antibiótico, reevaluación y seguimiento de NAC. |
 | *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | `public/biblio/urgencias-murillo-7ma.pdf` | Activa | Obra base auditada y usada por la app. |
 | Bibliografía específica de radiología | No detectada en este workspace | No disponible en workspace | Sigue pendiente de incorporación real al repositorio. |
