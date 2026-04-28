@@ -19,6 +19,15 @@ const escFaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng250-2025',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const roundToOne = (value) => Math.round(value * 10) / 10;
 
 export const calculateCockcroftGault = ({ age, sex, weightKg, serumCreatinineMgDl }) => {
@@ -151,6 +160,42 @@ export const calculateHasBled = ({
   };
 };
 
+export const calculateCrb65 = ({ confusion, respiratoryRate30, lowBloodPressure, age65 }) => {
+  const score = [confusion, respiratoryRate30, lowBloodPressure, age65].filter(Boolean).length;
+
+  return {
+    value: score,
+    unit: 'puntos',
+    interpretation:
+      score >= 3
+        ? 'Riesgo alto. NICE recomienda usar juicio clínico y considerar derivación hospitalaria.'
+        : score >= 2
+          ? 'Riesgo intermedio-alto. NICE recomienda considerar derivación hospitalaria.'
+          : score === 1
+            ? 'Riesgo intermedio. NICE propone consejos de seguridad y reevaluación, o derivación a atención urgente en el día, hospitalización a domicilio, unidad virtual u hospital según contexto.'
+            : 'Riesgo bajo. NICE permite manejo comunitario con consejo de seguridad si el juicio clínico lo respalda.',
+    caution:
+      'CRB-65 debe combinarse con juicio clínico; comorbilidad, embarazo, hipoxemia, sepsis o mala tolerancia oral pueden cambiar el destino.',
+  };
+};
+
+export const calculateCurb65 = ({ confusion, ureaOver7, respiratoryRate30, lowBloodPressure, age65 }) => {
+  const score = [confusion, ureaOver7, respiratoryRate30, lowBloodPressure, age65].filter(Boolean).length;
+
+  return {
+    value: score,
+    unit: 'puntos',
+    interpretation:
+      score >= 3
+        ? 'Riesgo alto. NICE recomienda considerar ingreso y derivación a críticos si procede.'
+        : score === 2
+          ? 'Riesgo intermedio. NICE propone decidir entre atención urgente en el día, unidad virtual, hospitalización a domicilio o ingreso.'
+          : 'Riesgo bajo. NICE permite alta con seguimiento y consejos de seguridad si no hay criterios clínicos de riesgo.',
+    caution:
+      'CURB-65 no sustituye la valoración de hipoxemia, sepsis, complicaciones pleurales, comorbilidad, fragilidad ni tolerancia oral.',
+  };
+};
+
 export const calculatorCatalog = {
   'cha2ds2-va': {
     id: 'cha2ds2-va',
@@ -212,6 +257,46 @@ export const calculatorCatalog = {
       }),
     ],
   },
+  'crb-65': {
+    id: 'crb-65',
+    title: 'CRB-65',
+    shortTitle: 'CRB-65',
+    moduleId: 'neumonia-comunidad',
+    block: 'Neumonía adquirida en la comunidad',
+    chapter: 'NICE NG250 2025 · Atención inicial',
+    verifiedPage: 9,
+    pdfPage: 9,
+    status: 'implementado',
+    summary: 'Riesgo de mortalidad y decisión de destino inicial en adultos con NAC fuera del hospital.',
+    bibliography: [
+      niceNg250Entry({
+        id: 'crb65-nice-ng250',
+        verifiedPages: [8, 9, 10],
+        pdfPages: [8, 9, 10],
+        note: 'NICE NG250 recomienda CRB-65 junto con juicio clínico para estratificar gravedad y decidir lugar de cuidados en atención inicial.',
+      }),
+    ],
+  },
+  'curb-65': {
+    id: 'curb-65',
+    title: 'CURB-65',
+    shortTitle: 'CURB-65',
+    moduleId: 'neumonia-comunidad',
+    block: 'Neumonía adquirida en la comunidad',
+    chapter: 'NICE NG250 2025 · Hospital',
+    verifiedPage: 11,
+    pdfPage: 11,
+    status: 'implementado',
+    summary: 'Riesgo de mortalidad y decisión de destino hospitalario en adultos con NAC.',
+    bibliography: [
+      niceNg250Entry({
+        id: 'curb65-nice-ng250',
+        verifiedPages: [10, 11, 12],
+        pdfPages: [10, 11, 12],
+        note: 'NICE NG250 recomienda CURB-65 junto con juicio clínico para estratificar gravedad y decidir alta, atención urgente en el día/observación, ingreso o críticos.',
+      }),
+    ],
+  },
 };
 
 export const implementedCalculators = Object.values(calculatorCatalog);
@@ -261,6 +346,24 @@ export const calculationAudit = [
     pdfPage: 40,
     status: 'implementado',
     note: 'Escala integrada en FA para revisar riesgo hemorrágico y factores corregibles, no para vetar ACO por sí sola.',
+  },
+  {
+    id: 'crb-65',
+    title: 'CRB-65',
+    chapter: 'NICE NG250 2025 · Neumonía adquirida en la comunidad',
+    verifiedPage: 9,
+    pdfPage: 9,
+    status: 'implementado',
+    note: 'Integrado para valoración inicial extrahospitalaria o de primer contacto en NAC.',
+  },
+  {
+    id: 'curb-65',
+    title: 'CURB-65',
+    chapter: 'NICE NG250 2025 · Neumonía adquirida en la comunidad',
+    verifiedPage: 11,
+    pdfPage: 11,
+    status: 'implementado',
+    note: 'Integrado para valoración hospitalaria y decisión de destino en NAC.',
   },
   {
     id: 'grace',

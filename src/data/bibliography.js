@@ -56,6 +56,12 @@ export const bibliographyCatalog = {
     shortTitle: 'AHA Ictus hemorrágico 2022',
     filePath: buildFilePath('biblio/Ictus hemorragico AHA 2022.pdf'),
   },
+  'nice-ng250-2025': {
+    id: 'nice-ng250-2025',
+    title: 'NICE NG250: Neumonía: diagnóstico y manejo',
+    shortTitle: 'NICE NG250 2025',
+    filePath: buildFilePath('biblio/neumonia-nice-ng250-2025.pdf'),
+  },
 };
 
 export const buildReferenceHref = (referenceId, pdfPage) => {
