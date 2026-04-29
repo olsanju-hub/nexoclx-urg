@@ -722,7 +722,7 @@ export const protocolCatalog = {
       {
         id: 'antibiotico',
         title: 'Antibiótico',
-        action: 'NICE prioriza pauta por gravedad, inicio precoz y revisión de IV a 48 h.',
+        action: 'Elegir pauta según gravedad, iniciar precozmente y revisar antibiótico IV a las 48 h.',
       },
     ],
     decisionCards: [
@@ -797,7 +797,7 @@ export const protocolCatalog = {
     ],
     warnings: [
       'No introduzcas recomendaciones antibióticas sin fuente y revisa alergias, función renal, embarazo, interacciones y resistencias locales.',
-      'Si Murillo y NICE difieren, prioriza NICE NG250 2025 para antibiótico, reevaluación y seguimiento.',
+      'Antes de indicar tratamiento o alta: revisar alergias, función renal, gravedad clínica, estabilidad respiratoria y necesidad de reevaluación.',
       'CRB-65 y CURB-65 no sustituyen el juicio clínico: hipoxemia, sepsis, complicaciones, fragilidad o inmunosupresión pueden elevar el nivel de cuidados.',
     ],
     calculatorIds: ['crb-65', 'curb-65'],
