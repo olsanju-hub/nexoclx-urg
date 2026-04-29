@@ -1,0 +1,35 @@
+name: Tarea
+description: Trabajo tecnico, organizativo o de contenido.
+title: "[Tarea]: "
+labels:
+  - task
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objetivo
+      description: Que debe quedar hecho.
+    validations:
+      required: true
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      value: |
+        - [ ] 
+        - [ ] 
+        - [ ] 
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - App
+        - Contenido clinico
+        - Bibliografia
+        - Calculos
+        - Medicamentos
+        - PWA / despliegue
+        - Documentacion
+    validations:
+      required: true
