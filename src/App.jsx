@@ -1512,7 +1512,7 @@ const NeumoniaComunidadFlowView = ({ protocol, onCalculatorOpen, onBack }) => {
         <SectionTitle
           eyebrow="Entrada rápida"
           title="Qué confirmar al inicio"
-          note="NICE actualiza destino, antibiótico, revisión y seguimiento; Murillo aporta el marco de sospecha y pruebas urgentes."
+          note="Primero confirma el escenario, descarta inestabilidad y decide qué cambia la conducta ahora."
         />
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {protocol.quickChecks.map((check) => (
@@ -1566,7 +1566,7 @@ const NeumoniaComunidadFlowView = ({ protocol, onCalculatorOpen, onBack }) => {
       </section>
 
       <section className={`${panelClass} p-5 sm:p-6`}>
-        <SectionTitle eyebrow="Antibiótico inicial" title="Adulto con NAC según gravedad" note="Pauta NICE NG250; revisar alergias, embarazo, función renal, interacciones y resistencias locales." />
+        <SectionTitle eyebrow="Antibiótico inicial" title="Adulto con NAC según gravedad" note="Elegir por escenario clínico y revisar seguridad antes de prescribir." />
         <div className="grid gap-3 lg:grid-cols-3">
           {protocol.antibioticPlan.map((item) => (
             <ProtocolGuideBlock key={item.severity} label={item.severity} tone={item.severity.includes('Alta') ? 'warning' : 'neutral'}>
