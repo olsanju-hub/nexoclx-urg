@@ -18,6 +18,8 @@ import { buildReferenceHref } from './data/bibliography';
 import {
   calculateCha2ds2Va,
   calculateCockcroftGault,
+  calculateCrb65,
+  calculateCurb65,
   calculateHasBled,
   getCalculator,
   implementedCalculators,
@@ -71,6 +73,19 @@ const initialCalculatorInputs = {
     sex: 'male',
     weightKg: '',
     serumCreatinineMgDl: '',
+  },
+  'crb-65': {
+    confusion: false,
+    respiratoryRate30: false,
+    lowBloodPressure: false,
+    age65: false,
+  },
+  'curb-65': {
+    confusion: false,
+    ureaOver7: false,
+    respiratoryRate30: false,
+    lowBloodPressure: false,
+    age65: false,
   },
 };
 
@@ -155,6 +170,14 @@ const getCalculatorResult = (calculatorId, values) => {
 
   if (calculatorId === 'cockcroft-gault') {
     return calculateCockcroftGault(values);
+  }
+
+  if (calculatorId === 'crb-65') {
+    return calculateCrb65(values);
+  }
+
+  if (calculatorId === 'curb-65') {
+    return calculateCurb65(values);
   }
 
   return null;
@@ -893,6 +916,39 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
           <CalculatorResult result={result} />
         </div>
       ) : null}
+
+      {calculatorId === 'crb-65' ? (
+        <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={values.confusion} label="Confusión nueva" onChange={(value) => onChange('confusion', value)} />
+            <BooleanField checked={values.respiratoryRate30} label="FR ≥ 30/min" onChange={(value) => onChange('respiratoryRate30', value)} />
+            <BooleanField
+              checked={values.lowBloodPressure}
+              label="TAS < 90 o TAD ≤ 60"
+              onChange={(value) => onChange('lowBloodPressure', value)}
+            />
+            <BooleanField checked={values.age65} label="Edad ≥ 65 años" onChange={(value) => onChange('age65', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'curb-65' ? (
+        <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={values.confusion} label="Confusión nueva" onChange={(value) => onChange('confusion', value)} />
+            <BooleanField checked={values.ureaOver7} label="Urea > 7 mmol/L" onChange={(value) => onChange('ureaOver7', value)} />
+            <BooleanField checked={values.respiratoryRate30} label="FR ≥ 30/min" onChange={(value) => onChange('respiratoryRate30', value)} />
+            <BooleanField
+              checked={values.lowBloodPressure}
+              label="TAS < 90 o TAD ≤ 60"
+              onChange={(value) => onChange('lowBloodPressure', value)}
+            />
+            <BooleanField checked={values.age65} label="Edad ≥ 65 años" onChange={(value) => onChange('age65', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
     </section>
   );
 };
@@ -1430,6 +1486,127 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpe
       ) : (
         <EmptySearchState query={deferredSearchQuery} />
       )}
+    </div>
+  );
+};
+
+const NeumoniaComunidadFlowView = ({ protocol, onCalculatorOpen, onBack }) => {
+  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('nice-ng250-2025');
+
+  return (
+    <div className={pageClass}>
+      <FlowHeader
+        eyebrow="Protocolo NAC"
+        title={protocol.longTitle ?? protocol.title}
+        step={1}
+        totalSteps={1}
+        steps={['Evaluación']}
+        current="Sospecha, gravedad, destino y tratamiento inicial"
+        decision="CRB-65 fuera del hospital; CURB-65 en hospital; juicio clínico siempre"
+        next="Revisar antibiótico IV a las 48 h y reevaluar si no mejora"
+        onBack={onBack}
+        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
+      />
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle
+          eyebrow="Entrada rápida"
+          title="Qué confirmar al inicio"
+          note="NICE actualiza destino, antibiótico, revisión y seguimiento; Murillo aporta el marco de sospecha y pruebas urgentes."
+        />
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {protocol.quickChecks.map((check) => (
+            <div key={check} className="rounded-[1rem] border border-[color:var(--line)] bg-white/70 px-3 py-2 text-sm text-[var(--text-soft)]">
+              {check}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-3 lg:grid-cols-2">
+        {protocol.decisionCards.map((card) => (
+          <ProtocolGuideBlock key={card.id} label={card.situation} tone={card.id.includes('destino') ? 'accent' : 'neutral'}>
+            <p className="font-semibold text-[var(--text)]">{card.action}</p>
+            <p className="mt-1">{card.nuance}</p>
+          </ProtocolGuideBlock>
+        ))}
+      </section>
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle eyebrow="Escalas" title="CRB-65 y CURB-65" note="Úsalas para orientar destino, no para sustituir la valoración clínica." />
+        <div className="grid gap-3 sm:grid-cols-2">
+          {protocol.calculatorIds.map((calculatorId) => {
+            const calculator = getCalculator(calculatorId);
+
+            return (
+              <button
+                key={calculatorId}
+                type="button"
+                onClick={() => onCalculatorOpen(calculatorId)}
+                className="rounded-[1.15rem] border border-[color:var(--line)] bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:border-[rgba(191,146,69,0.45)]"
+              >
+                <p className="eyebrow eyebrow-muted">{calculator.block}</p>
+                <p className="mt-1 text-base font-semibold text-[var(--text)]">{calculator.title}</p>
+                <p className="mt-1 text-sm text-[var(--text-soft)]">{calculator.summary}</p>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle eyebrow="Destino" title="Dónde continuar cuidados" />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {protocol.carePath.map((item) => (
+            <ProtocolGuideBlock key={item.title} label={item.title} tone={item.title.includes('UCI') ? 'critical' : 'neutral'}>
+              {item.text}
+            </ProtocolGuideBlock>
+          ))}
+        </div>
+      </section>
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle eyebrow="Antibiótico inicial" title="Adulto con NAC según gravedad" note="Pauta NICE NG250; revisar alergias, embarazo, función renal, interacciones y resistencias locales." />
+        <div className="grid gap-3 lg:grid-cols-3">
+          {protocol.antibioticPlan.map((item) => (
+            <ProtocolGuideBlock key={item.severity} label={item.severity} tone={item.severity.includes('Alta') ? 'warning' : 'neutral'}>
+              {item.regimen}
+            </ProtocolGuideBlock>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className={`${panelClass} p-5 sm:p-6`}>
+          <SectionTitle eyebrow="Revisión y seguimiento" title="Después de iniciar tratamiento" />
+          <div className="space-y-2 text-sm text-[var(--text-soft)]">
+            {protocol.reassessment.map((item) => (
+              <p key={item}>{item}</p>
+            ))}
+          </div>
+        </div>
+        <div className={`${panelClass} p-5 sm:p-6`}>
+          <SectionTitle eyebrow="No alta segura" title="Criterios de alerta" />
+          <div className="space-y-3">
+            {protocol.noDischargeCriteria.map((item) => (
+              <ProtocolGuideBlock key={item} label="Revisar antes de alta" tone="warning">
+                {item}
+              </ProtocolGuideBlock>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle eyebrow="Seguridad clínica" title="Límites del módulo" />
+        <div className="grid gap-3 lg:grid-cols-3">
+          {protocol.warnings.map((warning) => (
+            <ProtocolGuideBlock key={warning} label="Alerta" tone="warning">
+              {warning}
+            </ProtocolGuideBlock>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
@@ -3979,6 +4156,16 @@ const App = () => {
             onHemorrhagicStrokeFlowChange={updateHemorrhagicStrokeFlow}
             onHemorrhagicStrokeFlowReset={resetHemorrhagicStrokeFlow}
             onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
+            onBack={handleBack}
+          />
+        );
+      }
+
+      if (protocolId === 'neumonia-comunidad') {
+        return (
+          <NeumoniaComunidadFlowView
+            protocol={getProtocol(protocolId)}
+            onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
             onBack={handleBack}
           />
         );

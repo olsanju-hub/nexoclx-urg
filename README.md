@@ -32,11 +32,11 @@ Principios actuales del proyecto:
 
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Especialidades` con acordeones por bloque clínico para evitar una lista plana interminable.
-- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico` e `ictus hemorrágico`.
-- Cálculos activos del módulo FA: `CHA2DS2-VA`, `HAS-BLED` y `Cockcroft-Gault`.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico` y `neumonía adquirida en la comunidad`.
+- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65` y `CURB-65`.
 - Fichas farmacológicas activas para FA, HTA, SCA, arritmias agudas e ictus enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
-- Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
+- Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `NICE NG250 2025` como referencia principal de neumonía, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
 - Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`.
 - Despliegue activo en GitHub Pages: `https://olsanju-hub.github.io/NexoClx/`.
 
@@ -171,7 +171,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 - `public/biblio/est car 2021.pdf`
   - documento principal actual indexado para `bradicardias`
 
-- `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf`
+- `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf`
   - documento principal actual indexado para `arritmias ventriculares`
 
 ## Índice funcional del proyecto
@@ -185,6 +185,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Síndrome coronario agudo | Cap. 26 | 214 | Creado | Flujo real para ECG, hs-cTn, riesgo, reperfusión y antitrombosis, con bibliografía principal `ESC SCA 2023`. |
 | Bradicardias | Documento ESC 2021 | 1 | Creado | Guía interactiva de guardia para repercusión clínica, bradicardia sinusal / nodo, bloqueo AV y necesidad de estimulación. |
 | Arritmias ventriculares | Documento ESC 2022 | 1 | Creado | Guía interactiva de guardia para TV con pulso o sin pulso, TV monomorfa estable y torsades / TV polimórfica. |
+| Neumonía adquirida en la comunidad | NICE NG250 2025 + Cap. 42 | 300 | Creado | Flujo real para sospecha, diagnóstico, CRB/CURB-65, destino, antibiótico inicial, revisión IV a 48 h y seguimiento. |
 | Insuficiencia cardiaca | Cap. 19 | 161 | Solo indexado | Tema auditado para futura integración del protocolo de `ICC`. |
 | Taquicardia supraventricular | Guía ESC 2019 | 1 | Solo indexado | Referencia preparada para futuro módulo independiente de TSV. |
 | Shock | Cap. 18 | 154 | Solo indexado | Tema auditado, sin protocolo operativo. |
@@ -201,6 +202,8 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Aclaramiento de creatinina (Cockcroft-Gault) | Cap. 5 · Bioquímica sanguínea | 39 | Implementado | Se usa ya para revisar ajuste renal de anticoagulantes en FA. |
 | CHA2DS2-VA | Guía ESC 2024 · Fibrilación auricular | 32 | Implementado | Integrado dentro del protocolo FA y también accesible desde `Cálculos`. |
 | HAS-BLED | Guía ESC 2024 · Fibrilación auricular | 40 | Implementado | Integrado dentro del protocolo FA para vigilar riesgo hemorrágico y también accesible desde `Cálculos`. |
+| CRB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 9 | Implementado | Integrado para orientar riesgo y destino en atención inicial / ámbito ambulatorio. |
+| CURB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 11 | Implementado | Integrado para orientar riesgo y destino en ámbito hospitalario. |
 | TFG estimado (CKD-EPI) | Cap. 5 · Bioquímica sanguínea | 39 | Pendiente | Auditado, pero fuera del alcance del primer módulo real. |
 | Diferencia alveoloarterial de O2 (∆AaPO2) | Cap. 8 · Gasometría, pulsioximetría y capnografía | 66 | Pendiente | Detectado en bibliografía, no implementado. |
 | GRACE | Cap. 26 · Síndrome coronario agudo | 220 | Pendiente | Escala detectada para futuro módulo. |
@@ -250,7 +253,8 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | *Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos* | `public/biblio/SCA 2023.pdf` | Activa · principal en IAM/SCA | Referencia principal actual del protocolo de IAM / SCA. |
 | *Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular* | `public/biblio/TSV 2019.pdf` | Activa · principal en TSV | Referencia principal actual para TSV, pendiente de módulo independiente. |
 | *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | `public/biblio/est car 2021.pdf` | Activa · principal en bradicardias | Referencia principal del módulo de `Bradicardias`. |
-| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Referencia principal del módulo de `Arritmias ventriculares`. |
+| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Referencia principal del módulo de `Arritmias ventriculares`. |
+| *NICE NG250: Neumonía: diagnóstico y manejo* | `public/biblio/neumonia-nice-ng250-2025.pdf` | Activa · principal en neumonía | Referencia principal actualizada para diagnóstico, destino, antibiótico, reevaluación y seguimiento de NAC. |
 | *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | `public/biblio/urgencias-murillo-7ma.pdf` | Activa | Obra base auditada y usada por la app. |
 | Bibliografía específica de radiología | No detectada en este workspace | No disponible en workspace | Sigue pendiente de incorporación real al repositorio. |
 
@@ -288,6 +292,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fecha | Cambio realizado | Sección afectada | Breve explicación |
 | --- | --- | --- | --- |
+| 2026-04-28 | Protocolo de neumonía adquirida en la comunidad | Protocolos / bibliografía / cálculos | Se añadió NAC con NICE NG250 2025 como fuente principal actualizada, Murillo cap. 42 como base y CRB-65/CURB-65 para decisión de destino. |
 | 2026-04-24 | FA como guía principal y protocolos por especialidad | Protocolos / bibliografía / cálculos | Se indexó `ESC FA 2024`, se pasó FA a `CHA2DS2-VA`, se revisó el flujo clínico y se agrupó la lista de protocolos por especialidad. |
 | 2026-04-24 | Reindexación bibliográfica de HTA e IAM/SCA | Bibliografía / protocolos / medicamentos | Se añadieron `ESC HTA 2024` y `ESC SCA 2023` como referencias principales reales, se ajustaron enlaces y se revisó el contenido clínico relacionado. |
 | 2026-04-05 | Montaje base del proyecto | Base técnica | Se creó la app con `Vite + React + Tailwind` y se dejó lista para build estático. |

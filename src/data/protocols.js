@@ -82,6 +82,15 @@ const ahaHemorrhagicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note
     note,
   });
 
+const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng250-2025',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const protocolCatalog = {
   'fibrilacion-auricular': {
     id: 'fibrilacion-auricular',
@@ -673,6 +682,151 @@ export const protocolCatalog = {
         verifiedPages: [442, 443, 444, 445],
         pdfPages: [467, 468, 469, 470],
         note: 'Apoyo práctico secundario del capítulo de ictus en la obra base.',
+      }),
+    ],
+  },
+  'neumonia-comunidad': {
+    id: 'neumonia-comunidad',
+    title: 'Neumonía',
+    longTitle: 'Neumonía adquirida en la comunidad',
+    chapter: 'NICE NG250 2025 + Cap. 42',
+    section: 'Urgencias del aparato respiratorio',
+    indexPage: 300,
+    verifiedPage: 300,
+    pdfPage: 325,
+    status: 'implementado',
+    summary: 'Sospecha, diagnóstico, CRB/CURB-65, destino, antibiótico inicial, revisión y seguimiento.',
+    quickChecks: [
+      'Síntomas de infección respiratoria baja y signos focales, taquipnea, hipoxemia o gravedad',
+      'Confirmación con radiografía de tórax en hospital, idealmente dentro de 4 h',
+      'CRB-65 en atención inicial y CURB-65 en hospital',
+      'Sepsis, insuficiencia respiratoria, hipotensión, confusión o mala tolerancia oral',
+      'Antibiótico empírico según gravedad y revisión IV a las 48 h',
+    ],
+    quickSummary: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        action: 'NAC si infección respiratoria baja con signos compatibles; Murillo exige infiltrado nuevo si hay Rx disponible.',
+      },
+      {
+        id: 'riesgo',
+        title: 'Riesgo',
+        action: 'Usa CRB-65 fuera del hospital y CURB-65 en hospital siempre con juicio clínico.',
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        action: '0 bajo riesgo; 1-2 intermedio; ≥3 alto. Hipoxemia, sepsis o mala tolerancia oral pesan más que la cifra.',
+      },
+      {
+        id: 'antibiotico',
+        title: 'Antibiótico',
+        action: 'NICE prioriza pauta por gravedad, inicio precoz y revisión de IV a 48 h.',
+      },
+    ],
+    decisionCards: [
+      {
+        id: 'diagnostico',
+        situation: 'Sospecha o diagnóstico inicial',
+        action: 'Buscar fiebre o síntomas respiratorios, signos focales, taquipnea, hipoxemia, gravedad o infiltrado nuevo en radiografía.',
+        nuance: 'NICE permite diagnóstico clínico si aún no hay Rx; Murillo define NAC por clínica compatible más infiltrado radiológico no atribuible a otra causa.',
+      },
+      {
+        id: 'pruebas',
+        situation: 'Pruebas iniciales en urgencias',
+        action: 'Pulsioximetría, radiografía de tórax, analítica con función renal/urea y valorar gasometría si SpO2 ≤ 92% o comorbilidad cardiorrespiratoria.',
+        nuance: 'NICE añade Rx dentro de 4 h en hospital, CRP basal en adultos ingresados y microbiología solo si gravedad moderada/alta o indicación como sepsis.',
+      },
+      {
+        id: 'destino-crb',
+        situation: 'Atención inicial / ambulatoria',
+        action: 'CRB-65 0: domicilio con consejos de seguridad si estable. CRB-65 1: decidir entre domicilio con seguridad, atención urgente en el día/observación, hospitalización a domicilio o derivación. CRB-65 ≥ 2: considerar hospital.',
+        nuance: 'Insuficiencia cardiorrespiratoria, sepsis o imposibilidad de vía oral obligan a derivar aunque el score sea bajo.',
+      },
+      {
+        id: 'destino-curb',
+        situation: 'Hospital',
+        action: 'CURB-65 0-1: alta si estable y con seguimiento. CURB-65 2: observación/atención urgente en el día, hospitalización a domicilio o ingreso. CURB-65 ≥ 3: ingreso y valorar críticos.',
+        nuance: 'La gravedad real puede ser mayor que el score si hay hipoxemia, complicación pleural, comorbilidad, fragilidad o embarazo.',
+      },
+    ],
+    carePath: [
+      {
+        title: 'Domicilio',
+        text: 'Bajo riesgo, tolera vía oral, sin hipoxemia ni inestabilidad, con red de apoyo y consejo de reevaluación.',
+      },
+      {
+        title: 'Observación / atención urgente en el día',
+        text: 'Riesgo intermedio, necesidad de pruebas o tratamiento breve, o vigilancia sin ingreso convencional inicial.',
+      },
+      {
+        title: 'Ingreso',
+        text: 'CURB-65 alto, comorbilidad relevante, mala evolución, imposibilidad de vía oral, hipoxemia o criterios de no alta segura.',
+      },
+      {
+        title: 'UCI / críticos',
+        text: 'Insuficiencia respiratoria, sepsis/shock, necesidad de soporte ventilatorio o deterioro clínico rápido.',
+      },
+    ],
+    antibioticPlan: [
+      {
+        severity: 'Baja gravedad',
+        regimen: 'Amoxicilina oral 500 mg/8 h 5 días; si alergia o sospecha de atípicos: doxiciclina, claritromicina o eritromicina en embarazo.',
+      },
+      {
+        severity: 'Gravedad moderada',
+        regimen: 'Amoxicilina oral 500 mg/8 h 5 días; añadir claritromicina si se sospechan atípicos. Alternativas en alergia: doxiciclina o claritromicina.',
+      },
+      {
+        severity: 'Alta gravedad',
+        regimen: 'Co-amoxiclav oral/IV 5 días más claritromicina oral/IV; eritromicina si embarazo. En alergia a penicilina: levofloxacino y valorar microbiología local.',
+      },
+    ],
+    reassessment: [
+      'Iniciar antibiótico tras establecer diagnóstico y dentro de 4 h si presentación hospitalaria.',
+      'Usar vía oral de primera línea si puede tomarla y la gravedad no exige IV.',
+      'Si se administra antibiótico IV, revisar a las 48 h y cambiar a vía oral si es posible.',
+      'Duración habitual en adultos: 5 días si hay estabilidad clínica y microbiología no obliga a prolongar.',
+      'Reevaluar si no mejora como se espera, empeora rápida o significativamente, o se vuelve sistémicamente enfermo.',
+      'No pedir radiografía de control de rutina tras ingreso; considerar a 6 semanas si riesgo de cáncer/respiratorio, síntomas persistentes/deterioro o pérdida de peso.',
+    ],
+    noDischargeCriteria: [
+      '2 o más en las últimas 24 h: T > 37,5 °C, FR ≥ 24, FC > 100, TAS ≤ 90, SpO2 < 90% en aire ambiente o por debajo de basal, estado mental anormal, incapacidad para comer sin ayuda.',
+      'Cualquier alerta mayor: sepsis, insuficiencia respiratoria, hipotensión, confusión, hipoxemia, mala tolerancia oral, comorbilidad relevante o inmunosupresión.',
+    ],
+    warnings: [
+      'No introduzcas recomendaciones antibióticas sin fuente y revisa alergias, función renal, embarazo, interacciones y resistencias locales.',
+      'Si Murillo y NICE difieren, prioriza NICE NG250 2025 para antibiótico, reevaluación y seguimiento.',
+      'CRB-65 y CURB-65 no sustituyen el juicio clínico: hipoxemia, sepsis, complicaciones, fragilidad o inmunosupresión pueden elevar el nivel de cuidados.',
+    ],
+    calculatorIds: ['crb-65', 'curb-65'],
+    bibliography: [
+      niceNg250Entry({
+        id: 'neumonia-ng250-assessment',
+        verifiedPages: [8, 9, 10, 11, 12, 13, 14],
+        pdfPages: [8, 9, 10, 11, 12, 13, 14],
+        note: 'Sospecha, CRB-65, CURB-65, decisión de lugar de cuidados y pruebas hospitalarias.',
+      }),
+      niceNg250Entry({
+        id: 'neumonia-ng250-antibiotics',
+        verifiedPages: [15, 16, 17, 36, 37, 38, 39],
+        pdfPages: [15, 16, 17, 36, 37, 38, 39],
+        note: 'Inicio y revisión de antibióticos, duración, alta segura, reevaluación y radiografía de control.',
+      }),
+      referenceEntry({
+        id: 'neumonia-murillo-start',
+        indexPage: 300,
+        verifiedPage: 300,
+        pdfPage: 325,
+        note: 'Capítulo 42: concepto, clínica inicial, diagnóstico y pruebas urgentes.',
+      }),
+      createBibliographyEntry({
+        id: 'neumonia-murillo-tests',
+        referenceId: 'murillo7',
+        verifiedPages: [301, 302, 303],
+        pdfPages: [326, 327, 328],
+        note: 'Apoyo práctico para clínica, exploración, pulsioximetría, gasometría, radiografía y tratamiento inicial.',
       }),
     ],
   },

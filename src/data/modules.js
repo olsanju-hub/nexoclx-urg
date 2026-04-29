@@ -82,6 +82,15 @@ const ahaHemorrhagicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note
     note,
   });
 
+const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng250-2025',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const coreReference = bibliographyCatalog.murillo7;
 
 export const clinicalIndexAudit = [
@@ -283,6 +292,17 @@ export const clinicalIndexAudit = [
     status: 'auditado',
     note: 'Sin discrepancia entre índice y arranque real.',
   },
+  {
+    id: 'neumonia-comunidad',
+    title: 'Neumonía adquirida en la comunidad',
+    chapter: 'Cap. 42',
+    section: 'Urgencias del aparato respiratorio',
+    indexPage: 300,
+    verifiedPage: 300,
+    pdfPage: 325,
+    status: 'implementado',
+    note: 'Capítulo 42 verificado en Murillo; NICE NG250 2025 queda como fuente principal actualizada para decisiones de antibiótico, reevaluación y seguimiento.',
+  },
 ];
 
 export const protocolSpecialties = [
@@ -304,7 +324,7 @@ export const protocolSpecialties = [
   {
     id: 'infecciosas',
     title: 'Infecciosas',
-    note: 'Sepsis y otros síndromes infecciosos.',
+    note: 'Neumonía, sepsis y otros síndromes infecciosos.',
   },
 ];
 
@@ -609,6 +629,34 @@ export const motivoConsultaModules = [
     ],
   },
   {
+    id: 'neumonia-comunidad',
+    title: 'Neumonía adquirida en la comunidad',
+    shortTitle: 'Neumonía',
+    chapter: 'NICE NG250 2025 + Cap. 42',
+    section: 'Infecciosas',
+    specialtyId: 'infecciosas',
+    verifiedPage: 9,
+    pdfPage: 9,
+    status: 'implementado',
+    implemented: true,
+    summary: 'Sospecha, diagnóstico, CRB/CURB-65, destino, antibiótico inicial y reevaluación.',
+    bibliography: [
+      niceNg250Entry({
+        id: 'neumonia-nice-module',
+        verifiedPages: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 36, 37, 38, 39],
+        pdfPages: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 36, 37, 38, 39],
+        note: 'Fuente principal actualizada: estratificación, destino, antibióticos, reevaluación y seguimiento.',
+      }),
+      referenceEntry({
+        id: 'neumonia-murillo-cap42',
+        indexPage: 300,
+        verifiedPage: 300,
+        pdfPage: 325,
+        note: 'Capítulo base de Murillo 7.ª ed. para concepto, sospecha clínica y pruebas urgentes.',
+      }),
+    ],
+  },
+  {
     id: 'coma',
     title: 'Coma',
     shortTitle: 'Coma',
@@ -761,6 +809,14 @@ export const bibliographyBaseUsed = [
     filePath: bibliographyCatalog.murillo7.filePath,
     status: 'activa',
     note: 'Obra base general y apoyo práctico; ya no es la referencia principal en HTA ni en IAM/SCA.',
+  },
+  {
+    id: 'nice-ng250-2025',
+    title: bibliographyCatalog['nice-ng250-2025'].title,
+    shortTitle: bibliographyCatalog['nice-ng250-2025'].shortTitle,
+    filePath: bibliographyCatalog['nice-ng250-2025'].filePath,
+    status: 'activa · principal en neumonía',
+    note: 'Guía principal actualizada para neumonía: diagnóstico, lugar de cuidados, antibióticos, reevaluación y seguimiento.',
   },
   {
     id: 'radiologia-pendiente',

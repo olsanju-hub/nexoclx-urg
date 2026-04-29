@@ -42,7 +42,7 @@ export const bibliographyCatalog = {
     id: 'esc-arritmias-ventriculares-2022',
     title: 'Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita',
     shortTitle: 'ESC Arritmias ventriculares 2022',
-    filePath: buildFilePath('biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf'),
+    filePath: buildFilePath('biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf'),
   },
   'aha-ictus-isquemico-2026': {
     id: 'aha-ictus-isquemico-2026',
@@ -55,6 +55,12 @@ export const bibliographyCatalog = {
     title: '2022 Guideline for the Management of Patients With Spontaneous Intracerebral Hemorrhage',
     shortTitle: 'AHA Ictus hemorrágico 2022',
     filePath: buildFilePath('biblio/Ictus hemorragico AHA 2022.pdf'),
+  },
+  'nice-ng250-2025': {
+    id: 'nice-ng250-2025',
+    title: 'NICE NG250: Neumonía: diagnóstico y manejo',
+    shortTitle: 'NICE NG250 2025',
+    filePath: buildFilePath('biblio/neumonia-nice-ng250-2025.pdf'),
   },
 };
 
