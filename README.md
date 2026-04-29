@@ -32,7 +32,7 @@ Principios actuales del proyecto:
 
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Especialidades` con acordeones por bloque clínico para evitar una lista plana interminable.
-- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico` y `neumonía adquirida en la comunidad`.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `neumonía adquirida en la comunidad` y `dolor abdominal agudo`.
 - Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65` y `CURB-65`.
 - Fichas farmacológicas activas para FA, HTA, SCA, arritmias agudas e ictus enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
@@ -52,6 +52,7 @@ Principios actuales del proyecto:
 | Módulo de bradicardias | Activo | Flujo breve para repercusión, bradicardia sinusal / nodo, bloqueo AV y necesidad de pacing. | Embebe atropina y procedimiento de marcapasos transcutáneo cuando cambia la conducta. |
 | Módulo de arritmias ventriculares | Activo | Flujo breve para pulso, inestabilidad, TV monomorfa y torsades / TV polimórfica. | Embebe amiodarona IV, magnesio IV y electricidad urgente cuando corresponde. |
 | Módulos de ictus | Activos | `Ictus isquémico` e `ictus hemorrágico` con flujo corto de ventana, imagen, reperfusión, PA y reversión. | Quedan agrupados en `Neurología` y enlazan medicación y fuente principal. |
+| Módulo de dolor abdominal agudo | Activo | Mapa clínico por localización con filtro inicial de gravedad, sospechas, pruebas dirigidas, tratamiento inicial y destino. | Queda agrupado en `Digestivo` y enlaza la fuente principal de Murillo. |
 | Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo. |
 | Medicamentos | Activa | Reúne fichas farmacológicas completas del módulo activo. | Cada ficha puede abrirse desde el protocolo y volver a él. |
 | Bibliografía | Activa | Da acceso a la obra base y a referencias estructuradas. | Cada módulo guarda sus referencias y páginas verificadas. |
@@ -193,7 +194,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Ictus | Cap. 64 | 442 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Sepsis | Cap. 107 | 640 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Coma | Cap. 62 | 428 | Solo indexado | Tema auditado, sin protocolo operativo. |
-| Dolor abdominal agudo | Cap. 50 | 340 | Solo indexado | Tema auditado, sin protocolo operativo. |
+| Dolor abdominal agudo | Cap. 50 | 340 | Creado | Mapa interactivo por localización con filtro de gravedad, sospechas, pruebas dirigidas, tratamiento inicial y destino. |
 
 ### Cálculos / escalas
 
@@ -281,7 +282,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Insuficiencia cardíaca | Cap. 19 | 161 | 161 | 186 | Auditado | Sin discrepancia. |
 | Dolor torácico agudo | Cap. 25 | 207 | 207 | 232 | Auditado | El contenido arranca en la página indexada. |
 | Síndrome coronario agudo | Cap. 26 | 214 | 214 | 239 | Auditado | El arranque conceptual está en la página indexada; el rótulo del capítulo aparece a continuación. |
-| Dolor abdominal agudo | Cap. 50 | 340 | 340 | 365 | Auditado | El contenido arranca en la página indexada. |
+| Dolor abdominal agudo | Cap. 50 | 340 | 340 | 365 | Implementado | Mapa clínico interactivo basado en el capítulo auditado. |
 | Náuseas, vómitos y diarrea | Cap. 51 | 358 | 358 | 383 | Auditado | Sin discrepancia. |
 | Coma | Cap. 62 | 428 | 428 | 453 | Auditado | El arranque conceptual está en la página indexada; el rótulo del capítulo aparece en la siguiente. |
 | Crisis epilépticas | Cap. 63 | 435 | 435 | 460 | Auditado | Sin discrepancia. |
@@ -292,6 +293,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fecha | Cambio realizado | Sección afectada | Breve explicación |
 | --- | --- | --- | --- |
+| 2026-04-29 | Protocolo de dolor abdominal agudo | Protocolos / Digestivo / bibliografía | Se añadió un mapa por localización con filtro de gravedad, pruebas dirigidas, tratamiento inicial y decisión de destino. |
 | 2026-04-28 | Protocolo de neumonía adquirida en la comunidad | Protocolos / bibliografía / cálculos | Se añadió NAC con NICE NG250 2025 como fuente principal actualizada, Murillo cap. 42 como base y CRB-65/CURB-65 para decisión de destino. |
 | 2026-04-24 | FA como guía principal y protocolos por especialidad | Protocolos / bibliografía / cálculos | Se indexó `ESC FA 2024`, se pasó FA a `CHA2DS2-VA`, se revisó el flujo clínico y se agrupó la lista de protocolos por especialidad. |
 | 2026-04-24 | Reindexación bibliográfica de HTA e IAM/SCA | Bibliografía / protocolos / medicamentos | Se añadieron `ESC HTA 2024` y `ESC SCA 2023` como referencias principales reales, se ajustaron enlaces y se revisó el contenido clínico relacionado. |

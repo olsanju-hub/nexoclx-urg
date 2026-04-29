@@ -686,9 +686,9 @@ export const motivoConsultaModules = [
     specialtyId: 'digestivo',
     verifiedPage: 340,
     pdfPage: 365,
-    status: 'auditado',
-    implemented: false,
-    summary: 'Tema auditado. Sin protocolo operativo en esta fase.',
+    status: 'implementado',
+    implemented: true,
+    summary: 'Mapa clínico por localización con filtro de gravedad, sospechas, pruebas dirigidas, tratamiento inicial y destino.',
     bibliography: [
       referenceEntry({
         id: 'dolor-abdominal-cap50',
