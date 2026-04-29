@@ -1622,9 +1622,18 @@ const InlineClinicalList = ({ items }) => (
   </ul>
 );
 
+const CompactClinicalList = ({ items, limit = 3 }) => (
+  <div className="space-y-2">
+    {items.slice(0, limit).map((item) => (
+      <p key={item} className="text-sm font-semibold leading-snug text-[var(--text)]">
+        {item}
+      </p>
+    ))}
+  </div>
+);
+
 const DolorAbdominalAgudoFlowView = ({ protocol, onBack }) => {
-  const initialAlarms = Object.fromEntries(protocol.severityChecks.map((check) => [check, false]));
-  const [alarms, setAlarms] = useState(initialAlarms);
+  const [alarms, setAlarms] = useState(() => Object.fromEntries(protocol.severityChecks.map((check) => [check, false])));
   const [selectedRegionId, setSelectedRegionId] = useState(protocol.abdominalRegions[0]?.id ?? '');
   const selectedRegion =
     protocol.abdominalRegions.find((region) => region.id === selectedRegionId) ?? protocol.abdominalRegions[0];
@@ -1647,7 +1656,7 @@ const DolorAbdominalAgudoFlowView = ({ protocol, onBack }) => {
         totalSteps={4}
         steps={['Gravedad', 'Localización', 'Conducta', 'Destino']}
         current="Primero descarta gravedad; después localiza el dolor"
-        decision={hasAlarm ? 'Alto riesgo: prioriza estabilización y valoración especializada' : 'Sin alarma marcada: selecciona región y dirige pruebas'}
+        decision={hasAlarm ? 'Alto riesgo: estabiliza, pide pruebas urgentes y avisa pronto' : `Dolor en ${selectedRegion?.label.toLowerCase()}: sospechas y pruebas dirigidas`}
         next="Decidir observación, ingreso, alta o especialista según hallazgos"
         onBack={onBack}
         onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
@@ -1667,18 +1676,11 @@ const DolorAbdominalAgudoFlowView = ({ protocol, onBack }) => {
         </div>
       </section>
 
-      {hasAlarm ? (
-        <section className={`${panelClass} border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.9)] p-5 sm:p-6`}>
-          <SectionTitle eyebrow="Alto riesgo" title="Conducta inmediata" />
-          <InlineClinicalList items={protocol.highRiskActions} />
-        </section>
-      ) : null}
-
       <section className={`${panelClass} p-5 sm:p-6`}>
         <SectionTitle
           eyebrow="Paso 2"
           title="Localiza el dolor"
-          note="En móvil se usan botones grandes por región para evitar zonas pequeñas difíciles de pulsar."
+          note="Elige la zona dominante. Si el dolor es generalizado o el paciente está mal, usa dolor difuso."
         />
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           {protocol.abdominalRegions.map((region) => (
@@ -1694,26 +1696,63 @@ const DolorAbdominalAgudoFlowView = ({ protocol, onBack }) => {
         </div>
       </section>
 
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle
+          eyebrow="Respuesta de guardia"
+          title={hasAlarm ? 'Alto riesgo: actúa antes de completar el mapa' : `Dolor en ${selectedRegion.label}`}
+          note={hasAlarm ? 'No esperes a cerrar diagnóstico si hay peritonitis, shock, sepsis o deterioro.' : 'Controla síntomas, pide pruebas que cambien conducta y decide destino.'}
+          action={<StatusBadge tone={hasAlarm ? 'critical' : 'accent'}>{hasAlarm ? 'Ingreso / especialista' : 'Dirigir por sospecha'}</StatusBadge>}
+        />
+        {hasAlarm ? (
+          <div className="grid gap-3 lg:grid-cols-3">
+            <ProtocolGuideBlock label="Haz ahora" tone="critical">
+              <CompactClinicalList items={protocol.highRiskActions} limit={4} />
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="No retrases" tone="critical">
+              No retrasar valoración quirúrgica si hay peritonitis o inestabilidad.
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Destino" tone="critical">
+              Ingreso o valoración urgente por cirugía, ginecología, urología, vascular o críticos según contexto.
+            </ProtocolGuideBlock>
+          </div>
+        ) : (
+          <div className="grid gap-3 lg:grid-cols-4">
+            <ProtocolGuideBlock label="Piensa primero" tone="accent">
+              <CompactClinicalList items={selectedRegion.diagnoses} limit={3} />
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Pregunta clave">
+              <CompactClinicalList items={selectedRegion.questions} limit={3} />
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Pide si cambia conducta">
+              <CompactClinicalList items={selectedRegion.tests} limit={3} />
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Destino probable" tone="warning">
+              Alta solo si estable, dolor controlado, tolera vía oral y no hay alarma. Si dudas, observación y reevaluación.
+            </ProtocolGuideBlock>
+          </div>
+        )}
+      </section>
+
       {selectedRegion ? (
         <section className={`${panelClass} p-5 sm:p-6`}>
           <SectionTitle
-            eyebrow="Paso 3"
+            eyebrow="Detalle por región"
             title={selectedRegion.label}
-            note="Sospechas y pruebas dirigidas: pide lo que cambia conducta."
+            note="Amplía diagnósticos, preguntas y pruebas si persiste duda clínica."
           />
-          <div className="grid gap-3 lg:grid-cols-2">
-            <ProtocolGuideBlock label="Diagnósticos probables">
+          <div className="grid gap-2 lg:grid-cols-2">
+            <DisclosureBlock title="Diagnósticos probables" summary={selectedRegion.diagnoses.slice(0, 3).join(' · ')} defaultOpen>
               <InlineClinicalList items={selectedRegion.diagnoses} />
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Preguntas clave">
+            </DisclosureBlock>
+            <DisclosureBlock title="Preguntas clave" summary={selectedRegion.questions.slice(0, 3).join(' · ')}>
               <InlineClinicalList items={selectedRegion.questions} />
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Pruebas iniciales">
+            </DisclosureBlock>
+            <DisclosureBlock title="Pruebas iniciales" summary={selectedRegion.tests.slice(0, 2).join(' · ')}>
               <InlineClinicalList items={selectedRegion.tests} />
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Alertas específicas" tone="warning">
+            </DisclosureBlock>
+            <DisclosureBlock title="Alertas específicas" summary={selectedRegion.alerts.slice(0, 2).join(' · ')} tone="warning" defaultOpen>
               <InlineClinicalList items={selectedRegion.alerts} />
-            </ProtocolGuideBlock>
+            </DisclosureBlock>
           </div>
         </section>
       ) : null}
@@ -1721,17 +1760,21 @@ const DolorAbdominalAgudoFlowView = ({ protocol, onBack }) => {
       <section className="grid gap-3 lg:grid-cols-2">
         <div className={`${panelClass} p-5 sm:p-6`}>
           <SectionTitle eyebrow="Preguntas comunes" title="Datos que orientan la rama" />
-          <InlineClinicalList items={protocol.commonQuestions} />
+          <DisclosureBlock title="Ver preguntas" summary="Inicio, fiebre, vómitos, deposición, sangre, orina, embarazo y comorbilidad">
+            <InlineClinicalList items={protocol.commonQuestions} />
+          </DisclosureBlock>
         </div>
         <div className={`${panelClass} p-5 sm:p-6`}>
           <SectionTitle eyebrow="Pruebas comunes" title="Según sospecha y contexto" />
-          <InlineClinicalList items={protocol.commonTests} />
+          <DisclosureBlock title="Ver pruebas" summary="Constantes, analítica, orina, embarazo y lactato/gasometría si gravedad">
+            <InlineClinicalList items={protocol.commonTests} />
+          </DisclosureBlock>
         </div>
       </section>
 
       <section className={`${panelClass} p-5 sm:p-6`}>
         <SectionTitle eyebrow="Tratamiento inicial" title="Medidas generales" />
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {protocol.generalTreatment.map((item) => (
             <ProtocolGuideBlock key={item} label="Conducta" tone={item.startsWith('Antibiótico') ? 'warning' : 'neutral'}>
               {item}
