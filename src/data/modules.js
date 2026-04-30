@@ -227,17 +227,6 @@ export const clinicalIndexAudit = [
     note: 'El arranque conceptual está en la página indexada; el rótulo del capítulo aparece a continuación.',
   },
   {
-    id: 'dolor-abdominal-agudo',
-    title: 'Dolor abdominal agudo',
-    chapter: 'Cap. 50',
-    section: 'Urgencias del aparato digestivo',
-    indexPage: 340,
-    verifiedPage: 340,
-    pdfPage: 365,
-    status: 'auditado',
-    note: 'Capítulo base auditado; se implementa dividido por escenarios clínicos y especialidad.',
-  },
-  {
     id: 'nauseas-vomitos-diarrea',
     title: 'Náuseas, vómitos y diarrea',
     chapter: 'Cap. 51',
@@ -306,11 +295,6 @@ export const clinicalIndexAudit = [
 ];
 
 export const protocolSpecialties = [
-  {
-    id: 'transversal',
-    title: 'Triaje transversal',
-    note: 'Entradas de orientacion inicial que derivan a una especialidad concreta.',
-  },
   {
     id: 'cardiologia',
     title: 'Cardiología',
@@ -702,21 +686,7 @@ export const motivoConsultaModules = [
       }),
     ],
   },
-  {
-    id: 'dolor-abdominal-agudo',
-    title: 'Dolor abdominal agudo',
-    shortTitle: 'Dolor abdominal',
-    chapter: 'Cap. 50',
-    section: 'Triaje transversal',
-    specialtyId: 'transversal',
-    verifiedPage: 340,
-    pdfPage: 365,
-    status: 'implementado',
-    implemented: true,
-    summary: 'Entrada transversal: gravedad, localizacion y derivacion a rama clinica por especialidad.',
-    bibliography: [referenceEntry({ id: 'dolor-abdominal-triage-module', indexPage: 340, pdfPage: 365, note: 'Murillo 7. ed., cap. 50, entrada transversal de dolor abdominal agudo.' })],
-  },
-  {
+{
     id: 'dolor-abdomen-quirurgico',
     title: 'Abdomen quirurgico',
     shortTitle: 'Abdomen quirurgico',
@@ -799,20 +769,6 @@ export const motivoConsultaModules = [
     implemented: true,
     summary: 'Gastroenteritis, colitis, diverticulitis, sepsis abdominal y absceso intraabdominal.',
     bibliography: [referenceEntry({ id: 'dolor-infeccioso-module', indexPage: 340, pdfPage: 365, note: 'Dolor abdominal agudo: rama infeccioso-digestiva.' })],
-  },
-  {
-    id: 'dolor-simuladores-extraabdominales',
-    title: 'Simuladores extraabdominales',
-    shortTitle: 'Simuladores',
-    chapter: 'Cap. 50',
-    section: 'Transversal',
-    specialtyId: 'transversal',
-    verifiedPage: 340,
-    pdfPage: 365,
-    status: 'implementado',
-    implemented: true,
-    summary: 'SCA, neumonia basal, metabolico, herpes zoster inicial y patologia testicular.',
-    bibliography: [referenceEntry({ id: 'dolor-simuladores-module', indexPage: 340, pdfPage: 365, note: 'Dolor abdominal agudo: simuladores extraabdominales.' })],
   },
 ];
 

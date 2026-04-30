@@ -1586,110 +1586,6 @@ const InlineClinicalList = ({ items }) => (
   </ul>
 );
 
-const DolorAbdominalTriageView = ({ protocol, onModuleOpen, onBack }) => {
-  const triage = protocol.triage;
-  const [alarms, setAlarms] = useState(() => Object.fromEntries(triage.severityChecks.map((check) => [check, false])));
-  const [selectedRegionId, setSelectedRegionId] = useState(triage.regions[0]?.id ?? '');
-  const selectedRegion = triage.regions.find((region) => region.id === selectedRegionId) ?? triage.regions[0];
-  const hasAlarm = Object.values(alarms).some(Boolean);
-
-  const updateAlarm = (check, value) => {
-    setAlarms((current) => ({ ...current, [check]: value }));
-  };
-
-  return (
-    <div className={pageClass}>
-      <FlowHeader
-        eyebrow="Entrada transversal"
-        title={protocol.longTitle ?? protocol.title}
-        step={hasAlarm ? 1 : 2}
-        totalSteps={4}
-        steps={['Gravedad', 'Localización', 'Rama', 'Destino']}
-        current="Descarta gravedad, localiza el dolor y deriva a la rama clínica"
-        decision={hasAlarm ? 'Alto riesgo: estabiliza y avisa pronto' : `Región: ${selectedRegion.label}`}
-        next="Abrir la rama concreta por especialidad"
-        onBack={onBack}
-      />
-
-      <section className={`${panelClass} p-5 sm:p-6`}>
-        <SectionTitle
-          eyebrow="Diagnóstico inicial"
-          title={triage.severityTitle}
-          note="Si marcas una alarma, el caso se maneja como alto riesgo antes de completar el mapa."
-          action={<StatusBadge tone={hasAlarm ? 'critical' : 'active'}>{hasAlarm ? 'Alto riesgo' : 'Sin alarma marcada'}</StatusBadge>}
-        />
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {triage.severityChecks.map((check) => (
-            <BooleanField key={check} checked={alarms[check]} label={check} onChange={(value) => updateAlarm(check, value)} />
-          ))}
-        </div>
-      </section>
-
-      {hasAlarm ? (
-        <section className={`${panelClass} p-5 sm:p-6`}>
-          <SectionTitle eyebrow="Alto riesgo" title="Actúa antes de elegir rama" />
-          <div className="grid gap-3 lg:grid-cols-2">
-            <ProtocolGuideBlock label="Conducta inmediata" tone="critical">
-              <InlineClinicalList items={triage.highRisk} />
-            </ProtocolGuideBlock>
-            <ProtocolGuideBlock label="Destino probable" tone="critical">
-              Valoración especializada urgente o críticos según contexto. No retrasar cirugía si hay peritonitis o inestabilidad.
-            </ProtocolGuideBlock>
-          </div>
-        </section>
-      ) : null}
-
-      <section className={`${panelClass} p-5 sm:p-6`}>
-        <SectionTitle eyebrow="Localización" title="Elige la región dominante" note="No se muestran todas las ramas a la vez: la región orienta la siguiente decisión." />
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          {triage.regions.map((region) => (
-            <button
-              key={region.id}
-              type="button"
-              onClick={() => setSelectedRegionId(region.id)}
-              className={`choice-button min-h-[4.6rem] justify-center text-center ${selectedRegion.id === region.id ? 'choice-button-active' : ''}`}
-            >
-              {region.label}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className={`${panelClass} p-5 sm:p-6`}>
-        <SectionTitle eyebrow="Rama sugerida" title={selectedRegion.label} note="Abre solo la rama que encaja con el paciente." />
-        <div className="grid gap-3 lg:grid-cols-3">
-          <ProtocolGuideBlock label="Sospechas principales" tone="accent">
-            <InlineClinicalList items={selectedRegion.suspects} />
-          </ProtocolGuideBlock>
-          <ProtocolGuideBlock label="Pruebas que cambian conducta">
-            <InlineClinicalList items={selectedRegion.tests} />
-          </ProtocolGuideBlock>
-          <ProtocolGuideBlock label="Tratamiento inicial común" tone="warning">
-            <InlineClinicalList items={triage.commonTreatment.slice(0, 5)} />
-          </ProtocolGuideBlock>
-        </div>
-        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {selectedRegion.branches.map((branchId) => {
-            const branch = getProtocol(branchId);
-            return (
-              <button key={branchId} type="button" onClick={() => onModuleOpen(branchId)} className="list-row text-left">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[var(--text)]">{branch.title}</p>
-                  <p className="mt-1 text-xs text-[var(--text-muted)]">{branch.section}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)]" />
-              </button>
-            );
-          })}
-        </div>
-        <p className="mt-4 text-sm font-semibold text-[var(--text-soft)]">{selectedRegion.destination}</p>
-      </section>
-
-      <BibliographyBlock entries={protocol.bibliography} />
-    </div>
-  );
-};
-
 const GuardiaProtocolView = ({ protocol, onBack }) => {
   const guardia = protocol.guardia;
 
@@ -1708,7 +1604,7 @@ const GuardiaProtocolView = ({ protocol, onBack }) => {
       />
 
       <section className={`${panelClass} p-5 sm:p-6`}>
-        <SectionTitle eyebrow="De un vistazo" title="Clínica, diagnóstico, tratamiento" />
+        <SectionTitle eyebrow="1" title="Diagnóstico" />
         <div className="grid gap-3 lg:grid-cols-3">
           <ProtocolGuideBlock label="Clínica" tone="accent">
             <p className="font-semibold text-[var(--text)]">{guardia.clinica}</p>
@@ -1716,45 +1612,45 @@ const GuardiaProtocolView = ({ protocol, onBack }) => {
           <ProtocolGuideBlock label="Diagnóstico">
             <p className="font-semibold text-[var(--text)]">{guardia.diagnostico}</p>
           </ProtocolGuideBlock>
-          <ProtocolGuideBlock label="Tratamiento inicial" tone="warning">
-            <p className="font-semibold text-[var(--text)]">{guardia.tratamiento}</p>
+          <ProtocolGuideBlock label="Pruebas">
+            <InlineClinicalList items={guardia.pruebas} />
           </ProtocolGuideBlock>
         </div>
       </section>
 
       <section className={`${panelClass} p-5 sm:p-6`}>
-        <SectionTitle eyebrow="Seguridad" title="Primero decide si puede esperar" />
+        <SectionTitle eyebrow="2" title="Tratamiento en Urgencias" />
         <div className="grid gap-3 lg:grid-cols-2">
-          <ProtocolGuideBlock label="Alarma" tone="critical">
+          <ProtocolGuideBlock label="Tratamiento inicial" tone="warning">
+            <p className="font-semibold text-[var(--text)]">{guardia.tratamiento}</p>
+          </ProtocolGuideBlock>
+          <ProtocolGuideBlock label="Qué hacer ahora" tone="accent">
+            <InlineClinicalList items={guardia.manejo} />
+          </ProtocolGuideBlock>
+        </div>
+      </section>
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle eyebrow="3" title="Seguimiento / destino" />
+        <div className="grid gap-3 lg:grid-cols-3">
+          <ProtocolGuideBlock label="Alarmas" tone="critical">
             <InlineClinicalList items={guardia.alertas} />
           </ProtocolGuideBlock>
           <ProtocolGuideBlock label="Destino" tone="critical">
             <InlineClinicalList items={guardia.destinoItems} />
           </ProtocolGuideBlock>
+          <ProtocolGuideBlock label="Seguimiento">
+            <InlineClinicalList items={guardia.seguimiento} />
+          </ProtocolGuideBlock>
         </div>
       </section>
 
-      <section className={`${panelClass} p-5 sm:p-6`}>
-        <SectionTitle eyebrow="Pruebas" title="Pide solo lo que cambia conducta" />
-        <div className="grid gap-3 lg:grid-cols-3">
-          {guardia.pruebas.map((item) => (
-            <ProtocolGuideBlock key={item} label="Prueba">
-              {item}
-            </ProtocolGuideBlock>
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-3 lg:grid-cols-2">
-        <div className={`${panelClass} p-5 sm:p-6`}>
-          <SectionTitle eyebrow="Manejo" title="Qué hacer ahora" />
-          <InlineClinicalList items={guardia.manejo} />
-        </div>
-        <div className={`${panelClass} p-5 sm:p-6`}>
-          <SectionTitle eyebrow="Seguimiento" title="Alta u observación" />
-          <InlineClinicalList items={guardia.seguimiento} />
-        </div>
-      </section>
+      {guardia.simuladores ? (
+        <section className={`${panelClass} p-5 sm:p-6`}>
+          <SectionTitle eyebrow="Alertas" title="Simuladores extraabdominales" />
+          <InlineClinicalList items={guardia.simuladores} />
+        </section>
+      ) : null}
 
       <BibliographyBlock entries={protocol.bibliography} />
     </div>
@@ -4304,15 +4200,6 @@ const App = () => {
         );
       }
 
-      if (protocolId === 'dolor-abdominal-agudo') {
-        return (
-          <DolorAbdominalTriageView
-            protocol={getProtocol(protocolId)}
-            onModuleOpen={(moduleId) => openModule(moduleId, protocolReturnTo)}
-            onBack={handleBack}
-          />
-        );
-      }
 
       if (getProtocol(protocolId).guardia) {
         return (

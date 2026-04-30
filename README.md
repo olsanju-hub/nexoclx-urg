@@ -32,7 +32,7 @@ Principios actuales del proyecto:
 
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Especialidades` con acordeones por bloque clínico para evitar una lista plana interminable.
-- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `neumonía adquirida en la comunidad` y `dolor abdominal agudo` como entrada transversal con ramas por especialidad.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
 - Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65` y `CURB-65`.
 - Fichas farmacológicas activas para FA, HTA, SCA, arritmias agudas e ictus enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
@@ -154,7 +154,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs ni muestra 
 
 - `src/data/protocols.js`
   - protocolos clínicos reales
-  - contiene protocolos clínicos y entradas transversales operativas
+  - contiene protocolos clínicos operativos
 
 - `src/data/calculators.js`
   - catálogo de cálculos implementados
@@ -182,14 +182,12 @@ La interfaz muestra referencias textuales verificables. No abre PDFs ni muestra 
 | Bradicardias | Documento ESC 2021 | 1 | Creado | Guía interactiva de guardia para repercusión clínica, bradicardia sinusal / nodo, bloqueo AV y necesidad de estimulación. |
 | Arritmias ventriculares | Documento ESC 2022 | 1 | Creado | Guía interactiva de guardia para TV con pulso o sin pulso, TV monomorfa estable y torsades / TV polimórfica. |
 | Neumonía adquirida en la comunidad | NICE NG250 2025 + Cap. 42 | 300 | Creado | Flujo real para sospecha, diagnóstico, CRB/CURB-65, destino, antibiótico inicial, revisión IV a 48 h y seguimiento. |
-| Dolor abdominal agudo | Cap. 50 | 340 | Creado | Entrada transversal de triaje: gravedad, localización y apertura de rama clínica por especialidad. |
 | Abdomen quirúrgico | Cap. 50 | 340 | Creado | Mini-protocolo de cirugía general para apendicitis, perforación, obstrucción, peritonitis y complicación. |
 | Hepatobiliar-pancreático | Cap. 50 | 340 | Creado | Mini-protocolo digestivo para cólico biliar, colecistitis, colangitis, hepatitis y pancreatitis. |
 | Dolor urinario | Cap. 50 | 340 | Creado | Mini-protocolo urológico para cólico renal, pielonefritis, ITU complicada, retención y prostatitis. |
 | Dolor ginecológico | Cap. 50 | 340 | Creado | Mini-protocolo ginecológico para ectópico, torsión, EPI, quiste complicado y gestación. |
 | Dolor vascular | Cap. 50 | 340 | Creado | Mini-protocolo vascular para isquemia mesentérica, aneurisma, disección y embolia visceral. |
 | Dolor infeccioso-digestivo | Cap. 50 | 340 | Creado | Mini-protocolo digestivo/infeccioso para gastroenteritis, colitis, diverticulitis y sepsis abdominal. |
-| Simuladores extraabdominales | Cap. 50 | 340 | Creado | Mini-protocolo transversal para SCA, neumonía basal, metabólico, zóster y patología testicular. |
 | Insuficiencia cardiaca | Cap. 19 | 161 | Solo indexado | Tema auditado para futura integración del protocolo de `ICC`. |
 | Taquicardia supraventricular | Guía ESC 2019 | 1 | Solo indexado | Referencia preparada para futuro módulo independiente de TSV. |
 | Shock | Cap. 18 | 154 | Solo indexado | Tema auditado, sin protocolo operativo. |
@@ -294,7 +292,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs ni muestra 
 
 | Fecha | Cambio realizado | Sección afectada | Breve explicación |
 | --- | --- | --- | --- |
-| 2026-04-30 | Triaje transversal y bibliografía textual | Protocolos / bibliografía | Dolor abdominal pasa a entrada transversal con ramas clínicas y la app deja de enlazar PDFs públicos. |
+| 2026-04-30 | Dolor abdominal por especialidades y bibliografía textual | Protocolos / bibliografía | Se eliminó la entrada transversal; cada tipo de dolor abdominal queda en su especialidad y la app deja de enlazar PDFs públicos. |
 | 2026-04-29 | Dolor abdominal dividido por especialidad | Protocolos / Digestivo / Cirugía / Urología / Ginecología / Vascular | Se retiró el mapa único y se sustituyó por protocolos breves de guardia: clínica, diagnóstico, pruebas, tratamiento, destino y seguimiento. |
 | 2026-04-28 | Protocolo de neumonía adquirida en la comunidad | Protocolos / bibliografía / cálculos | Se añadió NAC con NICE NG250 2025 como fuente principal actualizada, Murillo cap. 42 como base y CRB-65/CURB-65 para decisión de destino. |
 | 2026-04-24 | FA como guía principal y protocolos por especialidad | Protocolos / bibliografía / cálculos | Se indexó `ESC FA 2024`, se pasó FA a `CHA2DS2-VA`, se revisó el flujo clínico y se agrupó la lista de protocolos por especialidad. |
