@@ -104,6 +104,12 @@ Reglas:
 
 ### Integración de la bibliografía en cada módulo
 
+Murillo 7.ª edición es la base práctica inicial de los protocolos de urgencias. Cada protocolo mantiene la referencia textual a Murillo cuando aplica, con capítulo y páginas verificadas si están disponibles.
+
+Las decisiones clínicas críticas se corroboran con guías europeas o americanas recientes y de alto rigor cuando existen: ESC en cardiología, AHA/ASA en ictus, NICE/ERS/ATS/BTS/IDSA en neumonía e infecciones respiratorias, EAU en urología, ACG/AGA/ESGE/EASL/WSES en digestivo y cirugía urgente, ACOG/RCOG en ginecología y SCCM/Surviving Sepsis Campaign en sepsis. Si Murillo y una guía más reciente difieren, el flujo clínico muestra directamente la conducta actualizada y la justificación queda en fuentes, no en mitad del protocolo.
+
+No se usan Wikipedia, blogs, webs comerciales ni resúmenes sin respaldo como fuente clínica.
+
 Cada módulo puede guardar una o varias referencias estructuradas. La app distingue:
 
 - `Página índice`: página declarada por el índice del libro
@@ -117,7 +123,7 @@ Cada referencia guarda:
 - `internalId`
 - `note`
 
-La interfaz muestra referencias textuales verificables. No abre PDFs ni muestra rutas internas.
+La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra rutas internas y no depende de `public/biblio/` para funcionar.
 
 ## Estructura técnica actual
 
@@ -257,7 +263,14 @@ La interfaz muestra referencias textuales verificables. No abre PDFs ni muestra 
 | *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | Activa · principal en bradicardias | Referencia textual del módulo de `Bradicardias`. |
 | *Comentarios a la guía ESC 2022 sobre arritmias ventriculares y prevención de muerte súbita* | Activa · principal en arritmias ventriculares | Referencia textual del módulo de `Arritmias ventriculares`. |
 | *NICE NG250: Neumonía: diagnóstico y manejo* | Activa · principal en neumonía | Referencia textual actualizada para diagnóstico, destino, antibiótico, reevaluación y seguimiento de NAC. |
-| *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | Activa | Obra base textual auditada y usada por la app. |
+| *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | Activa · base práctica | Obra base textual auditada y usada por la app. |
+| *WSES Jerusalem guidelines 2020: diagnóstico y tratamiento de la apendicitis aguda* | Activa · corroboración quirúrgica | Referencia textual para abdomen quirúrgico. |
+| *WSES 2020: manejo de la diverticulitis colónica aguda en urgencias* | Activa · corroboración digestivo-infecciosa | Referencia textual para diverticulitis y dolor infeccioso-digestivo. |
+| *American College of Gastroenterology guideline 2024: manejo de la pancreatitis aguda* | Activa · corroboración digestiva | Referencia textual para dolor hepatobiliar-pancreático. |
+| *EAU Guidelines on Urolithiasis, edición 2025* | Activa · corroboración urológica | Referencia textual para cólico renal y dolor de flanco. |
+| *EAU Guidelines on Urological Infections, edición 2025* | Activa · corroboración urológica | Referencia textual para pielonefritis, ITU complicada y obstrucción infectada. |
+| *ACOG Practice Bulletin No. 193: Tubal Ectopic Pregnancy, 2018; reafirmado 2025* | Activa · corroboración ginecológica | Referencia textual para dolor pélvico con sospecha de ectópico. |
+| *Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021* | Activa · corroboración sepsis | Referencia textual para sepsis, shock y deterioro abdominal. |
 
 ## Índice clínico comprobado
 

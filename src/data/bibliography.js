@@ -49,6 +49,41 @@ export const bibliographyCatalog = {
     title: 'NICE NG250: Neumonía: diagnóstico y manejo',
     shortTitle: 'NICE NG250 2025',
   },
+  'wses-appendicitis-2020': {
+    id: 'wses-appendicitis-2020',
+    title: 'WSES Jerusalem guidelines 2020: diagnóstico y tratamiento de la apendicitis aguda',
+    shortTitle: 'WSES Apendicitis 2020',
+  },
+  'wses-diverticulitis-2020': {
+    id: 'wses-diverticulitis-2020',
+    title: 'WSES 2020: manejo de la diverticulitis colónica aguda en urgencias',
+    shortTitle: 'WSES Diverticulitis 2020',
+  },
+  'acg-pancreatitis-2024': {
+    id: 'acg-pancreatitis-2024',
+    title: 'American College of Gastroenterology guideline 2024: manejo de la pancreatitis aguda',
+    shortTitle: 'ACG Pancreatitis 2024',
+  },
+  'eau-urolithiasis-2025': {
+    id: 'eau-urolithiasis-2025',
+    title: 'EAU Guidelines on Urolithiasis, edición 2025',
+    shortTitle: 'EAU Urolitiasis 2025',
+  },
+  'eau-urological-infections-2025': {
+    id: 'eau-urological-infections-2025',
+    title: 'EAU Guidelines on Urological Infections, edición 2025',
+    shortTitle: 'EAU Infecciones urinarias 2025',
+  },
+  'acog-ectopic-2018': {
+    id: 'acog-ectopic-2018',
+    title: 'ACOG Practice Bulletin No. 193: Tubal Ectopic Pregnancy, 2018; reafirmado 2025',
+    shortTitle: 'ACOG Ectópico 2018/2025',
+  },
+  'ssc-sepsis-2021': {
+    id: 'ssc-sepsis-2021',
+    title: 'Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021',
+    shortTitle: 'SSC Sepsis 2021',
+  },
 };
 
 export const createBibliographyEntry = ({
@@ -68,7 +103,9 @@ export const createBibliographyEntry = ({
     shortReference: source?.shortTitle ?? referenceId,
     indexPages,
     verifiedPages,
-    pdfPages,
+    historicalPdfPages: pdfPages,
+    isTextualReference: true,
+    hasPublicPdfLink: false,
     internalId: `${referenceId}:${id}`,
     note,
   };
