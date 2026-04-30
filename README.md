@@ -97,7 +97,8 @@ Reglas:
 - frases cortas y pasos accionables
 - escalas solo si son usables dentro de la app y cambian conducta
 - dosis, vía, frecuencia y duración solo si están auditadas
-- si falta ficha farmacológica, dejarlo como pendiente y no inventar dosis
+- los tratamientos deben ser concretos y escalonados; si falta un dato del paciente, la app debe pedirlo antes de adaptar la conducta
+- si no hay fuente auditada suficiente para una pauta, no inventar dosis ni mostrar notas internas al usuario
 - criterios claros de alta, observación, ingreso, UCI o derivación
 - bibliografía textual al final o en zona de fuentes
 

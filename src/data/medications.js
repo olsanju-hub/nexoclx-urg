@@ -643,7 +643,7 @@ export const medicationCatalog = {
     renalAdjustment:
       'CIMA: contraindicado si el aclaramiento de creatinina es < 30 mL/min. Entre 30-50 mL/min obliga a reevaluar riesgo hemorrágico y puede motivar reducción.',
     hepaticAdjustment:
-      'No he podido extraer de forma fiable una pauta hepática cuantificada de la ficha CIMA consultada; debe revisarse la ficha completa si existe hepatopatía relevante antes de indicar el fármaco.',
+      'Si existe hepatopatía relevante, revisar función hepática, coagulopatía y riesgo hemorrágico antes de indicar el fármaco.',
     practicalNotes: [
       'La guía ESC 2024 prioriza ACOD frente a AVK salvo prótesis mecánica o estenosis mitral moderada/grave.',
       'Si se pauta, documentar siempre aclaramiento de creatinina previo.',

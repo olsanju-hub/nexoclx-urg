@@ -476,7 +476,7 @@ const ProtocolSpecialtyList = ({ groups, onModuleOpen }) => (
               key={module.id}
               title={module.title}
               meta={module.summary}
-              badge={!module.implemented ? <StatusBadge tone="pending">Pendiente</StatusBadge> : null}
+              badge={!module.implemented ? <StatusBadge tone="pending">Indexado</StatusBadge> : null}
               disabled={!module.implemented}
               onClick={() => onModuleOpen(module.id)}
             />
@@ -564,7 +564,7 @@ const SpecialtyAccordionList = ({
                     key={module.id}
                     title={module.title}
                     meta={module.summary}
-                    badge={!module.implemented ? <StatusBadge tone="pending">Pendiente</StatusBadge> : null}
+                    badge={!module.implemented ? <StatusBadge tone="pending">Indexado</StatusBadge> : null}
                     disabled={!module.implemented}
                     onClick={() => onModuleOpen(module.id)}
                   />
@@ -1588,6 +1588,7 @@ const InlineClinicalList = ({ items }) => (
 
 const GuardiaProtocolView = ({ protocol, onBack }) => {
   const guardia = protocol.guardia;
+  const treatmentItems = guardia.tratamientoItems ?? [];
 
   return (
     <div className={pageClass}>
@@ -1620,6 +1621,13 @@ const GuardiaProtocolView = ({ protocol, onBack }) => {
 
       <section className={`${panelClass} p-5 sm:p-6`}>
         <SectionTitle eyebrow="2" title="Tratamiento en Urgencias" />
+        {guardia.datosTratamiento ? (
+          <div className="mb-3">
+            <ProtocolGuideBlock label="Datos antes de tratar" tone="accent">
+              <InlineClinicalList items={guardia.datosTratamiento} />
+            </ProtocolGuideBlock>
+          </div>
+        ) : null}
         <div className="grid gap-3 lg:grid-cols-2">
           <ProtocolGuideBlock label="Tratamiento inicial" tone="warning">
             <p className="font-semibold text-[var(--text)]">{guardia.tratamiento}</p>
@@ -1628,6 +1636,15 @@ const GuardiaProtocolView = ({ protocol, onBack }) => {
             <InlineClinicalList items={guardia.manejo} />
           </ProtocolGuideBlock>
         </div>
+        {treatmentItems.length > 0 ? (
+          <div className="mt-3 grid gap-3 lg:grid-cols-3">
+            {treatmentItems.map((item) => (
+              <ProtocolGuideBlock key={item.title} label={item.title} tone={item.tone ?? 'neutral'}>
+                <InlineClinicalList items={item.items} />
+              </ProtocolGuideBlock>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className={`${panelClass} p-5 sm:p-6`}>

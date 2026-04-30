@@ -317,7 +317,7 @@ export const calculationAudit = [
     chapter: 'Cap. 5 · Bioquímica sanguínea',
     verifiedPage: 39,
     pdfPage: 64,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Se mantiene indexado, pero no es necesario todavía para el primer módulo.',
   },
   {
@@ -326,7 +326,7 @@ export const calculationAudit = [
     chapter: 'Cap. 8 · Gasometría, pulsioximetría y capnografía',
     verifiedPage: 66,
     pdfPage: 91,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Fórmula citada en la obra. Queda fuera del primer protocolo real.',
   },
   {
@@ -371,7 +371,7 @@ export const calculationAudit = [
     chapter: 'Cap. 26 · Síndrome coronario agudo',
     verifiedPage: 220,
     pdfPage: 245,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Tabla de riesgo isquémico explícita.',
   },
   {
@@ -380,7 +380,7 @@ export const calculationAudit = [
     chapter: 'Cap. 26 · Síndrome coronario agudo',
     verifiedPage: 220,
     pdfPage: 245,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Clasificación de gravedad usada en el mismo bloque clínico.',
   },
   {
@@ -390,7 +390,7 @@ export const calculationAudit = [
     verifiedPage: 261,
     pdfPage: 286,
     status: 'no aplicable por ahora',
-    note: 'Detectado en tabla, pendiente del módulo correspondiente.',
+    note: 'Detectado en tabla, indexado para el módulo correspondiente.',
   },
   {
     id: 'wells-tep',
@@ -417,7 +417,7 @@ export const calculationAudit = [
     verifiedPage: 329,
     pdfPage: 354,
     status: 'no aplicable por ahora',
-    note: 'Escala validada para HDA, pendiente de módulo específico.',
+    note: 'Escala validada para HDA, indexado para módulo específico.',
   },
   {
     id: 'alvarado',
@@ -425,7 +425,7 @@ export const calculationAudit = [
     chapter: 'Cap. 50 · Dolor abdominal agudo',
     verifiedPage: 349,
     pdfPage: 374,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Referida en el diagnóstico diferencial del abdomen agudo.',
   },
   {
@@ -434,7 +434,7 @@ export const calculationAudit = [
     chapter: 'Cap. 62 · Coma',
     verifiedPage: 429,
     pdfPage: 454,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Escala explícita para valoración del nivel de conciencia.',
   },
   {
@@ -443,7 +443,7 @@ export const calculationAudit = [
     chapter: 'Cap. 64 · Ictus',
     verifiedPage: 446,
     pdfPage: 471,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Tabla de valoración neurológica para ictus.',
   },
   {
@@ -452,7 +452,7 @@ export const calculationAudit = [
     chapter: 'Cap. 64 · Ictus',
     verifiedPage: 442,
     pdfPage: 467,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Se usa como criterio funcional en la selección terapéutica del ictus.',
   },
   {
@@ -461,7 +461,7 @@ export const calculationAudit = [
     chapter: 'Cap. 64 · Ictus',
     verifiedPage: 446,
     pdfPage: 471,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Escala extrahospitalaria de sospecha citada en la activación del Código Ictus.',
   },
   {
@@ -470,7 +470,7 @@ export const calculationAudit = [
     chapter: 'Cap. 107 · Sepsis',
     verifiedPage: 640,
     pdfPage: 665,
-    status: 'pendiente',
+    status: 'indexado',
     note: 'Se proponen ambas escalas para sospecha diagnóstica y valoración del riesgo.',
   },
 ];

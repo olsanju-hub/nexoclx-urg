@@ -446,7 +446,7 @@ export const motivoConsultaModules = [
     pdfPage: 186,
     status: 'auditado',
     implemented: false,
-    summary: 'Tema auditado. Protocolo operativo pendiente.',
+    summary: 'Tema auditado. Protocolo operativo no activo.',
     bibliography: [
       referenceEntry({
         id: 'icc-cap19',
@@ -468,7 +468,7 @@ export const motivoConsultaModules = [
     pdfPage: 1,
     status: 'auditado',
     implemented: false,
-    summary: 'Tema auditado. Protocolo independiente pendiente.',
+    summary: 'Tema auditado. Protocolo independiente no activo.',
     bibliography: [
       escTsvEntry({
         id: 'tsv-esc-module',
@@ -852,7 +852,7 @@ export const bibliographyBaseUsed = [
     title: bibliographyCatalog['esc-tsv-2019'].title,
     shortTitle: bibliographyCatalog['esc-tsv-2019'].shortTitle,
     status: 'activa · principal en TSV',
-    note: 'Guía principal actual para taquicardia supraventricular, pendiente de módulo independiente.',
+    note: 'Guía principal actual para taquicardia supraventricular; referencia indexada para módulo independiente.',
   },
   {
     id: 'esc-bradicardias-2021',
@@ -883,9 +883,9 @@ export const bibliographyBaseUsed = [
     note: 'Guía principal actualizada para neumonía: diagnóstico, lugar de cuidados, antibióticos, reevaluación y seguimiento.',
   },
   {
-    id: 'radiologia-pendiente',
+    id: 'radiologia-indexada',
     title: 'Bibliografía específica de radiología',
-    shortTitle: 'Radiología pendiente',
+    shortTitle: 'Radiología indexada',
     status: 'no disponible en workspace',
     note: 'No se ha detectado ningún nuevo archivo de radiología en el repositorio actual.',
   },
