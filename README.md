@@ -32,7 +32,7 @@ Principios actuales del proyecto:
 
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Especialidades` con acordeones por bloque clínico para evitar una lista plana interminable.
-- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `neumonía adquirida en la comunidad` y escenarios de dolor abdominal repartidos por especialidad.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `neumonía adquirida en la comunidad` y `dolor abdominal agudo` como entrada transversal con ramas por especialidad.
 - Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65` y `CURB-65`.
 - Fichas farmacológicas activas para FA, HTA, SCA, arritmias agudas e ictus enlazadas desde protocolo y desde `Medicamentos`.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
@@ -82,26 +82,41 @@ Principios actuales del proyecto:
 - `Bibliografía` no vive como texto suelto al final: cada módulo guarda referencias estructuradas.
 - `Plantillas` siguen una lógica paralela: estructura, fuente base y estado de desarrollo.
 
+### Criterio clínico global
+
+Todo protocolo debe funcionar como organigrama clínico de guardia, no como capítulo resumido.
+
+Estructura fija:
+
+1. Diagnóstico
+2. Tratamiento en Urgencias
+3. Seguimiento / destino
+
+Reglas:
+
+- frases cortas y pasos accionables
+- escalas solo si son usables dentro de la app y cambian conducta
+- dosis, vía, frecuencia y duración solo si están auditadas
+- si falta ficha farmacológica, dejarlo como pendiente y no inventar dosis
+- criterios claros de alta, observación, ingreso, UCI o derivación
+- bibliografía textual al final o en zona de fuentes
+
 ### Integración de la bibliografía en cada módulo
 
-Cada módulo puede enlazar una o varias referencias estructuradas. La app distingue:
+Cada módulo puede guardar una o varias referencias estructuradas. La app distingue:
 
 - `Página índice`: página declarada por el índice del libro
-- `Página real`: página verificada donde empieza de verdad el contenido útil
-- `Página PDF`: página física del archivo usada para `#page=`
+- `Página real`: página verificada donde empieza el contenido útil
 
 Cada referencia guarda:
 
 - `referenceId`
-- `filePath`
 - `indexPages`
 - `verifiedPages`
-- `pdfPages`
-- `href`
 - `internalId`
 - `note`
 
-La interfaz prioriza `verifiedPages` para mostrar la ubicación real del contenido y usa `pdfPages` solo para construir el enlace al PDF cuando hace falta.
+La interfaz muestra referencias textuales verificables. No abre PDFs ni muestra rutas internas.
 
 ## Estructura técnica actual
 
@@ -128,7 +143,6 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `src/data/bibliography.js`
   - catálogo bibliográfico
-  - generador de enlaces al PDF
   - estructura común para todas las referencias
 
 - `src/data/modules.js`
@@ -140,7 +154,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `src/data/protocols.js`
   - protocolos clínicos reales
-  - actualmente contiene `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico` e `ictus hemorrágico`
+  - contiene protocolos clínicos y entradas transversales operativas
 
 - `src/data/calculators.js`
   - catálogo de cálculos implementados
@@ -154,26 +168,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
   - auditoría y estructura de plantillas de imagen
   - primera plantilla en desarrollo: `RX tórax sistemática`
 
-- `public/biblio/urgencias-murillo-7ma.pdf`
-  - obra base activa auditada y enlazada por la app
-
-- `public/biblio/HTA 2024.pdf`
-  - guía principal actual para `HTA en urgencias`
-
-- `public/biblio/SCA 2023.pdf`
-  - guía principal actual para `IAM / síndrome coronario agudo`
-
-- `public/biblio/FA 2024.pdf`
-  - guía principal actual para `fibrilación auricular`
-
-- `public/biblio/TSV 2019.pdf`
-  - guía principal actual indexada para `TSV`
-
-- `public/biblio/est car 2021.pdf`
-  - documento principal actual indexado para `bradicardias`
-
-- `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf`
-  - documento principal actual indexado para `arritmias ventriculares`
+- La app no depende de una carpeta pública de PDFs para funcionar; mantiene bibliografía textual verificable.
 
 ## Índice funcional del proyecto
 
@@ -187,14 +182,14 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Bradicardias | Documento ESC 2021 | 1 | Creado | Guía interactiva de guardia para repercusión clínica, bradicardia sinusal / nodo, bloqueo AV y necesidad de estimulación. |
 | Arritmias ventriculares | Documento ESC 2022 | 1 | Creado | Guía interactiva de guardia para TV con pulso o sin pulso, TV monomorfa estable y torsades / TV polimórfica. |
 | Neumonía adquirida en la comunidad | NICE NG250 2025 + Cap. 42 | 300 | Creado | Flujo real para sospecha, diagnóstico, CRB/CURB-65, destino, antibiótico inicial, revisión IV a 48 h y seguimiento. |
-| Dolor epigástrico agudo | Cap. 50 | 340 | Creado | Vista de guardia para pancreatitis, úlcera/perforación, biliar alto y SCA simulador. |
-| Dolor en hipocondrio derecho | Cap. 50 | 340 | Creado | Vista de guardia para cólico biliar, colecistitis, colangitis, hepatitis y simuladores. |
-| Dolor en fosa iliaca izquierda | Cap. 50 | 340 | Creado | Vista de guardia para diverticulitis, colitis, estreñimiento complicado y simuladores. |
-| Dolor en fosa iliaca derecha | Cap. 50 | 340 | Creado | Vista de guardia quirúrgica para apendicitis y urgencias ginecológicas/urinarias asociadas. |
-| Dolor difuso / peritonismo | Cap. 50 | 340 | Creado | Vista de guardia para abdomen agudo, obstrucción, perforación, sepsis abdominal e isquemia. |
-| Dolor en flanco / cólico renal | Cap. 50 | 340 | Creado | Vista de guardia urológica para cólico renal, pielonefritis y criterios de complicación. |
-| Dolor pélvico ginecológico | Cap. 50 | 340 | Creado | Vista de guardia para embarazo ectópico, torsión, EPI y quiste complicado. |
-| Dolor abdominal vascular | Cap. 50 | 340 | Creado | Vista de guardia para dolor desproporcionado, isquemia mesentérica, aneurisma o disección. |
+| Dolor abdominal agudo | Cap. 50 | 340 | Creado | Entrada transversal de triaje: gravedad, localización y apertura de rama clínica por especialidad. |
+| Abdomen quirúrgico | Cap. 50 | 340 | Creado | Mini-protocolo de cirugía general para apendicitis, perforación, obstrucción, peritonitis y complicación. |
+| Hepatobiliar-pancreático | Cap. 50 | 340 | Creado | Mini-protocolo digestivo para cólico biliar, colecistitis, colangitis, hepatitis y pancreatitis. |
+| Dolor urinario | Cap. 50 | 340 | Creado | Mini-protocolo urológico para cólico renal, pielonefritis, ITU complicada, retención y prostatitis. |
+| Dolor ginecológico | Cap. 50 | 340 | Creado | Mini-protocolo ginecológico para ectópico, torsión, EPI, quiste complicado y gestación. |
+| Dolor vascular | Cap. 50 | 340 | Creado | Mini-protocolo vascular para isquemia mesentérica, aneurisma, disección y embolia visceral. |
+| Dolor infeccioso-digestivo | Cap. 50 | 340 | Creado | Mini-protocolo digestivo/infeccioso para gastroenteritis, colitis, diverticulitis y sepsis abdominal. |
+| Simuladores extraabdominales | Cap. 50 | 340 | Creado | Mini-protocolo transversal para SCA, neumonía basal, metabólico, zóster y patología testicular. |
 | Insuficiencia cardiaca | Cap. 19 | 161 | Solo indexado | Tema auditado para futura integración del protocolo de `ICC`. |
 | Taquicardia supraventricular | Guía ESC 2019 | 1 | Solo indexado | Referencia preparada para futuro módulo independiente de TSV. |
 | Shock | Cap. 18 | 154 | Solo indexado | Tema auditado, sin protocolo operativo. |
@@ -202,7 +197,6 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 | Ictus | Cap. 64 | 442 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Sepsis | Cap. 107 | 640 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Coma | Cap. 62 | 428 | Solo indexado | Tema auditado, sin protocolo operativo. |
-| Dolor abdominal agudo | Cap. 50 | 340 | Solo auditado | El protocolo único se retiró; el contenido queda dividido por escenarios y especialidad. |
 
 ### Cálculos / escalas
 
@@ -255,17 +249,16 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 ### Bibliografía base usada
 
-| Fuente | Ubicación | Estado | Observaciones |
-| --- | --- | --- | --- |
-| *Guía ESC 2024 sobre el manejo de la fibrilación auricular* | `public/biblio/FA 2024.pdf` | Activa · principal en FA | Referencia principal actual del protocolo de FA. |
-| *Guía ESC 2024 sobre el manejo de la presión arterial elevada y la hipertensión* | `public/biblio/HTA 2024.pdf` | Activa · principal en HTA | Referencia principal actual del protocolo de HTA en urgencias. |
-| *Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos* | `public/biblio/SCA 2023.pdf` | Activa · principal en IAM/SCA | Referencia principal actual del protocolo de IAM / SCA. |
-| *Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular* | `public/biblio/TSV 2019.pdf` | Activa · principal en TSV | Referencia principal actual para TSV, pendiente de módulo independiente. |
-| *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | `public/biblio/est car 2021.pdf` | Activa · principal en bradicardias | Referencia principal del módulo de `Bradicardias`. |
-| *Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita* | `public/biblio/ arritmias ventriculares y la prevención de la muerte cardiaca súbita 2022.pdf` | Activa · principal en arritmias ventriculares | Referencia principal del módulo de `Arritmias ventriculares`. |
-| *NICE NG250: Neumonía: diagnóstico y manejo* | `public/biblio/neumonia-nice-ng250-2025.pdf` | Activa · principal en neumonía | Referencia principal actualizada para diagnóstico, destino, antibiótico, reevaluación y seguimiento de NAC. |
-| *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | `public/biblio/urgencias-murillo-7ma.pdf` | Activa | Obra base auditada y usada por la app. |
-| Bibliografía específica de radiología | No detectada en este workspace | No disponible en workspace | Sigue pendiente de incorporación real al repositorio. |
+| Fuente | Estado | Observaciones |
+| --- | --- | --- |
+| *Guía ESC 2024 sobre el manejo de la fibrilación auricular* | Activa · principal en FA | Referencia textual principal del protocolo de FA. |
+| *Guía ESC 2024 sobre el manejo de la presión arterial elevada y la hipertensión* | Activa · principal en HTA | Referencia textual principal del protocolo de HTA en urgencias. |
+| *Guía ESC 2023 sobre el diagnóstico y tratamiento de los síndromes coronarios agudos* | Activa · principal en IAM/SCA | Referencia textual principal del protocolo de IAM / SCA. |
+| *Guía ESC 2019 sobre el tratamiento de pacientes con taquicardia supraventricular* | Activa · principal en TSV | Referencia textual actual para TSV, pendiente de módulo independiente. |
+| *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | Activa · principal en bradicardias | Referencia textual del módulo de `Bradicardias`. |
+| *Comentarios a la guía ESC 2022 sobre arritmias ventriculares y prevención de muerte súbita* | Activa · principal en arritmias ventriculares | Referencia textual del módulo de `Arritmias ventriculares`. |
+| *NICE NG250: Neumonía: diagnóstico y manejo* | Activa · principal en neumonía | Referencia textual actualizada para diagnóstico, destino, antibiótico, reevaluación y seguimiento de NAC. |
+| *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | Activa | Obra base textual auditada y usada por la app. |
 
 ## Índice clínico comprobado
 
@@ -273,11 +266,11 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 - `Página índice`: numeración mostrada en el índice del libro
 - `Página real`: numeración impresa verificada sobre el contenido real
-- `Página PDF`: página física del archivo para construir enlaces `#page=`
+- `Página PDF histórica`: dato interno de auditoría anterior; no se usa para enlazar PDFs en la app pública
 
 ### Patologías / temas auditados
 
-| Tema | Capítulo | Página índice | Página real verificada | Página PDF | Estado | Observaciones |
+| Tema | Capítulo | Página índice | Página real verificada | Página PDF histórica | Estado | Observaciones |
 | --- | --- | ---: | ---: | ---: | --- | --- |
 | Fibrilación y flúter auriculares | Cap. 23 | 184 | 185 | 210 | Implementado | El índice adelanta el capítulo una página; el arranque útil real está en p. 185. |
 | Soporte vital básico en adultos | Cap. 1 | 2 | 2 | 27 | Auditado | Sin discrepancia. |
@@ -301,6 +294,7 @@ La interfaz prioriza `verifiedPages` para mostrar la ubicación real del conteni
 
 | Fecha | Cambio realizado | Sección afectada | Breve explicación |
 | --- | --- | --- | --- |
+| 2026-04-30 | Triaje transversal y bibliografía textual | Protocolos / bibliografía | Dolor abdominal pasa a entrada transversal con ramas clínicas y la app deja de enlazar PDFs públicos. |
 | 2026-04-29 | Dolor abdominal dividido por especialidad | Protocolos / Digestivo / Cirugía / Urología / Ginecología / Vascular | Se retiró el mapa único y se sustituyó por protocolos breves de guardia: clínica, diagnóstico, pruebas, tratamiento, destino y seguimiento. |
 | 2026-04-28 | Protocolo de neumonía adquirida en la comunidad | Protocolos / bibliografía / cálculos | Se añadió NAC con NICE NG250 2025 como fuente principal actualizada, Murillo cap. 42 como base y CRB-65/CURB-65 para decisión de destino. |
 | 2026-04-24 | FA como guía principal y protocolos por especialidad | Protocolos / bibliografía / cálculos | Se indexó `ESC FA 2024`, se pasó FA a `CHA2DS2-VA`, se revisó el flujo clínico y se agrupó la lista de protocolos por especialidad. |

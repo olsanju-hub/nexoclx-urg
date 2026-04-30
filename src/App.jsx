@@ -2,7 +2,6 @@ import React, { startTransition, useDeferredValue, useEffect, useState } from 'r
 import {
   Activity,
   ArrowLeft,
-  BookOpen,
   Calculator,
   ChevronRight,
   ClipboardList,
@@ -14,7 +13,6 @@ import {
   Search,
   ShieldAlert,
 } from 'lucide-react';
-import { buildReferenceHref } from './data/bibliography';
 import {
   calculateCha2ds2Va,
   calculateCockcroftGault,
@@ -181,10 +179,6 @@ const getCalculatorResult = (calculatorId, values) => {
   }
 
   return null;
-};
-
-const openPdf = (href) => {
-  window.open(href, '_blank', 'noopener,noreferrer');
 };
 
 const updateNestedState = (setState, key, field, value) => {
@@ -501,7 +495,7 @@ const SpecialtySectionRows = ({ title, children }) => (
 );
 
 const SpecialtyReferenceRow = ({ entry }) => (
-  <a href={entry.href} target="_blank" rel="noreferrer" className="list-row">
+  <div className="list-row">
     <div className="min-w-0">
       <p className="text-sm font-semibold text-[var(--text)]">{entry.moduleTitle}</p>
       <p className="mt-1 text-xs text-[var(--text-muted)]">
@@ -509,8 +503,7 @@ const SpecialtyReferenceRow = ({ entry }) => (
         {entry.note ? ` · ${entry.note}` : ''}
       </p>
     </div>
-    <ExternalLink className="h-4 w-4 shrink-0 text-[var(--text-muted)]" />
-  </a>
+  </div>
 );
 
 const SearchField = ({ value, onChange, placeholder }) => (
@@ -685,25 +678,16 @@ const MedicationQuickRow = ({ medication, onOpen }) => (
 
 const BibliographyBlock = ({ entries }) => (
   <section className={`${panelClass} p-4 sm:p-5`}>
-    <SectionTitle title="Fuente" />
+    <SectionTitle title="Fuentes" note="Referencias textuales verificadas; la app no abre PDFs." />
     <div className="space-y-3">
       {entries.map((entry) => (
         <div key={entry.internalId} className={`${mutedPanelClass} p-4`}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[var(--text)]">{entry.shortReference}</p>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                Libro: p. {entry.verifiedPages.join(', ')}
-                {entry.pdfPages.length > 0 ? ` · PDF: p. ${entry.pdfPages.join(', ')}` : ''}
-              </p>
-              {entry.note ? <p className="mt-2 text-sm text-[var(--text-soft)]">{entry.note}</p> : null}
-            </div>
-            {entry.href ? (
-              <a href={entry.href} target="_blank" rel="noreferrer" className={subtleButtonClass}>
-                Abrir
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            ) : null}
+          <div>
+            <p className="text-sm font-semibold text-[var(--text)]">{entry.shortReference}</p>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              {entry.verifiedPages.length > 0 ? `Página verificada: ${entry.verifiedPages.join(', ')}` : 'Página no especificada'}
+            </p>
+            {entry.note ? <p className="mt-2 text-sm text-[var(--text-soft)]">{entry.note}</p> : null}
           </div>
         </div>
       ))}
@@ -714,7 +698,7 @@ const BibliographyBlock = ({ entries }) => (
 const SourceList = ({ sources }) => (
   <div className="space-y-2">
     {sources.map((source) => {
-      if (source.url) {
+      if (source.url && !source.url.toLowerCase().includes('.pdf')) {
         return (
           <a
             key={source.url}
@@ -734,17 +718,6 @@ const SourceList = ({ sources }) => (
           <p className="text-sm font-medium text-[var(--text)]">{source.label}</p>
           {source.bibliography?.note ? (
             <p className="mt-1 text-xs text-[var(--text-muted)]">{source.bibliography.note}</p>
-          ) : null}
-          {source.bibliography?.href ? (
-            <a
-              href={source.bibliography.href}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-[var(--accent-500)]"
-            >
-              Abrir referencia
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
           ) : null}
         </div>
       );
@@ -1375,19 +1348,13 @@ const FlowActionCard = ({ title, body, tone = 'neutral', children = null }) => {
   );
 };
 
-const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision, next, onBack, onOpenSource }) => (
+const FlowHeader = ({ eyebrow, title, step, totalSteps, steps, current, decision, next, onBack }) => (
   <section className={`${shellCardClass} p-4 sm:p-6`}>
     <div className="flex flex-wrap items-center justify-between gap-3">
       <button type="button" onClick={onBack} className={ghostButtonClass}>
         <ArrowLeft className="h-4 w-4" />
         Volver
       </button>
-      {onOpenSource ? (
-        <button type="button" onClick={onOpenSource} className={subtleButtonClass}>
-          <BookOpen className="h-4 w-4" />
-          Fuente
-        </button>
-      ) : null}
     </div>
 
     <div className="mt-4 flex flex-col gap-3 sm:mt-5 sm:gap-4 xl:flex-row xl:items-end xl:justify-between">
@@ -1491,8 +1458,6 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpe
 };
 
 const NeumoniaComunidadFlowView = ({ protocol, onCalculatorOpen, onBack }) => {
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('nice-ng250-2025');
-
   return (
     <div className={pageClass}>
       <FlowHeader
@@ -1505,7 +1470,6 @@ const NeumoniaComunidadFlowView = ({ protocol, onCalculatorOpen, onBack }) => {
         decision="CRB-65 fuera del hospital; CURB-65 en hospital; juicio clínico siempre"
         next="Revisar antibiótico IV a las 48 h y reevaluar si no mejora"
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       <section className={`${panelClass} p-5 sm:p-6`}>
@@ -1622,8 +1586,111 @@ const InlineClinicalList = ({ items }) => (
   </ul>
 );
 
+const DolorAbdominalTriageView = ({ protocol, onModuleOpen, onBack }) => {
+  const triage = protocol.triage;
+  const [alarms, setAlarms] = useState(() => Object.fromEntries(triage.severityChecks.map((check) => [check, false])));
+  const [selectedRegionId, setSelectedRegionId] = useState(triage.regions[0]?.id ?? '');
+  const selectedRegion = triage.regions.find((region) => region.id === selectedRegionId) ?? triage.regions[0];
+  const hasAlarm = Object.values(alarms).some(Boolean);
+
+  const updateAlarm = (check, value) => {
+    setAlarms((current) => ({ ...current, [check]: value }));
+  };
+
+  return (
+    <div className={pageClass}>
+      <FlowHeader
+        eyebrow="Entrada transversal"
+        title={protocol.longTitle ?? protocol.title}
+        step={hasAlarm ? 1 : 2}
+        totalSteps={4}
+        steps={['Gravedad', 'Localización', 'Rama', 'Destino']}
+        current="Descarta gravedad, localiza el dolor y deriva a la rama clínica"
+        decision={hasAlarm ? 'Alto riesgo: estabiliza y avisa pronto' : `Región: ${selectedRegion.label}`}
+        next="Abrir la rama concreta por especialidad"
+        onBack={onBack}
+      />
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle
+          eyebrow="Diagnóstico inicial"
+          title={triage.severityTitle}
+          note="Si marcas una alarma, el caso se maneja como alto riesgo antes de completar el mapa."
+          action={<StatusBadge tone={hasAlarm ? 'critical' : 'active'}>{hasAlarm ? 'Alto riesgo' : 'Sin alarma marcada'}</StatusBadge>}
+        />
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {triage.severityChecks.map((check) => (
+            <BooleanField key={check} checked={alarms[check]} label={check} onChange={(value) => updateAlarm(check, value)} />
+          ))}
+        </div>
+      </section>
+
+      {hasAlarm ? (
+        <section className={`${panelClass} p-5 sm:p-6`}>
+          <SectionTitle eyebrow="Alto riesgo" title="Actúa antes de elegir rama" />
+          <div className="grid gap-3 lg:grid-cols-2">
+            <ProtocolGuideBlock label="Conducta inmediata" tone="critical">
+              <InlineClinicalList items={triage.highRisk} />
+            </ProtocolGuideBlock>
+            <ProtocolGuideBlock label="Destino probable" tone="critical">
+              Valoración especializada urgente o críticos según contexto. No retrasar cirugía si hay peritonitis o inestabilidad.
+            </ProtocolGuideBlock>
+          </div>
+        </section>
+      ) : null}
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle eyebrow="Localización" title="Elige la región dominante" note="No se muestran todas las ramas a la vez: la región orienta la siguiente decisión." />
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {triage.regions.map((region) => (
+            <button
+              key={region.id}
+              type="button"
+              onClick={() => setSelectedRegionId(region.id)}
+              className={`choice-button min-h-[4.6rem] justify-center text-center ${selectedRegion.id === region.id ? 'choice-button-active' : ''}`}
+            >
+              {region.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <SectionTitle eyebrow="Rama sugerida" title={selectedRegion.label} note="Abre solo la rama que encaja con el paciente." />
+        <div className="grid gap-3 lg:grid-cols-3">
+          <ProtocolGuideBlock label="Sospechas principales" tone="accent">
+            <InlineClinicalList items={selectedRegion.suspects} />
+          </ProtocolGuideBlock>
+          <ProtocolGuideBlock label="Pruebas que cambian conducta">
+            <InlineClinicalList items={selectedRegion.tests} />
+          </ProtocolGuideBlock>
+          <ProtocolGuideBlock label="Tratamiento inicial común" tone="warning">
+            <InlineClinicalList items={triage.commonTreatment.slice(0, 5)} />
+          </ProtocolGuideBlock>
+        </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {selectedRegion.branches.map((branchId) => {
+            const branch = getProtocol(branchId);
+            return (
+              <button key={branchId} type="button" onClick={() => onModuleOpen(branchId)} className="list-row text-left">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[var(--text)]">{branch.title}</p>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">{branch.section}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)]" />
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-[var(--text-soft)]">{selectedRegion.destination}</p>
+      </section>
+
+      <BibliographyBlock entries={protocol.bibliography} />
+    </div>
+  );
+};
+
 const GuardiaProtocolView = ({ protocol, onBack }) => {
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('murillo7', protocol.pdfPage);
   const guardia = protocol.guardia;
 
   return (
@@ -1638,7 +1705,6 @@ const GuardiaProtocolView = ({ protocol, onBack }) => {
         decision={guardia.diagnostico}
         next={guardia.destino}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       <section className={`${panelClass} p-5 sm:p-6`}>
@@ -1689,6 +1755,8 @@ const GuardiaProtocolView = ({ protocol, onBack }) => {
           <InlineClinicalList items={guardia.seguimiento} />
         </div>
       </section>
+
+      <BibliographyBlock entries={protocol.bibliography} />
     </div>
   );
 };
@@ -1705,7 +1773,6 @@ const FibrilacionAuricularFlowView = ({
   onBack,
   onFinish,
 }) => {
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('esc-fa-2024');
   const {
     step,
     stability,
@@ -1759,7 +1826,6 @@ const FibrilacionAuricularFlowView = ({
         decision={flowFocus.decision}
         next={flowFocus.next}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
@@ -2100,7 +2166,6 @@ const HipertensionUrgenciasFlowView = ({
   onBack,
   onFinish,
 }) => {
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('murillo7', protocol.pdfPage);
   const { step, pas, pad, hasTargetOrganDamage } = htaFlowState;
   const systolic = Number(pas);
   const diastolic = Number(pad);
@@ -2149,7 +2214,6 @@ const HipertensionUrgenciasFlowView = ({
         decision={flowFocus.decision}
         next={flowFocus.next}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
@@ -2362,7 +2426,6 @@ const SindromeCoronarioAgudoFlowView = ({
   onBack,
   onFinish,
 }) => {
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('murillo7', protocol.pdfPage);
   const { step, stability, syndromeType, stemiScenario, nsteacsRisk } = scaFlowState;
   const flowFocus = getScaFlowFocus({ step, syndromeType, stability, stemiScenario, nsteacsRisk });
 
@@ -2451,7 +2514,6 @@ const SindromeCoronarioAgudoFlowView = ({
         decision={flowFocus.decision}
         next={flowFocus.next}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
@@ -2795,8 +2857,6 @@ const BradicardiasFlowView = ({
   const isUnstable = shock || syncope || ischemia || heartFailure;
   const hasAsystoleRisk = recentAsystole || mobitzTwo || completeBlockBroad || ventricularPause;
   const flowFocus = getBradycardiaFlowFocus({ step, isUnstable, bradyPattern, hasAsystoleRisk });
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('esc-bradicardias-2021');
-
   const updateFlow = (changes) => {
     onBradycardiaFlowChange(changes);
   };
@@ -2813,7 +2873,6 @@ const BradicardiasFlowView = ({
         decision={flowFocus.decision}
         next={flowFocus.next}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
@@ -3027,8 +3086,6 @@ const ArritmiasVentricularesFlowView = ({
   const { step, hasPulse, shock, syncope, ischemia, heartFailure, ventricularPattern } = ventricularArrhythmiaFlowState;
   const isUnstable = shock || syncope || ischemia || heartFailure;
   const flowFocus = getVentricularArrhythmiaFlowFocus({ step, hasPulse, isUnstable, ventricularPattern });
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('esc-arritmias-ventriculares-2022');
-
   const updateFlow = (changes) => {
     onVentricularArrhythmiaFlowChange(changes);
   };
@@ -3045,7 +3102,6 @@ const ArritmiasVentricularesFlowView = ({
         decision={flowFocus.decision}
         next={flowFocus.next}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
@@ -3290,7 +3346,6 @@ const IctusIsquemicoFlowView = ({
 }) => {
   const { step, lastKnownWell, ctWithoutBleed, thrombolysisContraindication, largeVesselOcclusion } = ischemicStrokeFlowState;
   const flowFocus = getIschemicStrokeFlowFocus({ step, lastKnownWell, ctWithoutBleed, largeVesselOcclusion });
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('aha-ictus-isquemico-2026');
   const inThrombolysisWindow = lastKnownWell === 'lt4h30';
   const inThrombectomyWindow = lastKnownWell === 'lt4h30' || lastKnownWell === '4h30-24h';
   const isThrombolysisCandidate = ctWithoutBleed === true && inThrombolysisWindow && thrombolysisContraindication === false;
@@ -3312,7 +3367,6 @@ const IctusIsquemicoFlowView = ({
         decision={flowFocus.decision}
         next={flowFocus.next}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
@@ -3541,8 +3595,6 @@ const IctusHemorragicoFlowView = ({
 }) => {
   const { step, airwayCompromise, anticoagulated, systolicBand, massEffectOrHydrocephalus } = hemorrhagicStrokeFlowState;
   const flowFocus = getHemorrhagicStrokeFlowFocus({ step, airwayCompromise, anticoagulated, massEffectOrHydrocephalus });
-  const referenceHref = protocol.bibliography[0]?.href ?? buildReferenceHref('aha-ictus-hemorragico-2022');
-
   const updateFlow = (changes) => {
     onHemorrhagicStrokeFlowChange(changes);
   };
@@ -3566,7 +3618,6 @@ const IctusHemorragicoFlowView = ({
         decision={flowFocus.decision}
         next={flowFocus.next}
         onBack={onBack}
-        onOpenSource={referenceHref ? () => openPdf(referenceHref) : null}
       />
 
       {step === 1 ? (
@@ -4248,6 +4299,16 @@ const App = () => {
           <NeumoniaComunidadFlowView
             protocol={getProtocol(protocolId)}
             onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
+            onBack={handleBack}
+          />
+        );
+      }
+
+      if (protocolId === 'dolor-abdominal-agudo') {
+        return (
+          <DolorAbdominalTriageView
+            protocol={getProtocol(protocolId)}
+            onModuleOpen={(moduleId) => openModule(moduleId, protocolReturnTo)}
             onBack={handleBack}
           />
         );
