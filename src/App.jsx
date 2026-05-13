@@ -1409,7 +1409,7 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
         />
       </PageHero>
 
-      <ClinicalFlowTree protocol={demoFlow} />
+      <ClinicalFlowTree protocol={demoFlow} onCalculatorOpen={onCalculatorOpen} />
 
       {specialtyCollections.length > 0 ? (
         <SpecialtyAccordionList
@@ -1422,6 +1422,17 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
       ) : (
         <EmptySearchState query={deferredSearchQuery} />
       )}
+    </div>
+  );
+};
+
+const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen }) => {
+  const flow = getProtocolFlow(protocolId);
+
+  return (
+    <div className={pageClass}>
+      <BackBar label="Protocolos" onClick={onBack} />
+      <ClinicalFlowTree protocol={flow} onCalculatorOpen={onCalculatorOpen} />
     </div>
   );
 };
@@ -4070,130 +4081,11 @@ const App = () => {
         protocolId,
       };
 
-      if (protocolId === 'hta-urgencias') {
-        return (
-          <HipertensionUrgenciasFlowView
-            protocol={getProtocol(protocolId)}
-            htaFlowState={htaFlowState}
-            onHtaFlowChange={updateHtaFlow}
-            onHtaFlowReset={resetHtaFlow}
-            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
-            onMedicationsHub={() => openMedications(protocolReturnTo)}
-            onBack={handleBack}
-            onFinish={() => {
-              resetHtaFlow();
-              navigate({ view: 'home' });
-            }}
-          />
-        );
-      }
-
-      if (protocolId === 'sindrome-coronario-agudo') {
-        return (
-          <SindromeCoronarioAgudoFlowView
-            protocol={getProtocol(protocolId)}
-            scaFlowState={scaFlowState}
-            onScaFlowChange={updateScaFlow}
-            onScaFlowReset={resetScaFlow}
-            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
-            onMedicationsHub={() => openMedications(protocolReturnTo)}
-            onBack={handleBack}
-            onFinish={() => {
-              resetScaFlow();
-              navigate({ view: 'home' });
-            }}
-          />
-        );
-      }
-
-      if (protocolId === 'bradicardias') {
-        return (
-          <BradicardiasFlowView
-            protocol={getProtocol(protocolId)}
-            bradycardiaFlowState={bradycardiaFlowState}
-            onBradycardiaFlowChange={updateBradycardiaFlow}
-            onBradycardiaFlowReset={resetBradycardiaFlow}
-            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
-            onBack={handleBack}
-          />
-        );
-      }
-
-      if (protocolId === 'arritmias-ventriculares') {
-        return (
-          <ArritmiasVentricularesFlowView
-            protocol={getProtocol(protocolId)}
-            ventricularArrhythmiaFlowState={ventricularArrhythmiaFlowState}
-            onVentricularArrhythmiaFlowChange={updateVentricularArrhythmiaFlow}
-            onVentricularArrhythmiaFlowReset={resetVentricularArrhythmiaFlow}
-            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
-            onBack={handleBack}
-          />
-        );
-      }
-
-      if (protocolId === 'ictus-isquemico') {
-        return (
-          <IctusIsquemicoFlowView
-            protocol={getProtocol(protocolId)}
-            ischemicStrokeFlowState={ischemicStrokeFlowState}
-            onIschemicStrokeFlowChange={updateIschemicStrokeFlow}
-            onIschemicStrokeFlowReset={resetIschemicStrokeFlow}
-            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
-            onModuleOpen={(moduleId) => openModule(moduleId, protocolReturnTo)}
-            onBack={handleBack}
-          />
-        );
-      }
-
-      if (protocolId === 'ictus-hemorragico') {
-        return (
-          <IctusHemorragicoFlowView
-            protocol={getProtocol(protocolId)}
-            hemorrhagicStrokeFlowState={hemorrhagicStrokeFlowState}
-            onHemorrhagicStrokeFlowChange={updateHemorrhagicStrokeFlow}
-            onHemorrhagicStrokeFlowReset={resetHemorrhagicStrokeFlow}
-            onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
-            onBack={handleBack}
-          />
-        );
-      }
-
-      if (protocolId === 'neumonia-comunidad') {
-        return (
-          <NeumoniaComunidadFlowView
-            protocol={getProtocol(protocolId)}
-            onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
-            onBack={handleBack}
-          />
-        );
-      }
-
-
-      if (getProtocol(protocolId).guardia) {
-        return (
-          <GuardiaProtocolView
-            protocol={getProtocol(protocolId)}
-            onBack={handleBack}
-          />
-        );
-      }
-
       return (
-        <FibrilacionAuricularFlowView
-          protocol={getProtocol(protocolId)}
-          faFlowState={faFlowState}
-          onFaFlowChange={updateFaFlow}
-          onFaFlowReset={resetFaFlow}
-          onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
-          onCalculationsHub={() => openCalculations(protocolReturnTo)}
-          onMedicationOpen={(medicationId) => openMedication(medicationId, protocolReturnTo)}
-          onMedicationsHub={() => openMedications(protocolReturnTo)}
+        <ClinicalProtocolFlowView
+          protocolId={protocolId}
           onBack={handleBack}
-          onFinish={() => {
-            resetFaFlow();
-            navigate({ view: 'home' });
-          }}
+          onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
         />
       );
     }

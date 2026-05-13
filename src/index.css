@@ -819,6 +819,18 @@
     font-weight: 650;
   }
 
+  .flow-node-action-button {
+    display: inline-flex;
+    min-height: 2.65rem;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(15, 75, 90, 0.18);
+    background: rgba(15, 75, 90, 0.08);
+    color: #0f4b5a;
+    text-align: center;
+  }
+
   .flow-node-list {
     margin: 0.62rem 0 0;
     padding-left: 0.95rem;

@@ -36,7 +36,7 @@ const TypeIcon = ({ type }) => {
   return <ClipboardList className="h-3.5 w-3.5" />;
 };
 
-const FlowNode = ({ node, depth = 0 }) => {
+const FlowNode = ({ node, depth = 0, onCalculatorOpen }) => {
   const [open, setOpen] = useState(() => getInitialNodeOpen(node));
   const hasChildren = Boolean(node.children?.length);
   const hasBody = Boolean(node.summary || node.items?.length || node.references?.length || node.action || node.calculatorId || node.medication);
@@ -80,10 +80,12 @@ const FlowNode = ({ node, depth = 0 }) => {
             </ul>
           ) : null}
           {node.medication ? <p className="flow-node-callout">{node.medication}</p> : null}
-          {node.calculatorId || node.action ? (
-            <p className="flow-node-action">
-              {node.action ?? `Calculadora: ${node.calculatorId}`}
-            </p>
+          {node.calculatorId ? (
+            <button type="button" className="flow-node-action flow-node-action-button" onClick={() => onCalculatorOpen?.(node.calculatorId)}>
+              {node.action ?? `Calcular ${node.calculatorId}`}
+            </button>
+          ) : node.action ? (
+            <p className="flow-node-action">{node.action}</p>
           ) : null}
           {node.references?.length ? (
             <ul className="flow-node-list flow-node-references">
@@ -95,7 +97,7 @@ const FlowNode = ({ node, depth = 0 }) => {
           {hasChildren ? (
             <div className="flow-node-children">
               {node.children.map((child) => (
-                <FlowNode key={child.id} node={child} depth={depth + 1} />
+                <FlowNode key={child.id} node={child} depth={depth + 1} onCalculatorOpen={onCalculatorOpen} />
               ))}
             </div>
           ) : null}
@@ -105,7 +107,7 @@ const FlowNode = ({ node, depth = 0 }) => {
   );
 };
 
-const FlowSection = ({ section }) => {
+const FlowSection = ({ section, onCalculatorOpen }) => {
   const [open, setOpen] = useState(section.initiallyOpen !== false);
 
   return (
@@ -120,7 +122,7 @@ const FlowSection = ({ section }) => {
       {open ? (
         <div className="flow-section-body">
           {section.children?.map((node) => (
-            <FlowNode key={node.id} node={node} />
+            <FlowNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} />
           ))}
         </div>
       ) : null}
@@ -128,7 +130,7 @@ const FlowSection = ({ section }) => {
   );
 };
 
-export const ClinicalFlowTree = ({ protocol }) => {
+export const ClinicalFlowTree = ({ protocol, onCalculatorOpen }) => {
   const mainSections = protocol.sections.slice(0, 3);
 
   return (
@@ -154,7 +156,7 @@ export const ClinicalFlowTree = ({ protocol }) => {
       </nav>
       <div className="flow-sections">
         {protocol.sections.map((section) => (
-          <FlowSection key={section.id} section={section} />
+          <FlowSection key={section.id} section={section} onCalculatorOpen={onCalculatorOpen} />
         ))}
       </div>
     </div>

@@ -1,6 +1,26 @@
-import { getProtocol } from './protocols';
+import { getCalculator } from './calculators';
+import { getMedication } from './medications';
+import { protocolList } from './protocols';
 
-const pneumoniaProtocol = getProtocol('neumonia-comunidad');
+const PRIMARY_SECTION_TITLES = {
+  diagnosis: 'Diagnóstico / Pruebas Dx',
+  treatment: 'Tratamiento',
+  followUp: 'Seguimiento / destino',
+};
+
+const slugify = (value = '') =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+const asArray = (value) => (Array.isArray(value) ? value.filter(Boolean) : value ? [value] : []);
+
+const compactText = (value = '') => String(value).replace(/\s+/g, ' ').trim();
+
+const firstSentence = (value = '') => compactText(value).split('. ')[0]?.replace(/\.$/, '') ?? '';
 
 const asReferenceItems = (entries = []) =>
   entries.map((entry) => {
@@ -8,133 +28,440 @@ const asReferenceItems = (entries = []) =>
     return `${entry.shortReference}${pages}. ${entry.note ?? ''}`.trim();
   });
 
-export const protocolFlowCatalog = {
-  'neumonia-comunidad': {
-    id: 'neumonia-comunidad',
-    title: pneumoniaProtocol.longTitle ?? pneumoniaProtocol.title,
-    specialty: pneumoniaProtocol.section,
-    summary: pneumoniaProtocol.summary,
+const medicationDetailItems = (medication) =>
+  [
+    `Fármaco: ${medication.name}`,
+    medication.contextDose || medication.dose ? `Dosis: ${medication.contextDose ?? medication.dose}` : null,
+    medication.contextRoute || medication.route ? `Vía: ${medication.contextRoute ?? medication.route}` : null,
+    medication.contextFrequency || medication.frequency ? `Frecuencia: ${medication.contextFrequency ?? medication.frequency}` : null,
+    medication.followUpPlan || medication.duration ? `Duración/plan: ${medication.followUpPlan ?? medication.duration}` : null,
+    medication.contraindications?.length ? `Evitar: ${medication.contraindications.slice(0, 2).join(' ')}` : null,
+    medication.renalAdjustment ? `Ajuste renal: ${medication.renalAdjustment}` : null,
+    medication.hepaticAdjustment ? `Ajuste hepático: ${medication.hepaticAdjustment}` : null,
+  ].filter(Boolean);
+
+const medicationNode = (medicationId) => {
+  const medication = getMedication(medicationId);
+
+  return {
+    id: `med-${medication.id}`,
+    title: medication.name,
+    type: 'treatment',
+    summary: medication.contextUse ?? medication.indication,
+    items: medicationDetailItems(medication),
+    medication: medication.family,
+  };
+};
+
+const calculatorNode = (calculatorId) => {
+  const calculator = getCalculator(calculatorId);
+
+  return {
+    id: `calc-${calculatorId}`,
+    title: calculator.title,
+    type: 'calculator',
+    summary: calculator.summary,
+    calculatorId,
+    action: `Calcular ${calculator.title}`,
+  };
+};
+
+const referencesSection = (protocol) => ({
+  id: 'bibliografia',
+  title: 'Bibliografía textual',
+  type: 'references',
+  children: [
+    {
+      id: 'fuentes',
+      title: 'Fuentes usadas',
+      type: 'references',
+      references: asReferenceItems(protocol.bibliography),
+    },
+  ],
+});
+
+const diagnosisSection = (protocol) => ({
+  id: 'diagnostico',
+  title: PRIMARY_SECTION_TITLES.diagnosis,
+  type: 'section',
+  initiallyOpen: true,
+  children: [
+    {
+      id: 'entrada',
+      title: 'Entrada rápida',
+      type: 'step',
+      summary: protocol.summary,
+      items: asArray(protocol.quickChecks),
+      severity: 'info',
+      initiallyOpen: true,
+    },
+    ...(protocol.calculatorIds?.length
+      ? [
+          {
+            id: 'calculos-diagnosticos',
+            title: 'Escalas / calculadoras',
+            type: 'scale',
+            summary: 'Usar solo cuando cambia la conducta.',
+            children: protocol.calculatorIds.map(calculatorNode),
+          },
+        ]
+      : []),
+  ],
+});
+
+const decisionNodes = (protocol) =>
+  asArray(protocol.decisionCards).map((card) => ({
+    id: card.id ?? slugify(card.situation),
+    title: card.situation,
+    type: card.id?.includes('destino') ? 'decision' : 'step',
+    summary: card.action,
+    items: asArray(card.nuance),
+    severity: card.id?.includes('inestable') || card.id?.includes('critical') || card.id?.includes('unstable') ? 'danger' : 'info',
+  }));
+
+const genericTreatmentSection = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+  const calculators = asArray(protocol.calculatorIds);
+  const primaryCareGroup =
+    protocol.id === 'hta-urgencias' ? medicationGroups.find((group) => group.title === 'Urgencia hipertensiva') : null;
+
+  return {
+    id: 'tratamiento',
+    title: PRIMARY_SECTION_TITLES.treatment,
+    type: 'section',
+    initiallyOpen: true,
+    children: [
+      {
+        id: 'tratamiento-urgencias',
+        title: 'Tratamiento en Urgencias',
+        type: 'treatment',
+        summary: firstSentence(protocol.summary),
+        children: [
+          ...decisionNodes(protocol),
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            type: 'treatment',
+            summary: 'Pauta concreta auditada dentro del protocolo.',
+            children: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      ...(primaryCareGroup
+        ? [
+            {
+              id: 'tratamiento-ap',
+              title: 'Tratamiento en Atención Primaria',
+              type: 'treatment',
+              summary: 'Solo si no hay daño agudo de órgano diana y el paciente permite manejo ambulatorio.',
+              children: [
+                ...asArray(primaryCareGroup.medicationIds).map(medicationNode),
+                {
+                  id: 'reevaluar-derivar',
+                  title: 'Reevaluar / derivar',
+                  type: 'decision',
+                  summary: 'Derivar si aparece daño de órgano diana, clínica de alarma, embarazo, mala respuesta o necesidad de vía IV.',
+                  severity: 'warning',
+                },
+              ],
+            },
+          ]
+        : []),
+      ...(calculators.length
+        ? [
+            {
+              id: 'calculos-tratamiento',
+              title: 'Cálculos que cambian tratamiento',
+              type: 'calculator',
+              summary: 'Abrir la calculadora concreta desde el nodo.',
+              children: calculators.map(calculatorNode),
+            },
+          ]
+        : []),
+      ...(protocol.warnings?.length
+        ? [
+            {
+              id: 'seguridad',
+              title: 'Seguridad',
+              type: 'alert',
+              severity: 'warning',
+              items: protocol.warnings,
+            },
+          ]
+        : []),
+    ],
+  };
+};
+
+const genericFollowUpSection = (protocol) => ({
+  id: 'seguimiento',
+  title: PRIMARY_SECTION_TITLES.followUp,
+  type: 'section',
+  initiallyOpen: true,
+  children: [
+    {
+      id: 'destino',
+      title: 'Destino',
+      type: 'decision',
+      summary: 'Definir alta, observación, ingreso o unidad monitorizada según gravedad y respuesta.',
+      items: [
+        ...asArray(protocol.quickSummary).map((item) => `${item.title}: ${item.action}`),
+        ...asArray(protocol.warnings).slice(0, 2),
+      ],
+      severity: 'success',
+    },
+  ],
+});
+
+const pneumoniaTreatmentSection = (protocol) => ({
+  id: 'tratamiento',
+  title: PRIMARY_SECTION_TITLES.treatment,
+  type: 'section',
+  initiallyOpen: true,
+  children: [
+    {
+      id: 'tratamiento-urgencias',
+      title: 'Tratamiento en Urgencias',
+      type: 'treatment',
+      summary: 'Elegir antibiótico por gravedad y revisar seguridad antes de prescribir.',
+      children: [
+        {
+          id: 'seguridad-antibiotico',
+          title: 'Antes de prescribir',
+          type: 'alert',
+          severity: 'warning',
+          items: [protocol.warnings[0]],
+          initiallyOpen: true,
+        },
+        ...protocol.antibioticPlan.map((item) => ({
+          id: slugify(item.severity),
+          title: item.severity,
+          type: 'treatment',
+          summary: item.regimen,
+        })),
+      ],
+    },
+    {
+      id: 'tratamiento-ap',
+      title: 'Tratamiento en Atención Primaria',
+      type: 'treatment',
+      summary: 'Aplicar solo en bajo riesgo con estabilidad y tolerancia oral.',
+      items: [
+        protocol.antibioticPlan[0]?.regimen,
+        'Reevaluar/derivar: si empeora, no mejora en 72 h, disnea, fiebre persistente, confusión, intolerancia oral o deterioro general.',
+      ].filter(Boolean),
+      severity: 'success',
+    },
+  ],
+});
+
+const pneumoniaFollowUpSection = (protocol) => ({
+  id: 'seguimiento',
+  title: PRIMARY_SECTION_TITLES.followUp,
+  type: 'section',
+  initiallyOpen: true,
+  children: [
+    {
+      id: 'destino',
+      title: 'Decisión de destino',
+      type: 'decision',
+      summary: protocol.decisionCards[3]?.action,
+      items: [protocol.decisionCards[3]?.nuance].filter(Boolean),
+      children: protocol.carePath.map((item) => ({
+        id: slugify(item.title),
+        title: item.title,
+        type: item.title.includes('UCI') ? 'alert' : 'decision',
+        summary: item.text,
+        severity: item.title.includes('UCI') ? 'danger' : item.title.includes('Bajo') ? 'success' : 'info',
+      })),
+    },
+    {
+      id: 'alta-segura',
+      title: 'Alta segura',
+      type: 'decision',
+      severity: 'success',
+      items: protocol.noDischargeCriteria,
+    },
+    {
+      id: 'seguimiento',
+      title: 'Seguimiento',
+      type: 'step',
+      items: protocol.reassessment,
+    },
+  ],
+});
+
+const buildPneumoniaFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: protocol.summary,
+  sections: [
+    {
+      ...diagnosisSection(protocol),
+      children: [
+        ...diagnosisSection(protocol).children,
+        {
+          id: 'gravedad',
+          title: 'CRB-65 / CURB-65',
+          type: 'scale',
+          summary: protocol.decisionCards[2]?.action,
+          items: [protocol.decisionCards[2]?.nuance].filter(Boolean),
+          children: protocol.calculatorIds.map(calculatorNode),
+        },
+      ],
+    },
+    pneumoniaTreatmentSection(protocol),
+    pneumoniaFollowUpSection(protocol),
+    referencesSection(protocol),
+  ],
+});
+
+const guardiaFlow = (protocol) => {
+  const guardia = protocol.guardia;
+
+  return {
+    id: protocol.id,
+    title: protocol.longTitle ?? protocol.title,
+    specialty: protocol.section,
+    summary: protocol.summary,
     sections: [
       {
         id: 'diagnostico',
-        title: 'Diagnostico / Pruebas Dx',
+        title: PRIMARY_SECTION_TITLES.diagnosis,
         type: 'section',
         initiallyOpen: true,
         children: [
           {
-            id: 'sospecha',
-            title: 'Sospecha y entrada',
+            id: 'clinica',
+            title: 'Clínica',
             type: 'step',
-            summary: pneumoniaProtocol.decisionCards[0].action,
-            items: [
-              pneumoniaProtocol.decisionCards[0].nuance,
-              ...pneumoniaProtocol.quickChecks.slice(0, 3),
-            ],
+            summary: guardia.clinica,
             severity: 'warning',
-            initiallyOpen: true,
           },
           {
-            id: 'confirmacion',
-            title: 'Confirmacion diagnostica',
+            id: 'diagnostico',
+            title: 'Diagnóstico',
             type: 'decision',
-            summary: pneumoniaProtocol.decisionCards[1].action,
-            items: [pneumoniaProtocol.decisionCards[1].nuance],
-            initiallyOpen: true,
+            summary: guardia.diagnostico,
           },
           {
-            id: 'gravedad',
-            title: 'Gravedad',
-            type: 'scale',
-            summary: pneumoniaProtocol.decisionCards[2].action,
-            items: [pneumoniaProtocol.decisionCards[2].nuance],
-            calculatorId: 'crb-65',
-            action: 'Abrir CRB-65 / CURB-65 desde Calculos',
+            id: 'pruebas',
+            title: 'Pruebas',
+            type: 'step',
+            items: guardia.pruebas,
           },
         ],
       },
       {
         id: 'tratamiento',
-        title: 'Tratamiento en Urgencias',
+        title: PRIMARY_SECTION_TITLES.treatment,
         type: 'section',
         initiallyOpen: true,
         children: [
           {
-            id: 'seguridad-antibiotico',
-            title: 'Antes de prescribir',
-            type: 'alert',
-            severity: 'warning',
-            items: [pneumoniaProtocol.warnings[0]],
-            initiallyOpen: true,
-          },
-          ...pneumoniaProtocol.antibioticPlan.map((item) => ({
-            id: item.severity.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            title: item.severity,
+            id: 'tratamiento-urgencias',
+            title: 'Tratamiento en Urgencias',
             type: 'treatment',
-            summary: item.regimen,
-            medication: 'Antibiotico segun escenario clinico auditado en el protocolo NAC',
-          })),
-          {
-            id: 'reevaluacion-iv',
-            title: 'Reevaluacion',
-            type: 'step',
-            items: pneumoniaProtocol.reassessment.slice(0, 3),
-            severity: 'info',
+            summary: guardia.tratamiento,
+            children: [
+              ...(guardia.datosTratamiento
+                ? [
+                    {
+                      id: 'datos',
+                      title: 'Datos antes de tratar',
+                      type: 'step',
+                      items: guardia.datosTratamiento,
+                      severity: 'warning',
+                    },
+                  ]
+                : []),
+              ...asArray(guardia.tratamientoItems).map((item) => ({
+                id: slugify(item.title),
+                title: item.title,
+                type: 'treatment',
+                items: item.items,
+                severity: item.tone === 'critical' ? 'danger' : item.tone === 'warning' ? 'warning' : 'info',
+              })),
+            ],
           },
         ],
       },
       {
         id: 'seguimiento',
-        title: 'Seguimiento / destino',
+        title: PRIMARY_SECTION_TITLES.followUp,
         type: 'section',
         initiallyOpen: true,
         children: [
           {
-            id: 'destino',
-            title: 'Decision de destino',
-            type: 'decision',
-            summary: pneumoniaProtocol.decisionCards[3].action,
-            items: [pneumoniaProtocol.decisionCards[3].nuance],
-            severity: 'info',
-            initiallyOpen: true,
-            children: pneumoniaProtocol.carePath.map((item) => ({
-              id: item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              title: item.title,
-              type: item.title.includes('UCI') ? 'alert' : 'decision',
-              summary: item.text,
-              severity: item.title.includes('UCI') ? 'danger' : item.title.includes('Bajo') ? 'success' : 'info',
-            })),
+            id: 'alarmas',
+            title: 'Alarmas',
+            type: 'alert',
+            severity: 'danger',
+            items: guardia.alertas,
           },
           {
-            id: 'alta-segura',
-            title: 'Alta segura',
+            id: 'destino',
+            title: 'Destino',
             type: 'decision',
+            summary: guardia.destino,
+            items: guardia.destinoItems,
             severity: 'success',
-            items: pneumoniaProtocol.noDischargeCriteria,
           },
           {
             id: 'seguimiento',
             title: 'Seguimiento',
             type: 'step',
-            items: pneumoniaProtocol.reassessment.slice(3),
+            items: guardia.seguimiento,
           },
+          ...(guardia.simuladores
+            ? [
+                {
+                  id: 'simuladores',
+                  title: 'Simuladores extraabdominales',
+                  type: 'alert',
+                  severity: 'warning',
+                  items: guardia.simuladores,
+                },
+              ]
+            : []),
         ],
       },
-      {
-        id: 'bibliografia',
-        title: 'Bibliografia textual',
-        type: 'references',
-        children: [
-          {
-            id: 'fuentes',
-            title: 'Fuentes usadas',
-            type: 'references',
-            references: asReferenceItems(pneumoniaProtocol.bibliography),
-          },
-        ],
-      },
+      referencesSection(protocol),
     ],
-  },
+  };
 };
+
+const genericFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: protocol.summary,
+  sections: [
+    diagnosisSection(protocol),
+    genericTreatmentSection(protocol),
+    genericFollowUpSection(protocol),
+    referencesSection(protocol),
+  ],
+});
+
+const buildFlow = (protocol) => {
+  if (protocol.id === 'neumonia-comunidad') {
+    return buildPneumoniaFlow(protocol);
+  }
+
+  if (protocol.guardia) {
+    return guardiaFlow(protocol);
+  }
+
+  return genericFlow(protocol);
+};
+
+export const protocolFlowCatalog = Object.fromEntries(
+  protocolList
+    .filter((protocol) => protocol.status === 'implementado')
+    .map((protocol) => [protocol.id, buildFlow(protocol)]),
+);
 
 export const protocolFlowList = Object.values(protocolFlowCatalog);
 
