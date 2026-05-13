@@ -20,7 +20,10 @@ const typeLabels = {
 };
 
 const getInitialNodeOpen = (node) =>
-  Boolean(node.initiallyOpen && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches);
+  Boolean(
+    node.initiallyOpenMobile ||
+      (node.initiallyOpen && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches),
+  );
 
 const getPreview = (node) => {
   const source = node.summary ?? node.items?.[0] ?? node.references?.[0] ?? node.action ?? node.medication ?? '';

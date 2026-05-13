@@ -4,7 +4,7 @@ import { protocolList } from './protocols';
 
 const PRIMARY_SECTION_TITLES = {
   diagnosis: 'Diagnóstico / Pruebas Dx',
-  treatment: 'Tratamiento',
+  treatment: 'Tratamiento en Urgencias',
   followUp: 'Seguimiento / destino',
 };
 
@@ -63,6 +63,7 @@ const calculatorNode = (calculatorId) => {
     summary: calculator.summary,
     calculatorId,
     action: `Calcular ${calculator.title}`,
+    initiallyOpenMobile: true,
   };
 };
 
@@ -102,6 +103,7 @@ const diagnosisSection = (protocol) => ({
             title: 'Escalas / calculadoras',
             type: 'scale',
             summary: 'Usar solo cuando cambia la conducta.',
+            initiallyOpenMobile: true,
             children: protocol.calculatorIds.map(calculatorNode),
           },
         ]
@@ -133,7 +135,7 @@ const genericTreatmentSection = (protocol) => {
     children: [
       {
         id: 'tratamiento-urgencias',
-        title: 'Tratamiento en Urgencias',
+        title: 'Conducta inicial',
         type: 'treatment',
         summary: firstSentence(protocol.summary),
         children: [
@@ -174,6 +176,7 @@ const genericTreatmentSection = (protocol) => {
               title: 'Cálculos que cambian tratamiento',
               type: 'calculator',
               summary: 'Abrir la calculadora concreta desde el nodo.',
+              initiallyOpenMobile: true,
               children: calculators.map(calculatorNode),
             },
           ]
@@ -221,7 +224,7 @@ const pneumoniaTreatmentSection = (protocol) => ({
   children: [
     {
       id: 'tratamiento-urgencias',
-      title: 'Tratamiento en Urgencias',
+      title: 'Antibiótico inicial en Urgencias',
       type: 'treatment',
       summary: 'Elegir antibiótico por gravedad y revisar seguridad antes de prescribir.',
       children: [
@@ -307,6 +310,7 @@ const buildPneumoniaFlow = (protocol) => ({
           type: 'scale',
           summary: protocol.decisionCards[2]?.action,
           items: [protocol.decisionCards[2]?.nuance].filter(Boolean),
+          initiallyOpenMobile: true,
           children: protocol.calculatorIds.map(calculatorNode),
         },
       ],
@@ -361,7 +365,7 @@ const guardiaFlow = (protocol) => {
         children: [
           {
             id: 'tratamiento-urgencias',
-            title: 'Tratamiento en Urgencias',
+            title: 'Medidas en Urgencias',
             type: 'treatment',
             summary: guardia.tratamiento,
             children: [

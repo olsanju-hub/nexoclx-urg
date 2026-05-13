@@ -1391,7 +1391,6 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const specialtyCollections = filterSpecialtyCollections(buildSpecialtyCollections(), deferredSearchQuery);
-  const demoFlow = getProtocolFlow('neumonia-comunidad');
 
   return (
     <div className={pageClass}>
@@ -1408,8 +1407,6 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
           placeholder="Filtrar contenido"
         />
       </PageHero>
-
-      <ClinicalFlowTree protocol={demoFlow} onCalculatorOpen={onCalculatorOpen} />
 
       {specialtyCollections.length > 0 ? (
         <SpecialtyAccordionList
