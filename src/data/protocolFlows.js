@@ -22,23 +22,31 @@ const compactText = (value = '') => String(value).replace(/\s+/g, ' ').trim();
 
 const firstSentence = (value = '') => compactText(value).split('. ')[0]?.replace(/\.$/, '') ?? '';
 
+const brief = (value = '', maxLength = 150) => {
+  const text = compactText(value);
+  return text.length > maxLength ? `${text.slice(0, maxLength).replace(/\s+\S*$/, '')}.` : text;
+};
+
 const asReferenceItems = (entries = []) =>
   entries.map((entry) => {
     const pages = entry.verifiedPages?.length ? ` pags. ${entry.verifiedPages.join(', ')}` : '';
     return `${entry.shortReference}${pages}. ${entry.note ?? ''}`.trim();
   });
 
-const medicationDetailItems = (medication) =>
-  [
+const medicationDetailItems = (medication) => {
+  const avoid = medication.contraindications?.length
+    ? medication.contraindications.slice(0, 2).map((item) => brief(item, 105)).join(' ')
+    : null;
+
+  return [
     `Fármaco: ${medication.name}`,
     medication.contextDose || medication.dose ? `Dosis: ${medication.contextDose ?? medication.dose}` : null,
     medication.contextRoute || medication.route ? `Vía: ${medication.contextRoute ?? medication.route}` : null,
     medication.contextFrequency || medication.frequency ? `Frecuencia: ${medication.contextFrequency ?? medication.frequency}` : null,
-    medication.followUpPlan || medication.duration ? `Duración/plan: ${medication.followUpPlan ?? medication.duration}` : null,
-    medication.contraindications?.length ? `Evitar: ${medication.contraindications.slice(0, 2).join(' ')}` : null,
-    medication.renalAdjustment ? `Ajuste renal: ${medication.renalAdjustment}` : null,
-    medication.hepaticAdjustment ? `Ajuste hepático: ${medication.hepaticAdjustment}` : null,
+    medication.followUpPlan || medication.duration ? `Duración: ${brief(medication.followUpPlan ?? medication.duration, 130)}` : null,
+    avoid ? `Evitar: ${avoid}` : null,
   ].filter(Boolean);
+};
 
 const medicationNode = (medicationId) => {
   const medication = getMedication(medicationId);
@@ -96,18 +104,6 @@ const diagnosisSection = (protocol) => ({
       severity: 'info',
       initiallyOpen: true,
     },
-    ...(protocol.calculatorIds?.length
-      ? [
-          {
-            id: 'calculos-diagnosticos',
-            title: 'Escalas / calculadoras',
-            type: 'scale',
-            summary: 'Usar solo cuando cambia la conducta.',
-            initiallyOpenMobile: true,
-            children: protocol.calculatorIds.map(calculatorNode),
-          },
-        ]
-      : []),
   ],
 });
 
@@ -144,7 +140,7 @@ const genericTreatmentSection = (protocol) => {
             id: `grupo-${slugify(group.title)}`,
             title: group.title,
             type: 'treatment',
-            summary: 'Pauta concreta auditada dentro del protocolo.',
+            summary: 'Pauta concreta del protocolo.',
             children: asArray(group.medicationIds).map(medicationNode),
           })),
         ],
@@ -240,7 +236,7 @@ const pneumoniaTreatmentSection = (protocol) => ({
           id: slugify(item.severity),
           title: item.severity,
           type: 'treatment',
-          summary: item.regimen,
+          summary: brief(item.regimen, 190),
         })),
       ],
     },
@@ -250,7 +246,7 @@ const pneumoniaTreatmentSection = (protocol) => ({
       type: 'treatment',
       summary: 'Aplicar solo en bajo riesgo con estabilidad y tolerancia oral.',
       items: [
-        protocol.antibioticPlan[0]?.regimen,
+        brief(protocol.antibioticPlan[0]?.regimen, 190),
         'Reevaluar/derivar: si empeora, no mejora en 72 h, disnea, fiebre persistente, confusión, intolerancia oral o deterioro general.',
       ].filter(Boolean),
       severity: 'success',
@@ -309,7 +305,6 @@ const buildPneumoniaFlow = (protocol) => ({
           title: 'CRB-65 / CURB-65',
           type: 'scale',
           summary: protocol.decisionCards[2]?.action,
-          items: [protocol.decisionCards[2]?.nuance].filter(Boolean),
           initiallyOpenMobile: true,
           children: protocol.calculatorIds.map(calculatorNode),
         },

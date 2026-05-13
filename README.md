@@ -135,12 +135,10 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 
 - `src/App.jsx`
   - shell principal de la app
-  - navegación entre `Home`, `Especialidades`, `Cálculos` y `Medicamentos`
-  - retorno contextual al origen cuando se abre cálculo o fármaco desde protocolo
+  - navegación entre `Home`, `Protocolos` y `Cálculos`
+  - retorno contextual al origen cuando se abre un cálculo desde protocolo
   - agrupación y navegación por especialidad con acordeones
-  - control de subpantallas cortas dentro del módulo de `fibrilación auricular`
-  - flujos operativos de `bradicardias` y `arritmias ventriculares`
-  - flujos operativos de `ictus isquémico` e `ictus hemorrágico`
+  - render de protocolos mediante `ClinicalFlowTree`
 
 - `src/main.jsx`
   - arranque de React
@@ -318,7 +316,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | 2026-04-24 | FA como guía principal y protocolos por especialidad | Protocolos / bibliografía / cálculos | Se indexó `ESC FA 2024`, se pasó FA a `CHA2DS2-VA`, se revisó el flujo clínico y se agrupó la lista de protocolos por especialidad. |
 | 2026-04-24 | Reindexación bibliográfica de HTA e IAM/SCA | Bibliografía / protocolos / medicamentos | Se añadieron `ESC HTA 2024` y `ESC SCA 2023` como referencias principales reales, se ajustaron enlaces y se revisó el contenido clínico relacionado. |
 | 2026-04-05 | Montaje base del proyecto | Base técnica | Se creó la app con `Vite + React + Tailwind` y se dejó lista para build estático. |
-| 2026-04-05 | Preparación de despliegue | Infraestructura | Se configuró publicación continua en GitHub Pages. |
+| 2026-04-05 | Preparación de despliegue inicial | Infraestructura | Se configuró el primer despliegue estático. GitHub Pages ya no es el despliegue activo. |
 | 2026-04-05 | Revisión de jerarquía visual | Home / shell | Se compactó la interfaz y se eliminó parte del aspecto de demo o dashboard genérico. |
 | 2026-04-05 | Auditoría bibliográfica inicial | Bibliografía / datos | Se separaron `página índice`, `página real` y `página PDF` para no enlazar capítulos de forma errónea. |
 | 2026-04-05 | Simplificación de la home | Home | Se rebajó el peso visual del libro y se dejó la bibliografía accesible sin dominar la interfaz. |
@@ -374,9 +372,11 @@ npm run build
 
 La salida queda en `dist/`.
 
-## Publicación en GitHub Pages
+## Publicación en Vercel
 
-El proyecto ya incluye `.github/workflows/deploy-pages.yml`.
+GitHub Pages está desactivado y no debe usarse como despliegue público. El despliegue público principal es Vercel:
+
+`https://nexo-clx.vercel.app/`
 
 Flujo mínimo:
 
@@ -386,4 +386,4 @@ git commit -m "Tu cambio"
 git push origin main
 ```
 
-GitHub Actions compila y publica automáticamente la rama `main`.
+Vercel despliega automáticamente la rama `main`. GitHub Actions mantiene solo CI de build.
