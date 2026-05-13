@@ -19,6 +19,15 @@ const typeLabels = {
   treatment: 'Tratamiento',
 };
 
+const getInitialNodeOpen = (node) =>
+  Boolean(node.initiallyOpen && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches);
+
+const getPreview = (node) => {
+  const source = node.summary ?? node.items?.[0] ?? node.references?.[0] ?? node.action ?? node.medication ?? '';
+  const [firstSentence] = source.split('. ');
+  return firstSentence ? `${firstSentence.replace(/\.$/, '')}.` : '';
+};
+
 const TypeIcon = ({ type }) => {
   if (type === 'alert') return <AlertTriangle className="h-3.5 w-3.5" />;
   if (type === 'calculator' || type === 'scale') return <Calculator className="h-3.5 w-3.5" />;
@@ -28,11 +37,12 @@ const TypeIcon = ({ type }) => {
 };
 
 const FlowNode = ({ node, depth = 0 }) => {
-  const [open, setOpen] = useState(Boolean(node.initiallyOpen));
+  const [open, setOpen] = useState(() => getInitialNodeOpen(node));
   const hasChildren = Boolean(node.children?.length);
   const hasBody = Boolean(node.summary || node.items?.length || node.references?.length || node.action || node.calculatorId || node.medication);
   const canToggle = hasChildren || hasBody;
   const visible = open || !canToggle;
+  const preview = !visible ? getPreview(node) : '';
 
   return (
     <article className={`flow-node flow-node-${node.severity ?? 'info'}`} style={{ '--flow-depth': depth }}>
@@ -46,14 +56,18 @@ const FlowNode = ({ node, depth = 0 }) => {
           <TypeIcon type={node.type} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="flow-node-title">{node.title}</span>
+          <span className="flow-node-heading">
+            <span className="flow-node-title">{node.title}</span>
+            <span className={`flow-node-tag flow-node-tag-${node.type}`}>{typeLabels[node.type] ?? node.type}</span>
+          </span>
           <span className="flow-node-meta">
-            {typeLabels[node.type] ?? node.type}
-            {node.severity ? ` · ${severityLabels[node.severity]}` : ''}
+            {node.severity ? severityLabels[node.severity] : 'Info'}
           </span>
         </span>
         {canToggle ? <ChevronRight className={`flow-node-chevron ${visible ? 'rotate-90' : ''}`} /> : null}
       </button>
+
+      {preview ? <p className="flow-node-preview">{preview}</p> : null}
 
       {visible ? (
         <div className="flow-node-body">
@@ -95,7 +109,7 @@ const FlowSection = ({ section }) => {
   const [open, setOpen] = useState(section.initiallyOpen !== false);
 
   return (
-    <section className="flow-section">
+    <section id={`flow-section-${section.id}`} className={`flow-section flow-section-${section.id}`}>
       <button type="button" className="flow-section-header" onClick={() => setOpen((current) => !current)} aria-expanded={open}>
         <span>
           <span className="flow-section-kicker">{typeLabels[section.type] ?? 'Seccion'}</span>
@@ -115,6 +129,8 @@ const FlowSection = ({ section }) => {
 };
 
 export const ClinicalFlowTree = ({ protocol }) => {
+  const mainSections = protocol.sections.slice(0, 3);
+
   return (
     <div className="clinical-flow-tree">
       <header className="flow-hero">
@@ -128,6 +144,14 @@ export const ClinicalFlowTree = ({ protocol }) => {
           {protocol.summary ? <p className="flow-hero-summary">{protocol.summary}</p> : null}
         </div>
       </header>
+      <nav className="flow-jump-nav" aria-label="Bloques principales del protocolo">
+        {mainSections.map((section, index) => (
+          <a key={section.id} href={`#flow-section-${section.id}`} className="flow-jump-link">
+            <span>{index + 1}</span>
+            {section.title}
+          </a>
+        ))}
+      </nav>
       <div className="flow-sections">
         {protocol.sections.map((section) => (
           <FlowSection key={section.id} section={section} />
