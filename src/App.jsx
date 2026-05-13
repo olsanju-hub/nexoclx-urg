@@ -9,7 +9,6 @@ import {
   HeartPulse,
   Info,
   LayoutDashboard,
-  Pill,
   Search,
   ShieldAlert,
 } from 'lucide-react';
@@ -22,8 +21,10 @@ import {
   getCalculator,
   implementedCalculators,
 } from './data/calculators';
-import { getMedication, medicationGroups, medicationList } from './data/medications';
+import { ClinicalFlowTree } from './components/ClinicalFlowTree';
+import { getMedication, medicationGroups } from './data/medications';
 import { getMotivoModule, groupModulesBySpecialty, motivoConsultaModules } from './data/modules';
+import { getProtocolFlow } from './data/protocolFlows';
 import { getProtocol } from './data/protocols';
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
@@ -41,9 +42,8 @@ const widePageClass = 'mx-auto max-w-[76rem] space-y-3 sm:space-y-5 xl:space-y-6
 
 const primaryNavItems = [
   { key: 'home', label: 'Inicio', icon: LayoutDashboard },
-  { key: 'protocols', label: 'Especialidades', icon: ClipboardList },
+  { key: 'protocols', label: 'Protocolos', icon: ClipboardList },
   { key: 'calculations', label: 'Cálculos', icon: Calculator },
-  { key: 'medications', label: 'Fármacos', icon: Pill },
 ];
 
 const initialCalculatorInputs = {
@@ -200,10 +200,6 @@ const getPrimarySection = (view) => {
     return 'calculations';
   }
 
-  if (view === 'medication' || view === 'medications') {
-    return 'medications';
-  }
-
   return 'home';
 };
 
@@ -228,10 +224,6 @@ const getPageLabel = (route) => {
     return 'Cálculos';
   }
 
-  if (route.view === 'medications') {
-    return 'Medicamentos';
-  }
-
   return 'Inicio clínico';
 };
 
@@ -252,12 +244,6 @@ const buildSpecialtyCollections = () =>
     const calculators = implementedCalculators
       .filter((calculator) => moduleIds.has(calculator.moduleId))
       .sort((left, right) => left.title.localeCompare(right.title, 'es'));
-    const medications = uniqueByKey(
-      medicationList
-        .filter((medication) => medication.protocolId && moduleIds.has(medication.protocolId))
-        .sort((left, right) => left.name.localeCompare(right.name, 'es')),
-      (medication) => medication.id,
-    );
     const bibliography = uniqueByKey(
       implementedModules.flatMap((module) =>
         getModulePrimaryReferences(module.id).map((entry) => ({
@@ -272,7 +258,7 @@ const buildSpecialtyCollections = () =>
       ...group,
       protocols: group.modules,
       calculators,
-      medications,
+      medications: [],
       bibliography,
     };
   });
@@ -294,9 +280,6 @@ const filterSpecialtyCollections = (groups, query) => {
 
       const protocols = group.protocols.filter((module) => matchesSearch(needle, module.title, module.summary, module.section));
       const calculators = group.calculators.filter((calculator) => matchesSearch(needle, calculator.title, calculator.summary, calculator.block));
-      const medications = group.medications.filter((medication) =>
-        matchesSearch(needle, medication.name, medication.family, medication.contextUse ?? medication.indication),
-      );
       const bibliography = group.bibliography.filter((entry) =>
         matchesSearch(needle, entry.moduleTitle, entry.shortReference, entry.note),
       );
@@ -305,11 +288,11 @@ const filterSpecialtyCollections = (groups, query) => {
         ...group,
         protocols,
         calculators,
-        medications,
+        medications: [],
         bibliography,
       };
     })
-    .filter((group) => group.protocols.length > 0 || group.calculators.length > 0 || group.medications.length > 0 || group.bibliography.length > 0);
+    .filter((group) => group.protocols.length > 0 || group.calculators.length > 0 || group.bibliography.length > 0);
 };
 
 const BrandLockup = ({ label }) => (
@@ -400,7 +383,7 @@ const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
 
 const PrimaryNavigation = ({ activeKey, onSelect }) => (
   <nav className="mobile-nav lg:hidden">
-    <div className="grid grid-cols-4 gap-1">
+    <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
       {primaryNavItems.map((item) => {
         const Icon = item.icon;
         const isActive = activeKey === item.key;
@@ -536,7 +519,6 @@ const SpecialtyAccordionList = ({
   groups,
   onModuleOpen,
   onCalculatorOpen,
-  onMedicationOpen,
   forceOpen = false,
   preferredOpenId = null,
 }) => (
@@ -582,22 +564,6 @@ const SpecialtyAccordionList = ({
                     onClick={() => onCalculatorOpen(calculator.id)}
                   />
                 ))}
-              </SpecialtySectionRows>
-            ) : null}
-
-            {group.medications.length > 0 ? (
-              <SpecialtySectionRows title="Medicamentos relacionados">
-                {group.medications.map((medication) => {
-                  const protocolLabel = medication.protocolId ? getProtocol(medication.protocolId)?.title ?? 'Protocolo' : 'Protocolo';
-                  return (
-                    <ListActionRow
-                      key={medication.id}
-                      title={medication.name}
-                      meta={`${protocolLabel} · ${medication.family}`}
-                      onClick={() => onMedicationOpen(medication.id)}
-                    />
-                  );
-                })}
               </SpecialtySectionRows>
             ) : null}
 
@@ -660,8 +626,8 @@ const ProtocolSectionButton = ({ label, active, onClick }) => (
   </button>
 );
 
-const MedicationQuickRow = ({ medication, onOpen }) => (
-  <button type="button" onClick={onOpen} className={listRowClass}>
+const MedicationQuickRow = ({ medication }) => (
+  <div className={listRowClass}>
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-sm font-semibold text-[var(--text)]">{medication.name}</p>
@@ -672,8 +638,7 @@ const MedicationQuickRow = ({ medication, onOpen }) => (
       <p className="mt-1 text-xs text-[var(--text-muted)]">{compactSentence(medication.contextUse ?? medication.indication)}</p>
       <p className="mt-1 text-xs text-[var(--text-soft)]">{compactSentence(medication.contextDose ?? medication.dose)}</p>
     </div>
-    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
-  </button>
+  </div>
 );
 
 const BibliographyBlock = ({ entries }) => (
@@ -1386,7 +1351,6 @@ const HomeView = ({
   onSpecialtyOpen,
   onModuleOpen,
   onCalculatorOpen,
-  onMedicationOpen,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -1398,7 +1362,7 @@ const HomeView = ({
   return (
     <div className={pageClass}>
       <PageHero title="Inicio clínico">
-        <SearchField value={searchQuery} onChange={setSearchQuery} placeholder="Módulo o fármaco" />
+        <SearchField value={searchQuery} onChange={setSearchQuery} placeholder="Protocolo o cálculo" />
       </PageHero>
 
       {hasSearchQuery ? (
@@ -1408,7 +1372,6 @@ const HomeView = ({
               groups={specialtyCollections}
               onModuleOpen={onModuleOpen}
               onCalculatorOpen={onCalculatorOpen}
-              onMedicationOpen={onMedicationOpen}
               forceOpen={Boolean(normalizeSearch(deferredSearchQuery))}
             />
           ) : (
@@ -1424,16 +1387,21 @@ const HomeView = ({
   );
 };
 
-const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpen, focusSpecialtyId = null }) => {
+const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyId = null }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const specialtyCollections = filterSpecialtyCollections(buildSpecialtyCollections(), deferredSearchQuery);
+  const demoFlow = getProtocolFlow('neumonia-comunidad');
 
   return (
     <div className={pageClass}>
       <BackBar label="Inicio" onClick={onBack} />
 
-      <PageHero title="Especialidades">
+      <PageHero
+        eyebrow="Organigrama clínico"
+        title="Protocolos"
+        note="Base técnica para renderizar protocolos rápidos como árboles de decisión compactos, con diagnóstico, tratamiento y destino visibles desde móvil."
+      >
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
@@ -1441,12 +1409,13 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, onMedicationOpe
         />
       </PageHero>
 
+      <ClinicalFlowTree protocol={demoFlow} />
+
       {specialtyCollections.length > 0 ? (
         <SpecialtyAccordionList
           groups={specialtyCollections}
           onModuleOpen={onModuleOpen}
           onCalculatorOpen={onCalculatorOpen}
-          onMedicationOpen={onMedicationOpen}
           forceOpen={Boolean(normalizeSearch(deferredSearchQuery))}
           preferredOpenId={focusSpecialtyId}
         />
@@ -1916,7 +1885,6 @@ const FibrilacionAuricularFlowView = ({
                   <MedicationQuickRow
                     key={medicationId}
                     medication={getMedication(medicationId)}
-                    onOpen={() => onMedicationOpen(medicationId)}
                   />
                 ))}
               </div>
@@ -2026,13 +1994,12 @@ const FibrilacionAuricularFlowView = ({
           </div>
 
           <div className="mt-4">
-            <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+            <p className="eyebrow eyebrow-muted mb-2">Tratamiento farmacológico</p>
             <div className="grid gap-2 lg:grid-cols-2">
               {(valvularFa === true ? ['acenocumarol'] : preventionMedicationIds).map((medicationId) => (
                 <MedicationQuickRow
                   key={medicationId}
                   medication={getMedication(medicationId)}
-                  onOpen={() => onMedicationOpen(medicationId)}
                 />
               ))}
             </div>
@@ -2055,9 +2022,6 @@ const FibrilacionAuricularFlowView = ({
             </button>
             <button type="button" onClick={onCalculationsHub} className={subtleButtonClass}>
               Abrir cálculos
-            </button>
-            <button type="button" onClick={onMedicationsHub} className={subtleButtonClass}>
-              Abrir medicamentos
             </button>
             <button type="button" onClick={onFinish} className={primaryButtonClass}>
               Finalizar
@@ -2285,7 +2249,6 @@ const HipertensionUrgenciasFlowView = ({
                 <MedicationQuickRow
                   key={medicationId}
                   medication={getMedication(medicationId)}
-                  onOpen={() => onMedicationOpen(medicationId)}
                 />
               ))}
             </div>
@@ -2308,9 +2271,6 @@ const HipertensionUrgenciasFlowView = ({
           <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={() => updateFlow({ step: 3 })} className={subtleButtonClass}>
               Volver
-            </button>
-            <button type="button" onClick={onMedicationsHub} className={subtleButtonClass}>
-              Abrir medicamentos
             </button>
             <button
               type="button"
@@ -2710,13 +2670,12 @@ const SindromeCoronarioAgudoFlowView = ({
           ) : null}
 
           <div className="mt-4">
-            <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+            <p className="eyebrow eyebrow-muted mb-2">Tratamiento farmacológico</p>
             <div className="space-y-2">
               {treatmentMedicationIds.map((medicationId) => (
                 <MedicationQuickRow
                   key={medicationId}
                   medication={getMedication(medicationId)}
-                  onOpen={() => onMedicationOpen(medicationId)}
                 />
               ))}
             </div>
@@ -2736,9 +2695,6 @@ const SindromeCoronarioAgudoFlowView = ({
           <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={() => updateFlow({ step: 4 })} className={subtleButtonClass}>
               Volver
-            </button>
-            <button type="button" onClick={onMedicationsHub} className={subtleButtonClass}>
-              Abrir medicamentos
             </button>
             <button
               type="button"
@@ -2840,7 +2796,7 @@ const BradicardiasFlowView = ({
           </div>
 
           <div className="mt-4 space-y-3">
-            <MedicationQuickRow medication={getMedication('atropina')} onOpen={() => onMedicationOpen('atropina')} />
+            <MedicationQuickRow medication={getMedication('atropina')} />
 
             <div className={`${mutedPanelClass} p-4`}>
               <p className="eyebrow eyebrow-muted">¿Respuesta satisfactoria a atropina?</p>
@@ -3167,9 +3123,6 @@ const ArritmiasVentricularesFlowView = ({
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => onMedicationOpen('amiodarona-vt')} className={subtleButtonClass}>
-              Ver amiodarona IV
-            </button>
             <button type="button" onClick={() => updateFlow({ step: 2 })} className={subtleButtonClass}>
               Volver
             </button>
@@ -3196,7 +3149,7 @@ const ArritmiasVentricularesFlowView = ({
           </div>
 
           <div className="mt-4 space-y-3">
-            <MedicationQuickRow medication={getMedication('amiodarona-vt')} onOpen={() => onMedicationOpen('amiodarona-vt')} />
+            <MedicationQuickRow medication={getMedication('amiodarona-vt')} />
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -3231,7 +3184,7 @@ const ArritmiasVentricularesFlowView = ({
               </div>
             </DisclosureBlock>
 
-            <MedicationQuickRow medication={getMedication('magnesio-torsades')} onOpen={() => onMedicationOpen('magnesio-torsades')} />
+            <MedicationQuickRow medication={getMedication('magnesio-torsades')} />
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -3459,13 +3412,12 @@ const IctusIsquemicoFlowView = ({
               </div>
 
               <div className="mt-4">
-                <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+                <p className="eyebrow eyebrow-muted mb-2">Tratamiento farmacológico</p>
                 <div className="space-y-2">
                   {['alteplasa-ictus', 'labetalol-ictus'].map((medicationId) => (
                     <MedicationQuickRow
                       key={medicationId}
                       medication={getMedication(medicationId)}
-                      onOpen={() => onMedicationOpen(medicationId)}
                     />
                   ))}
                 </div>
@@ -3679,9 +3631,9 @@ const IctusHemorragicoFlowView = ({
           </div>
 
           <div className="mt-4">
-            <p className="eyebrow eyebrow-muted mb-2">Medicamentos</p>
+            <p className="eyebrow eyebrow-muted mb-2">Tratamiento farmacológico</p>
             <div className="space-y-2">
-              <MedicationQuickRow medication={getMedication('labetalol-ictus')} onOpen={() => onMedicationOpen('labetalol-ictus')} />
+              <MedicationQuickRow medication={getMedication('labetalol-ictus')} />
             </div>
           </div>
 
@@ -4102,12 +4054,12 @@ const App = () => {
       return;
     }
 
-    if (sectionKey === 'calculations') {
-      openCalculations({ view: 'home' });
-      return;
-    }
+  if (sectionKey === 'calculations') {
+    openCalculations({ view: 'home' });
+    return;
+  }
 
-    openMedications({ view: 'home' });
+    navigate({ view: 'home' });
   };
 
   const renderView = () => {
@@ -4252,7 +4204,6 @@ const App = () => {
           onBack={() => navigate({ view: 'home' })}
           onModuleOpen={(moduleId) => openModule(moduleId, { view: 'protocols' })}
           onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'protocols' })}
-          onMedicationOpen={(medicationId) => openMedication(medicationId, { view: 'protocols' })}
           focusSpecialtyId={route.focusSpecialtyId ?? null}
         />
       );
@@ -4300,7 +4251,6 @@ const App = () => {
         onSpecialtyOpen={openSpecialty}
         onModuleOpen={(moduleId) => openModule(moduleId, { view: 'home' })}
         onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'home' })}
-        onMedicationOpen={(medicationId) => openMedication(medicationId, { view: 'home' })}
       />
     );
   };

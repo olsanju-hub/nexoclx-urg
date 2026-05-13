@@ -1,7 +1,9 @@
 # NexoClx
 
-NexoClx es una app web estática para consulta clínica inicial basada en bibliografía real de urgencias.  
-Su objetivo no es replicar un libro en pantalla, sino convertir capítulos auditados en módulos rápidos de uso clínico, conectando protocolo, cálculos, medicación y referencia bibliográfica verificable.
+NexoClx es una app web estática orientada a protocolos clínicos rápidos en formato de organigrama interactivo, basada en bibliografía real de urgencias.  
+Su objetivo no es replicar un libro en pantalla, sino convertir capítulos auditados en flujos breves de decisión, conectando protocolo, cálculos, tratamiento y referencia bibliográfica textual verificable.
+
+URL pública principal en Vercel: `https://nexo-clx.vercel.app/`.
 
 ## README vivo
 
@@ -12,7 +14,7 @@ Debe mantenerse actualizado en cuatro capas:
 
 - estructura funcional real de la app
 - índice de lo implementado, lo auditado y lo pendiente
-- relación entre protocolos, cálculos, medicamentos y bibliografía
+- relación entre protocolos, cálculos, tratamientos y bibliografía
 - bitácora acumulativa de cambios relevantes
 
 ## Qué es NexoClx
@@ -26,19 +28,19 @@ Principios actuales del proyecto:
 - bibliografía presente, pero no dominante
 - cálculos implementados solo cuando un módulo real los necesita
 - fichas farmacológicas con fuente explícita
-- navegación contextual entre protocolo, cálculo y medicación
+- navegación contextual entre protocolo, cálculo y tratamiento
 
 ## Estado actual
 
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
-- Pantalla propia de `Especialidades` con acordeones por bloque clínico para evitar una lista plana interminable.
+- Pantalla propia de `Protocolos` con un ejemplo funcional de organigrama clínico y acordeones por bloque clínico para evitar una lista plana interminable.
 - Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
 - Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65` y `CURB-65`.
-- Fichas farmacológicas activas para FA, HTA, SCA, arritmias agudas e ictus enlazadas desde protocolo y desde `Medicamentos`.
+- La sección `Medicamentos` deja de ser sección principal visible. Los tratamientos deben vivir dentro de cada protocolo como pautas concretas y auditadas.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
 - Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `NICE NG250 2025` como referencia principal de neumonía, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
 - Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`.
-- Despliegue activo en GitHub Pages: `https://olsanju-hub.github.io/NexoClx/`.
+- Despliegue público principal en Vercel: `https://nexo-clx.vercel.app/`.
 
 ## Estructura funcional de la app
 
@@ -47,14 +49,14 @@ Principios actuales del proyecto:
 | Sección | Estado | Función real hoy | Relación con el resto |
 | --- | --- | --- | --- |
 | Home | Activa | Punto de entrada mínimo con `buscador` y rejilla de `especialidades`. | Lleva a la especialidad o al resultado buscado sin pasos intermedios ni bloques redundantes. |
-| Especialidades | Activa | Índice clínico principal con acordeones por bloque y recursos relacionados. | Abre protocolo real, cálculo relacionado, medicamento relacionado o fuente principal desde la misma especialidad. |
+| Protocolos | Activa | Índice clínico principal con organigrama interactivo de ejemplo y acordeones por bloque. | Abre protocolo real, cálculo relacionado o fuente principal desde la misma sección. |
 | Módulo FA | Activo | Flujo clínico dividido en `Estabilidad`, `Contexto`, `Conducta` y `Anticoagulación`. | Embebe o enlaza cálculos, medicación y fuente principal sin saturar una sola pantalla. |
 | Módulo de bradicardias | Activo | Flujo breve para repercusión, bradicardia sinusal / nodo, bloqueo AV y necesidad de pacing. | Embebe atropina y procedimiento de marcapasos transcutáneo cuando cambia la conducta. |
 | Módulo de arritmias ventriculares | Activo | Flujo breve para pulso, inestabilidad, TV monomorfa y torsades / TV polimórfica. | Embebe amiodarona IV, magnesio IV y electricidad urgente cuando corresponde. |
 | Módulos de ictus | Activos | `Ictus isquémico` e `ictus hemorrágico` con flujo corto de ventana, imagen, reperfusión, PA y reversión. | Quedan agrupados en `Neurología` y enlazan medicación y fuente principal. |
 | Dolor abdominal por escenarios | Activo | Protocolos de un vistazo para epigastrio, hipocondrio derecho, fosas iliacas, flanco, pelvis, peritonismo y sospecha vascular. | Cada cuadro queda en su especialidad principal: `Digestivo`, `Cirugía general`, `Urología`, `Ginecología` o `Vascular`. |
 | Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo. |
-| Medicamentos | Activa | Reúne fichas farmacológicas completas del módulo activo. | Cada ficha puede abrirse desde el protocolo y volver a él. |
+| Medicamentos | No visible como sección principal | Los datos farmacológicos pueden seguir existiendo como soporte interno mientras se integran pautas auditadas dentro de cada protocolo. | No debe mostrarse como módulo independiente ni como navegación principal. |
 | Bibliografía | Activa | Da acceso a la obra base y a referencias estructuradas. | Cada módulo guarda sus referencias y páginas verificadas. |
 | Plantillas de imagen | En desarrollo | Solo existe la estructura inicial para `RX tórax sistemática`. | Quedará conectada a bibliografía específica cuando esa fuente esté en el repo. |
 
@@ -65,10 +67,10 @@ Principios actuales del proyecto:
 3. La pantalla `Especialidades` agrupa los módulos por bloque clínico y muestra recursos relacionados para que el crecimiento no se convierta en una lista plana.
 4. Al abrir `fibrilación auricular`, la navegación prioriza vistas cortas y no una página continua.
 5. Los módulos de `ictus` entran por `Neurología` y se resuelven como flujo corto de manejo urgente, no como capítulo de estudio.
-6. Desde el protocolo se puede abrir un cálculo concreto o una ficha farmacológica concreta.
-7. Si un cálculo o un medicamento se abre desde el protocolo, la interfaz conserva botón claro de retorno al protocolo y a la subsección de origen.
+6. Desde el protocolo se puede abrir un cálculo concreto cuando cambia la conducta.
+7. Los tratamientos farmacológicos deben mostrarse dentro del protocolo, no como dependencia de una sección externa de medicamentos.
 8. Los mismos cálculos siguen existiendo en la sección general de `Cálculos`.
-9. Las mismas fichas siguen existiendo en la sección general de `Medicamentos`.
+9. Las fichas farmacológicas pueden mantenerse en datos internos si siguen siendo necesarias para no romper módulos existentes, pero no como sección principal visible.
 10. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
 
 ### Cómo se conectan los módulos
@@ -78,7 +80,7 @@ Principios actuales del proyecto:
 - `Módulo FA` ya no se resuelve como pantalla única; se reparte en subpantallas cortas.
 - `Módulos de ictus` siguen la misma lógica: dato clave, clasificación, conducta y tratamiento.
 - `Cálculos` solo se implementan cuando un protocolo real los necesita.
-- `Medicamentos` se construyen a partir de los fármacos realmente usados en un protocolo activo.
+- Los tratamientos se construyen dentro de cada protocolo a partir de pautas auditadas: fármaco, dosis, vía, frecuencia, duración, máximos, contraindicaciones y ajustes cuando proceda.
 - `Bibliografía` no vive como texto suelto al final: cada módulo guarda referencias estructuradas.
 - `Plantillas` siguen una lógica paralela: estructura, fuente base y estado de desarrollo.
 
@@ -104,7 +106,9 @@ Reglas:
 
 ### Integración de la bibliografía en cada módulo
 
-Murillo 7.ª edición es la base práctica inicial de los protocolos de urgencias. Cada protocolo mantiene la referencia textual a Murillo cuando aplica, con capítulo y páginas verificadas si están disponibles.
+Murillo 7.ª edición es la base práctica inicial local de los protocolos de urgencias cuando el PDF está disponible en el workspace. Cada protocolo mantiene la referencia textual a Murillo cuando aplica, con capítulo y páginas verificadas si están disponibles. La bibliografía será textual y verificable, sin enlaces PDF públicos.
+
+Ubicación local recomendada si hay que aportar el PDF sin publicarlo: `.local-biblio/urgencias-murillo-7ma.pdf`. La carpeta `.local-biblio/` queda ignorada por Git.
 
 Las decisiones clínicas críticas se corroboran con guías europeas o americanas recientes y de alto rigor cuando existen: ESC en cardiología, AHA/ASA en ictus, NICE/ERS/ATS/BTS/IDSA en neumonía e infecciones respiratorias, EAU en urología, ACG/AGA/ESGE/EASL/WSES en digestivo y cirugía urgente, ACOG/RCOG en ginecología y SCCM/Surviving Sepsis Campaign en sepsis. Si Murillo y una guía más reciente difieren, el flujo clínico muestra directamente la conducta actualizada y la justificación queda en fuentes, no en mitad del protocolo.
 
@@ -331,7 +335,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 
 - Construir el siguiente protocolo real a partir de los temas ya auditados después de FA, HTA y SCA.
 - Hacer que la búsqueda evolucione de filtro simple a entrada clínica más útil.
-- Seguir ampliando `Medicamentos` hacia los próximos módulos clínicos reales.
+- Integrar tratamientos dentro de cada protocolo y retirar progresivamente dependencias visibles de fichas farmacológicas externas.
 - Mantener la regla de no implementar cálculos fuera de contexto de módulo.
 
 ### Pendiente clínico
