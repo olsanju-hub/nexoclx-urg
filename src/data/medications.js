@@ -942,7 +942,7 @@ export const medicationCatalog = {
     indication:
       'Control de la presión arterial en urgencia hipertensiva por vía oral y en emergencia hipertensiva por vía intravenosa.',
     dose:
-      'En este contexto: 100 mg VO y repetir a las 2 h si hace falta. En emergencia: 20 mg IV lento cada 5 min hasta 100 mg o perfusión 0,5-2 mg/min; después 100 mg VO/12 h.',
+      'En este contexto: 100 mg VO y repetir a las 2 h si hace falta. En emergencia: 20 mg IV lento cada 5 min hasta 100 mg o perfusión 0,5-2 mg/min; no sobrepasar 300 mg totales. Después 100 mg VO/12 h.',
     route: 'Oral / intravenosa',
     frequency: 'Bolos o perfusión IV titulados; cada 12 h por vía oral al pasar a estabilidad.',
     duration: 'Uso agudo con transición posterior cuando las cifras se estabilizan.',
@@ -1519,9 +1519,9 @@ export const medicationCatalog = {
     indication:
       'Analgesia intravenosa cuando persiste dolor torácico intenso a pesar de nitratos y medidas iniciales.',
     dose:
-      'En este contexto: 5-10 mg IV, titulando según control del dolor y tolerancia hemodinámica.',
+      'En este contexto: 2 mg/min IV hasta ceder el dolor o hasta 10 mg totales; si persiste dolor a los 10 min, repetir la misma pauta.',
     route: 'Intravenosa',
-    frequency: 'Bolos titulados y, si hace falta, perfusión continua.',
+    frequency: 'Bolos titulados; repetir a los 10 min si persiste dolor.',
     duration: 'Uso agudo mientras persista dolor isquémico no controlado.',
     contraindications: [
       'Precaución si existe depresión respiratoria o deterioro hemodinámico.',

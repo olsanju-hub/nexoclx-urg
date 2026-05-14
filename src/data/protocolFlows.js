@@ -10,6 +10,14 @@ const PRIMARY_SECTION_TITLES = {
   followUp: 'Seguimiento / destino',
 };
 
+const CARDIOLOGY_PROTOCOL_IDS = new Set([
+  'fibrilacion-auricular',
+  'sindrome-coronario-agudo',
+  'hta-urgencias',
+  'bradicardias',
+  'arritmias-ventriculares',
+]);
+
 const slugify = (value = '') =>
   value
     .toLowerCase()
@@ -33,18 +41,34 @@ const asReferenceItems = (entries = []) =>
     return `${entry.shortReference}${pages}. ${entry.note ?? ''}`.trim();
   });
 
+const shortAdjustment = (label, value) => (value ? `${label}: ${brief(value, 125)}` : null);
+
+const maxDoseFrom = (value = '') => {
+  const text = compactText(value);
+  const match = text.match(/(?:máxim[ao]s?|hasta|sin sobrepasar)[^.;]*/i);
+  return match ? brief(match[0].replace(/^hasta\s+/i, ''), 100) : null;
+};
+
 const medicationDetailItems = (medication) => {
   const avoid = medication.contraindications?.length
     ? medication.contraindications.slice(0, 2).map((item) => brief(item, 105)).join(' ')
     : null;
+  const doseText = medication.contextDose ?? medication.dose;
+  const maxDose = maxDoseFrom(doseText);
 
   return [
     `Fármaco: ${medication.name}`,
-    medication.contextDose || medication.dose ? `Dosis: ${medication.contextDose ?? medication.dose}` : null,
+    doseText ? `Dosis: ${doseText}` : null,
     medication.contextRoute || medication.route ? `Vía: ${medication.contextRoute ?? medication.route}` : null,
     medication.contextFrequency || medication.frequency ? `Frecuencia: ${medication.contextFrequency ?? medication.frequency}` : null,
     medication.followUpPlan || medication.duration ? `Duración: ${brief(medication.followUpPlan ?? medication.duration, 130)}` : null,
+    maxDose ? `Máximo: ${maxDose}` : null,
     avoid ? `Evitar: ${avoid}` : null,
+    shortAdjustment('Ajuste renal', medication.renalAdjustment),
+    shortAdjustment('Ajuste hepático', medication.hepaticAdjustment),
+    medication.followUpPlan || medication.practicalNotes?.length
+      ? `Reevaluar: ${brief(medication.followUpPlan ?? medication.practicalNotes[0], 130)}`
+      : null,
   ].filter(Boolean);
 };
 
@@ -59,6 +83,7 @@ const medicationNode = (medicationId) => {
     summary: doseSummary,
     items: medicationDetailItems(medication),
     medication: medication.family,
+    initiallyOpenMobile: CARDIOLOGY_PROTOCOL_IDS.has(medication.protocolId),
   };
 };
 
@@ -212,6 +237,151 @@ const decisionNodes = (protocol) =>
     severity: card.id?.includes('inestable') || card.id?.includes('critical') || card.id?.includes('unstable') ? 'danger' : 'info',
   }));
 
+const cardiologyInterventionNodes = (protocol) => {
+  if (protocol.id === 'fibrilacion-auricular') {
+    return [
+      {
+        id: 'cardioversion-electrica-fa',
+        title: 'Cardioversión eléctrica',
+        type: 'treatment',
+        severity: 'danger',
+        summary: 'Urgente si inestabilidad; electiva solo si duración y anticoagulación lo permiten.',
+        items: [
+          'Indicación: hipotensión, shock, isquemia, edema pulmonar o mala perfusión atribuible a FA.',
+          'Vía: eléctrica sincronizada con sedoanalgesia según protocolo local.',
+          'Evitar: intoxicación digitálica; si toma digoxina, iniciar con menor energía según Murillo.',
+          'Reevaluar: ritmo, PA, síntomas y plan anticoagulante tras la reversión.',
+        ],
+      },
+      {
+        id: 'cardioversion-farmacologica-fa',
+        title: 'Cardioversión farmacológica',
+        type: 'treatment',
+        summary: 'Solo si estable y el contexto permite control de ritmo precoz.',
+        items: [
+          'Elegir según cardiopatía estructural, FEVI, duración del episodio y anticoagulación.',
+          'Amiodarona IV queda disponible como pauta concreta en la tarjeta de tratamiento.',
+          'No mezclar antiarrítmicos de clase I y III en el mismo momento.',
+        ],
+      },
+    ];
+  }
+
+  if (protocol.id === 'sindrome-coronario-agudo') {
+    return [
+      {
+        id: 'monitorizacion-sca',
+        title: 'Monitorización inicial',
+        type: 'step',
+        summary: 'ECG, monitor, vía venosa y troponinas sin retrasar reperfusión si SCACEST.',
+        items: [
+          'ECG 12 derivaciones en los primeros 10 min y monitorización continua.',
+          'Vía venosa, hemograma, bioquímica, coagulación y hs-cTn seriada si no hay SCACEST.',
+          'No esperar troponina si ECG y clínica indican SCACEST o SCASEST de muy alto riesgo.',
+        ],
+      },
+      {
+        id: 'oxigeno-sca',
+        title: 'Oxígeno',
+        type: 'treatment',
+        summary: 'Solo si hipoxemia, insuficiencia respiratoria o shock.',
+        items: [
+          'Indicación: SpO2 < 90%, dificultad respiratoria o shock.',
+          'Vía: gafas nasales, Venturi o reservorio según necesidad clínica.',
+          'Reevaluar: SatO2, trabajo respiratorio y necesidad de VNI/intubación si no mejora.',
+        ],
+      },
+      {
+        id: 'reperfusion-scacest',
+        title: 'Reperfusión en SCACEST',
+        type: 'decision',
+        severity: 'danger',
+        summary: 'ICP primaria si acceso en tiempo; fibrinólisis solo si procede y no hay contraindicación.',
+        items: [
+          'No esperar hs-cTn si SCACEST claro.',
+          'Priorizar ICP primaria si puede realizarse en tiempo.',
+          'Si no hay ICP en tiempo, valorar fibrinólisis con contraindicaciones revisadas; no se muestra dosis porque no está cargada como pauta auditada.',
+        ],
+      },
+    ];
+  }
+
+  if (protocol.id === 'hta-urgencias') {
+    return [
+      {
+        id: 'urgencia-hta-objetivo',
+        title: 'Urgencia hipertensiva',
+        type: 'decision',
+        summary: 'Sin daño agudo de órgano diana: descenso gradual y tratamiento oral si procede.',
+        items: [
+          'Confirmar cifras, reposo y reevaluación.',
+          'Evitar descensos bruscos o vía IV si no hay daño agudo de órgano.',
+          'Reevaluar PA y clínica antes de alta; ajustar seguimiento ambulatorio.',
+        ],
+      },
+      {
+        id: 'emergencia-hta-objetivo',
+        title: 'Emergencia hipertensiva',
+        type: 'alert',
+        severity: 'danger',
+        summary: 'Daño agudo de órgano diana: ingreso, monitorización y perfusión IV titulada.',
+        items: [
+          'Monitorización continua y tratamiento IV de acción corta.',
+          'Objetivo: reducción controlada, evitando caídas rápidas no monitorizadas.',
+          'UCI/área monitorizada si daño neurológico, coronario, edema pulmonar, disección o fracaso renal agudo.',
+        ],
+      },
+    ];
+  }
+
+  if (protocol.id === 'bradicardias') {
+    return [
+      {
+        id: 'marcapasos-transcutaneo',
+        title: 'Marcapasos transcutáneo',
+        type: 'treatment',
+        severity: 'danger',
+        summary: 'Preparar si inestabilidad persistente o bloqueo avanzado.',
+        items: [
+          'Indicación: mala perfusión, síncope, isquemia, insuficiencia cardíaca o bloqueo AV de alto riesgo que no responde rápido.',
+          'No retrasar por repetir atropina si el paciente sigue inestable.',
+          'Avisar UCI/cardiología y preparar estimulación temporal si Mobitz II, BAV completo con QRS ancho o pausas > 3 s.',
+        ],
+      },
+    ];
+  }
+
+  if (protocol.id === 'arritmias-ventriculares') {
+    return [
+      {
+        id: 'tv-sin-pulso',
+        title: 'TV/FV sin pulso',
+        type: 'alert',
+        severity: 'danger',
+        summary: 'Desfibrilación inmediata y algoritmo de parada.',
+        items: [
+          'Iniciar RCP y desfibrilación según protocolo de soporte vital.',
+          'Adrenalina y amiodarona pertenecen al algoritmo de parada; no se duplican aquí si no están cargadas como pauta auditada.',
+        ],
+      },
+      {
+        id: 'tv-pulso-inestable',
+        title: 'TV con pulso inestable',
+        type: 'treatment',
+        severity: 'danger',
+        summary: 'Cardioversión sincronizada urgente.',
+        items: [
+          'Indicación: shock, síncope, isquemia, edema pulmonar o deterioro.',
+          'Si es polimórfica o no sincroniza, desfibrilar.',
+          'Sedoanalgesia si no retrasa la electricidad y el paciente lo permite.',
+        ],
+      },
+    ];
+  }
+
+  return [];
+};
+
 const genericTreatmentSection = (protocol) => {
   const medicationGroups = asArray(protocol.medicationGroups);
   const calculators = asArray(protocol.calculatorIds);
@@ -229,12 +399,15 @@ const genericTreatmentSection = (protocol) => {
         title: 'Pautas en Urgencias',
         type: 'treatment',
         summary: 'Fármacos y medidas concretas cuando están auditadas.',
+        initiallyOpenMobile: CARDIOLOGY_PROTOCOL_IDS.has(protocol.id),
         children: [
+          ...cardiologyInterventionNodes(protocol),
           ...medicationGroups.map((group) => ({
             id: `grupo-${slugify(group.title)}`,
             title: group.title,
             type: 'treatment',
             summary: 'Abrir para ver fármacos y dosis.',
+            initiallyOpenMobile: CARDIOLOGY_PROTOCOL_IDS.has(protocol.id),
             children: asArray(group.medicationIds).map(medicationNode),
           })),
         ],
