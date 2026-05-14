@@ -3,7 +3,9 @@ import { getMedication } from './medications';
 import { protocolList } from './protocols';
 
 const PRIMARY_SECTION_TITLES = {
-  diagnosis: 'Diagnóstico / Pruebas Dx',
+  definition: 'Qué es',
+  orders: 'Qué pido',
+  findings: 'Qué espero encontrar',
   treatment: 'Tratamiento en Urgencias',
   followUp: 'Seguimiento / destino',
 };
@@ -19,8 +21,6 @@ const slugify = (value = '') =>
 const asArray = (value) => (Array.isArray(value) ? value.filter(Boolean) : value ? [value] : []);
 
 const compactText = (value = '') => String(value).replace(/\s+/g, ' ').trim();
-
-const firstSentence = (value = '') => compactText(value).split('. ')[0]?.replace(/\.$/, '') ?? '';
 
 const brief = (value = '', maxLength = 150) => {
   const text = compactText(value);
@@ -50,12 +50,13 @@ const medicationDetailItems = (medication) => {
 
 const medicationNode = (medicationId) => {
   const medication = getMedication(medicationId);
+  const doseSummary = medication.contextDose ?? medication.dose ?? medication.contextUse ?? medication.indication;
 
   return {
     id: `med-${medication.id}`,
     title: medication.name,
     type: 'treatment',
-    summary: medication.contextUse ?? medication.indication,
+    summary: doseSummary,
     items: medicationDetailItems(medication),
     medication: medication.family,
   };
@@ -75,6 +76,61 @@ const calculatorNode = (calculatorId) => {
   };
 };
 
+const treatmentCalculatorNodes = (protocol, calculators) => {
+  if (protocol.id === 'fibrilacion-auricular') {
+    const calculatorMap = {
+      'cha2ds2-va': {
+        id: 'riesgo-tromboembolico',
+        title: 'Riesgo tromboembólico',
+        summary: 'Decide indicación de anticoagulación.',
+        severity: 'info',
+      },
+      'has-bled': {
+        id: 'riesgo-hemorragico',
+        title: 'Riesgo hemorrágico modificable',
+        summary: 'Detecta factores corregibles antes y durante anticoagulación.',
+        severity: 'warning',
+      },
+      'cockcroft-gault': {
+        id: 'funcion-renal-anticoagulacion',
+        title: 'Función renal para anticoagulación',
+        summary: 'Ajusta elección o dosis cuando procede.',
+        severity: 'info',
+      },
+    };
+
+    return calculators.map((calculatorId) => {
+      const meta = calculatorMap[calculatorId] ?? {
+        id: `calculo-${calculatorId}`,
+        title: getCalculator(calculatorId).title,
+        summary: 'Abrir la calculadora concreta.',
+        severity: 'info',
+      };
+
+      return {
+        id: meta.id,
+        title: meta.title,
+        type: 'calculator',
+        summary: meta.summary,
+        severity: meta.severity,
+        initiallyOpenMobile: true,
+        children: [calculatorNode(calculatorId)],
+      };
+    });
+  }
+
+  return [
+    {
+      id: 'calculos-tratamiento',
+      title: 'Cálculos que cambian tratamiento',
+      type: 'calculator',
+      summary: 'Abrir la calculadora concreta desde el punto de decisión.',
+      initiallyOpenMobile: true,
+      children: calculators.map(calculatorNode),
+    },
+  ];
+};
+
 const referencesSection = (protocol) => ({
   id: 'bibliografia',
   title: 'Bibliografía textual',
@@ -89,21 +145,60 @@ const referencesSection = (protocol) => ({
   ],
 });
 
-const diagnosisSection = (protocol) => ({
-  id: 'diagnostico',
-  title: PRIMARY_SECTION_TITLES.diagnosis,
+const definitionSection = (protocol) => ({
+  id: 'que-es',
+  title: PRIMARY_SECTION_TITLES.definition,
   type: 'section',
   initiallyOpen: true,
   children: [
     {
-      id: 'entrada',
-      title: 'Entrada rápida',
+      id: 'definicion',
+      title: protocol.title,
       type: 'step',
-      summary: protocol.summary,
-      items: asArray(protocol.quickChecks),
+      summary: brief(protocol.summary, 180),
       severity: 'info',
       initiallyOpen: true,
     },
+  ],
+});
+
+const defaultOrders = (protocol) => {
+  const checks = asArray(protocol.quickChecks);
+
+  return {
+    id: 'que-pido',
+    title: PRIMARY_SECTION_TITLES.orders,
+    type: 'section',
+    initiallyOpen: true,
+    children: [
+      {
+        id: 'pruebas-iniciales',
+        title: 'Pruebas iniciales',
+        type: 'step',
+        items: checks.length ? checks : ['Constantes, exploración dirigida y pruebas según sospecha clínica.'],
+      },
+    ],
+  };
+};
+
+const defaultFindings = (protocol) => ({
+  id: 'que-espero',
+  title: PRIMARY_SECTION_TITLES.findings,
+  type: 'section',
+  initiallyOpen: true,
+  children: [
+    ...decisionNodes(protocol),
+    ...(protocol.warnings?.length
+      ? [
+          {
+            id: 'gravedad',
+            title: 'Criterios de gravedad',
+            type: 'alert',
+            severity: 'warning',
+            items: protocol.warnings,
+          },
+        ]
+      : []),
   ],
 });
 
@@ -131,16 +226,15 @@ const genericTreatmentSection = (protocol) => {
     children: [
       {
         id: 'tratamiento-urgencias',
-        title: 'Conducta inicial',
+        title: 'Pautas en Urgencias',
         type: 'treatment',
-        summary: firstSentence(protocol.summary),
+        summary: 'Fármacos y medidas concretas cuando están auditadas.',
         children: [
-          ...decisionNodes(protocol),
           ...medicationGroups.map((group) => ({
             id: `grupo-${slugify(group.title)}`,
             title: group.title,
             type: 'treatment',
-            summary: 'Pauta concreta del protocolo.',
+            summary: 'Abrir para ver fármacos y dosis.',
             children: asArray(group.medicationIds).map(medicationNode),
           })),
         ],
@@ -165,18 +259,7 @@ const genericTreatmentSection = (protocol) => {
             },
           ]
         : []),
-      ...(calculators.length
-        ? [
-            {
-              id: 'calculos-tratamiento',
-              title: 'Cálculos que cambian tratamiento',
-              type: 'calculator',
-              summary: 'Abrir la calculadora concreta desde el nodo.',
-              initiallyOpenMobile: true,
-              children: calculators.map(calculatorNode),
-            },
-          ]
-        : []),
+      ...(calculators.length ? treatmentCalculatorNodes(protocol, calculators) : []),
       ...(protocol.warnings?.length
         ? [
             {
@@ -208,6 +291,59 @@ const genericFollowUpSection = (protocol) => ({
         ...asArray(protocol.warnings).slice(0, 2),
       ],
       severity: 'success',
+    },
+  ],
+});
+
+const pneumoniaOrdersSection = (protocol) => ({
+  id: 'que-pido',
+  title: PRIMARY_SECTION_TITLES.orders,
+  type: 'section',
+  initiallyOpen: true,
+  children: [
+    {
+      id: 'clinica-constantes-imagen',
+      title: 'Clínica, constantes e imagen',
+      type: 'step',
+      items: protocol.quickChecks.slice(0, 3),
+    },
+    {
+      id: 'microbiologia-analitica',
+      title: 'Analítica / microbiología',
+      type: 'step',
+      summary: 'Pedir solo si cambia conducta o hay gravedad.',
+      items: [protocol.decisionCards[1]?.nuance].filter(Boolean),
+    },
+    {
+      id: 'gravedad',
+      title: 'Escalas de gravedad',
+      type: 'scale',
+      summary: protocol.decisionCards[2]?.action,
+      initiallyOpenMobile: true,
+      children: protocol.calculatorIds.map(calculatorNode),
+    },
+  ],
+});
+
+const pneumoniaFindingsSection = (protocol) => ({
+  id: 'que-espero',
+  title: PRIMARY_SECTION_TITLES.findings,
+  type: 'section',
+  initiallyOpen: true,
+  children: [
+    {
+      id: 'criterios-destino',
+      title: 'Gravedad y destino',
+      type: 'decision',
+      summary: protocol.decisionCards[3]?.action,
+      items: [protocol.decisionCards[3]?.nuance].filter(Boolean),
+    },
+    {
+      id: 'alertas',
+      title: 'No alta segura',
+      type: 'alert',
+      severity: 'warning',
+      items: protocol.noDischargeCriteria,
     },
   ],
 });
@@ -294,22 +430,11 @@ const buildPneumoniaFlow = (protocol) => ({
   id: protocol.id,
   title: protocol.longTitle ?? protocol.title,
   specialty: protocol.section,
-  summary: protocol.summary,
+  summary: brief(protocol.summary, 170),
   sections: [
-    {
-      ...diagnosisSection(protocol),
-      children: [
-        ...diagnosisSection(protocol).children,
-        {
-          id: 'gravedad',
-          title: 'CRB-65 / CURB-65',
-          type: 'scale',
-          summary: protocol.decisionCards[2]?.action,
-          initiallyOpenMobile: true,
-          children: protocol.calculatorIds.map(calculatorNode),
-        },
-      ],
-    },
+    definitionSection(protocol),
+    pneumoniaOrdersSection(protocol),
+    pneumoniaFindingsSection(protocol),
     pneumoniaTreatmentSection(protocol),
     pneumoniaFollowUpSection(protocol),
     referencesSection(protocol),
@@ -323,32 +448,55 @@ const guardiaFlow = (protocol) => {
     id: protocol.id,
     title: protocol.longTitle ?? protocol.title,
     specialty: protocol.section,
-    summary: protocol.summary,
+    summary: brief(protocol.summary, 170),
     sections: [
       {
-        id: 'diagnostico',
-        title: PRIMARY_SECTION_TITLES.diagnosis,
+        id: 'que-es',
+        title: PRIMARY_SECTION_TITLES.definition,
         type: 'section',
         initiallyOpen: true,
         children: [
           {
             id: 'clinica',
-            title: 'Clínica',
+            title: protocol.title,
             type: 'step',
             summary: guardia.clinica,
             severity: 'warning',
           },
-          {
-            id: 'diagnostico',
-            title: 'Diagnóstico',
-            type: 'decision',
-            summary: guardia.diagnostico,
-          },
+        ],
+      },
+      {
+        id: 'que-pido',
+        title: PRIMARY_SECTION_TITLES.orders,
+        type: 'section',
+        initiallyOpen: true,
+        children: [
           {
             id: 'pruebas',
             title: 'Pruebas',
             type: 'step',
             items: guardia.pruebas,
+          },
+        ],
+      },
+      {
+        id: 'que-espero',
+        title: PRIMARY_SECTION_TITLES.findings,
+        type: 'section',
+        initiallyOpen: true,
+        children: [
+          {
+            id: 'diagnostico',
+            title: 'Hallazgos clave',
+            type: 'decision',
+            summary: guardia.diagnostico,
+          },
+          {
+            id: 'alarmas',
+            title: 'Criterios de gravedad',
+            type: 'alert',
+            severity: 'danger',
+            items: guardia.alertas,
           },
         ],
       },
@@ -393,13 +541,6 @@ const guardiaFlow = (protocol) => {
         initiallyOpen: true,
         children: [
           {
-            id: 'alarmas',
-            title: 'Alarmas',
-            type: 'alert',
-            severity: 'danger',
-            items: guardia.alertas,
-          },
-          {
             id: 'destino',
             title: 'Destino',
             type: 'decision',
@@ -435,9 +576,11 @@ const genericFlow = (protocol) => ({
   id: protocol.id,
   title: protocol.longTitle ?? protocol.title,
   specialty: protocol.section,
-  summary: protocol.summary,
+  summary: brief(protocol.summary, 170),
   sections: [
-    diagnosisSection(protocol),
+    definitionSection(protocol),
+    defaultOrders(protocol),
+    defaultFindings(protocol),
     genericTreatmentSection(protocol),
     genericFollowUpSection(protocol),
     referencesSection(protocol),

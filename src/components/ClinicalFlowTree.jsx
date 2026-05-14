@@ -134,7 +134,7 @@ const FlowSection = ({ section, onCalculatorOpen }) => {
 };
 
 export const ClinicalFlowTree = ({ protocol, onCalculatorOpen }) => {
-  const mainSections = protocol.sections.slice(0, 3);
+  const mainSections = protocol.sections.filter((section) => section.type !== 'references');
 
   return (
     <div className="clinical-flow-tree">
