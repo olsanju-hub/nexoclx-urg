@@ -6,8 +6,8 @@ const PRIMARY_SECTION_TITLES = {
   definition: 'Qué es',
   orders: 'Qué pido',
   findings: 'Qué espero encontrar',
-  treatment: 'Tratamiento en Urgencias',
-  followUp: 'Seguimiento / destino',
+  treatment: 'Tratamiento',
+  followUp: 'Destino / seguimiento',
 };
 
 const CARDIOLOGY_PROTOCOL_IDS = new Set([
