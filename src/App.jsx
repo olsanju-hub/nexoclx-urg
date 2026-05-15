@@ -263,6 +263,60 @@ const buildSpecialtyCollections = () =>
     };
   });
 
+const implementedProtocolModules = motivoConsultaModules.filter((module) => module.implemented);
+
+const frequentProtocolIds = [
+  'fibrilacion-auricular',
+  'sindrome-coronario-agudo',
+  'ictus-isquemico',
+  'neumonia-comunidad',
+  'hta-urgencias',
+  'dolor-urinario',
+];
+
+const protocolSearchAliases = {
+  'fibrilacion-auricular': ['fa', 'arritmia', 'palpitaciones'],
+  'sindrome-coronario-agudo': ['sca', 'infarto', 'dolor toracico', 'iam', 'scacest'],
+  'ictus-isquemico': ['ictus', 'codigo ictus', 'trombolisis', 'trombectomia'],
+  'ictus-hemorragico': ['ictus', 'hemorragia cerebral', 'tac'],
+  'neumonia-comunidad': ['nac', 'neumonia', 'infeccion respiratoria'],
+  'hta-urgencias': ['hta', 'hipertension', 'presion arterial'],
+  bradicardias: ['bradicardia', 'bloqueo av'],
+  'arritmias-ventriculares': ['tv', 'fv', 'torsades', 'taquicardia ventricular'],
+  'dolor-urinario': ['colico renal', 'urologia', 'litiasis', 'flanco'],
+};
+
+const getProtocolCalculatorCount = (moduleId) => implementedCalculators.filter((calculator) => calculator.moduleId === moduleId).length;
+
+const getProtocolSearchText = (module) =>
+  [
+    module.title,
+    module.shortTitle,
+    module.summary,
+    module.section,
+    module.chapter,
+    ...(protocolSearchAliases[module.id] ?? []),
+  ].join(' ');
+
+const filterProtocolModules = (modules, query, specialtyId = 'todos') => {
+  const needle = normalizeSearch(query);
+
+  return modules.filter((module) => {
+    const specialtyMatches = specialtyId === 'todos' || module.specialtyId === specialtyId;
+    const queryMatches = !needle || matchesSearch(needle, getProtocolSearchText(module));
+    return specialtyMatches && queryMatches;
+  });
+};
+
+const filterCalculatorItems = (query) => {
+  const needle = normalizeSearch(query);
+  if (!needle) return [];
+
+  return implementedCalculators.filter((calculator) =>
+    matchesSearch(needle, calculator.title, calculator.summary, calculator.block, calculator.moduleId),
+  );
+};
+
 const filterSpecialtyCollections = (groups, query) => {
   const needle = normalizeSearch(query);
 
@@ -280,19 +334,15 @@ const filterSpecialtyCollections = (groups, query) => {
 
       const protocols = group.protocols.filter((module) => matchesSearch(needle, module.title, module.summary, module.section));
       const calculators = group.calculators.filter((calculator) => matchesSearch(needle, calculator.title, calculator.summary, calculator.block));
-      const bibliography = group.bibliography.filter((entry) =>
-        matchesSearch(needle, entry.moduleTitle, entry.shortReference, entry.note),
-      );
-
       return {
         ...group,
         protocols,
         calculators,
         medications: [],
-        bibliography,
+        bibliography: [],
       };
     })
-    .filter((group) => group.protocols.length > 0 || group.calculators.length > 0 || group.bibliography.length > 0);
+    .filter((group) => group.protocols.length > 0 || group.calculators.length > 0);
 };
 
 const BrandLockup = ({ label }) => (
@@ -445,6 +495,59 @@ const ListActionRow = ({ title, meta, onClick, badge = null, disabled = false })
   </button>
 );
 
+const ProtocolCompactCard = ({ module, onClick }) => {
+  const calculatorCount = getProtocolCalculatorCount(module.id);
+
+  return (
+    <button type="button" onClick={onClick} className="protocol-compact-card group">
+      <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <p className="truncate text-sm font-semibold text-[var(--text)]">{module.title}</p>
+          {calculatorCount ? <StatusBadge tone="active">{calculatorCount} cálculo{calculatorCount > 1 ? 's' : ''}</StatusBadge> : null}
+        </div>
+        <p className="mt-1 text-[0.72rem] font-semibold text-[var(--text-muted)]">{module.section}</p>
+        <p className="mt-1 line-clamp-1 text-xs leading-snug text-[var(--text-soft)]">{module.summary}</p>
+      </div>
+      <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
+    </button>
+  );
+};
+
+const CalculatorCompactRow = ({ calculator, onClick }) => (
+  <button type="button" onClick={onClick} className="protocol-compact-card group">
+    <div className="min-w-0 flex-1">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <p className="truncate text-sm font-semibold text-[var(--text)]">{calculator.title}</p>
+        <StatusBadge>Cálculo</StatusBadge>
+      </div>
+      <p className="mt-1 line-clamp-1 text-xs leading-snug text-[var(--text-soft)]">{calculator.summary}</p>
+    </div>
+    <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
+  </button>
+);
+
+const SpecialtyChips = ({ groups, activeId = 'todos', onSelect }) => (
+  <div className="specialty-chip-row">
+    <button
+      type="button"
+      onClick={() => onSelect('todos')}
+      className={`specialty-chip ${activeId === 'todos' ? 'specialty-chip-active' : ''}`}
+    >
+      Todos
+    </button>
+    {groups.map((group) => (
+      <button
+        key={group.id}
+        type="button"
+        onClick={() => onSelect(group.id)}
+        className={`specialty-chip ${activeId === group.id ? 'specialty-chip-active' : ''}`}
+      >
+        {group.title}
+      </button>
+    ))}
+  </div>
+);
+
 const ProtocolSpecialtyList = ({ groups, onModuleOpen }) => (
   <div className="space-y-4">
     {groups.map((group) => (
@@ -489,8 +592,8 @@ const SpecialtyReferenceRow = ({ entry }) => (
   </div>
 );
 
-const SearchField = ({ value, onChange, placeholder }) => (
-  <label className={`${mutedPanelClass} flex items-center gap-3 px-4 py-3.5`}>
+const SearchField = ({ value, onChange, placeholder, prominent = false }) => (
+  <label className={`${prominent ? 'primary-search-field' : mutedPanelClass} flex items-center gap-3 px-4 py-3.5`}>
     <span className="icon-well h-10 w-10 rounded-[0.95rem] bg-[rgba(191,146,69,0.12)] text-[var(--accent-500)]">
       <Search className="h-4 w-4" />
     </span>
@@ -501,7 +604,7 @@ const SearchField = ({ value, onChange, placeholder }) => (
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="mt-1 w-full bg-transparent text-sm font-medium text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]"
+        className={`${prominent ? 'text-base sm:text-lg' : 'text-sm'} mt-1 w-full bg-transparent font-medium text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]`}
       />
     </div>
   </label>
@@ -567,13 +670,6 @@ const SpecialtyAccordionList = ({
               </SpecialtySectionRows>
             ) : null}
 
-            {group.bibliography.length > 0 ? (
-              <SpecialtySectionRows title="Fuentes principales">
-                {group.bibliography.map((entry) => (
-                  <SpecialtyReferenceRow key={`${entry.moduleTitle}:${entry.internalId}`} entry={entry} />
-                ))}
-              </SpecialtySectionRows>
-            ) : null}
           </div>
         </div>
       </details>
@@ -643,7 +739,7 @@ const MedicationQuickRow = ({ medication }) => (
 
 const BibliographyBlock = ({ entries }) => (
   <section className={`${panelClass} p-4 sm:p-5`}>
-    <SectionTitle title="Fuentes" note="Referencias textuales verificadas; la app no abre PDFs." />
+    <SectionTitle title="Fuentes" note="Referencias textuales verificadas." />
     <div className="space-y-3">
       {entries.map((entry) => (
         <div key={entry.internalId} className={`${mutedPanelClass} p-4`}>
@@ -1354,34 +1450,68 @@ const HomeView = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  const specialtyCollectionsBase = buildSpecialtyCollections();
-  const specialtyCollections = filterSpecialtyCollections(specialtyCollectionsBase, deferredSearchQuery);
+  const specialtyCollectionsBase = buildSpecialtyCollections().map((group) => ({
+    ...group,
+    protocols: group.protocols.filter((module) => module.implemented),
+    bibliography: [],
+  }));
   const hasSearchQuery = Boolean(normalizeSearch(deferredSearchQuery));
-  const hasSearchResults = specialtyCollections.length > 0;
+  const protocolResults = filterProtocolModules(implementedProtocolModules, deferredSearchQuery).slice(0, 8);
+  const calculatorResults = filterCalculatorItems(deferredSearchQuery).slice(0, 4);
+  const hasSearchResults = protocolResults.length > 0 || calculatorResults.length > 0;
+  const frequentProtocols = frequentProtocolIds
+    .map((id) => implementedProtocolModules.find((module) => module.id === id))
+    .filter(Boolean);
 
   return (
     <div className={pageClass}>
-      <PageHero title="Inicio clínico">
-        <SearchField value={searchQuery} onChange={setSearchQuery} placeholder="Protocolo o cálculo" />
-      </PageHero>
+      <section className="home-search-panel">
+        <SearchField
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Buscar protocolo, síntoma o cálculo"
+          prominent
+        />
+      </section>
 
       {hasSearchQuery ? (
-        <DetailPanel title="Resultados">
+        <section className="compact-section">
+          <SectionTitle title="Resultados" />
           {hasSearchResults ? (
-            <SpecialtyAccordionList
-              groups={specialtyCollections}
-              onModuleOpen={onModuleOpen}
-              onCalculatorOpen={onCalculatorOpen}
-              forceOpen={Boolean(normalizeSearch(deferredSearchQuery))}
-            />
+            <div className="space-y-2">
+              {protocolResults.map((module) => (
+                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
+              ))}
+              {calculatorResults.map((calculator) => (
+                <CalculatorCompactRow key={calculator.id} calculator={calculator} onClick={() => onCalculatorOpen(calculator.id)} />
+              ))}
+            </div>
           ) : (
             <EmptySearchState query={deferredSearchQuery} />
           )}
-        </DetailPanel>
+        </section>
       ) : (
-        <DetailPanel title="Especialidades">
-          <SpecialtyLandingGrid groups={specialtyCollectionsBase} onOpen={onSpecialtyOpen} />
-        </DetailPanel>
+        <>
+          <section className="compact-section">
+            <SectionTitle title="Frecuentes" />
+            <div className="compact-card-grid">
+              {frequentProtocols.map((module) => (
+                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
+              ))}
+            </div>
+          </section>
+
+          <section className="compact-section">
+            <SectionTitle title="Especialidades" />
+            <div className="specialty-chip-row">
+              {specialtyCollectionsBase.map((group) => (
+                <button key={group.id} type="button" onClick={() => onSpecialtyOpen(group.id)} className="specialty-chip">
+                  {group.title}
+                </button>
+              ))}
+            </div>
+          </section>
+        </>
       )}
     </div>
   );
@@ -1389,33 +1519,39 @@ const HomeView = ({
 
 const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyId = null }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSpecialtyId, setActiveSpecialtyId] = useState(focusSpecialtyId ?? 'todos');
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  const specialtyCollections = filterSpecialtyCollections(buildSpecialtyCollections(), deferredSearchQuery);
+  const specialtyCollections = buildSpecialtyCollections().map((group) => ({
+    ...group,
+    protocols: group.protocols.filter((module) => module.implemented),
+    bibliography: [],
+  }));
+  const protocolResults = filterProtocolModules(implementedProtocolModules, deferredSearchQuery, activeSpecialtyId);
 
   return (
     <div className={pageClass}>
       <BackBar label="Inicio" onClick={onBack} />
 
-      <PageHero
-        eyebrow="Organigrama clínico"
-        title="Protocolos"
-        note="Base técnica para renderizar protocolos rápidos como árboles de decisión compactos, con diagnóstico, tratamiento y destino visibles desde móvil."
-      >
+      <section className="compact-section">
+        <SectionTitle title="Protocolos" />
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Filtrar contenido"
+          placeholder="Buscar protocolo, síntoma o cálculo"
         />
-      </PageHero>
+        <div className="mt-3">
+          <SpecialtyChips groups={specialtyCollections} activeId={activeSpecialtyId} onSelect={setActiveSpecialtyId} />
+        </div>
+      </section>
 
-      {specialtyCollections.length > 0 ? (
-        <SpecialtyAccordionList
-          groups={specialtyCollections}
-          onModuleOpen={onModuleOpen}
-          onCalculatorOpen={onCalculatorOpen}
-          forceOpen={Boolean(normalizeSearch(deferredSearchQuery))}
-          preferredOpenId={focusSpecialtyId}
-        />
+      {protocolResults.length > 0 ? (
+        <section className="compact-section">
+          <div className="space-y-2">
+            {protocolResults.map((module) => (
+              <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
+            ))}
+          </div>
+        </section>
       ) : (
         <EmptySearchState query={deferredSearchQuery} />
       )}
