@@ -403,13 +403,13 @@ const PageHero = ({ eyebrow, title, note, aside = null, children = null }) => (
 );
 
 const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
-  <header className={`fixed inset-x-0 top-0 z-40 border-b border-[color:var(--line)] bg-[rgba(248,243,236,0.88)] backdrop-blur-xl ${isScrolled ? 'shadow-[0_22px_44px_-36px_rgba(64,49,22,0.28)]' : ''}`}>
+  <header className={`fixed inset-x-0 top-0 z-40 border-b border-[color:var(--line)] bg-[rgba(255,255,255,0.82)] backdrop-blur-xl ${isScrolled ? 'shadow-[0_18px_38px_-34px_rgba(0,0,0,0.18)]' : ''}`}>
     <div className="mx-auto flex h-[4.2rem] max-w-[82rem] items-center gap-3 px-3.5 sm:h-[4.6rem] sm:gap-4 sm:px-6 lg:px-8 xl:px-10">
       <button type="button" onClick={onHome} className="min-w-0 text-left">
         <BrandLockup label={pageLabel} />
       </button>
 
-      <nav className="ml-auto hidden items-center gap-1 rounded-full border border-[color:var(--line)] bg-[rgba(255,255,255,0.68)] p-1 shadow-[0_18px_36px_-28px_rgba(64,49,22,0.18)] lg:flex">
+      <nav className="ml-auto hidden items-center gap-1 rounded-full border border-[color:var(--line)] bg-[rgba(255,255,255,0.72)] p-1 shadow-[0_14px_30px_-26px_rgba(0,0,0,0.14)] lg:flex">
         {primaryNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeKey === item.key;
@@ -629,7 +629,7 @@ const SpecialtyAccordionList = ({
     {groups.map((group) => (
       <details
         key={group.id}
-        className="group overflow-hidden rounded-[1.55rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.78)] shadow-[0_24px_48px_-38px_rgba(64,49,22,0.2)]"
+        className="group overflow-hidden rounded-[1.35rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.92)] shadow-[0_18px_40px_-34px_rgba(0,0,0,0.16)]"
         {...(forceOpen || group.id === preferredOpenId || (!preferredOpenId && group.id === 'cardiologia') ? { open: true } : {})}
       >
         <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4 sm:px-5 sm:py-4.5 [&::-webkit-details-marker]:hidden">
@@ -684,7 +684,7 @@ const SpecialtyLandingGrid = ({ groups, onOpen }) => (
         key={group.id}
         type="button"
         onClick={() => onOpen(group.id)}
-        className="group flex items-center justify-between rounded-[1.45rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] px-4 py-4 text-left shadow-[0_18px_38px_-30px_rgba(64,49,22,0.14)] transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(191,146,69,0.24)]"
+        className="group flex items-center justify-between rounded-[1.45rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] px-4 py-4 text-left shadow-[0_18px_38px_-30px_rgba(0,0,0,0.12)] transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(0,113,227,0.20)]"
       >
         <span className="text-sm font-semibold text-[var(--text)]">{group.title}</span>
         <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -699,12 +699,12 @@ const QuickAccessCard = ({ icon: Icon, title, meta, onClick, tone = 'neutral' })
     onClick={onClick}
     className={`group flex items-start gap-3 rounded-[1.5rem] border px-4 py-4 text-left transition duration-200 hover:-translate-y-0.5 ${
       tone === 'accent'
-        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.9)] shadow-[0_24px_48px_-34px_rgba(171,126,48,0.3)]'
-        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.88)] shadow-[0_18px_42px_-30px_rgba(64,49,22,0.16)] hover:border-[rgba(191,146,69,0.24)]'
+        ? 'border-[rgba(0,113,227,0.20)] bg-[rgba(0,113,227,0.08)] shadow-[0_24px_48px_-34px_rgba(0,113,227,0.24)]'
+        : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.88)] shadow-[0_18px_42px_-30px_rgba(0,0,0,0.12)] hover:border-[rgba(0,113,227,0.20)]'
     }`}
   >
     <span
-      className={`icon-well ${tone === 'accent' ? 'bg-[rgba(191,146,69,0.16)] text-[var(--accent-500)]' : ''}`}
+      className={`icon-well ${tone === 'accent' ? 'bg-[rgba(0,113,227,0.10)] text-[var(--accent-500)]' : ''}`}
     >
       <Icon className="h-[1.125rem] w-[1.125rem]" />
     </span>
@@ -727,7 +727,7 @@ const MedicationQuickRow = ({ medication }) => (
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-sm font-semibold text-[var(--text)]">{medication.name}</p>
-        <span className="rounded-full bg-[rgba(191,146,69,0.12)] px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-500)]">
+        <span className="rounded-full bg-[rgba(0,113,227,0.08)] px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-500)]">
           {medication.family}
         </span>
       </div>
@@ -790,7 +790,7 @@ const BooleanField = ({ checked, label, onChange }) => (
   <label
     className={`flex items-center gap-3 rounded-[1rem] border px-3.5 py-3 text-sm transition-colors ${
       checked
-        ? 'border-[rgba(191,146,69,0.3)] bg-[rgba(247,241,226,0.82)] text-[var(--text)]'
+        ? 'border-[rgba(0,113,227,0.28)] bg-[rgba(0,113,227,0.07)] text-[var(--text)]'
         : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] text-[var(--text-soft)]'
     }`}
   >
@@ -833,7 +833,7 @@ const SelectField = ({ value, label, options, onChange }) => (
 
 const CalculatorResult = ({ result }) =>
   result ? (
-    <div className="rounded-[1.15rem] border border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.9)] px-4 py-3">
+    <div className="rounded-[1.15rem] border border-[rgba(0,113,227,0.20)] bg-[rgba(0,113,227,0.08)] px-4 py-3">
       <p className="text-2xl font-semibold tracking-[-0.04em] text-[var(--text)]">
         {result.value} <span className="text-sm font-medium text-[var(--text-muted)]">{result.unit}</span>
       </p>
@@ -998,9 +998,9 @@ const ProtocolGuideBlock = ({ label, children, tone = 'neutral' }) => {
     tone === 'critical'
       ? 'border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.9)]'
       : tone === 'warning'
-        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.9)]'
+        ? 'border-[rgba(0,113,227,0.20)] bg-[rgba(245,245,247,0.92)]'
         : tone === 'accent'
-          ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.88)]'
+          ? 'border-[rgba(0,113,227,0.20)] bg-[rgba(0,113,227,0.08)]'
           : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.82)]';
 
   return (
@@ -1016,9 +1016,9 @@ const DisclosureBlock = ({ title, summary, children, tone = 'neutral', defaultOp
     tone === 'critical'
       ? 'border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.92)]'
       : tone === 'warning'
-        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.94)]'
+        ? 'border-[rgba(0,113,227,0.20)] bg-[rgba(245,245,247,0.94)]'
         : tone === 'accent'
-          ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(247,241,226,0.9)]'
+          ? 'border-[rgba(0,113,227,0.20)] bg-[rgba(0,113,227,0.08)]'
           : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.88)]';
 
   return (
@@ -1355,14 +1355,14 @@ const FlowChoiceCard = ({ icon: Icon, title, note, onClick, tone = 'neutral', di
     className={`group flex w-full items-center gap-4 rounded-[1.55rem] border px-4 py-4 text-left transition duration-200 sm:px-5 sm:py-5 ${
       tone === 'critical'
         ? `border-[rgba(164,76,63,0.18)] bg-[rgba(249,236,232,0.88)] ${disabled ? 'opacity-55' : 'hover:-translate-y-0.5 hover:bg-[rgba(249,236,232,0.95)]'}`
-        : `border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] ${disabled ? 'opacity-55' : 'hover:-translate-y-0.5 hover:border-[rgba(191,146,69,0.24)]'}`
+        : `border-[color:var(--line)] bg-[rgba(255,255,255,0.84)] ${disabled ? 'opacity-55' : 'hover:-translate-y-0.5 hover:border-[rgba(0,113,227,0.20)]'}`
     }`}
   >
     <span
       className={`icon-well ${
         tone === 'critical'
           ? 'bg-[rgba(164,76,63,0.12)] text-[var(--danger-500)]'
-          : 'bg-[rgba(191,146,69,0.14)] text-[var(--accent-500)]'
+          : 'bg-[rgba(0,113,227,0.09)] text-[var(--accent-500)]'
       }`}
     >
       <Icon className="h-5 w-5" />
@@ -1390,7 +1390,7 @@ const FlowActionCard = ({ title, body, tone = 'neutral', children = null }) => {
     tone === 'critical'
       ? 'border-[rgba(164,76,63,0.22)] bg-[rgba(164,76,63,0.92)] text-white shadow-[0_28px_58px_-38px_rgba(139,57,44,0.42)]'
       : tone === 'warning'
-        ? 'border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.94)] text-[var(--text)]'
+        ? 'border-[rgba(0,113,227,0.20)] bg-[rgba(245,245,247,0.94)] text-[var(--text)]'
         : 'border-[color:var(--line)] bg-[rgba(255,255,255,0.9)] text-[var(--text)]';
 
   const bodyClass =
@@ -1401,7 +1401,7 @@ const FlowActionCard = ({ title, body, tone = 'neutral', children = null }) => {
         : 'text-[var(--text-soft)]';
 
   return (
-    <section className={`rounded-[1.7rem] border px-5 py-5 shadow-[0_24px_50px_-42px_rgba(64,49,22,0.2)] ${toneClass}`}>
+    <section className={`rounded-[1.35rem] border px-5 py-5 shadow-[0_18px_42px_-36px_rgba(0,0,0,0.16)] ${toneClass}`}>
       <h3 className="text-lg font-semibold tracking-[-0.03em]">{title}</h3>
       <p className={`mt-2 text-sm leading-relaxed ${bodyClass}`}>{body}</p>
       {children ? <div className="mt-5">{children}</div> : null}
@@ -1620,7 +1620,7 @@ const NeumoniaComunidadFlowView = ({ protocol, onCalculatorOpen, onBack }) => {
                 key={calculatorId}
                 type="button"
                 onClick={() => onCalculatorOpen(calculatorId)}
-                className="rounded-[1.15rem] border border-[color:var(--line)] bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:border-[rgba(191,146,69,0.45)]"
+                className="rounded-[1.15rem] border border-[color:var(--line)] bg-white/80 p-4 text-left transition hover:-translate-y-0.5 hover:border-[rgba(0,113,227,0.34)]"
               >
                 <p className="eyebrow eyebrow-muted">{calculator.block}</p>
                 <p className="mt-1 text-base font-semibold text-[var(--text)]">{calculator.title}</p>
@@ -2201,13 +2201,13 @@ const HipertensionUrgenciasFlowView = ({
       : systolic >= 160 || diastolic >= 100
         ? {
             label: 'Moderada · estadio 2',
-            containerClass: 'border-[rgba(191,146,69,0.24)] bg-[rgba(248,241,223,0.92)] text-[var(--accent-ink)]',
+            containerClass: 'border-[rgba(0,113,227,0.20)] bg-[rgba(245,245,247,0.92)] text-[var(--accent-ink)]',
             iconClass: 'text-[var(--accent-500)]',
           }
         : systolic >= 140 || diastolic >= 90
           ? {
               label: 'Ligera · estadio 1',
-              containerClass: 'border-[rgba(191,146,69,0.18)] bg-[rgba(247,241,226,0.84)] text-[var(--accent-ink)]',
+              containerClass: 'border-[rgba(0,113,227,0.14)] bg-[rgba(0,113,227,0.06)] text-[var(--accent-ink)]',
               iconClass: 'text-[var(--accent-500)]',
             }
           : {
