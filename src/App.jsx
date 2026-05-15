@@ -495,18 +495,18 @@ const ListActionRow = ({ title, meta, onClick, badge = null, disabled = false })
   </button>
 );
 
-const ProtocolCompactCard = ({ module, onClick }) => {
+const ProtocolCompactCard = ({ module, onClick, compact = false }) => {
   const calculatorCount = getProtocolCalculatorCount(module.id);
 
   return (
-    <button type="button" onClick={onClick} className="protocol-compact-card group">
+    <button type="button" onClick={onClick} className={`protocol-compact-card ${compact ? 'protocol-compact-card-slim' : ''} group`}>
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <p className="truncate text-sm font-semibold text-[var(--text)]">{module.title}</p>
-          {calculatorCount ? <StatusBadge tone="active">{calculatorCount} cálculo{calculatorCount > 1 ? 's' : ''}</StatusBadge> : null}
+          {!compact && calculatorCount ? <StatusBadge tone="active">{calculatorCount} cálculo{calculatorCount > 1 ? 's' : ''}</StatusBadge> : null}
         </div>
         <p className="mt-1 text-[0.72rem] font-semibold text-[var(--text-muted)]">{module.section}</p>
-        <p className="mt-1 line-clamp-1 text-xs leading-snug text-[var(--text-soft)]">{module.summary}</p>
+        {!compact ? <p className="mt-1 line-clamp-1 text-xs leading-snug text-[var(--text-soft)]">{module.summary}</p> : null}
       </div>
       <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
     </button>
@@ -594,17 +594,17 @@ const SpecialtyReferenceRow = ({ entry }) => (
 
 const SearchField = ({ value, onChange, placeholder, prominent = false }) => (
   <label className={`${prominent ? 'primary-search-field' : mutedPanelClass} flex items-center gap-3 px-4 py-3.5`}>
-    <span className="icon-well h-10 w-10 rounded-[0.95rem] bg-[rgba(191,146,69,0.12)] text-[var(--accent-500)]">
+    <span className={`icon-well ${prominent ? 'h-9 w-9' : 'h-10 w-10'} rounded-[0.95rem] bg-[rgba(15,111,124,0.1)] text-[var(--accent-500)]`}>
       <Search className="h-4 w-4" />
     </span>
     <div className="min-w-0 flex-1">
-      <p className="eyebrow eyebrow-muted">Buscar</p>
+      {!prominent ? <p className="eyebrow eyebrow-muted">Buscar</p> : null}
       <input
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className={`${prominent ? 'text-base sm:text-lg' : 'text-sm'} mt-1 w-full bg-transparent font-medium text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]`}
+        className={`${prominent ? 'text-[0.98rem] sm:text-[1.05rem]' : 'mt-1 text-sm'} w-full bg-transparent font-medium text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]`}
       />
     </div>
   </label>
@@ -1493,21 +1493,21 @@ const HomeView = ({
       ) : (
         <>
           <section className="compact-section">
-            <SectionTitle title="Frecuentes" />
-            <div className="compact-card-grid">
-              {frequentProtocols.map((module) => (
-                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
-              ))}
-            </div>
-          </section>
-
-          <section className="compact-section">
             <SectionTitle title="Especialidades" />
-            <div className="specialty-chip-row">
+            <div className="home-specialty-grid">
               {specialtyCollectionsBase.map((group) => (
                 <button key={group.id} type="button" onClick={() => onSpecialtyOpen(group.id)} className="specialty-chip">
                   {group.title}
                 </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="compact-section compact-section-secondary">
+            <SectionTitle title="Frecuentes" />
+            <div className="compact-list">
+              {frequentProtocols.map((module) => (
+                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} compact />
               ))}
             </div>
           </section>
