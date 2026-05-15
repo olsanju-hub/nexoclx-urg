@@ -1486,17 +1486,14 @@ const HomeView = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  const specialtyCollectionsBase = buildSpecialtyCollections().map((group) => ({
-    ...group,
-    protocols: group.protocols.filter((module) => module.implemented),
-    bibliography: [],
-  }));
+  const specialtyCollections = buildSimplifiedSpecialtyCollections();
+  const simplifiedProtocols = specialtyCollections.flatMap((group) => group.protocols);
   const hasSearchQuery = Boolean(normalizeSearch(deferredSearchQuery));
-  const protocolResults = filterProtocolModules(implementedProtocolModules, deferredSearchQuery).slice(0, 8);
+  const protocolResults = filterSimplifiedProtocolModules(simplifiedProtocols, deferredSearchQuery).slice(0, 8);
   const calculatorResults = filterCalculatorItems(deferredSearchQuery).slice(0, 4);
   const hasSearchResults = protocolResults.length > 0 || calculatorResults.length > 0;
   const frequentProtocols = frequentProtocolIds
-    .map((id) => implementedProtocolModules.find((module) => module.id === id))
+    .map((id) => simplifiedProtocols.find((module) => module.id === id))
     .filter(Boolean);
 
   return (
@@ -1531,7 +1528,7 @@ const HomeView = ({
           <section className="compact-section">
             <SectionTitle title="Especialidades" />
             <div className="home-specialty-grid">
-              {specialtyCollectionsBase.map((group) => (
+              {specialtyCollections.map((group) => (
                 <button key={group.id} type="button" onClick={() => onSpecialtyOpen(group.id)} className="specialty-chip">
                   {group.title}
                 </button>
@@ -1558,11 +1555,12 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
   const [activeSpecialtyId, setActiveSpecialtyId] = useState(focusSpecialtyId ?? 'todos');
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const specialtyCollections = buildSimplifiedSpecialtyCollections();
-  const protocolResults = filterSimplifiedProtocolModules(
-    specialtyCollections.flatMap((group) => group.protocols),
-    deferredSearchQuery,
-    activeSpecialtyId,
-  );
+  const displayedCollections = specialtyCollections
+    .map((group) => ({
+      ...group,
+      protocols: filterSimplifiedProtocolModules(group.protocols, deferredSearchQuery, activeSpecialtyId),
+    }))
+    .filter((group) => group.protocols.length > 0);
 
   return (
     <div className={pageClass}>
@@ -1580,14 +1578,33 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
         </div>
       </section>
 
-      {protocolResults.length > 0 ? (
-        <section className="compact-section">
-          <div className="space-y-2">
-            {protocolResults.map((module) => (
-              <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
-            ))}
-          </div>
-        </section>
+      {displayedCollections.length > 0 ? (
+        <div className="space-y-4">
+          {displayedCollections.map((group) => (
+            <section key={group.id} className="compact-section">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="eyebrow eyebrow-muted">{group.title}</p>
+                  <p className="mt-1 text-sm text-[var(--text-soft)]">{group.protocols.length} protocolos</p>
+                </div>
+                {activeSpecialtyId === 'todos' ? (
+                  <button
+                    type="button"
+                    onClick={() => setActiveSpecialtyId(group.id)}
+                    className="ghost-button"
+                  >
+                    Ver
+                  </button>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                {group.protocols.map((module) => (
+                  <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       ) : (
         <EmptySearchState query={deferredSearchQuery} />
       )}
