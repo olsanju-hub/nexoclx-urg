@@ -604,6 +604,198 @@ const ophthalmologyProtocols = {
   }),
 };
 
+// DIGESTIVO / UROLOGÍA / GINECOLOGÍA / INFECCIONES CLAVE
+const additionalProtocols = {
+  'apendicitis-aguda': createProtocol({
+    id: 'apendicitis-aguda',
+    title: 'Apendicitis aguda',
+    category: 'Urgencia',
+    specialty: 'Digestivo',
+    definition: 'Inflamación aguda del apéndice cecal, causa de dolor abdominal agudo en fosa iliaca derecha.',
+    diagnosticOrders: [
+      'Hemograma, PCR',
+      'Rx abdomen solo si obstructivo',
+      'Ecografía abdominal (preferible en jóvenes y embarazadas)',
+      'TC abdominopélvico si duda diagnóstica o adulto mayor',
+    ],
+    expectedFindings: [
+      'Dolor migratorio a fosa iliaca derecha',
+      'Defensa localizada, fiebre, leucocitosis y PCR elevada',
+      'Imagen: apéndice engrosado/enrojecido',
+    ],
+    treatment: [
+      'Analgesia y líquidos IV según tolerancia',
+      'Antibiótico perioperatorio si sospecha complicada (según protocolo local)',
+      'Cirugía urgente si peritonitis, perforación o empeoramiento',
+      'Observación en casos equivocos con re-evaluación en 6-12h y pruebas seriadas',
+    ],
+    followUp: ['Cirugía si confirmado; control postoperatorio y revisiones según evolución'],
+    redFlags: ['Peritonitis, shock, fiebre alta, empeoramiento rápido'],
+    notes: 'Decisión quirúrgica basada en clínica, analítica e imagen; no demorar si peritonismo.',
+  }),
+
+  'diverticulitis-aguda': createProtocol({
+    id: 'diverticulitis-aguda',
+    title: 'Diverticulitis aguda',
+    category: 'Urgencia',
+    specialty: 'Digestivo',
+    definition: 'Inflamación/infección de divertículos colónicos; puede ser no complicada o complicada.',
+    diagnosticOrders: [
+      'Hemograma, PCR, grupo y cruce si se va a intervenir',
+      'TC abdominopélvico con contraste (prueba de elección para estadificar)',
+      'Orina y test embarazo si mujer en edad fértil',
+    ],
+    expectedFindings: [
+      'Dolor en cuadrante inferior izquierdo, fiebre',
+      'Leucocitosis y PCR elevada',
+      'TC: engrosamiento pared, absceso o perforación si complicada',
+    ],
+    treatment: [
+      'No complicada, afebril y tolera VO: tratamiento oral y seguimiento en AP',
+      'Complicada (absceso/perforación): ingreso, ayuno, líquidos IV y antibiótico IV de amplio espectro',
+      'Drenaje guiado por imagen para abscesos seleccionados',
+      'Cirugía si peritonitis generalizada o fracaso de tratamiento',
+    ],
+    followUp: ['Control en consultas, colonoscopia electiva tras resolución según edad y riesgo'],
+    redFlags: ['Perforación, absceso grande, sepsis, deterioro hemodinámico'],
+    notes: 'Imagen (TC) guía conducta; evitar antibiótico rutinario en casos muy leves sin comorbilidad según guías.',
+  }),
+
+  'pancreatitis-aguda': createProtocol({
+    id: 'pancreatitis-aguda',
+    title: 'Pancreatitis aguda',
+    category: 'Urgencia',
+    specialty: 'Digestivo',
+    definition: 'Inflamación aguda del páncreas con dolor epigástrico intenso y elevación de lipasa/amilasa.',
+    diagnosticOrders: [
+      'Lipasa (preferible) y amilasa',
+      'Hemograma, bioquímica, función renal, calcio, glicemia',
+      'Rx tórax/abdominal si sospecha complicación',
+      'Ecografía para litiasis biliar; TC si dudas o empeoramiento',
+    ],
+    expectedFindings: [
+      'Dolor epigástrico intenso irradiado a espalda',
+      'Lipasa elevada ≥3 veces ULN',
+      'Náuseas, vómitos, posible distensión abdominal',
+    ],
+    treatment: [
+      'Reanimación con fluidos dirigidos (balance y resucitación)',
+      'Analgesia adecuada (opioides según protocolo local)',
+      'Ayuno inicial y nutrición temprana por vía enteral si se necesita soporte',
+      'Antibióticos solo si infección documentada o necrosis infectada',
+    ],
+    followUp: ['Ingresar según criterios de severidad; seguimiento según complicaciones y etiología (colangitis/litiasis)'],
+    redFlags: ['Shock, fallo orgánico, necrosis infectada, hipocalcemia grave'],
+    notes: 'Evaluar etiología: bilis, alcohol, hipertrigliceridemia; derivar a digestivo según evolución.',
+  }),
+
+  'colico-renal': createProtocol({
+    id: 'colico-renal',
+    title: 'Cólico renal / Urolitiasis aguda',
+    category: 'Urgencia',
+    specialty: 'Nefrología',
+    definition: 'Dolor lumbar/abdominal intenso por paso de cálculo ureteral, frecuentemente con hematuria.',
+    diagnosticOrders: [
+      'Analítica: hemograma, función renal, orina con sedimento',
+      'TC sin contraste abd/ pelvis (prueba de elección)',
+      'Rx simple si no disponible; ecografía si embarazo o pediatría',
+    ],
+    expectedFindings: [
+      'Dolor cólico lumbar irradiado a ingle, hematuria',
+      'Náuseas, vómitos, agitación por dolor',
+    ],
+    treatment: [
+      'Analgesia escalonada (opioide si necesario) y antiespasmódicos según protocolo local',
+      'Hidratación según tolerancia y estado hemodinámico',
+      'Urología si obstrucción infectada, fiebre, anuria o dolor intratable',
+      'Tamaño >6-7 mm o obstrucción persistente: valoración urológica para extracción o litotricia',
+    ],
+    followUp: ['Derivar a urología si persiste o existe complicación; control imagen según evolución'],
+    redFlags: ['Fiebre con litiasis (obstrucción infectada), monorreno, anuria, fracaso renal'],
+    notes: 'TC sin contraste es el estándar; en embarazo usar ecografía y minimizar radiación.',
+  }),
+
+  'pielonefritis-febril': createProtocol({
+    id: 'pielonefritis-febril',
+    title: 'Pielonefritis febril / ITU complicada',
+    category: 'Urgencia',
+    specialty: 'Nefrología',
+    definition: 'Infección renal con fiebre, dolor lumbar y posible sepsis; requiere evaluación y a menudo tratamiento IV.',
+    diagnosticOrders: [
+      'Orina: tira y sedimento, urocultivo',
+      'Hemograma, PCR, función renal',
+      'Ecografía/TC si sospecha obstrucción o complicación',
+    ],
+    expectedFindings: [
+      'Fiebre, escalofríos, dolor en flanco, signos de infección sistémica',
+      'Orina con piuria y/o bacteriuria; urocultivo positivo',
+    ],
+    treatment: [
+      'Antibiótico empírico IV según protocolo local y ajuste según urocultivo',
+      'Hidratación y analgesia',
+      'Ingresar si signos de sepsis, vómitos, intolerancia oral o riesgo de obstrucción',
+    ],
+    followUp: ['Reevaluar cultivos y ajustar antibiótico; control por urología si obstrucción o recidiva'],
+    redFlags: ['Obstrucción, fracaso renal, sepsis, shock'],
+    notes: 'Tratar la obstrucción concomitante (sondaje o drenaje) con prioridad.',
+  }),
+
+  'embarazo-ectopico': createProtocol({
+    id: 'embarazo-ectopico',
+    title: 'Embarazo ectópico',
+    category: 'Emergencia',
+    specialty: 'Ginecología',
+    definition: 'Implantación extrauterina, riesgo de rotura y hemorragia intraabdominal.',
+    diagnosticOrders: [
+      'Test embarazo (hCG cuantitativa)',
+      'Ecografía transvaginal urgente',
+      'Hemograma, grupo y cruce si sospecha sangrado',
+    ],
+    expectedFindings: [
+      'Dolor unilateral, sangrado vaginal, amenorrea',
+      'hCG no compatible con gestación intrauterina o masa anexial en ecografía',
+    ],
+    treatment: [
+      'Estable: metotrexato según criterios y seguimiento hCG',
+      'Inestable o rotura: cirugía urgente (laparoscopia/laparotomía) y control hemodinámico',
+      'Analgesia y soporte transfusional si necesario',
+    ],
+    followUp: ['Control hCG seriado hasta negativización; consulta de Ginecología'],
+    redFlags: ['Shock, peritonitis, hemorragia activa, hCG muy elevada sugestiva de masa grande'],
+    notes: 'Test embarazo obligatorio en toda mujer en edad fértil con dolor abdominal; avisar Ginecología precozmente.',
+  }),
+
+  'sepsis': createProtocol({
+    id: 'sepsis',
+    title: 'Sepsis y shock séptico',
+    category: 'Emergencia',
+    specialty: 'Urgencias',
+    definition: 'Respuesta disfuncional a la infección con disfunción orgánica potencialmente mortal.',
+    diagnosticOrders: [
+      'Hemograma, bioquímica, lactato seriado',
+      'Hemocultivos (antes de AB si no retrasa terapia)',
+      'Gasometría y pruebas según órgano afectado',
+      'Cultivos dirigidos (orina, esputo, LCR según sospecha)',
+    ],
+    expectedFindings: [
+      'Fiebre o hipotermia, taquicardia, taquipnea',
+      'Lactato elevado y signos de hipoperfusión',
+      'Disfunción orgánica nueva (SOFA aumentado)',
+    ],
+    treatment: [
+      'Reanimación inicial con líquidos (bolos en 30-60min según tolerancia)',
+      'Antibiótico empírico IV precoz (ideal <1h) según sospecha de foco y protocolos locales',
+      'Vasopresores si hipotensión persistente (noradrenalina de elección)',
+      'Soporte orgánico según necesidad (Oxígeno, VM, diálisis)',
+    ],
+    followUp: ['Ingreso en UCI si shock o fallo orgánico; monitorización continua y ajuste de terapias'],
+    redFlags: ['Shock refractario, fallo respiratorio, necesidad de soporte hemodinámico'],
+    notes: 'Actúa rápidamente: cultivos y antibioterapia precoz salvan vidas; correlacionar con guías SSC.',
+  }),
+};
+
+// (additionalProtocols will be merged into the final exported collection below)
+
 // GINECOLOGÍA / ETS
 const gynecologyProtocols = {
   'sangrado-primer-trimestre': createProtocol({
@@ -998,6 +1190,7 @@ export const allProtocolsPartTwo = {
   ...endocrinologyProtocols,
   ...orlProtocols,
   ...ophthalmologyProtocols,
+  ...additionalProtocols,
   ...gynecologyProtocols,
   ...pediatricsProtocols,
   ...toxicologyProtocols,
