@@ -1550,6 +1550,447 @@ export const medicationCatalog = {
       ),
     ],
   },
+  'tenecteplasa-sca': {
+    id: 'tenecteplasa-sca',
+    name: 'Tenecteplasa',
+    protocolId: 'sindrome-coronario-agudo',
+    family: 'Fibrinólisis SCACEST',
+    indication:
+      'Fibrinólisis en SCACEST si no puede realizarse ICP primaria en tiempo y no hay contraindicación mayor.',
+    contextUse: 'SCACEST < 12 h, sin acceso a ICP primaria en tiempo útil y tras revisar contraindicaciones.',
+    contextDose:
+      '< 60 kg: 30 mg; 60-69 kg: 35 mg; 70-79 kg: 40 mg; 80-89 kg: 45 mg; ≥ 90 kg: 50 mg. Mitad de dosis si ≥ 75 años según Murillo.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Bolo único en unos 10 s.',
+    followUpPlan:
+      'Tras fibrinólisis, traslado a centro con ICP; angiografía de rescate inmediata si falla o hay reinfarto/reoclusión.',
+    dose:
+      'Bolo IV según peso: < 60 kg 30 mg; 60-69 kg 35 mg; 70-79 kg 40 mg; 80-89 kg 45 mg; ≥ 90 kg 50 mg. Máximo 50 mg.',
+    route: 'Intravenosa.',
+    frequency: 'Bolo único.',
+    duration: 'Uso agudo puntual dentro de estrategia farmacoinvasiva.',
+    contraindications: [
+      'Ictus hemorrágico o de origen desconocido, ictus isquémico reciente, lesión/neoplasia del SNC o cirugía/traumatismo craneal reciente.',
+      'Sangrado activo o diátesis hemorrágica, disección aórtica, punción no compresible reciente o HTA grave no controlada.',
+      'No usar si ya está programada ICP primaria en tiempo útil.',
+    ],
+    renalAdjustment:
+      'No hay ajuste renal específico de la dosis de fibrinólisis; el riesgo hemorrágico obliga a individualizar.',
+    hepaticAdjustment:
+      'Evitar si disfunción hepática grave o coagulopatía con riesgo hemorrágico.',
+    practicalNotes: [
+      'Administrar AAS, clopidogrel y anticoagulación según estrategia local de SCACEST fibrinolizado.',
+      'No usar en SCASEST.',
+      'Tener preparado manejo de arritmias de reperfusión y sangrado.',
+    ],
+    sourceScope:
+      'Dosis y contraindicaciones verificadas con Murillo 7.ª ed. y ficha CIMA de Metalyse; estrategia de rescate/farmacoinvasiva con ESC SCA 2023.',
+    sources: [
+      protocolSource(
+        'Murillo 7.ª ed. · fibrinólisis con tenecteplasa',
+        referenceEntry({
+          id: 'tenecteplasa-sca-murillo',
+          verifiedPage: 226,
+          pdfPage: 251,
+          note: 'Dosis por peso, bolo IV y reducción en edad avanzada en SCACEST.',
+        }),
+      ),
+      cimaSource('CIMA · Metalyse 10.000 unidades', 'https://cima.aemps.es/cima/dochtml/ft/00169006/FichaTecnica_00169006.html'),
+      protocolSource(
+        'ESC SCA 2023 · fibrinólisis y angiografía de rescate',
+        escScaReferenceEntry({
+          id: 'tenecteplasa-sca-esc',
+          verifiedPages: [32],
+          pdfPages: [33],
+          note: 'Preferencia por fibrinolítico específico de fibrina y angiografía de rescate si falla la reperfusión.',
+        }),
+      ),
+    ],
+  },
+  'alteplasa-sca': {
+    id: 'alteplasa-sca',
+    name: 'Alteplasa',
+    protocolId: 'sindrome-coronario-agudo',
+    family: 'Fibrinólisis SCACEST',
+    indication:
+      'Alternativa fibrinolítica en SCACEST cuando no puede realizarse ICP primaria en tiempo y no hay contraindicación.',
+    contextUse: 'SCACEST candidato a fibrinólisis, especialmente si puede iniciarse dentro de las primeras 6 h.',
+    contextDose: '15 mg IV bolo, luego 0,75 mg/kg en 30 min (máx. 50 mg) y 0,5 mg/kg en 60 min (máx. 35 mg). Máximo total 100 mg.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Bolo seguido de perfusión acelerada de 90 min.',
+    followUpPlan:
+      'Tras fibrinólisis, traslado a centro con ICP; angiografía de rescate si no hay reperfusión o hay reoclusión/reinfarto.',
+    dose:
+      'Régimen acelerado: 15 mg IV bolo; 0,75 mg/kg IV en 30 min, máximo 50 mg; 0,5 mg/kg IV en 60 min, máximo 35 mg. Máximo total 100 mg.',
+    route: 'Intravenosa.',
+    frequency: 'Administración única en bolo y perfusión.',
+    duration: '90 min en régimen acelerado.',
+    contraindications: [
+      'Ictus hemorrágico o de origen desconocido, ictus isquémico reciente, lesión/neoplasia del SNC o cirugía/traumatismo craneal reciente.',
+      'Sangrado activo, diátesis hemorrágica, disección aórtica, punción no compresible reciente o HTA grave no controlada.',
+      'No usar en SCASEST.',
+    ],
+    renalAdjustment:
+      'No hay ajuste renal específico de la dosis de fibrinólisis; individualizar por riesgo hemorrágico.',
+    hepaticAdjustment:
+      'Evitar si hepatopatía avanzada/coagulopatía con riesgo hemorrágico.',
+    practicalNotes: [
+      'Usar con tratamiento antitrombótico coadyuvante según estrategia de SCACEST.',
+      'Reevaluar signos de reperfusión y dolor.',
+    ],
+    sourceScope:
+      'Dosis verificadas con Murillo 7.ª ed. y ficha CIMA de Actilyse; estrategia de reperfusión con ESC SCA 2023.',
+    sources: [
+      protocolSource(
+        'Murillo 7.ª ed. · fibrinólisis con alteplasa',
+        referenceEntry({
+          id: 'alteplasa-sca-murillo',
+          verifiedPage: 226,
+          pdfPage: 251,
+          note: 'Régimen acelerado de alteplasa en SCACEST.',
+        }),
+      ),
+      cimaSource('CIMA · Actilyse', 'https://cima.aemps.es/cima/dochtml/ft/59494/FT_59494.html'),
+      protocolSource(
+        'ESC SCA 2023 · fibrinólisis y estrategia invasiva',
+        escScaReferenceEntry({
+          id: 'alteplasa-sca-esc',
+          verifiedPages: [32],
+          pdfPages: [33],
+          note: 'Fibrinolítico específico de fibrina si ICP primaria no llega en tiempo.',
+        }),
+      ),
+    ],
+  },
+  'reteplasa-sca': {
+    id: 'reteplasa-sca',
+    name: 'Reteplasa',
+    protocolId: 'sindrome-coronario-agudo',
+    family: 'Fibrinólisis SCACEST',
+    indication:
+      'Alternativa fibrinolítica en SCACEST si no puede realizarse ICP primaria en tiempo y no hay contraindicación.',
+    contextUse: 'SCACEST candidato a fibrinólisis dentro de ventana y con antitrombótico coadyuvante.',
+    contextDose: '10 U IV en bolo lento; repetir 10 U IV a los 30 min.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Doble bolo separado 30 min.',
+    followUpPlan:
+      'Administrar AAS y heparina antes/después según ficha; traslado a centro con ICP y rescate si falla la reperfusión.',
+    dose: '10 U IV en bolo lento, seguido de un segundo bolo de 10 U IV a los 30 min.',
+    route: 'Intravenosa.',
+    frequency: 'Dos bolos IV separados 30 min.',
+    duration: 'Cada bolo en unos 2 min.',
+    contraindications: [
+      'Ictus hemorrágico o de origen desconocido, ictus isquémico reciente, lesión/neoplasia del SNC o cirugía/traumatismo craneal reciente.',
+      'Sangrado activo, diátesis hemorrágica, disección aórtica, punción no compresible reciente o HTA grave no controlada.',
+      'No usar en SCASEST.',
+    ],
+    renalAdjustment:
+      'No hay ajuste renal específico de la dosis de fibrinólisis; individualizar por riesgo hemorrágico.',
+    hepaticAdjustment:
+      'Evitar si hepatopatía avanzada/coagulopatía con riesgo hemorrágico.',
+    practicalNotes: [
+      'CIMA exige heparina y ácido acetilsalicílico antes y después para reducir retrombosis.',
+      'Mantener monitorización estrecha de reperfusión, sangrado y arritmias.',
+    ],
+    sourceScope:
+      'Dosis verificadas con Murillo 7.ª ed. y ficha CIMA de Rapilysin; estrategia de reperfusión con ESC SCA 2023.',
+    sources: [
+      protocolSource(
+        'Murillo 7.ª ed. · fibrinólisis con reteplasa',
+        referenceEntry({
+          id: 'reteplasa-sca-murillo',
+          verifiedPage: 226,
+          pdfPage: 251,
+          note: 'Doble bolo de reteplasa en SCACEST.',
+        }),
+      ),
+      cimaSource('CIMA · Rapilysin', 'https://cima.aemps.es/cima/dochtml/ft/96018001/FT_96018001.html'),
+      protocolSource(
+        'ESC SCA 2023 · fibrinólisis y rescate',
+        escScaReferenceEntry({
+          id: 'reteplasa-sca-esc',
+          verifiedPages: [32],
+          pdfPages: [33],
+          note: 'Reteplasa como fibrinolítico específico de fibrina y rescate si falla.',
+        }),
+      ),
+    ],
+  },
+  'flecainida-fa': {
+    id: 'flecainida-fa',
+    name: 'Flecainida',
+    protocolId: 'fibrilacion-auricular',
+    family: 'Cardioversión farmacológica',
+    indication:
+      'Cardioversión farmacológica de FA reciente en paciente estable sin cardiopatía estructural significativa, HFrEF ni enfermedad coronaria.',
+    contextUse: 'FA estable, reciente, tras control de frecuencia si procede y sin cardiopatía estructural significativa.',
+    contextDose: 'IV 1,5-3 mg/kg en 20 min; alternativa VO 200-300 mg si está seleccionada y monitorizada.',
+    contextRoute: 'Intravenosa u oral.',
+    contextFrequency: 'Dosis única con monitorización si IV.',
+    followUpPlan: 'Si revierte, definir anticoagulación según duración de FA y riesgo; si falla, valorar cardioversión eléctrica.',
+    dose:
+      'IV 1,5-3 mg/kg en 20 min; alternativa VO 200-300 mg en paciente seleccionado.',
+    route: 'Intravenosa u oral.',
+    frequency: 'Dosis única.',
+    duration: 'Uso agudo puntual.',
+    contraindications: [
+      'Cardiopatía estructural significativa, HFrEF, hipertrofia ventricular severa o enfermedad coronaria.',
+      'Trastornos relevantes de conducción, QT prolongado o enfermedad del nodo sin valorar riesgo.',
+      'No mezclar con antiarrítmicos de clase III en el mismo episodio.',
+    ],
+    renalAdjustment:
+      'No se añade ajuste renal cerrado en esta vista; si hay insuficiencia renal relevante, individualizar y consultar ficha completa.',
+    hepaticAdjustment:
+      'No se añade ajuste hepático cerrado en esta vista; individualizar si hepatopatía relevante.',
+    practicalNotes: [
+      'ESC la recomienda para cardioversión farmacológica de FA reciente si no hay cardiopatía estructural significativa.',
+      'Evitar en FA preexcitada no evaluada y en QRS ancho no aclarado.',
+    ],
+    sourceScope:
+      'Dosis prácticas verificadas con Murillo 7.ª ed.; selección de pacientes con ESC FA 2024.',
+    sources: [
+      protocolSource(
+        'Murillo 7.ª ed. · cardioversión farmacológica en FA',
+        referenceEntry({
+          id: 'flecainida-fa-murillo',
+          verifiedPage: 188,
+          pdfPage: 213,
+          note: 'Dosis IV y oral para reversión a ritmo sinusal en FA sin cardiopatía estructural significativa.',
+        }),
+      ),
+      protocolSource(
+        'ESC FA 2024 · cardioversión farmacológica',
+        escFaReferenceEntry({
+          id: 'flecainida-fa-esc',
+          verifiedPages: [46, 47, 48],
+          pdfPages: [46, 47, 48],
+          note: 'Flecainida/propafenona en FA reciente excluyendo cardiopatía estructural relevante.',
+        }),
+      ),
+    ],
+  },
+  'propafenona-fa': {
+    id: 'propafenona-fa',
+    name: 'Propafenona',
+    protocolId: 'fibrilacion-auricular',
+    family: 'Cardioversión farmacológica',
+    indication:
+      'Cardioversión farmacológica de FA reciente en paciente estable sin cardiopatía estructural significativa, HFrEF ni enfermedad coronaria.',
+    contextUse: 'FA estable, reciente y sin cardiopatía estructural significativa.',
+    contextDose: 'IV 1,5-2 mg/kg en 20 min; alternativa VO 450-600 mg.',
+    contextRoute: 'Intravenosa u oral.',
+    contextFrequency: 'Dosis única con monitorización si IV.',
+    followUpPlan: 'Si revierte, definir anticoagulación según duración de FA y riesgo; si falla, valorar cardioversión eléctrica.',
+    dose:
+      'IV 1,5-2 mg/kg en 20 min; alternativa VO 450-600 mg.',
+    route: 'Intravenosa u oral.',
+    frequency: 'Dosis única.',
+    duration: 'Uso agudo puntual.',
+    contraindications: [
+      'Cardiopatía estructural significativa, HFrEF, hipertrofia ventricular severa o enfermedad coronaria.',
+      'Trastorno de conducción relevante o QRS ancho no aclarado.',
+      'No mezclar con antiarrítmicos de clase III en el mismo episodio.',
+    ],
+    renalAdjustment:
+      'No se añade ajuste renal cerrado en esta vista; individualizar si insuficiencia renal relevante.',
+    hepaticAdjustment:
+      'No se añade ajuste hepático cerrado en esta vista; individualizar si hepatopatía relevante.',
+    practicalNotes: [
+      'ESC la recomienda para cardioversión farmacológica de FA reciente si no hay cardiopatía estructural significativa.',
+      'Mantener monitorización si se usa vía IV.',
+    ],
+    sourceScope:
+      'Dosis prácticas verificadas con Murillo 7.ª ed.; selección de pacientes con ESC FA 2024.',
+    sources: [
+      protocolSource(
+        'Murillo 7.ª ed. · cardioversión farmacológica en FA',
+        referenceEntry({
+          id: 'propafenona-fa-murillo',
+          verifiedPage: 188,
+          pdfPage: 213,
+          note: 'Dosis IV y oral para reversión a ritmo sinusal en FA sin cardiopatía estructural significativa.',
+        }),
+      ),
+      protocolSource(
+        'ESC FA 2024 · cardioversión farmacológica',
+        escFaReferenceEntry({
+          id: 'propafenona-fa-esc',
+          verifiedPages: [46, 47, 48],
+          pdfPages: [46, 47, 48],
+          note: 'Flecainida/propafenona en FA reciente excluyendo cardiopatía estructural relevante.',
+        }),
+      ),
+    ],
+  },
+  'adrenalina-bradicardia': {
+    id: 'adrenalina-bradicardia',
+    name: 'Adrenalina perfusión',
+    protocolId: 'bradicardias',
+    family: 'Bradicardia sintomática',
+    indication:
+      'Soporte cronotrópico temporal si atropina falla y el pacing no está disponible de inmediato o como puente a estimulación.',
+    contextUse: 'Bradicardia sintomática con signos adversos persistentes tras atropina o mientras se prepara pacing.',
+    contextDose: '2-10 microg/min IV en perfusión titulada.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Perfusión continua titulada a respuesta.',
+    followUpPlan: 'Avisar UCI/cardiología y preparar pacing transcutáneo/transvenoso si no corrige rápido.',
+    dose: '2-10 microg/min IV.',
+    route: 'Intravenosa.',
+    frequency: 'Perfusión continua titulada.',
+    duration: 'Puente corto hasta resolución, pacing o tratamiento definitivo.',
+    contraindications: [
+      'No retrasa pacing en bloqueo AV alto, QRS ancho o mala perfusión persistente.',
+      'Vigilar isquemia, arritmias e hipertensión.',
+    ],
+    renalAdjustment: 'Sin ajuste renal cerrado para perfusión titulada aguda.',
+    hepaticAdjustment: 'Sin ajuste hepático cerrado para perfusión titulada aguda.',
+    practicalNotes: [
+      'Usar monitorización ECG y presión arterial.',
+      'Buscar y corregir causa reversible en paralelo.',
+    ],
+    sourceScope:
+      'Pauta de segunda línea verificada con Resuscitation Council UK/ERC 2025 y coherente con algoritmo AHA de bradicardia.',
+    sources: [
+      externalSource(
+        'Resuscitation Council UK/ERC 2025 · bradicardia',
+        'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+    ],
+  },
+  'isoprenalina-bradicardia': {
+    id: 'isoprenalina-bradicardia',
+    name: 'Isoprenalina perfusión',
+    protocolId: 'bradicardias',
+    family: 'Bradicardia sintomática',
+    indication:
+      'Cronotrópico de segunda línea si atropina falla y pacing no está disponible de inmediato o como puente a estimulación.',
+    contextUse: 'Bradicardia sintomática refractaria a atropina, especialmente como puente monitorizado.',
+    contextDose: 'Inicio 5 microg/min IV; titular según respuesta.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Perfusión continua titulada.',
+    followUpPlan: 'Avisar UCI/cardiología y preparar pacing transcutáneo/transvenoso si persisten signos adversos.',
+    dose: '5 microg/min IV de inicio; titular según respuesta clínica y ECG.',
+    route: 'Intravenosa.',
+    frequency: 'Perfusión continua titulada.',
+    duration: 'Puente corto hasta resolución, pacing o tratamiento definitivo.',
+    contraindications: [
+      'No usar para retrasar pacing en bloqueo avanzado con mala perfusión.',
+      'Vigilar isquemia, taquiarritmias e hipotensión.',
+    ],
+    renalAdjustment: 'Sin ajuste renal cerrado para perfusión titulada aguda.',
+    hepaticAdjustment: 'Sin ajuste hepático cerrado para perfusión titulada aguda.',
+    practicalNotes: [
+      'Uso en área monitorizada con ayuda experta.',
+      'Corregir fármacos bradicardizantes y causas reversibles.',
+    ],
+    sourceScope:
+      'Pauta de segunda línea verificada con Resuscitation Council UK/ERC 2025.',
+    sources: [
+      externalSource(
+        'Resuscitation Council UK/ERC 2025 · bradicardia',
+        'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+    ],
+  },
+  'adrenalina-parada': {
+    id: 'adrenalina-parada',
+    name: 'Adrenalina',
+    protocolId: 'arritmias-ventriculares',
+    family: 'TV/FV sin pulso',
+    indication: 'Fármaco vasoactivo en parada por FV/TV sin pulso dentro del algoritmo ALS.',
+    contextUse: 'FV/TV sin pulso tras el tercer choque y después cada 3-5 min.',
+    contextDose: '1 mg IV/IO.',
+    contextRoute: 'Intravenosa o intraósea.',
+    contextFrequency: 'Tras 3 choques en ritmo desfibrilable; repetir cada 3-5 min.',
+    followUpPlan: 'Continuar ciclos de RCP de 2 min, desfibrilación si procede y búsqueda de causas reversibles.',
+    dose: '1 mg IV/IO.',
+    route: 'Intravenosa o intraósea.',
+    frequency: 'Después de 3 choques; repetir cada 3-5 min.',
+    duration: 'Durante algoritmo de parada hasta ROSC o decisión clínica.',
+    contraindications: [
+      'No interrumpir compresiones para administrarla.',
+      'No sustituye desfibrilación temprana en FV/TV sin pulso.',
+    ],
+    renalAdjustment: 'Sin ajuste renal en parada.',
+    hepaticAdjustment: 'Sin ajuste hepático en parada.',
+    practicalNotes: [
+      'Administrar durante RCP y lavar la vía.',
+      'Reevaluar ritmo cada 2 min.',
+    ],
+    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025.',
+    sources: [
+      externalSource(
+        'Resuscitation Council UK/ERC 2025 · ALS ritmo desfibrilable',
+        'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+    ],
+  },
+  'amiodarona-parada': {
+    id: 'amiodarona-parada',
+    name: 'Amiodarona',
+    protocolId: 'arritmias-ventriculares',
+    family: 'TV/FV sin pulso',
+    indication: 'Antiarrítmico en FV/TV sin pulso refractaria a desfibrilación.',
+    contextUse: 'FV/TV sin pulso persistente tras 3 choques; repetir dosis menor tras 5 choques.',
+    contextDose: '300 mg IV/IO tras 3 choques; 150 mg IV/IO tras 5 choques.',
+    contextRoute: 'Intravenosa o intraósea.',
+    contextFrequency: 'Dosis durante algoritmo de parada según número de choques.',
+    followUpPlan: 'Continuar RCP, desfibrilación y tratamiento de causas reversibles; si ROSC, vigilancia postparada.',
+    dose: '300 mg IV/IO tras el tercer choque; 150 mg IV/IO tras el quinto choque.',
+    route: 'Intravenosa o intraósea.',
+    frequency: 'Dosis escalonadas en FV/TV sin pulso refractaria.',
+    duration: 'Uso agudo durante parada.',
+    contraindications: [
+      'No retrasar desfibrilación ni compresiones.',
+      'No usar como sustituto de corrección de causas reversibles.',
+    ],
+    renalAdjustment: 'Sin ajuste renal en parada.',
+    hepaticAdjustment: 'Sin ajuste hepático en parada.',
+    practicalNotes: [
+      'Puede ir seguida de perfusión 900 mg/24 h si ROSC y se mantiene indicación.',
+      'Lavar la vía tras administración.',
+    ],
+    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025.',
+    sources: [
+      externalSource(
+        'Resuscitation Council UK/ERC 2025 · amiodarona en FV/TV sin pulso',
+        'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+    ],
+  },
+  'lidocaina-parada': {
+    id: 'lidocaina-parada',
+    name: 'Lidocaína',
+    protocolId: 'arritmias-ventriculares',
+    family: 'TV/FV sin pulso',
+    indication: 'Alternativa a amiodarona en FV/TV sin pulso si amiodarona no está disponible.',
+    contextUse: 'FV/TV sin pulso refractaria cuando no se dispone de amiodarona.',
+    contextDose: '100 mg IV/IO inicial; 50 mg IV/IO adicional si precisa.',
+    contextRoute: 'Intravenosa o intraósea.',
+    contextFrequency: 'Alternativa antiarrítmica durante algoritmo de parada.',
+    followUpPlan: 'Continuar RCP/desfibrilación y causas reversibles.',
+    dose: '100 mg IV/IO; considerar 50 mg IV/IO adicional.',
+    route: 'Intravenosa o intraósea.',
+    frequency: 'Dosis durante FV/TV sin pulso refractaria si no hay amiodarona.',
+    duration: 'Uso agudo durante parada.',
+    contraindications: [
+      'No combinar como rutina con amiodarona en el mismo escalón.',
+      'No retrasar desfibrilación ni compresiones.',
+    ],
+    renalAdjustment: 'Sin ajuste renal en parada.',
+    hepaticAdjustment: 'Precaución tras ROSC si hepatopatía o bajo gasto por riesgo de acumulación.',
+    practicalNotes: [
+      'Opción alternativa, no preferente si amiodarona disponible.',
+      'Reevaluar tras ROSC antes de continuar perfusión.',
+    ],
+    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025.',
+    sources: [
+      externalSource(
+        'Resuscitation Council UK/ERC 2025 · lidocaína alternativa en FV/TV sin pulso',
+        'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+    ],
+  },
 };
 
 export const medicationList = Object.values(medicationCatalog);
@@ -1559,6 +2000,11 @@ export const medicationGroups = [
     id: 'control-frecuencia',
     title: 'Control de frecuencia',
     items: ['metoprolol', 'verapamilo', 'digoxina', 'amiodarona'],
+  },
+  {
+    id: 'cardioversion-fa',
+    title: 'Cardioversión farmacológica en FA',
+    items: ['flecainida-fa', 'propafenona-fa', 'amiodarona'],
   },
   {
     id: 'anticoagulacion',
@@ -1599,9 +2045,24 @@ export const medicationGroups = [
     ],
   },
   {
+    id: 'sca-fibrinolisis',
+    title: 'SCA · fibrinólisis SCACEST',
+    items: ['tenecteplasa-sca', 'alteplasa-sca', 'reteplasa-sca'],
+  },
+  {
     id: 'arritmias-agudas',
     title: 'Arritmias agudas',
-    items: ['adenosina', 'atropina', 'amiodarona-vt', 'magnesio-torsades'],
+    items: [
+      'adenosina',
+      'atropina',
+      'adrenalina-bradicardia',
+      'isoprenalina-bradicardia',
+      'adrenalina-parada',
+      'amiodarona-parada',
+      'lidocaina-parada',
+      'amiodarona-vt',
+      'magnesio-torsades',
+    ],
   },
   {
     id: 'ictus',

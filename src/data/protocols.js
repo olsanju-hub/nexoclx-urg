@@ -172,6 +172,10 @@ export const protocolCatalog = {
         medicationIds: ['metoprolol', 'verapamilo', 'digoxina', 'amiodarona'],
       },
       {
+        title: 'Cardioversión farmacológica',
+        medicationIds: ['flecainida-fa', 'propafenona-fa', 'amiodarona'],
+      },
+      {
         title: 'Anticoagulación en FA no valvular',
         medicationIds: ['apixaban', 'dabigatran', 'edoxaban', 'rivaroxaban'],
       },
@@ -388,6 +392,10 @@ export const protocolCatalog = {
           'fondaparinux-sca',
         ],
       },
+      {
+        title: 'Fibrinólisis SCACEST',
+        medicationIds: ['tenecteplasa-sca', 'alteplasa-sca', 'reteplasa-sca'],
+      },
     ],
     bibliography: [
       escScaEntry({
@@ -493,7 +501,7 @@ export const protocolCatalog = {
     medicationGroups: [
       {
         title: 'Bradicardia sintomática',
-        medicationIds: ['atropina'],
+        medicationIds: ['atropina', 'adrenalina-bradicardia', 'isoprenalina-bradicardia'],
       },
     ],
     bibliography: [
@@ -577,6 +585,10 @@ export const protocolCatalog = {
       'Torsades obliga a buscar QT largo, electrolitos y fármacos desencadenantes en paralelo al tratamiento.',
     ],
     medicationGroups: [
+      {
+        title: 'TV/FV sin pulso',
+        medicationIds: ['adrenalina-parada', 'amiodarona-parada', 'lidocaina-parada'],
+      },
       {
         title: 'TV monomorfa estable',
         medicationIds: ['amiodarona-vt'],

@@ -33,6 +33,22 @@ const asReferenceItems = (entries = []) =>
     return `${entry.shortReference}${pages}. ${entry.note ?? ''}`.trim();
   });
 
+const asMedicationReferenceItems = (protocol) => {
+  const medicationIds = asArray(protocol.medicationGroups).flatMap((group) => asArray(group.medicationIds));
+  const references = medicationIds.flatMap((medicationId) =>
+    asArray(getMedication(medicationId).sources).map((source) => {
+      if (source.bibliography) {
+        const [item] = asReferenceItems([source.bibliography]);
+        return item;
+      }
+
+      return `${source.label}. Fuente textual consultada.`;
+    }),
+  );
+
+  return [...new Set(references)];
+};
+
 const shortAdjustment = (label, value) => (value ? `${label}: ${brief(value, 125)}` : null);
 
 const maxDoseFrom = (value = '') => {
@@ -49,7 +65,7 @@ const medicationDetailItems = (medication) => {
   const maxDose = maxDoseFrom(doseText);
 
   return [
-    `Fármaco: ${medication.name}`,
+    `Fármaco/intervención: ${medication.name}`,
     doseText ? `Dosis: ${doseText}` : null,
     medication.contextRoute || medication.route ? `Vía: ${medication.contextRoute ?? medication.route}` : null,
     medication.contextFrequency || medication.frequency ? `Frecuencia: ${medication.contextFrequency ?? medication.frequency}` : null,
@@ -153,7 +169,7 @@ const referencesSection = (protocol) => ({
       id: 'fuentes',
       title: 'Fuentes usadas',
       type: 'references',
-      references: asReferenceItems(protocol.bibliography),
+      references: [...asReferenceItems(protocol.bibliography), ...asMedicationReferenceItems(protocol)],
     },
   ],
 });
@@ -233,23 +249,25 @@ const cardiologyInterventionNodes = (protocol) => {
         title: 'Cardioversión eléctrica',
         type: 'treatment',
         severity: 'danger',
-        summary: 'Urgente si inestabilidad; electiva solo si duración y anticoagulación lo permiten.',
+        summary: 'Sincronizada urgente si inestabilidad; sedación según protocolo local si no retrasa.',
         items: [
           'Indicación: hipotensión, shock, isquemia, edema pulmonar o mala perfusión atribuible a FA.',
-          'Vía: eléctrica sincronizada con sedoanalgesia según protocolo local.',
+          'Dosis/energía: choque sincronizado; estrategia razonable con energía máxima del desfibrilador para FA.',
+          'Vía: cardioversión eléctrica sincronizada.',
           'Evitar: intoxicación digitálica; si toma digoxina, iniciar con menor energía según Murillo.',
-          'Reevaluar: ritmo, PA, síntomas y plan anticoagulante tras la reversión.',
+          'Reevaluar/siguiente paso: ritmo, PA, síntomas y anticoagulación según duración de FA y riesgo.',
         ],
       },
       {
         id: 'cardioversion-farmacologica-fa',
         title: 'Cardioversión farmacológica',
         type: 'treatment',
-        summary: 'Solo si estable y el contexto permite control de ritmo precoz.',
+        summary: 'Solo si estable y el contexto permite control de ritmo precoz con fármaco verificado.',
         items: [
-          'Elegir según cardiopatía estructural, FEVI, duración del episodio y anticoagulación.',
-          'Amiodarona IV queda disponible como pauta concreta en la tarjeta de tratamiento.',
+          'Sin cardiopatía estructural significativa: flecainida IV 1,5-3 mg/kg o propafenona IV 1,5-2 mg/kg; alternativas VO verificadas en detalle.',
+          'Con HFrEF, hipertrofia severa o enfermedad coronaria: amiodarona IV 5-7 mg/kg; aceptar reversión más lenta.',
           'No mezclar antiarrítmicos de clase I y III en el mismo momento.',
+          'Reevaluar/siguiente paso: si falla o empeora, cardioversión eléctrica; documentar anticoagulación.',
         ],
       },
     ];
@@ -287,8 +305,8 @@ const cardiologyInterventionNodes = (protocol) => {
         summary: 'ICP primaria si acceso en tiempo; fibrinólisis solo si procede y no hay contraindicación.',
         items: [
           'No esperar hs-cTn si SCACEST claro.',
-          'Priorizar ICP primaria si puede realizarse en tiempo.',
-          'Si no hay ICP en tiempo, valorar fibrinólisis solo con indicación clara y contraindicaciones revisadas.',
+          'Priorizar ICP primaria si puede realizarse en tiempo; si demora esperada > 120 min, fibrinólisis precoz si no contraindicada.',
+          'Tras fibrinólisis, traslado a centro con ICP; angiografía de rescate inmediata si falla, hay reoclusión o reinfarto.',
         ],
       },
     ];
@@ -332,8 +350,9 @@ const cardiologyInterventionNodes = (protocol) => {
         summary: 'Preparar si inestabilidad persistente o bloqueo avanzado.',
         items: [
           'Indicación: mala perfusión, síncope, isquemia, insuficiencia cardíaca o bloqueo AV de alto riesgo que no responde rápido.',
-          'No retrasar por repetir atropina si el paciente sigue inestable.',
-          'Avisar UCI/cardiología y preparar estimulación temporal si Mobitz II, BAV completo con QRS ancho o pausas > 3 s.',
+          'Dosis/intervención: pacing transcutáneo como puente si no hay respuesta a atropina o pacing transvenoso no está disponible.',
+          'Evitar retrasos: no repetir atropina si persiste mala perfusión o bloqueo AV alto con QRS ancho.',
+          'Reevaluar/siguiente paso: avisar UCI/cardiología y preparar marcapasos transvenoso si Mobitz II, BAV completo con QRS ancho o pausas > 3 s.',
         ],
       },
     ];
@@ -346,10 +365,12 @@ const cardiologyInterventionNodes = (protocol) => {
         title: 'TV/FV sin pulso',
         type: 'alert',
         severity: 'danger',
-        summary: 'Desfibrilación inmediata y algoritmo de parada.',
+        summary: 'Desfibrilación inmediata, RCP 2 min y fármacos tras choques según ALS.',
         items: [
-          'Iniciar RCP y desfibrilación según protocolo de soporte vital.',
-          'Seguir el algoritmo de parada sin duplicar pautas fuera de este protocolo.',
+          'Dosis/intervención: desfibrilación bifásica al menos 150 J; escalar si falla o usar máxima energía si se desconoce el equipo.',
+          'Adrenalina 1 mg IV/IO tras 3 choques y cada 3-5 min.',
+          'Amiodarona 300 mg IV/IO tras 3 choques; 150 mg tras 5 choques. Lidocaína alternativa si no hay amiodarona.',
+          'Reevaluar/siguiente paso: ciclos de RCP de 2 min, ritmo, desfibrilación si procede y causas reversibles.',
         ],
       },
       {
@@ -360,14 +381,57 @@ const cardiologyInterventionNodes = (protocol) => {
         summary: 'Cardioversión sincronizada urgente.',
         items: [
           'Indicación: shock, síncope, isquemia, edema pulmonar o deterioro.',
+          'Dosis/intervención: choque sincronizado inicial 120-150 J; aumentar escalonadamente si falla.',
           'Si es polimórfica o no sincroniza, desfibrilar.',
-          'Sedoanalgesia si no retrasa la electricidad y el paciente lo permite.',
+          'Sedación/anestesia si consciente y no retrasa la electricidad; si falla, amiodarona 300 mg IV en 10-20 min y reintentar.',
         ],
       },
     ];
   }
 
   return [];
+};
+
+const treatmentInitialItems = (protocol) => {
+  if (protocol.id === 'sindrome-coronario-agudo') {
+    return [
+      'AAS 150-300 mg VO carga o 75-250 mg IV si no tolera VO.',
+      'P2Y12: ticagrelor 180 mg VO o clopidogrel 300-600 mg VO; prasugrel 60 mg si ICP y sin contraindicación.',
+      'Anticoagulación: heparina sódica 70-100 UI/kg IV durante ICP; alternativas según estrategia en detalle.',
+      'SCACEST: ICP primaria si llega en tiempo; si demora > 120 min, fibrinólisis con tenecteplasa/alteplasa/reteplasa verificadas.',
+      'Nitroglicerina si dolor/isquemia sin hipotensión, VD ni PDE5; morfina IV titulada si dolor intenso persistente.',
+    ];
+  }
+
+  if (protocol.id === 'fibrilacion-auricular') {
+    return [
+      'Inestable: cardioversión eléctrica sincronizada urgente; sedación según protocolo local si no retrasa.',
+      'Frecuencia: metoprolol IV 2,5-5 mg, verapamilo IV 5 mg, digoxina IV 0,25 mg o amiodarona IV 5-7 mg/kg según FEVI/contexto.',
+      'Cardioversión farmacológica: flecainida IV 1,5-3 mg/kg o propafenona IV 1,5-2 mg/kg si no hay cardiopatía estructural; amiodarona si HFrEF/coronaria.',
+      'Anticoagulación: decidir con CHA2DS2-VA, duración de FA y función renal; ACOD salvo estenosis mitral moderada/grave o prótesis mecánica.',
+    ];
+  }
+
+  if (protocol.id === 'bradicardias') {
+    return [
+      'Atropina 0,5 mg IV; repetir cada 3-5 min hasta 3 mg si bradicardia con signos adversos.',
+      'Si atropina falla: marcapasos transcutáneo como puente o adrenalina 2-10 microg/min IV.',
+      'Isoprenalina 5 microg/min IV de inicio si se elige cronotrópico de segunda línea.',
+      'Avisar UCI/cardiología y preparar marcapasos transvenoso si Mobitz II, BAV completo con QRS ancho o mala perfusión persistente.',
+    ];
+  }
+
+  if (protocol.id === 'arritmias-ventriculares') {
+    return [
+      'TV/FV sin pulso: RCP 2 min + desfibrilación bifásica al menos 150 J; escalar si falla.',
+      'Adrenalina 1 mg IV/IO tras 3 choques y cada 3-5 min; amiodarona 300 mg tras 3 choques y 150 mg tras 5.',
+      'TV con pulso inestable: cardioversión sincronizada 120-150 J; sedación si consciente y no retrasa.',
+      'TV monomorfa estable: amiodarona 300 mg IV en 10-60 min, luego 900 mg/24 h si precisa.',
+      'Torsades/TV polimórfica: sulfato de magnesio 2 g IV en 10-15 min; corregir K/Mg y retirar fármacos QT.',
+    ];
+  }
+
+  return null;
 };
 
 const genericTreatmentSection = (protocol) => {
@@ -381,6 +445,8 @@ const genericTreatmentSection = (protocol) => {
     title: PRIMARY_SECTION_TITLES.treatment,
     type: 'section',
     summary: 'Pauta breve inicial; máximos, contraindicaciones, ajustes, alternativas y fuentes quedan en detalle.',
+    initialItems: treatmentInitialItems(protocol),
+    maxInitialItems: treatmentInitialItems(protocol)?.length ?? undefined,
     children: [
       {
         id: 'tratamiento-urgencias',

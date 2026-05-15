@@ -102,6 +102,10 @@ const collectTreatmentPreviewItems = (nodes = [], maxItems = DEFAULT_MAX_INITIAL
 const getSectionPreviewItems = (section) => {
   const maxItems = Math.min(section.maxInitialItems ?? DEFAULT_MAX_INITIAL_ITEMS, MAX_SECTION_ITEMS);
 
+  if (section.initialItems?.length) {
+    return uniquePreviewItems(section.initialItems).slice(0, maxItems);
+  }
+
   if (section.type === 'references') {
     return ['Bibliografía textual cerrada.'];
   }
