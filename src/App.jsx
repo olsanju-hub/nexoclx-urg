@@ -22,10 +22,12 @@ import {
   implementedCalculators,
 } from './data/calculators';
 import { ClinicalFlowTree } from './components/ClinicalFlowTree';
+import { ProtocolViewer } from './components/ProtocolViewer';
 import { getMedication, medicationGroups } from './data/medications';
 import { getMotivoModule, groupModulesBySpecialty, motivoConsultaModules } from './data/modules';
 import { getProtocolFlow } from './data/protocolFlows';
 import { getProtocol } from './data/protocols';
+import { specialties, protocolsBySpecialty } from './data/protocolsIndex';
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
 
