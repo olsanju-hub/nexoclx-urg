@@ -43,6 +43,8 @@ const formatPreviewItem = (node, item) => {
     : truncateText(text);
 };
 
+const uniquePreviewItems = (items = []) => [...new Set(items.filter(Boolean))];
+
 const collectNodePreviewItems = (node, bucket = [], maxItems = DEFAULT_MAX_INITIAL_ITEMS) => {
   if (node.calculatorId || bucket.length >= maxItems) return bucket;
 
@@ -77,21 +79,24 @@ const collectTreatmentPreviewItems = (nodes = [], maxItems = DEFAULT_MAX_INITIAL
       return;
     }
 
-    if (!node.children?.length) {
+    if (node.summary) {
       const preview = formatPreviewItem(node);
       if (preview) otherItems.push(preview);
+    }
+
+    if (!node.children?.length) {
+      if (!node.summary) {
+        const preview = formatPreviewItem(node);
+        if (preview) otherItems.push(preview);
+      }
       return;
     }
 
     node.children.forEach(walk);
-    if (otherItems.length < maxItems && !node.medication && node.summary) {
-      const preview = formatPreviewItem(node);
-      if (preview) otherItems.push(preview);
-    }
   };
 
   nodes.forEach(walk);
-  return [...medicationItems, ...otherItems].slice(0, maxItems);
+  return uniquePreviewItems([...medicationItems, ...otherItems]).slice(0, maxItems);
 };
 
 const getSectionPreviewItems = (section) => {
@@ -107,7 +112,7 @@ const getSectionPreviewItems = (section) => {
 
   const items = [];
   section.children?.forEach((node) => collectNodePreviewItems(node, items, maxItems));
-  return items.slice(0, maxItems);
+  return uniquePreviewItems(items).slice(0, maxItems);
 };
 
 const collectCalculatorActions = (nodes = [], bucket = new Map()) => {
@@ -268,7 +273,6 @@ export const ClinicalFlowTree = ({ protocol, onCalculatorOpen }) => {
           <p className="flow-hero-kicker">Protocolos</p>
           <h2>{protocol.title}</h2>
           <p>{protocol.specialty}</p>
-          {protocol.summary ? <p className="flow-hero-summary">{protocol.summary}</p> : null}
         </div>
       </header>
       <nav className="flow-jump-nav" aria-label="Bloques principales del protocolo">

@@ -288,7 +288,7 @@ const cardiologyInterventionNodes = (protocol) => {
         items: [
           'No esperar hs-cTn si SCACEST claro.',
           'Priorizar ICP primaria si puede realizarse en tiempo.',
-          'Si no hay ICP en tiempo, valorar fibrinólisis con contraindicaciones revisadas; no se muestra dosis porque no está cargada como pauta auditada.',
+          'Si no hay ICP en tiempo, valorar fibrinólisis solo con indicación clara y contraindicaciones revisadas.',
         ],
       },
     ];
@@ -349,7 +349,7 @@ const cardiologyInterventionNodes = (protocol) => {
         summary: 'Desfibrilación inmediata y algoritmo de parada.',
         items: [
           'Iniciar RCP y desfibrilación según protocolo de soporte vital.',
-          'Adrenalina y amiodarona pertenecen al algoritmo de parada; no se duplican aquí si no están cargadas como pauta auditada.',
+          'Seguir el algoritmo de parada sin duplicar pautas fuera de este protocolo.',
         ],
       },
       {
