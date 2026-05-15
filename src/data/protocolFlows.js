@@ -107,6 +107,14 @@ const calculatorNode = (calculatorId) => {
   };
 };
 
+const calculatorAction = (calculatorId) => {
+  const calculator = getCalculator(calculatorId);
+  return {
+    calculatorId,
+    label: `Calcular ${calculator.title}`,
+  };
+};
+
 const treatmentCalculatorNodes = (protocol, calculators) => {
   if (protocol.id === 'fibrilacion-auricular') {
     const calculatorMap = {
@@ -811,7 +819,120 @@ const genericFlow = (protocol) => ({
   ],
 });
 
+const buildFaDecisionPanelFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'FA clínica con ritmo irregular y respuesta ventricular variable; prioriza estabilidad y causa desencadenante.',
+        points: [
+          'Palpitaciones, dolor torácico, disnea, mareo, síncope o embolia.',
+          'ECG con ausencia de ondas P repetidas e intervalos RR irregulares.',
+          'Red flags: shock, isquemia, edema agudo de pulmón, mala perfusión o preexcitación.',
+        ],
+        detailNodes: [
+          {
+            id: 'sospecha-fa',
+            title: 'Cuándo pensar en FA',
+            type: 'step',
+            summary: protocol.summary,
+            items: asArray(protocol.quickChecks).slice(0, 4),
+          },
+          {
+            id: 'red-flags-fa',
+            title: 'Red flags',
+            type: 'alert',
+            severity: 'danger',
+            items: asArray(protocol.warnings).slice(0, 3),
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Confirmar ritmo, repercusión y datos que cambian frecuencia, cardioversión o anticoagulación.',
+        points: [
+          'ECG 12 derivaciones y tira de ritmo.',
+          'Constantes, estabilidad hemodinámica, SatO2 si disnea y búsqueda de insuficiencia cardíaca/isquemia.',
+          'Inicio del episodio: < 24 h, ≥ 24 h o desconocido.',
+          'FEVI/cardiopatía estructural y función renal si vas a anticoagular.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-fa',
+            title: 'Datos que cambian conducta',
+            type: 'step',
+            items: asArray(protocol.quickChecks),
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Decidir estabilidad, ritmo/frecuencia y anticoagulación sin repetir calculadoras.',
+        points: [
+          'Inestable: cardioversión eléctrica sincronizada urgente.',
+          'Estable < 24 h: controlar frecuencia y valorar ritmo precoz si procede.',
+          '≥ 24 h/desconocida: frecuencia y anticoagulación/ETE antes de cardioversión precoz.',
+          'Anticoagulación: riesgo tromboembólico, sangrado modificable y función renal.',
+        ],
+        actions: asArray(protocol.calculatorIds).map(calculatorAction),
+        detailNodes: decisionNodes(protocol),
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Pautas de guardia en tarjetas; máximos, contraindicaciones y ajustes quedan dentro de cada pauta.',
+        points: treatmentInitialItems(protocol),
+        treatmentGroups: [
+          {
+            id: 'intervenciones-fa',
+            title: 'Tratamiento en Urgencias',
+            cards: cardiologyInterventionNodes(protocol),
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta, observación o ingreso según estabilidad, control, anticoagulación y causa desencadenante.',
+        points: [
+          'Ingreso/monitorización si inestabilidad, isquemia, insuficiencia cardíaca o mal control.',
+          'Observación si precisa titulación de frecuencia, cardioversión o inicio seguro de anticoagulación.',
+          'Alta solo si estable, controlada, con plan anticoagulante y signos de alarma claros.',
+        ],
+        detailNodes: [
+          {
+            id: 'destino-fa',
+            title: 'Criterios prácticos',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              ...asArray(protocol.quickSummary).map((item) => `${item.title}: ${item.action}`),
+              ...asArray(protocol.warnings).slice(0, 2),
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
+  if (protocol.id === 'fibrilacion-auricular') {
+    return buildFaDecisionPanelFlow(protocol);
+  }
+
   if (protocol.id === 'neumonia-comunidad') {
     return buildPneumoniaFlow(protocol);
   }

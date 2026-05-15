@@ -264,7 +264,182 @@ const FlowSection = ({ section, onCalculatorOpen }) => {
   );
 };
 
+const PautaCard = ({ card }) => {
+  const detailItems = card.items?.length ? card.items : card.summary ? [card.summary] : [];
+
+  return (
+    <article className={`pauta-card pauta-card-${card.severity ?? 'info'}`}>
+      <div className="pauta-card-header">
+        <span className="flow-node-icon">
+          <TypeIcon type={card.type} />
+        </span>
+        <span className="min-w-0">
+          <span className="pauta-card-title">{card.title}</span>
+          {card.medication ? <span className="pauta-card-meta">{card.medication}</span> : null}
+        </span>
+      </div>
+      {card.summary ? <p className="pauta-card-summary">{card.summary}</p> : null}
+      {detailItems.length ? (
+        <dl className="pauta-card-list">
+          {detailItems.map((item) => {
+            const [label, ...rest] = item.split(': ');
+            const value = rest.join(': ');
+            return value ? (
+              <div key={item} className="pauta-card-row">
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ) : (
+              <div key={item} className="pauta-card-row pauta-card-row-full">
+                <dd>{item}</dd>
+              </div>
+            );
+          })}
+        </dl>
+      ) : null}
+    </article>
+  );
+};
+
+const DecisionPanelSection = ({ section, active, onToggle, onCalculatorOpen }) => {
+  const points = uniquePreviewItems(section.points).slice(0, MAX_SECTION_ITEMS);
+
+  return (
+    <section className={`decision-panel-card ${active ? 'decision-panel-card-active' : ''}`}>
+      <button type="button" className="decision-panel-card-button" onClick={onToggle} aria-expanded={active}>
+        <span>
+          <span className="decision-panel-card-title">{section.title}</span>
+          {section.summary ? <span className="decision-panel-card-summary">{section.summary}</span> : null}
+        </span>
+        <span className="flow-section-toggle">
+          {active ? 'Cerrar' : 'Ver detalle'}
+          <ChevronRight className={`flow-node-chevron ${active ? 'rotate-90' : ''}`} />
+        </span>
+      </button>
+
+      <div className="decision-panel-card-preview">
+        {points.length ? (
+          <ul className="flow-section-preview-list">
+            {points.map((point) => (
+              <li key={point}>{point}</li>
+            ))}
+          </ul>
+        ) : null}
+        {section.actions?.length ? (
+          <div className="flow-section-actions">
+            {section.actions.map((action) => (
+              <button
+                key={action.calculatorId}
+                type="button"
+                className="flow-node-action flow-node-action-button"
+                onClick={() => onCalculatorOpen?.(action.calculatorId)}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      {active ? (
+        <div className="decision-panel-detail">
+          {section.treatmentGroups?.length ? (
+            <div className="pauta-group-list">
+              {section.treatmentGroups.map((group) => (
+                <div key={group.id} className="pauta-group">
+                  <h3>{group.title}</h3>
+                  <div className="pauta-card-grid">
+                    {group.cards.map((card) => (
+                      <PautaCard key={card.id} card={card} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {section.detailNodes?.length ? (
+            <div className="flow-section-body decision-panel-nodes">
+              {section.detailNodes.map((node) => (
+                <FlowNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} />
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  );
+};
+
+const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
+  const [activePanel, setActivePanel] = useState(null);
+  const [referencesOpen, setReferencesOpen] = useState(false);
+  const referencesSection = protocol.sections.find((section) => section.type === 'references');
+
+  const togglePanel = (panelId) => {
+    setReferencesOpen(false);
+    setActivePanel((current) => (current === panelId ? null : panelId));
+  };
+
+  const toggleReferences = () => {
+    setActivePanel(null);
+    setReferencesOpen((current) => !current);
+  };
+
+  return (
+    <div className="clinical-flow-tree decision-panel-tree">
+      <header className="flow-hero">
+        <div className="flow-hero-icon">
+          <Stethoscope className="h-5 w-5" />
+        </div>
+        <div>
+          <p className="flow-hero-kicker">Protocolo piloto</p>
+          <h2>{protocol.title}</h2>
+          <p>{protocol.specialty}</p>
+        </div>
+      </header>
+
+      <div className="decision-panel-grid">
+        {protocol.panelSections.map((section) => (
+          <DecisionPanelSection
+            key={section.id}
+            section={section}
+            active={activePanel === section.id}
+            onToggle={() => togglePanel(section.id)}
+            onCalculatorOpen={onCalculatorOpen}
+          />
+        ))}
+      </div>
+
+      {referencesSection ? (
+        <section className="decision-panel-references">
+          <button type="button" className="flow-section-header" onClick={toggleReferences} aria-expanded={referencesOpen}>
+            <span>
+              <span className="flow-section-kicker">Fuentes</span>
+              <span className="flow-section-title">{referencesSection.title}</span>
+            </span>
+            <span className="flow-section-toggle">
+              {referencesOpen ? 'Ocultar' : 'Ver detalle'}
+              <ChevronRight className={`flow-node-chevron ${referencesOpen ? 'rotate-90' : ''}`} />
+            </span>
+          </button>
+          {referencesOpen ? (
+            <div className="flow-section-body">
+              {referencesSection.children?.map((node) => (
+                <FlowNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} />
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+    </div>
+  );
+};
+
 export const ClinicalFlowTree = ({ protocol, onCalculatorOpen }) => {
+  if (protocol.layout === 'decision-panel') {
+    return <DecisionPanelProtocol protocol={protocol} onCalculatorOpen={onCalculatorOpen} />;
+  }
+
   const mainSections = protocol.sections.filter((section) => section.type !== 'references');
 
   return (
