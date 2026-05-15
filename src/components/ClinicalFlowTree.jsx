@@ -301,6 +301,74 @@ const PautaCard = ({ card }) => {
   );
 };
 
+const PANEL_SECTION_MAP = [
+  { sourceId: 'que-es', id: 'sospecha', title: 'Sospecha' },
+  { sourceId: 'que-pido', id: 'pruebas', title: 'Pruebas' },
+  { sourceId: 'que-espero', id: 'decision', title: 'Decisión' },
+  { sourceId: 'tratamiento', id: 'tratamiento', title: 'Tratamiento' },
+  { sourceId: 'seguimiento', id: 'destino', title: 'Destino' },
+];
+
+const collectPautaCards = (nodes = [], bucket = []) => {
+  nodes.forEach((node) => {
+    if (node.calculatorId || node.type === 'calculator' || node.type === 'scale' || node.type === 'references') {
+      return;
+    }
+
+    const hasClinicalBody = node.summary || node.items?.length || node.medication;
+    if (hasClinicalBody) {
+      bucket.push(node);
+    }
+
+    if (node.children?.length) {
+      collectPautaCards(node.children, bucket);
+    }
+  });
+
+  return bucket;
+};
+
+const buildGenericTreatmentGroups = (section) => {
+  const groups = section.children
+    ?.map((node) => ({
+      id: node.id,
+      title: node.title,
+      cards: collectPautaCards(node.children?.length ? node.children : [node]).slice(0, 12),
+    }))
+    .filter((group) => group.cards.length);
+
+  return groups?.length ? groups : [];
+};
+
+const buildDecisionPanelSections = (protocol) => {
+  if (protocol.panelSections?.length) return protocol.panelSections;
+
+  return PANEL_SECTION_MAP.map(({ sourceId, id, title }) => {
+    const source = protocol.sections.find((section) => section.id === sourceId);
+    if (!source) {
+      return {
+        id,
+        title,
+        summary: 'Información no disponible en este protocolo.',
+        points: [],
+        detailNodes: [],
+      };
+    }
+
+    const treatmentGroups = sourceId === 'tratamiento' ? buildGenericTreatmentGroups(source) : [];
+
+    return {
+      id,
+      title,
+      summary: source.summary,
+      points: getSectionPreviewItems(source),
+      actions: sourceId === 'decision' ? collectCalculatorActions(source.children) : [],
+      treatmentGroups,
+      detailNodes: treatmentGroups.length ? [] : source.children,
+    };
+  });
+};
+
 const DecisionPanelSection = ({ section, active, onToggle, onCalculatorOpen }) => {
   const points = uniquePreviewItems(section.points).slice(0, MAX_SECTION_ITEMS);
 
@@ -373,6 +441,7 @@ const DecisionPanelSection = ({ section, active, onToggle, onCalculatorOpen }) =
 const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
   const [activePanel, setActivePanel] = useState(null);
   const [referencesOpen, setReferencesOpen] = useState(false);
+  const panelSections = buildDecisionPanelSections(protocol);
   const referencesSection = protocol.sections.find((section) => section.type === 'references');
 
   const togglePanel = (panelId) => {
@@ -392,14 +461,14 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
           <Stethoscope className="h-5 w-5" />
         </div>
         <div>
-          <p className="flow-hero-kicker">Protocolo piloto</p>
+          <p className="flow-hero-kicker">Protocolo</p>
           <h2>{protocol.title}</h2>
           <p>{protocol.specialty}</p>
         </div>
       </header>
 
       <div className="decision-panel-grid">
-        {protocol.panelSections.map((section) => (
+        {panelSections.map((section) => (
           <DecisionPanelSection
             key={section.id}
             section={section}
@@ -436,37 +505,5 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
 };
 
 export const ClinicalFlowTree = ({ protocol, onCalculatorOpen }) => {
-  if (protocol.layout === 'decision-panel') {
-    return <DecisionPanelProtocol protocol={protocol} onCalculatorOpen={onCalculatorOpen} />;
-  }
-
-  const mainSections = protocol.sections.filter((section) => section.type !== 'references');
-
-  return (
-    <div className="clinical-flow-tree">
-      <header className="flow-hero">
-        <div className="flow-hero-icon">
-          <Stethoscope className="h-5 w-5" />
-        </div>
-        <div>
-          <p className="flow-hero-kicker">Protocolos</p>
-          <h2>{protocol.title}</h2>
-          <p>{protocol.specialty}</p>
-        </div>
-      </header>
-      <nav className="flow-jump-nav" aria-label="Bloques principales del protocolo">
-        {mainSections.map((section, index) => (
-          <a key={section.id} href={`#flow-section-${section.id}`} className="flow-jump-link">
-            <span>{index + 1}</span>
-            {section.title}
-          </a>
-        ))}
-      </nav>
-      <div className="flow-sections">
-        {protocol.sections.map((section) => (
-          <FlowSection key={section.id} section={section} onCalculatorOpen={onCalculatorOpen} />
-        ))}
-      </div>
-    </div>
-  );
+  return <DecisionPanelProtocol protocol={protocol} onCalculatorOpen={onCalculatorOpen} />;
 };
