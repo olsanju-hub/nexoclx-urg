@@ -26,7 +26,7 @@ export const protocolsBySpecialty = {
     'bradicardias-ecg-dependientes',
   ],
   Respiratorio: [
-    'neumonia',
+    'neumonia-comunidad',
     'epoc-exacerbacion',
     'asma-exacerbacion',
     'tromboembolia-pulmonar',

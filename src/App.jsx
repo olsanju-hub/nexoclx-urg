@@ -26,8 +26,8 @@ import { ProtocolViewer } from './components/ProtocolViewer';
 import { getMedication, medicationGroups } from './data/medications';
 import { getMotivoModule, groupModulesBySpecialty, motivoConsultaModules } from './data/modules';
 import { getProtocolFlow } from './data/protocolFlows';
-import { getProtocol } from './data/protocols';
-import { specialties, protocolsBySpecialty } from './data/protocolsIndex';
+import { getProtocol as getLegacyProtocol } from './data/protocols';
+import { getProtocol as getSimplifiedProtocol, specialties, protocolsBySpecialty } from './data/protocolsIndex';
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
 
@@ -207,7 +207,9 @@ const getPrimarySection = (view) => {
 
 const getPageLabel = (route) => {
   if (route.view === 'protocol') {
-    return getProtocol(route.protocolId ?? 'fibrilacion-auricular').title;
+    const protocolId = route.protocolId ?? 'fibrilacion-auricular';
+    const simplifiedProtocol = getSimplifiedProtocol(protocolId);
+    return (simplifiedProtocol ?? getLegacyProtocol(protocolId)).title;
   }
 
   if (route.view === 'calculator') {
@@ -234,7 +236,7 @@ const normalizeSearch = (value = '') => String(value).normalize('NFD').replace(/
 const matchesSearch = (needle, ...parts) => parts.some((part) => normalizeSearch(part).includes(needle));
 
 const getModulePrimaryReferences = (moduleId) => {
-  const protocol = getProtocol(moduleId);
+  const protocol = getSimplifiedProtocol(moduleId) ?? getLegacyProtocol(moduleId);
   const entries = protocol?.bibliography ?? getMotivoModule(moduleId).bibliography ?? [];
   return entries.slice(0, 1);
 };
@@ -317,6 +319,38 @@ const filterCalculatorItems = (query) => {
   return implementedCalculators.filter((calculator) =>
     matchesSearch(needle, calculator.title, calculator.summary, calculator.block, calculator.moduleId),
   );
+};
+
+const buildSimplifiedSpecialtyCollections = () =>
+  specialties.map((specialty) => ({
+    id: specialty,
+    title: specialty,
+    note: '',
+    protocols: protocolsBySpecialty[specialty]
+      .map((protocolId) => getSimplifiedProtocol(protocolId))
+      .filter(Boolean)
+      .map((protocol) => ({
+        id: protocol.id,
+        title: protocol.title,
+        section: protocol.specialty,
+        summary: protocol.definition,
+        specialtyId: specialty,
+        implemented: true,
+        calculatorCount: protocol.calculatorIds?.length ?? 0,
+      })),
+  }));
+
+const getSimplifiedProtocolSearchText = (protocol) =>
+  [protocol.title, protocol.definition, protocol.specialty, protocol.category].join(' ');
+
+const filterSimplifiedProtocolModules = (modules, query, specialtyId = 'todos') => {
+  const needle = normalizeSearch(query);
+
+  return modules.filter((module) => {
+    const specialtyMatches = specialtyId === 'todos' || module.specialtyId === specialtyId;
+    const queryMatches = !needle || matchesSearch(needle, getSimplifiedProtocolSearchText(module));
+    return specialtyMatches && queryMatches;
+  });
 };
 
 const filterSpecialtyCollections = (groups, query) => {
@@ -498,7 +532,7 @@ const ListActionRow = ({ title, meta, onClick, badge = null, disabled = false })
 );
 
 const ProtocolCompactCard = ({ module, onClick, compact = false }) => {
-  const calculatorCount = getProtocolCalculatorCount(module.id);
+  const calculatorCount = module.calculatorCount ?? getProtocolCalculatorCount(module.id);
 
   return (
     <button type="button" onClick={onClick} className={`protocol-compact-card ${compact ? 'protocol-compact-card-slim' : ''} group`}>
@@ -1523,12 +1557,12 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSpecialtyId, setActiveSpecialtyId] = useState(focusSpecialtyId ?? 'todos');
   const deferredSearchQuery = useDeferredValue(searchQuery);
-  const specialtyCollections = buildSpecialtyCollections().map((group) => ({
-    ...group,
-    protocols: group.protocols.filter((module) => module.implemented),
-    bibliography: [],
-  }));
-  const protocolResults = filterProtocolModules(implementedProtocolModules, deferredSearchQuery, activeSpecialtyId);
+  const specialtyCollections = buildSimplifiedSpecialtyCollections();
+  const protocolResults = filterSimplifiedProtocolModules(
+    specialtyCollections.flatMap((group) => group.protocols),
+    deferredSearchQuery,
+    activeSpecialtyId,
+  );
 
   return (
     <div className={pageClass}>
@@ -3893,7 +3927,9 @@ const MedicationsView = ({ onBack, onMedicationOpen }) => {
 };
 
 const MedicationDetailView = ({ medication, onBack }) => {
-  const protocolLabel = medication.protocolId ? getProtocol(medication.protocolId)?.title ?? 'Módulo clínico' : 'Módulo clínico';
+  const protocolLabel = medication.protocolId
+    ? (getSimplifiedProtocol(medication.protocolId) ?? getLegacyProtocol(medication.protocolId))?.title ?? 'Módulo clínico'
+    : 'Módulo clínico';
   const primaryIndication = medication.contextUse ?? medication.indication;
   const primaryDose = medication.contextDose ?? medication.dose;
   const primaryRoute = medication.contextRoute ?? medication.route;
@@ -4123,6 +4159,13 @@ const App = () => {
   };
 
   const openModule = (moduleId, returnTo = { view: 'protocols' }) => {
+    const simplifiedProtocol = getSimplifiedProtocol(moduleId);
+
+    if (simplifiedProtocol) {
+      navigate({ view: 'protocol', protocolId: moduleId, returnTo });
+      return;
+    }
+
     const module = getMotivoModule(moduleId);
 
     if (!module.implemented) {
@@ -4215,6 +4258,17 @@ const App = () => {
         view: 'protocol',
         protocolId,
       };
+      const simplifiedProtocol = getSimplifiedProtocol(protocolId);
+
+      if (simplifiedProtocol) {
+        return (
+          <ProtocolViewer
+            protocolId={protocolId}
+            onBack={handleBack}
+            onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
+          />
+        );
+      }
 
       return (
         <ClinicalProtocolFlowView

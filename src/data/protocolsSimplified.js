@@ -94,6 +94,7 @@ const cardiologyProtocols = {
     category: 'Urgencia',
     specialty: 'Cardiología',
     definition: 'Arritmia rápida e irregular, ondas f en lugar de P, frecuencia 120-160.',
+    calculatorIds: ['cha2ds2-va', 'has-bled', 'cockcroft-gault'],
     diagnosticOrders: [
       'ECG 12 derivaciones',
       'Troponina, BNP',
@@ -291,12 +292,13 @@ const cardiologyProtocols = {
 
 // RESPIRATORIO
 const respiratoryProtocols = {
-  'neumonia': createProtocol({
-    id: 'neumonia',
+  'neumonia-comunidad': createProtocol({
+    id: 'neumonia-comunidad',
     title: 'Neumonía adquirida en comunidad (NAC)',
     category: 'Urgencia',
     specialty: 'Respiratorio',
     definition: 'Infección pulmonar con fiebre, tos, disnea, infiltrado radiológico.',
+    calculatorIds: ['crb-65', 'curb-65'],
     diagnosticOrders: [
       'Rx tórax posteroanterior y lateral',
       'TC tórax si no concluyente',
