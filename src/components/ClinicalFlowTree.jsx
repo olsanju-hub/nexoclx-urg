@@ -19,6 +19,7 @@ const typeLabels = {
   treatment: 'Tratamiento',
 };
 
+const DEFAULT_MAX_INITIAL_ITEMS = 4;
 const MAX_SECTION_ITEMS = 5;
 
 const compactText = (value = '') => String(value).replace(/\s+/g, ' ').trim();
@@ -42,11 +43,11 @@ const formatPreviewItem = (node, item) => {
     : truncateText(text);
 };
 
-const collectNodePreviewItems = (node, bucket = []) => {
-  if (node.calculatorId || bucket.length >= MAX_SECTION_ITEMS) return bucket;
+const collectNodePreviewItems = (node, bucket = [], maxItems = DEFAULT_MAX_INITIAL_ITEMS) => {
+  if (node.calculatorId || bucket.length >= maxItems) return bucket;
 
   if (node.items?.length) {
-    node.items.slice(0, MAX_SECTION_ITEMS - bucket.length).forEach((item) => {
+    node.items.slice(0, maxItems - bucket.length).forEach((item) => {
       const preview = formatPreviewItem(node, item);
       if (preview) bucket.push(preview);
     });
@@ -56,14 +57,14 @@ const collectNodePreviewItems = (node, bucket = []) => {
   const preview = formatPreviewItem(node);
   if (preview) bucket.push(preview);
 
-  if (node.children?.length && bucket.length < MAX_SECTION_ITEMS) {
-    node.children.forEach((child) => collectNodePreviewItems(child, bucket));
+  if (node.children?.length && bucket.length < maxItems) {
+    node.children.forEach((child) => collectNodePreviewItems(child, bucket, maxItems));
   }
 
   return bucket;
 };
 
-const collectTreatmentPreviewItems = (nodes = []) => {
+const collectTreatmentPreviewItems = (nodes = [], maxItems = DEFAULT_MAX_INITIAL_ITEMS) => {
   const medicationItems = [];
   const otherItems = [];
 
@@ -83,28 +84,30 @@ const collectTreatmentPreviewItems = (nodes = []) => {
     }
 
     node.children.forEach(walk);
-    if (otherItems.length < MAX_SECTION_ITEMS && !node.medication && node.summary) {
+    if (otherItems.length < maxItems && !node.medication && node.summary) {
       const preview = formatPreviewItem(node);
       if (preview) otherItems.push(preview);
     }
   };
 
   nodes.forEach(walk);
-  return [...medicationItems, ...otherItems].slice(0, MAX_SECTION_ITEMS);
+  return [...medicationItems, ...otherItems].slice(0, maxItems);
 };
 
 const getSectionPreviewItems = (section) => {
+  const maxItems = Math.min(section.maxInitialItems ?? DEFAULT_MAX_INITIAL_ITEMS, MAX_SECTION_ITEMS);
+
   if (section.type === 'references') {
     return ['Bibliografía textual cerrada.'];
   }
 
   if (section.id === 'tratamiento') {
-    return collectTreatmentPreviewItems(section.children);
+    return collectTreatmentPreviewItems(section.children, maxItems);
   }
 
   const items = [];
-  section.children?.forEach((node) => collectNodePreviewItems(node, items));
-  return items.slice(0, MAX_SECTION_ITEMS);
+  section.children?.forEach((node) => collectNodePreviewItems(node, items, maxItems));
+  return items.slice(0, maxItems);
 };
 
 const collectCalculatorActions = (nodes = [], bucket = new Map()) => {
@@ -218,6 +221,7 @@ const FlowSection = ({ section, onCalculatorOpen }) => {
         </span>
       </button>
       <div className="flow-section-preview">
+        {section.summary ? <p className="flow-section-summary">{section.summary}</p> : null}
         {previewItems.length ? (
           <ul className="flow-section-preview-list">
             {previewItems.map((item) => (

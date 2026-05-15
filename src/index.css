@@ -674,14 +674,23 @@
     padding: 0 0.82rem 0.78rem;
   }
 
+  .flow-section-summary,
   .flow-section-preview-list {
     margin: 0;
-    padding-left: 1rem;
     color: var(--text-soft);
     font-size: 0.82rem;
     line-height: 1.42;
     overflow-wrap: break-word;
     word-break: normal;
+  }
+
+  .flow-section-summary {
+    margin-bottom: 0.46rem;
+    font-weight: 650;
+  }
+
+  .flow-section-preview-list {
+    padding-left: 1rem;
   }
 
   .flow-section-preview-list li + li {

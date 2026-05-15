@@ -10,14 +10,6 @@ const PRIMARY_SECTION_TITLES = {
   followUp: 'Destino / seguimiento',
 };
 
-const CARDIOLOGY_PROTOCOL_IDS = new Set([
-  'fibrilacion-auricular',
-  'sindrome-coronario-agudo',
-  'hta-urgencias',
-  'bradicardias',
-  'arritmias-ventriculares',
-]);
-
 const slugify = (value = '') =>
   value
     .toLowerCase()
@@ -83,7 +75,6 @@ const medicationNode = (medicationId) => {
     summary: doseSummary,
     items: medicationDetailItems(medication),
     medication: medication.family,
-    initiallyOpenMobile: CARDIOLOGY_PROTOCOL_IDS.has(medication.protocolId),
   };
 };
 
@@ -97,7 +88,6 @@ const calculatorNode = (calculatorId) => {
     summary: calculator.summary,
     calculatorId,
     action: `Calcular ${calculator.title}`,
-    initiallyOpenMobile: true,
   };
 };
 
@@ -138,7 +128,6 @@ const treatmentCalculatorNodes = (protocol, calculators) => {
         type: 'calculator',
         summary: meta.summary,
         severity: meta.severity,
-        initiallyOpenMobile: true,
         children: [calculatorNode(calculatorId)],
       };
     });
@@ -150,7 +139,6 @@ const treatmentCalculatorNodes = (protocol, calculators) => {
       title: 'Cálculos que cambian tratamiento',
       type: 'calculator',
       summary: 'Abrir la calculadora concreta desde el punto de decisión.',
-      initiallyOpenMobile: true,
       children: calculators.map(calculatorNode),
     },
   ];
@@ -174,7 +162,8 @@ const definitionSection = (protocol) => ({
   id: 'que-es',
   title: PRIMARY_SECTION_TITLES.definition,
   type: 'section',
-  initiallyOpen: true,
+  summary: brief(protocol.summary, 130),
+  maxInitialItems: 0,
   children: [
     {
       id: 'definicion',
@@ -182,7 +171,6 @@ const definitionSection = (protocol) => ({
       type: 'step',
       summary: brief(protocol.summary, 180),
       severity: 'info',
-      initiallyOpen: true,
     },
   ],
 });
@@ -194,7 +182,7 @@ const defaultOrders = (protocol) => {
     id: 'que-pido',
     title: PRIMARY_SECTION_TITLES.orders,
     type: 'section',
-    initiallyOpen: true,
+    summary: 'Pruebas iniciales y datos que orientan la conducta.',
     children: [
       {
         id: 'pruebas-iniciales',
@@ -210,7 +198,7 @@ const defaultFindings = (protocol) => ({
   id: 'que-espero',
   title: PRIMARY_SECTION_TITLES.findings,
   type: 'section',
-  initiallyOpen: true,
+  summary: 'Hallazgos y puntos de decisión que cambian prioridad, tratamiento o destino.',
   children: [
     ...decisionNodes(protocol),
     ...(protocol.warnings?.length
@@ -392,14 +380,13 @@ const genericTreatmentSection = (protocol) => {
     id: 'tratamiento',
     title: PRIMARY_SECTION_TITLES.treatment,
     type: 'section',
-    initiallyOpen: true,
+    summary: 'Pauta breve inicial; máximos, contraindicaciones, ajustes, alternativas y fuentes quedan en detalle.',
     children: [
       {
         id: 'tratamiento-urgencias',
         title: 'Pautas en Urgencias',
         type: 'treatment',
         summary: 'Fármacos y medidas concretas cuando están auditadas.',
-        initiallyOpenMobile: CARDIOLOGY_PROTOCOL_IDS.has(protocol.id),
         children: [
           ...cardiologyInterventionNodes(protocol),
           ...medicationGroups.map((group) => ({
@@ -407,7 +394,6 @@ const genericTreatmentSection = (protocol) => {
             title: group.title,
             type: 'treatment',
             summary: 'Abrir para ver fármacos y dosis.',
-            initiallyOpenMobile: CARDIOLOGY_PROTOCOL_IDS.has(protocol.id),
             children: asArray(group.medicationIds).map(medicationNode),
           })),
         ],
@@ -452,7 +438,7 @@ const genericFollowUpSection = (protocol) => ({
   id: 'seguimiento',
   title: PRIMARY_SECTION_TITLES.followUp,
   type: 'section',
-  initiallyOpen: true,
+  summary: 'Destino, observación, ingreso o seguimiento según gravedad y respuesta.',
   children: [
     {
       id: 'destino',
@@ -472,7 +458,7 @@ const pneumoniaOrdersSection = (protocol) => ({
   id: 'que-pido',
   title: PRIMARY_SECTION_TITLES.orders,
   type: 'section',
-  initiallyOpen: true,
+  summary: 'Confirmar neumonía, gravedad y necesidad de microbiología o analítica.',
   children: [
     {
       id: 'clinica-constantes-imagen',
@@ -492,7 +478,6 @@ const pneumoniaOrdersSection = (protocol) => ({
       title: 'Escalas de gravedad',
       type: 'scale',
       summary: protocol.decisionCards[2]?.action,
-      initiallyOpenMobile: true,
       children: protocol.calculatorIds.map(calculatorNode),
     },
   ],
@@ -502,7 +487,7 @@ const pneumoniaFindingsSection = (protocol) => ({
   id: 'que-espero',
   title: PRIMARY_SECTION_TITLES.findings,
   type: 'section',
-  initiallyOpen: true,
+  summary: 'Identificar gravedad, criterios de ingreso y situaciones donde el alta no es segura.',
   children: [
     {
       id: 'criterios-destino',
@@ -525,7 +510,7 @@ const pneumoniaTreatmentSection = (protocol) => ({
   id: 'tratamiento',
   title: PRIMARY_SECTION_TITLES.treatment,
   type: 'section',
-  initiallyOpen: true,
+  summary: 'Antibiótico inicial resumido; seguridad, escenarios y reevaluación quedan cerrados en detalle.',
   children: [
     {
       id: 'tratamiento-urgencias',
@@ -539,7 +524,6 @@ const pneumoniaTreatmentSection = (protocol) => ({
           type: 'alert',
           severity: 'warning',
           items: [protocol.warnings[0]],
-          initiallyOpen: true,
         },
         ...protocol.antibioticPlan.map((item) => ({
           id: slugify(item.severity),
@@ -567,7 +551,7 @@ const pneumoniaFollowUpSection = (protocol) => ({
   id: 'seguimiento',
   title: PRIMARY_SECTION_TITLES.followUp,
   type: 'section',
-  initiallyOpen: true,
+  summary: 'Destino y revisión según gravedad, estabilidad, tolerancia oral y criterios de no alta.',
   children: [
     {
       id: 'destino',
@@ -627,7 +611,8 @@ const guardiaFlow = (protocol) => {
         id: 'que-es',
         title: PRIMARY_SECTION_TITLES.definition,
         type: 'section',
-        initiallyOpen: true,
+        summary: brief(guardia.clinica, 130),
+        maxInitialItems: 0,
         children: [
           {
             id: 'clinica',
@@ -642,7 +627,7 @@ const guardiaFlow = (protocol) => {
         id: 'que-pido',
         title: PRIMARY_SECTION_TITLES.orders,
         type: 'section',
-        initiallyOpen: true,
+        summary: 'Pruebas y datos de entrada para orientar el escenario de guardia.',
         children: [
           {
             id: 'pruebas',
@@ -656,7 +641,7 @@ const guardiaFlow = (protocol) => {
         id: 'que-espero',
         title: PRIMARY_SECTION_TITLES.findings,
         type: 'section',
-        initiallyOpen: true,
+        summary: 'Diagnóstico probable y criterios de gravedad que obligan a escalar.',
         children: [
           {
             id: 'diagnostico',
@@ -677,7 +662,7 @@ const guardiaFlow = (protocol) => {
         id: 'tratamiento',
         title: PRIMARY_SECTION_TITLES.treatment,
         type: 'section',
-        initiallyOpen: true,
+        summary: 'Medidas iniciales resumidas; datos previos, escalones y reevaluación quedan en detalle.',
         children: [
           {
             id: 'tratamiento-urgencias',
@@ -711,7 +696,7 @@ const guardiaFlow = (protocol) => {
         id: 'seguimiento',
         title: PRIMARY_SECTION_TITLES.followUp,
         type: 'section',
-        initiallyOpen: true,
+        summary: 'Destino y seguimiento según estabilidad, alarma y respuesta inicial.',
         children: [
           {
             id: 'destino',
