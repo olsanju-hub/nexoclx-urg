@@ -932,6 +932,10 @@ export const medicationCatalog = {
           note: 'Tratamiento oral inicial en urgencia hipertensiva.',
         }),
       ),
+      cimaSource(
+        'CIMA · Captopril Qualigen 25/50 mg comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/55938/FichaTecnica_55938.html',
+      ),
     ],
   },
   labetalol: {
@@ -990,6 +994,10 @@ export const medicationCatalog = {
           note: 'Labetalol intravenoso y transición oral en emergencia hipertensiva.',
         }),
       ),
+      cimaSource(
+        'CIMA · Trandate comprimidos y solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/55318/FT_55318.html',
+      ),
     ],
   },
   amlodipino: {
@@ -1037,6 +1045,10 @@ export const medicationCatalog = {
           pdfPages: [272, 273],
           note: 'Antagonista del calcio citado en el tratamiento oral de la urgencia hipertensiva.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Amlodipino cinfa 5 mg comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/65460/FichaTecnica_65460.html',
       ),
     ],
   },
@@ -1140,6 +1152,10 @@ export const medicationCatalog = {
           note: 'Perfusión de nitroglicerina en emergencia hipertensiva.',
         }),
       ),
+      cimaSource(
+        'CIMA · Solinitrina 1 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/55332/FichaTecnica_55332.html',
+      ),
     ],
   },
   nitroprusiato: {
@@ -1187,6 +1203,10 @@ export const medicationCatalog = {
           pdfPage: 276,
           note: 'Pauta intravenosa de nitroprusiato sódico en emergencia hipertensiva.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Nitroprussiat Fides 50 mg',
+        'https://cima.aemps.es/cima/dochtml/ft/54575/FichaTecnica_54575.html',
       ),
     ],
   },

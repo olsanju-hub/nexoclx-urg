@@ -244,10 +244,11 @@ export const protocolCatalog = {
     status: 'implementado',
     summary: 'Separar urgencia y emergencia, reconocer daño agudo de órgano diana y bajar la presión de forma segura.',
     quickChecks: [
-      'Confirmar PAS y PAD',
-      'Buscar daño agudo de órgano diana',
-      'Decidir si precisa ingreso y monitorización',
-      'Elegir descenso gradual u hospitalario titulado',
+      'Confirmar PAS/PAD con técnica correcta, reposo y repetición si procede.',
+      'Buscar daño agudo: focalidad, dolor torácico/dorsal, edema pulmonar, confusión, oliguria, embarazo o deterioro renal.',
+      'ECG, analítica renal/electrolitos y orina; añadir troponina, Rx tórax, gasometría o neuroimagen según clínica.',
+      'Urgencia hipertensiva: sin daño agudo; descenso gradual oral y seguimiento estrecho.',
+      'Emergencia hipertensiva: daño agudo; ingreso, monitorización y tratamiento IV titulado.',
     ],
     quickSummary: [
       {

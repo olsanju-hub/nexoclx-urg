@@ -1064,6 +1064,116 @@ const buildScaDecisionPanelFlow = (protocol) => {
   };
 };
 
+const buildHtaDecisionPanelFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'PA muy elevada: lo importante es separar cifra aislada de daño agudo de órgano diana.',
+        points: [
+          'Confirmar PA con técnica correcta, reposo y repetición en ambos brazos si procede.',
+          'Pensar en emergencia si hay focalidad, dolor torácico, disnea/edema pulmonar, confusión, embarazo o deterioro renal.',
+          'Cefalea, ansiedad o epistaxis sin daño agudo no equivalen por sí solas a emergencia.',
+        ],
+        detailNodes: [
+          {
+            id: 'sospecha-hta',
+            title: 'Qué buscar al inicio',
+            type: 'step',
+            items: [
+              'Síntomas neurológicos, visuales, dolor torácico, dolor dorsal, disnea, oliguria, embarazo/puerperio y consumo de simpaticomiméticos.',
+              'Revisar tratamiento antihipertensivo, adherencia, AINE/descongestivos, cocaína/anfetaminas y retirada de fármacos.',
+              'Valorar si la elevación es crónica/mal controlada o brusca con daño agudo.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Pedir pruebas dirigidas a daño de órgano: corazón, cerebro, riñón, retina, aorta y embarazo.',
+        points: [
+          'ECG y Rx tórax si dolor torácico, disnea, insuficiencia cardíaca o sospecha cardiovascular.',
+          'Analítica: hemograma, glucosa, urea/creatinina, Na/K/Ca y orina/sedimento si posible daño renal.',
+          'Troponina si dolor torácico o ECG compatible; BNP/gasometría si edema pulmonar o insuficiencia respiratoria.',
+          'Neuroimagen si focalidad, confusión, crisis, cefalea brusca intensa o sospecha de ictus/hemorragia.',
+          'Embarazo: tira/test y proteinuria si posibilidad de gestación o puerperio.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-hta',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'Creatinina elevada, hematuria/proteinuria o oliguria orientan a afectación renal aguda.',
+              'ECG/troponina positivos cambian a SCA/emergencia hipertensiva cardiaca.',
+              'Edema pulmonar en Rx o hipoxemia obliga a tratamiento IV monitorizado.',
+              'Focalidad o disminución de conciencia obliga a rama ictus/hemorragia y objetivos tensionales específicos.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Sin daño agudo: descenso gradual. Con daño agudo: emergencia, ingreso y perfusión IV titulada.',
+        points: [
+          'Urgencia hipertensiva: PA alta sin daño agudo; reposo, tratamiento oral si procede y reevaluación.',
+          'Emergencia hipertensiva: daño agudo neurológico, coronario, pulmonar, renal, aórtico o gestacional.',
+          'No bajar rápido una PA crónicamente elevada sin daño agudo: riesgo de hipoperfusión.',
+          'Elegir objetivo y fármaco según órgano afectado; no usar vía IV fuera de contexto monitorizado.',
+        ],
+        detailNodes: decisionNodes(protocol),
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Oral y gradual si urgencia; IV titulada y monitorizada si emergencia.',
+        points: [
+          'Urgencia: reposo y reevaluación; captopril 25 mg VO, labetalol 100 mg VO o amlodipino 5 mg VO según contexto.',
+          'Emergencia: monitorización, vía IV y objetivo tensional por órgano afectado.',
+          'Labetalol IV 20 mg cada 5 min hasta 100 mg o perfusión 0,5-2 mg/min si encaja.',
+          'Nitroglicerina IV si SCA/edema pulmonar; nitroprusiato IV si HTA maligna/encefalopatía y monitorización estricta.',
+        ],
+        treatmentGroups: medicationGroups.map((group) => ({
+          id: `grupo-${slugify(group.title)}`,
+          title: group.title,
+          cards: asArray(group.medicationIds).map(medicationNode),
+        })),
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta solo si no hay daño agudo, la PA desciende de forma segura y hay seguimiento cercano.',
+        points: [
+          'Alta: sin daño agudo, síntomas resueltos/banales, plan oral claro y control en 24-72 h.',
+          'Observación: dudas diagnósticas, síntomas persistentes, necesidad de reevaluación o ajuste oral.',
+          'Ingreso/UCI: cualquier daño agudo de órgano, perfusión IV, embarazo grave, disección, edema pulmonar, SCA o ictus.',
+          'Reevaluar PA, clínica, diuresis, ECG y analítica según el órgano afectado.',
+        ],
+        detailNodes: [
+          {
+            id: 'destino-hta',
+            title: 'Seguridad al alta',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'No dar alta si hay focalidad, dolor torácico, disnea, deterioro renal, embarazo grave o sospecha de disección.',
+              'Explicar alarma por dolor torácico/dorsal, disnea, focalidad, confusión, visión borrosa, oliguria o síncope.',
+              'Evitar duplicar fármacos sin revisar medicación habitual y adherencia.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -1071,6 +1181,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'sindrome-coronario-agudo') {
     return buildScaDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'hta-urgencias') {
+    return buildHtaDecisionPanelFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {
