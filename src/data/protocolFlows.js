@@ -83,6 +83,9 @@ const medicationDetailItems = (medication) => {
 const medicationNode = (medicationId) => {
   const medication = getMedication(medicationId);
   const doseSummary = medication.contextDose ?? medication.dose ?? medication.contextUse ?? medication.indication;
+  const cimaSource = asArray(medication.sources).find(
+    (source) => source.type === 'cima' && source.url && !source.url.toLowerCase().includes('.pdf'),
+  );
 
   return {
     id: `med-${medication.id}`,
@@ -91,6 +94,7 @@ const medicationNode = (medicationId) => {
     summary: doseSummary,
     items: medicationDetailItems(medication),
     medication: medication.family,
+    sourceUrl: cimaSource?.url,
   };
 };
 
@@ -257,13 +261,13 @@ const cardiologyInterventionNodes = (protocol) => {
         title: 'Cardioversión eléctrica',
         type: 'treatment',
         severity: 'danger',
-        summary: 'Sincronizada urgente si inestabilidad; sedación según protocolo local si no retrasa.',
+        summary: 'Sincronizada urgente si inestabilidad; sedación según protocolo local si no retrasa la descarga.',
         items: [
           'Indicación: hipotensión, shock, isquemia, edema pulmonar o mala perfusión atribuible a FA.',
-          'Dosis/energía: choque sincronizado; estrategia razonable con energía máxima del desfibrilador para FA.',
+          'Dosis/energía: choque sincronizado; si hay duda, usar energía alta/máxima del desfibrilador para FA.',
           'Vía: cardioversión eléctrica sincronizada.',
-          'Evitar: intoxicación digitálica; si toma digoxina, iniciar con menor energía según Murillo.',
-          'Reevaluar/siguiente paso: ritmo, PA, síntomas y anticoagulación según duración de FA y riesgo.',
+          'Evitar si: intoxicación digitálica; si toma digoxina, iniciar con menor energía según Murillo.',
+          'Reevaluar/siguiente paso: ritmo, PA, síntomas, causa desencadenante y anticoagulación según duración de FA/riesgo.',
         ],
       },
       {
@@ -275,6 +279,7 @@ const cardiologyInterventionNodes = (protocol) => {
           'Sin cardiopatía estructural significativa: flecainida IV 1,5-3 mg/kg o propafenona IV 1,5-2 mg/kg; alternativas VO verificadas en detalle.',
           'Con HFrEF, hipertrofia severa o enfermedad coronaria: amiodarona IV 5-7 mg/kg; aceptar reversión más lenta.',
           'No mezclar antiarrítmicos de clase I y III en el mismo momento.',
+          'Evitar si: duración ≥ 24 h/desconocida sin 3 semanas de ACO terapéutica o ETE sin trombo, salvo inestabilidad.',
           'Reevaluar/siguiente paso: si falla o empeora, cardioversión eléctrica; documentar anticoagulación.',
         ],
       },
@@ -829,11 +834,11 @@ const buildFaDecisionPanelFlow = (protocol) => {
       {
         id: 'sospecha',
         title: 'Sospecha',
-        summary: 'FA clínica con ritmo irregular y respuesta ventricular variable; prioriza estabilidad y causa desencadenante.',
+        summary: 'Ritmo irregular con respuesta ventricular variable; lo urgente es estabilidad, duración y desencadenante.',
         points: [
           'Palpitaciones, dolor torácico, disnea, mareo, síncope o embolia.',
           'ECG con ausencia de ondas P repetidas e intervalos RR irregulares.',
-          'Red flags: shock, isquemia, edema agudo de pulmón, mala perfusión o preexcitación.',
+          'Red flags: shock, isquemia, edema pulmonar, mala perfusión, síncope o preexcitación.',
         ],
         detailNodes: [
           {
@@ -855,19 +860,26 @@ const buildFaDecisionPanelFlow = (protocol) => {
       {
         id: 'pruebas',
         title: 'Pruebas',
-        summary: 'Confirmar ritmo, repercusión y datos que cambian frecuencia, cardioversión o anticoagulación.',
+        summary: 'Confirmar ritmo y pedir solo datos que cambian frecuencia, cardioversión, anticoagulación o destino.',
         points: [
-          'ECG 12 derivaciones y tira de ritmo.',
-          'Constantes, estabilidad hemodinámica, SatO2 si disnea y búsqueda de insuficiencia cardíaca/isquemia.',
-          'Inicio del episodio: < 24 h, ≥ 24 h o desconocido.',
-          'FEVI/cardiopatía estructural y función renal si vas a anticoagular.',
+          'ECG 12 derivaciones y tira de ritmo mínimo 30 s; monitor si rápida, síntomas o tratamiento IV.',
+          'Hemograma, glucosa, urea/creatinina, Na/K/Cl; coagulación si shock, coagulopatía o anticoagulación.',
+          'Troponina si dolor torácico; BNP/NT-proBNP si insuficiencia cardíaca.',
+          'Rx tórax si sospecha cardiopulmonar; gasometría/lactato si SpO2 < 90% o shock.',
+          'Fecha/hora de inicio, FEVI/cardiopatía estructural y Cockcroft-Gault si vas a anticoagular.',
         ],
         detailNodes: [
           {
             id: 'pruebas-fa',
-            title: 'Datos que cambian conducta',
+            title: 'Pruebas y resultados que cambian conducta',
             type: 'step',
-            items: asArray(protocol.quickChecks),
+            items: [
+              'ECG: FA si no hay ondas P repetidas, línea de base irregular y RR irregular; QRS ancho o FC > 200 sugiere preexcitación.',
+              'Analítica: creatinina/electrolitos para ACOD, digoxina y antiarrítmicos; K/Mg alterados aumentan recurrencia y toxicidad.',
+              'Coagulación: necesaria si ya toma anticoagulantes, hay coagulopatía o se plantea cardioversión/ingreso.',
+              'Imagen: Rx tórax si disnea, insuficiencia cardíaca, infección respiratoria o duda cardiopulmonar; ETE si cardioversión precoz guiada.',
+              'Gasometría/lactato: solo si hipoxemia marcada, shock o mala perfusión.',
+            ],
           },
         ],
       },
@@ -877,9 +889,10 @@ const buildFaDecisionPanelFlow = (protocol) => {
         summary: 'Decidir estabilidad, ritmo/frecuencia y anticoagulación sin repetir calculadoras.',
         points: [
           'Inestable: cardioversión eléctrica sincronizada urgente.',
-          'Estable < 24 h: controlar frecuencia y valorar ritmo precoz si procede.',
-          '≥ 24 h/desconocida: frecuencia y anticoagulación/ETE antes de cardioversión precoz.',
-          'Anticoagulación: riesgo tromboembólico, sangrado modificable y función renal.',
+          'Estable: frecuencia primero; ritmo precoz solo si síntomas, primera crisis o mala tolerancia.',
+          '≥ 24 h/desconocida: no cardiovertir precozmente sin 3 semanas de ACO terapéutica o ETE sin trombo.',
+          'Anticoagulación: CHA2DS2-VA, HAS-BLED modificable y Cockcroft-Gault para dosis.',
+          'FA valvular: estenosis mitral moderada/grave o prótesis mecánica orienta a AVK, no ACOD.',
         ],
         actions: asArray(protocol.calculatorIds).map(calculatorAction),
         detailNodes: decisionNodes(protocol),
@@ -907,9 +920,10 @@ const buildFaDecisionPanelFlow = (protocol) => {
         title: 'Destino',
         summary: 'Alta, observación o ingreso según estabilidad, control, anticoagulación y causa desencadenante.',
         points: [
-          'Ingreso/monitorización si inestabilidad, isquemia, insuficiencia cardíaca o mal control.',
-          'Observación si precisa titulación de frecuencia, cardioversión o inicio seguro de anticoagulación.',
-          'Alta solo si estable, controlada, con plan anticoagulante y signos de alarma claros.',
+          'UCI/monitorización si shock, isquemia, edema pulmonar, preexcitación o necesidad de cardioversión urgente.',
+          'Observación si requiere fármacos IV, cardioversión, titulación de frecuencia o inicio seguro de anticoagulación.',
+          'Ingreso si insuficiencia cardíaca, SCA, embolia, infección grave, alteración electrolítica relevante o mal control.',
+          'Alta solo si estable, FC controlada o aceptable, causa abordada, anticoagulación decidida y revisión planificada.',
         ],
         detailNodes: [
           {

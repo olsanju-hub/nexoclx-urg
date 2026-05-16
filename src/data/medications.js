@@ -241,7 +241,7 @@ export const medicationCatalog = {
           note: 'Digoxina como primera línea con FEVI reducida o como fármaco adicional según el contexto clínico.',
         }),
       ),
-      cimaSource('CIMA · Digoxina 0,25 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/25126/FichaTecnica_25126.html'),
+      cimaSource('CIMA · Digoxina Kern Pharma 0,25 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/34753/FT_34753.htm'),
       protocolSource(
         'Murillo 7.ª ed. · control de frecuencia en FA',
         referenceEntry({
@@ -1739,9 +1739,9 @@ export const medicationCatalog = {
       'No mezclar con antiarrítmicos de clase III en el mismo episodio.',
     ],
     renalAdjustment:
-      'No se añade ajuste renal cerrado en esta vista; si hay insuficiencia renal relevante, individualizar y consultar ficha completa.',
+      'CIMA oral: si aclaramiento de creatinina < 35 mL/min, dosis máxima inicial 100 mg/día (50 mg cada 12 h) y monitorización. Para uso IV agudo, individualizar y monitorizar ECG.',
     hepaticAdjustment:
-      'No se añade ajuste hepático cerrado en esta vista; individualizar si hepatopatía relevante.',
+      'CIMA oral: en disfunción hepática importante solo usar si el beneficio supera el riesgo, con monitorización de niveles plasmáticos.',
     practicalNotes: [
       'ESC la recomienda para cardioversión farmacológica de FA reciente si no hay cardiopatía estructural significativa.',
       'Evitar en FA preexcitada no evaluada y en QRS ancho no aclarado.',
@@ -1766,6 +1766,10 @@ export const medicationCatalog = {
           pdfPages: [46, 47, 48],
           note: 'Flecainida/propafenona en FA reciente excluyendo cardiopatía estructural relevante.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Flecainida Normon 100 mg comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/79329/FichaTecnica_79329.html',
       ),
     ],
   },
@@ -1792,9 +1796,9 @@ export const medicationCatalog = {
       'No mezclar con antiarrítmicos de clase III en el mismo episodio.',
     ],
     renalAdjustment:
-      'No se añade ajuste renal cerrado en esta vista; individualizar si insuficiencia renal relevante.',
+      'CIMA oral: en insuficiencia renal puede haber acumulación; ajustar individualmente con ECG y, si procede, niveles plasmáticos.',
     hepaticAdjustment:
-      'No se añade ajuste hepático cerrado en esta vista; individualizar si hepatopatía relevante.',
+      'CIMA oral: la biodisponibilidad y vida media aumentan en enfermedad hepática; ajustar dosis individualmente.',
     practicalNotes: [
       'ESC la recomienda para cardioversión farmacológica de FA reciente si no hay cardiopatía estructural significativa.',
       'Mantener monitorización si se usa vía IV.',
@@ -1819,6 +1823,10 @@ export const medicationCatalog = {
           pdfPages: [46, 47, 48],
           note: 'Flecainida/propafenona en FA reciente excluyendo cardiopatía estructural relevante.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Propafenona hidrocloruro Accord comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/82298/FT_82298.html',
       ),
     ],
   },

@@ -1145,6 +1145,15 @@
     overflow-wrap: break-word;
   }
 
+  .pauta-card-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pauta-card-link:hover {
+    color: var(--accent-500);
+  }
+
   .pauta-card-meta {
     display: block;
     margin-top: 0.14rem;

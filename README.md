@@ -184,6 +184,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 - `src/data/medications.js`
   - apoyo interno para datos farmacológicos
   - uso clínico, dosis, vía, frecuencia, duración, IR, IH y fuentes
+  - cuando una pauta usa una ficha CIMA verificada, el nombre del medicamento puede enlazar a esa ficha desde la tarjeta de tratamiento
   - no se muestra como sección principal ni como navegación independiente
 
 - `src/data/imageTemplates.js`

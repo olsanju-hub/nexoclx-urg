@@ -102,13 +102,13 @@ export const protocolCatalog = {
     verifiedPage: 184,
     pdfPage: 209,
     status: 'implementado',
-    summary: 'Estabilidad, inicio < 24 h o ≥ 24 h/desconocido, control de frecuencia y anticoagulación.',
+    summary: 'FA clínica confirmada por ECG: decide estabilidad, duración, frecuencia/ritmo y anticoagulación.',
     quickChecks: [
-      'ECG y tira de ritmo',
-      'Estable o inestable',
-      'Inicio del episodio actual: < 24 h, ≥ 24 h o desconocido',
-      'FEVI > 40% o FEVI ≤ 40% / insuficiencia cardíaca sistólica',
-      'CHA2DS2-VA, factores de sangrado y función renal si vas a anticoagular',
+      'ECG 12 derivaciones y tira de ritmo mínimo 30 s.',
+      'Constantes y estabilidad: shock, isquemia, edema pulmonar, mala perfusión, síncope o preexcitación.',
+      'Analítica: hemograma, glucosa, urea/creatinina, Na/K/Cl; coagulación si shock, coagulopatía o anticoagulación.',
+      'Troponina si dolor torácico; BNP/NT-proBNP si insuficiencia cardíaca; gasometría/lactato si SpO2 < 90% o shock.',
+      'Inicio del episodio, FEVI/cardiopatía estructural, CHA2DS2-VA, HAS-BLED y Cockcroft-Gault si vas a anticoagular.',
     ],
     quickSummary: [
       {

@@ -266,6 +266,13 @@ const FlowSection = ({ section, onCalculatorOpen }) => {
 
 const PautaCard = ({ card }) => {
   const detailItems = card.items?.length ? card.items : card.summary ? [card.summary] : [];
+  const title = card.sourceUrl ? (
+    <a href={card.sourceUrl} target="_blank" rel="noreferrer" className="pauta-card-link">
+      {card.title}
+    </a>
+  ) : (
+    card.title
+  );
 
   return (
     <article className={`pauta-card pauta-card-${card.severity ?? 'info'}`}>
@@ -274,7 +281,7 @@ const PautaCard = ({ card }) => {
           <TypeIcon type={card.type} />
         </span>
         <span className="min-w-0">
-          <span className="pauta-card-title">{card.title}</span>
+          <span className="pauta-card-title">{title}</span>
           {card.medication ? <span className="pauta-card-meta">{card.medication}</span> : null}
         </span>
       </div>
