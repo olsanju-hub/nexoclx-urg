@@ -1526,6 +1526,131 @@ const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
   };
 };
 
+const buildHemorrhagicStrokeDecisionPanelFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Déficit neurológico brusco con cefalea, vómitos, disminución de conciencia o PA muy elevada.',
+        points: [
+          'Pensar en hemorragia si cefalea brusca intensa, vómitos, crisis, rigidez, coma o déficit focal progresivo.',
+          'Registrar hora de inicio, Glasgow clínico, anticoagulación/antiagregación y situación basal.',
+          'Red flags: deterioro de conciencia, signos de herniación, hidrocefalia, hemorragia cerebelosa o anticoagulación activa.',
+          'No distinguir isquémico/hemorrágico sin neuroimagen urgente.',
+        ],
+        detailNodes: [
+          {
+            id: 'sospecha-hemorragico',
+            title: 'Datos que obligan a escalar',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'Deterioro neurológico, anisocoria, vómitos repetidos, hipertensión marcada o compromiso de vía aérea.',
+              'Tratamiento con AVK, ACOD, heparina, antiagregación múltiple o trombocitopenia relevante.',
+              'Hemorragia cerebelosa o hidrocefalia requieren neurocirugía precoz.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'TAC urgente, coagulación y datos para revertir anticoagulación y decidir neurocirugía/UCI.',
+        points: [
+          'TAC craneal sin contraste urgente; angio-TC si sospecha vascular, expansión, aneurisma o malformación.',
+          'Constantes, Glasgow clínico, glucemia, ECG/monitor y valoración de vía aérea.',
+          'Analítica: hemograma, plaquetas, TP/INR, TTPa, fibrinógeno si procede, creatinina, iones y glucosa.',
+          'Identificar anticoagulante, última dosis, función renal y disponibilidad de reversión específica.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-hemorragico',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'Volumen/localización, hidrocefalia, efecto masa o sangrado cerebeloso cambian destino y neurocirugía.',
+              'INR elevado, ACOD reciente, heparina o coagulopatía obligan a reversión urgente.',
+              'PA alta sostenida cambia a control tensional IV monitorizado.',
+              'TAC sin sangrado con sospecha persistente obliga a ruta diagnóstica según neurología/neurocirugía.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Priorizar vía aérea, PA, reversión de anticoagulación y necesidad de neurocirugía/UCI.',
+        points: [
+          'Inestable, Glasgow bajo o deterioro: UCI, vía aérea si procede y neurocirugía/neurología urgente.',
+          'PAS elevada sostenida: descenso controlado y mantenido, evitando variabilidad y caídas bruscas.',
+          'Anticoagulación activa: reversión lo antes posible según fármaco, última dosis, INR y función renal.',
+          'Cerebelosa con deterioro, compresión de tronco o hidrocefalia: valoración neuroquirúrgica inmediata.',
+        ],
+        detailNodes: decisionNodes(protocol),
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Control tensional titulado, reversión urgente si anticoagulado y medidas neurocríticas dirigidas.',
+        points: [
+          'Labetalol 10-20 mg IV lento; repetir o perfusión 0,5-2 mg/min si precisa control sostenido.',
+          'Reversión de anticoagulación activa sin demora según anticoagulante, INR, última dosis y protocolo local.',
+          'Evitar transfusión de plaquetas rutinaria por antiagregación si no hay cirugía urgente o trombocitopenia grave.',
+          'Cabecera elevada, normoxia, normoglucemia, normotermia y tratar crisis si aparecen.',
+        ],
+        treatmentGroups: medicationGroups.map((group) => ({
+          id: `grupo-${slugify(group.title)}`,
+          title: group.title,
+          cards: asArray(group.medicationIds).map(medicationNode),
+        })),
+        detailNodes: [
+          {
+            id: 'reversion-hemorragico',
+            title: 'Reversión y neurocirugía',
+            type: 'treatment',
+            severity: 'danger',
+            summary: 'Intervención tiempo-dependiente; no esperar a traslado si el recurso está disponible.',
+            items: [
+              'Fármaco/intervención: reversión específica o no específica según anticoagulante y disponibilidad local.',
+              'Dosis: usar pauta del protocolo local/ficha correspondiente; no se muestra una dosis única porque depende del anticoagulante.',
+              'Reevaluar: sangrado, PA, Glasgow, neuroimagen y necesidad de quirófano/UCI.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Ingreso monitorizado; UCI/neurocirugía si deterioro, anticoagulación, hidrocefalia o sangrado de riesgo.',
+        points: [
+          'UCI si bajo nivel de conciencia, ventilación, PA IV, expansión, hidrocefalia, resangrado o reversión compleja.',
+          'Neurocirugía si hemorragia cerebelosa de riesgo, hidrocefalia, efecto masa o lesión estructural tratable.',
+          'Unidad de ictus/neurología si estable pero requiere control, vigilancia y estudio etiológico.',
+          'No alta desde urgencias salvo diagnóstico alternativo seguro tras neuroimagen y valoración especializada.',
+        ],
+        detailNodes: [
+          {
+            id: 'reevaluacion-hemorragico',
+            title: 'Reevaluación',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Control seriado de Glasgow clínico, pupilas, PA, vómitos, cefalea, crisis y déficit focal.',
+              'Repetir imagen si deterioro neurológico, resangrado sospechado, cefalea/vómitos nuevos o antes de decisiones quirúrgicas.',
+              'Avisar de forma inmediata por somnolencia progresiva, anisocoria, crisis, vómitos repetidos o empeoramiento focal.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -1549,6 +1674,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'ictus-isquemico') {
     return buildIschemicStrokeDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'ictus-hemorragico') {
+    return buildHemorrhagicStrokeDecisionPanelFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {
