@@ -569,6 +569,10 @@ export const medicationCatalog = {
         pdfPage: 211,
         note: 'Apoyo práctico secundario de arritmias agudas en la obra base.',
       }),
+      cimaSource(
+        'CIMA · Sulmetin Simple 150 mg/ml solución inyectable y para perfusión',
+        'https://cima.aemps.es/cima/dochtml/ft/23622/FichaTecnica_23622.html',
+      ),
     ],
   },
   apixaban: {
@@ -2009,11 +2013,25 @@ export const medicationCatalog = {
       'Administrar durante RCP y lavar la vía.',
       'Reevaluar ritmo cada 2 min.',
     ],
-    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025.',
+    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025, Murillo 7.ª edición y ficha CIMA de adrenalina.',
     sources: [
+      cimaSource(
+        'CIMA · Adrenalina Level 1 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/35403/FichaTecnica_35403.html',
+      ),
       externalSource(
         'Resuscitation Council UK/ERC 2025 · ALS ritmo desfibrilable',
         'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+      protocolSource(
+        'Murillo 7.ª edición · ritmo desfibrilable',
+        referenceEntry({
+          id: 'adrenalina-parada-murillo',
+          indexPage: 23,
+          verifiedPage: 23,
+          pdfPage: 48,
+          note: 'Adrenalina 1 mg IV/IO repetida cada 3-5 min dentro de ciclos de FV/TV sin pulso.',
+        }),
       ),
     ],
   },
@@ -2042,11 +2060,22 @@ export const medicationCatalog = {
       'Puede ir seguida de perfusión 900 mg/24 h si ROSC y se mantiene indicación.',
       'Lavar la vía tras administración.',
     ],
-    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025.',
+    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025, Murillo 7.ª edición y ficha CIMA de amiodarona.',
     sources: [
+      cimaSource('CIMA · Trangorex 150 mg/3 ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/54723/FT_54723.html'),
       externalSource(
         'Resuscitation Council UK/ERC 2025 · amiodarona en FV/TV sin pulso',
         'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+      protocolSource(
+        'Murillo 7.ª edición · amiodarona en FV/TV sin pulso',
+        referenceEntry({
+          id: 'amiodarona-parada-murillo',
+          indexPage: 23,
+          verifiedPage: 23,
+          pdfPage: 48,
+          note: 'Amiodarona 300 mg IV/IO y repetición de 150 mg si persiste FV/TV sin pulso.',
+        }),
       ),
     ],
   },
@@ -2075,11 +2104,25 @@ export const medicationCatalog = {
       'Opción alternativa, no preferente si amiodarona disponible.',
       'Reevaluar tras ROSC antes de continuar perfusión.',
     ],
-    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025.',
+    sourceScope: 'Pauta verificada con Resuscitation Council UK/ERC 2025, Murillo 7.ª edición y ficha CIMA de lidocaína.',
     sources: [
+      cimaSource(
+        'CIMA · Lidocaína B. Braun 20 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/44792/FichaTecnica_44792.html',
+      ),
       externalSource(
         'Resuscitation Council UK/ERC 2025 · lidocaína alternativa en FV/TV sin pulso',
         'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
+      ),
+      protocolSource(
+        'Murillo 7.ª edición · lidocaína alternativa en FV/TV sin pulso',
+        referenceEntry({
+          id: 'lidocaina-parada-murillo',
+          indexPage: 23,
+          verifiedPage: 23,
+          pdfPage: 48,
+          note: 'Lidocaína alternativa a amiodarona en FV/TV sin pulso refractaria.',
+        }),
       ),
     ],
   },

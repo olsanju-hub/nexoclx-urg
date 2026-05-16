@@ -1287,6 +1287,119 @@ const buildBradyDecisionPanelFlow = (protocol) => {
   };
 };
 
+const buildVentricularDecisionPanelFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Taquicardia de QRS ancho: primero pulso y estabilidad; si dudas, tratar como ventricular.',
+        points: [
+          'QRS ancho regular o polimórfico con palpitaciones, dolor torácico, disnea, síncope o mala perfusión.',
+          'Sin pulso: FV/TV sin pulso y algoritmo de parada.',
+          'Con pulso inestable: shock, síncope, isquemia, edema pulmonar o deterioro.',
+          'Sospechar torsades si TV polimórfica con QT largo, bradicardia, hipoK/hipoMg o fármacos que prolongan QT.',
+        ],
+        detailNodes: [
+          {
+            id: 'sospecha-tv',
+            title: 'Datos de alarma',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'No retrasar desfibrilación/cardioversión por completar el diagnóstico si hay inestabilidad.',
+              'Preparar desfibrilador desde el inicio aunque el paciente esté inicialmente estable.',
+              'Buscar DAI, cardiopatía estructural, IAM, intoxicación, alteraciones iónicas y QT largo.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Monitor y ECG si no retrasa electricidad; analítica dirigida a isquemia, iones y causas reversibles.',
+        points: [
+          'Monitor/desfibrilador, PA, SatO2, accesos IV/IO y ECG 12 derivaciones si el paciente lo permite.',
+          'Analítica: K, Mg, Ca, función renal, glucosa y gasometría/lactato si shock o mala perfusión.',
+          'Troponina y ECG seriado si dolor, cambios isquémicos, SCA o TV en contexto de IAM.',
+          'Revisar fármacos QT, antiarrítmicos, digoxina, tóxicos y alteraciones metabólicas.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-tv',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'TV/FV sin pulso: no esperar pruebas; desfibrilar y RCP.',
+              'TV monomorfa estable: ECG ayuda, pero QRS ancho incierto se maneja como TV.',
+              'QTc largo, hipoK o hipoMg orientan a torsades y magnesio/corrección electrolítica.',
+              'SCA o shock cambia destino a hemodinámica/UCI según contexto.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'La rama depende de pulso, estabilidad, morfología y QT; la electricidad manda si hay deterioro.',
+        points: [
+          'TV/FV sin pulso: RCP 2 min, desfibrilación y fármacos según algoritmo.',
+          'TV con pulso inestable: cardioversión sincronizada; si no sincroniza o es polimórfica, desfibrilar.',
+          'TV monomorfa estable: amiodarona IV y preparación de cardioversión si cambia la perfusión.',
+          'Torsades/TV polimórfica estable: magnesio IV, K > 4 mEq/L si posible y retirar desencadenantes.',
+        ],
+        detailNodes: decisionNodes(protocol),
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Electricidad, RCP y fármacos en tarjetas; no convertir la parada en texto largo.',
+        points: treatmentInitialItems(protocol),
+        treatmentGroups: [
+          {
+            id: 'intervenciones-tv',
+            title: 'Electricidad y algoritmos',
+            cards: cardiologyInterventionNodes(protocol),
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Toda TV sostenida, torsades o parada recuperada requiere monitorización y causa corregida.',
+        points: [
+          'UCI/área crítica tras FV/TV sin pulso, ROSC, shock, cardioversión urgente o perfusión antiarrítmica.',
+          'Ingreso monitorizado si TV sostenida, cardiopatía estructural, SCA, alteraciones iónicas graves o recurrencia.',
+          'Cardiología/UCI si DAI con descargas, tormenta arrítmica, QT largo, síncope o necesidad de ablación/DAI.',
+          'Alta solo si no fue TV sostenida, causa benigna clara, ECG/iones corregidos y plan de seguimiento seguro.',
+        ],
+        detailNodes: [
+          {
+            id: 'destino-tv',
+            title: 'Reevaluación',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Reevaluar ritmo, perfusión, QT, K/Mg, dolor torácico, troponina y recurrencia tras cada intervención.',
+              'Buscar causas reversibles: hipoxia, hipo/hiperpotasemia, acidosis, hipotermia, tóxicos, trombosis coronaria y taponamiento.',
+              'Tras ROSC: cuidados postparada, control térmico según protocolo local y valoración de causa coronaria si procede.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -1302,6 +1415,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'bradicardias') {
     return buildBradyDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'arritmias-ventriculares') {
+    return buildVentricularDecisionPanelFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {

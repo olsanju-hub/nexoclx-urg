@@ -533,11 +533,11 @@ export const protocolCatalog = {
     status: 'implementado',
     summary: 'TV con pulso o sin pulso, estabilidad clínica y manejo inicial de TV monomorfa o torsades.',
     quickChecks: [
-      'Confirma si hay pulso y monitoriza ECG continuo',
-      'Shock, síncope, isquemia o insuficiencia cardíaca',
-      'TV monomorfa regular frente a TV polimórfica / torsades',
-      'QT largo, hipopotasemia, hipomagnesemia o fármacos desencadenantes',
-      'Ayuda experta y preparación de electricidad si hay deterioro',
+      'Pulso, estabilidad, monitor/desfibrilador, PA, SatO2 y accesos IV/IO',
+      'ECG 12 derivaciones si no retrasa cardioversión/desfibrilación',
+      'Analítica: K/Mg/Ca, función renal, glucosa; gasometría/lactato si shock o mala perfusión',
+      'Troponina y ECG seriado si dolor, isquemia, SCA o TV en contexto de IAM',
+      'QT largo, hipopotasemia, hipomagnesemia, DAI, tóxicos o fármacos desencadenantes',
     ],
     quickSummary: [
       {
@@ -612,6 +612,20 @@ export const protocolCatalog = {
         verifiedPages: [1, 2],
         pdfPages: [1, 2],
         note: 'Referencia principal para taquicardia ventricular, arritmias ventriculares agudas y torsades.',
+      }),
+      referenceEntry({
+        id: 'ventricular-murillo-als',
+        indexPage: 23,
+        verifiedPage: 23,
+        pdfPage: 48,
+        note: 'Ritmo desfibrilable, ciclos de RCP, desfibrilación, adrenalina, amiodarona/lidocaína y magnesio en torsades.',
+      }),
+      referenceEntry({
+        id: 'ventricular-murillo-cap23',
+        indexPage: 199,
+        verifiedPage: 199,
+        pdfPage: 224,
+        note: 'Taquicardia ventricular monomorfa/polimórfica, torsades, lidocaína y sulfato de magnesio.',
       }),
     ],
   },
