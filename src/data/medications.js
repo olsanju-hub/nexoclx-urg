@@ -424,12 +424,12 @@ export const medicationCatalog = {
     indication:
       'Tratamiento inicial de la bradicardia sintomática o con rasgos de inestabilidad mientras se corrigen causas y se prepara estimulación si hace falta.',
     contextUse: 'Bradicardia con shock, síncope, isquemia o insuficiencia cardíaca.',
-    contextDose: '0,5 mg IV; repetir cada 3-5 min hasta 3 mg si hace falta.',
+    contextDose: '0,5-1 mg IV; repetir cada 3-5 min hasta 3 mg si hace falta.',
     contextRoute: 'Intravenosa.',
     contextFrequency: 'Bolos repetidos según respuesta clínica y del ECG.',
     followUpPlan: 'Si no hay respuesta adecuada o hay bloqueo de alto grado, no retrasar marcapasos transcutáneo.',
     dose:
-      'Bradicardia sinusal: 0,5 mg IV cada 2-5 min. Bloqueo AV: 0,5 mg IV cada 3-5 min. Dosis máxima total: 3 mg.',
+      'Bradicardia sintomática: 0,5-1 mg IV; repetir cada 3-5 min hasta respuesta o dosis máxima total de 3 mg.',
     route: 'Intravenosa o intramuscular, pero en este contexto la vía útil es IV.',
     frequency: 'Bolos repetidos hasta respuesta o dosis máxima.',
     duration: 'Uso agudo puntual.',
@@ -461,7 +461,7 @@ export const medicationCatalog = {
       ),
       cimaSource(
         'CIMA · Atropina 1 mg/ml solución inyectable',
-        'https://cima.aemps.es/cima/pdfs/es/ft/85535/FT_85535.html.pdf',
+        'https://cima.aemps.es/cima/dochtml/ft/43064/FT_43064.html',
       ),
       externalSource(
         'Resuscitation Council UK · ALS chapter 11 bradycardia',
@@ -1913,8 +1913,22 @@ export const medicationCatalog = {
       'Buscar y corregir causa reversible en paralelo.',
     ],
     sourceScope:
-      'Pauta de segunda línea verificada con Resuscitation Council UK/ERC 2025 y coherente con algoritmo AHA de bradicardia.',
+      'Pauta de puente verificada con Murillo 7.ª edición y ficha CIMA de adrenalina; debe usarse en área monitorizada mientras se prepara estimulación o tratamiento definitivo.',
     sources: [
+      protocolSource(
+        'Murillo 7.ª edición · tratamiento general de bradiarritmias',
+        referenceEntry({
+          id: 'adrenalina-brady-murillo',
+          indexPage: 176,
+          verifiedPage: 176,
+          pdfPage: 201,
+          note: 'Infusión de adrenalina 2-10 microg/min como alternativa puente si no se dispone de marcapasos transcutáneo inmediato.',
+        }),
+      ),
+      cimaSource(
+        'CIMA · Adrenalina Level 1 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/35403/FichaTecnica_35403.html',
+      ),
       externalSource(
         'Resuscitation Council UK/ERC 2025 · bradicardia',
         'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',
@@ -1929,11 +1943,11 @@ export const medicationCatalog = {
     indication:
       'Cronotrópico de segunda línea si atropina falla y pacing no está disponible de inmediato o como puente a estimulación.',
     contextUse: 'Bradicardia sintomática refractaria a atropina, especialmente como puente monitorizado.',
-    contextDose: 'Inicio 5 microg/min IV; titular según respuesta.',
+    contextDose: 'Inicio 1-2 microg/min IV; titular según respuesta hasta 20 microg/min.',
     contextRoute: 'Intravenosa.',
     contextFrequency: 'Perfusión continua titulada.',
     followUpPlan: 'Avisar UCI/cardiología y preparar pacing transcutáneo/transvenoso si persisten signos adversos.',
-    dose: '5 microg/min IV de inicio; titular según respuesta clínica y ECG.',
+    dose: '1-2 microg/min IV de inicio; titular según respuesta clínica y ECG hasta 20 microg/min.',
     route: 'Intravenosa.',
     frequency: 'Perfusión continua titulada.',
     duration: 'Puente corto hasta resolución, pacing o tratamiento definitivo.',
@@ -1948,8 +1962,22 @@ export const medicationCatalog = {
       'Corregir fármacos bradicardizantes y causas reversibles.',
     ],
     sourceScope:
-      'Pauta de segunda línea verificada con Resuscitation Council UK/ERC 2025.',
+      'Pauta de puente verificada con Murillo 7.ª edición y ficha CIMA de isoprenalina; usar con monitorización y ayuda experta.',
     sources: [
+      protocolSource(
+        'Murillo 7.ª edición · tratamiento general de bradiarritmias',
+        referenceEntry({
+          id: 'isoprenalina-brady-murillo',
+          indexPage: 176,
+          verifiedPage: 176,
+          pdfPage: 201,
+          note: 'Isoprenalina IV como puente a estimulación, con titulación hasta estabilidad o dosis máxima descrita.',
+        }),
+      ),
+      cimaSource(
+        'CIMA · Aleudrina 0,2 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/47131/FichaTecnica_47131.html',
+      ),
       externalSource(
         'Resuscitation Council UK/ERC 2025 · bradicardia',
         'https://www.resus.org.uk/professional-library/2025-resuscitation-guidelines/adult-advanced-life-support-guidelines',

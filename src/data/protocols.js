@@ -451,11 +451,11 @@ export const protocolCatalog = {
     status: 'implementado',
     summary: 'Ritmo lento con o sin repercusión, bloqueo AV de alto riesgo y vía de estimulación urgente.',
     quickChecks: [
-      'ECG de 12 derivaciones, presión arterial y monitorización',
-      'Shock, síncope, isquemia o insuficiencia cardíaca',
-      'Bradicardia sinusal frente a bloqueo AV / trastorno de conducción',
-      'Mobitz II, bloqueo AV completo con QRS ancho o pausas > 3 s',
-      'Causas reversibles y fármacos bradicardizantes',
+      'ECG 12 derivaciones, tira de ritmo, presión arterial, SatO2 y monitorización si síntomas o bloqueo alto',
+      'Analítica dirigida: glucosa, K/Mg/Ca, función renal; gasometría/lactato si mala perfusión',
+      'Troponina si dolor torácico, cambios isquémicos o sospecha de SCA',
+      'Mobitz II, BAV completo con QRS ancho, pausas > 3 s o FC ventricular < 40/min',
+      'Fármacos bradicardizantes, hiperpotasemia, hipoxia, hipotermia o intoxicación',
     ],
     quickSummary: [
       {
@@ -511,6 +511,13 @@ export const protocolCatalog = {
         verifiedPages: [1, 2],
         pdfPages: [1, 2],
         note: 'Referencia principal para bradicardias, trastornos de conducción y necesidad de estimulación.',
+      }),
+      referenceEntry({
+        id: 'brady-murillo-cap21',
+        indexPage: 176,
+        verifiedPage: 176,
+        pdfPage: 201,
+        note: 'Tratamiento general de las bradiarritmias: atropina, pacing transcutáneo, isoprenalina/adrenalina como puente y criterios de riesgo.',
       }),
     ],
   },

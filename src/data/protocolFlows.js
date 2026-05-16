@@ -427,9 +427,10 @@ const treatmentInitialItems = (protocol) => {
 
   if (protocol.id === 'bradicardias') {
     return [
-      'Atropina 0,5 mg IV; repetir cada 3-5 min hasta 3 mg si bradicardia con signos adversos.',
-      'Si atropina falla: marcapasos transcutáneo como puente o adrenalina 2-10 microg/min IV.',
-      'Isoprenalina 5 microg/min IV de inicio si se elige cronotrópico de segunda línea.',
+      'Atropina 0,5-1 mg IV; repetir cada 3-5 min hasta 3 mg si bradicardia con signos adversos.',
+      'Si atropina falla o hay bloqueo AV alto: marcapasos transcutáneo como puente.',
+      'Adrenalina 2-10 microg/min IV en perfusión titulada si no hay pacing inmediato.',
+      'Isoprenalina 1-2 microg/min IV de inicio; titular hasta 20 microg/min si se elige cronotrópico de puente.',
       'Avisar UCI/cardiología y preparar marcapasos transvenoso si Mobitz II, BAV completo con QRS ancho o mala perfusión persistente.',
     ];
   }
@@ -1174,6 +1175,118 @@ const buildHtaDecisionPanelFlow = (protocol) => {
   };
 };
 
+const buildBradyDecisionPanelFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Ritmo lento: decidir si produce hipoperfusión o si hay bloqueo con riesgo de asistolia.',
+        points: [
+          'Pensar en bradiarritmia si FC baja, pausas, síncope, mareo, disnea, dolor torácico o confusión.',
+          'Datos adversos: shock, síncope, isquemia, insuficiencia cardíaca o mala perfusión.',
+          'Buscar fármacos bradicardizantes, hiperpotasemia, isquemia, hipoxia, hipotermia o intoxicación.',
+          'Alto riesgo: Mobitz II, BAV completo con QRS ancho, pausas > 3 s o FC ventricular < 40/min en vigilia.',
+        ],
+        detailNodes: [
+          {
+            id: 'sospecha-bradi',
+            title: 'Cuándo tratar de inmediato',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'La bradicardia estable permite ECG, causas reversibles y observación dirigida.',
+              'La bradicardia con signos adversos requiere tratamiento y vía de estimulación preparada.',
+              'En BAV avanzado o escape ventricular, no esperar a que aparezca shock para avisar y preparar pacing.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'ECG y monitorización primero; analítica dirigida a causas reversibles que cambian tratamiento.',
+        points: [
+          'ECG 12 derivaciones y tira de ritmo; monitor, PA, SatO2 y accesos IV si síntomas o bloqueo alto.',
+          'Analítica: glucosa, K/Mg/Ca, función renal, gasometría/lactato si mala perfusión o hipoxemia.',
+          'Troponina si dolor, cambios isquémicos o sospecha de SCA; revisar digoxina/betabloqueantes/calcioantagonistas.',
+          'Imagen solo dirigida: Rx tórax/eco si insuficiencia cardíaca, shock o duda cardiopulmonar.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-bradi',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'ECG: distinguir bradicardia sinusal, bloqueo AV nodal, Mobitz II, BAV completo y escape ancho.',
+              'Hiperpotasemia, hipoxia, hipotermia, hipoglucemia o intoxicación obligan a tratamiento causal paralelo.',
+              'Elevación de troponina o clínica isquémica cambia a rama SCA y puede explicar bloqueo inferior/anterior.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Separar estable, sintomática y alto riesgo; pacing no debe retrasarse por repetir atropina.',
+        points: [
+          'Estable sin alto riesgo: observar, corregir causa y revisar medicación.',
+          'Con signos adversos: atropina IV y reevaluación inmediata.',
+          'Si atropina falla o hay Mobitz II/BAV completo con QRS ancho: marcapasos transcutáneo y ayuda experta.',
+          'Si no hay pacing inmediato: adrenalina o isoprenalina IV como puente monitorizado.',
+        ],
+        detailNodes: decisionNodes(protocol),
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Atropina si sintomática; pacing y perfusiones como puente cuando persiste riesgo o bloqueo avanzado.',
+        points: treatmentInitialItems(protocol),
+        treatmentGroups: [
+          {
+            id: 'intervenciones-bradi',
+            title: 'Estimulación',
+            cards: cardiologyInterventionNodes(protocol),
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta solo si estable y causa banal corregida; bloqueo alto o tratamiento IV requiere ingreso monitorizado.',
+        points: [
+          'UCI/área monitorizada si shock, síncope, isquemia, insuficiencia cardíaca, perfusión vasoactiva o pacing.',
+          'Cardiología/UCI si Mobitz II, BAV completo, QRS ancho, pausas > 3 s o mala perfusión persistente.',
+          'Observación si síntomas resueltos pero causa no aclarada, fármaco implicado o recurrencia posible.',
+          'Alta solo si estable, sin bloqueo de alto riesgo, causa corregida y seguimiento definido.',
+        ],
+        detailNodes: [
+          {
+            id: 'destino-bradi',
+            title: 'Reevaluación',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Reevaluar FC, PA, perfusión, ECG y causa reversible tras cada intervención.',
+              'No retirar monitorización hasta confirmar estabilidad mantenida y ausencia de pausas o bloqueo progresivo.',
+              'Explicar alarma por síncope, dolor torácico, disnea, mareo persistente o palpitaciones.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -1185,6 +1298,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'hta-urgencias') {
     return buildHtaDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'bradicardias') {
+    return buildBradyDecisionPanelFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {
