@@ -139,6 +139,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
   - retorno contextual al origen cuando se abre un cálculo desde protocolo
   - agrupación y navegación por especialidad con acordeones
   - render de protocolos mediante `ClinicalFlowTree`
+  - no debe contener contenido clínico duplicado de protocolos
 
 - `src/main.jsx`
   - arranque de React
@@ -157,23 +158,33 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
   - estructura común para todas las referencias
 
 - `src/data/modules.js`
-  - índice clínico auditado
+  - catálogo/meta de módulos
+  - títulos, especialidades, resúmenes, estado de implementación y búsqueda
   - módulos visibles en `Protocolos`
   - agrupación por especialidad
   - actividad reciente
   - bibliografía base usada
 
+- `src/data/protocolFlows.js`
+  - fuente visible principal de los protocolos
+  - define la estructura clínica renderizada: `Sospecha`, `Pruebas`, `Decisión`, `Tratamiento` y `Destino`
+  - adapta los datos heredados al panel clínico compacto
+  - integra referencias textuales y calculadoras directas cuando cambian conducta
+
 - `src/data/protocols.js`
-  - protocolos clínicos reales
-  - contiene protocolos clínicos operativos
+  - catálogo clínico/base heredada
+  - mantiene metadatos, bibliografía y datos clínicos usados por `protocolFlows.js`
+  - no debe competir con `protocolFlows.js` como fuente visible del protocolo
 
 - `src/data/calculators.js`
   - catálogo de cálculos implementados
+  - lógica funcional de las calculadoras disponibles
   - auditoría completa de escalas detectadas en la obra base
 
 - `src/data/medications.js`
-  - fichas farmacológicas del módulo activo
+  - apoyo interno para datos farmacológicos
   - uso clínico, dosis, vía, frecuencia, duración, IR, IH y fuentes
+  - no se muestra como sección principal ni como navegación independiente
 
 - `src/data/imageTemplates.js`
   - auditoría y estructura de plantillas de imagen
