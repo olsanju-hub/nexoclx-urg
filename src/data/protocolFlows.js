@@ -1400,6 +1400,132 @@ const buildVentricularDecisionPanelFlow = (protocol) => {
   };
 };
 
+const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Déficit neurológico focal brusco: activar código ictus y fijar última vez bien.',
+        points: [
+          'Debilidad facial/braquial, afasia, disartria, hemianopsia, ataxia o pérdida sensitiva brusca.',
+          'Registrar hora de última vez bien, situación basal y Rankin previo si se conoce.',
+          'Glucemia capilar inmediata para descartar simulador tratable.',
+          'Alarma: disminución de conciencia, déficit discapacitante, clínica de gran vaso o deterioro progresivo.',
+        ],
+        detailNodes: [
+          {
+            id: 'sospecha-ictus-isquemico',
+            title: 'No perder tiempo',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'No retrasar TAC ni activación por analíticas o pruebas secundarias.',
+              'Preguntar anticoagulación, cirugía reciente, sangrado, ictus previo y comorbilidad relevante.',
+              'NIHSS y Rankin cambian selección terapéutica, pero en esta app aún no son calculadoras funcionales.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'TAC sin contraste para descartar sangrado; angio-TC si sospecha gran vaso y no retrasa reperfusión.',
+        points: [
+          'Glucemia capilar, constantes, ECG/monitor y SatO2; dos accesos si candidato a reperfusión.',
+          'TAC craneal sin contraste urgente para excluir hemorragia.',
+          'Angio-TC cabeza-cuello si déficit grave/discapacitante o sospecha de oclusión de gran vaso.',
+          'Analítica: hemograma, coagulación, glucosa, iones y creatinina; no retrasar trombólisis si no cambia seguridad inmediata.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-ictus-isquemico',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'Hemorragia en TAC cambia a protocolo de ictus hemorrágico.',
+              'Oclusión de gran vaso activa trombectomía/traslado a centro con capacidad endovascular.',
+              'PA > 185/110 mmHg impide trombólisis hasta control tensional.',
+              'Anticoagulación o coagulopatía obliga a revisar contraindicaciones antes de alteplasa.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Decidir reperfusión IV, trombectomía, control tensional y destino monitorizado.',
+        points: [
+          'Candidato a trombólisis IV: déficit discapacitante, ventana compatible, TAC sin sangrado y sin contraindicación mayor.',
+          'Si PA > 185/110 mmHg, controlar antes de trombólisis; después mantener < 180/105 mmHg.',
+          'Sospecha/confirmación de gran vaso: no retrasar trombectomía por tratamientos secundarios.',
+          'Si no candidato a reperfusión: soporte, evitar descenso brusco de PA y definir ingreso en unidad de ictus.',
+        ],
+        detailNodes: decisionNodes(protocol),
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Reperfusión si candidato y control tensional dirigido; cada pauta queda en tarjeta.',
+        points: [
+          'Alteplasa 0,9 mg/kg IV, máximo 90 mg: 10% bolo y 90% en 60 min si candidato.',
+          'Controlar PA < 185/110 mmHg antes de trombólisis; mantener < 180/105 mmHg después.',
+          'Labetalol 10-20 mg IV lento; repetir o perfusión 0,5-2 mg/min si precisa control sostenido.',
+          'Trombectomía si oclusión de gran vaso y criterios; activar traslado/neurorradiología sin demoras.',
+          'Evitar antiagregación/anticoagulación en las primeras 24 h tras trombólisis hasta nueva imagen.',
+        ],
+        treatmentGroups: medicationGroups.map((group) => ({
+          id: `grupo-${slugify(group.title)}`,
+          title: group.title,
+          cards: asArray(group.medicationIds).map(medicationNode),
+        })),
+        detailNodes: [
+          {
+            id: 'trombectomia-ictus-isquemico',
+            title: 'Trombectomía mecánica',
+            type: 'treatment',
+            severity: 'danger',
+            summary: 'Prioritaria si hay oclusión de gran vaso y criterios de selección.',
+            items: [
+              'Intervención: activar centro con capacidad endovascular o traslado según red local.',
+              'No retrasar por tratamientos secundarios si hay sospecha de gran vaso.',
+              'Reevaluar: perfusión, NIHSS clínico, PA, glucemia y complicaciones durante traslado.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Unidad de ictus o centro de reperfusión; UCI si inestabilidad, complicaciones o soporte avanzado.',
+        points: [
+          'Centro con trombectomía si gran vaso o sospecha alta y red local lo indica.',
+          'Unidad de ictus/ingreso monitorizado tras trombólisis, AIT de alto riesgo o déficit persistente.',
+          'UCI si compromiso de vía aérea, edema maligno, deterioro neurológico, shock o complicación hemorrágica.',
+          'Alta solo en simulador/diagnóstico alternativo seguro o AIT de bajo riesgo con circuito urgente establecido.',
+        ],
+        detailNodes: [
+          {
+            id: 'reevaluacion-ictus-isquemico',
+            title: 'Seguimiento inmediato',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Reevaluar déficit, PA, glucemia, nivel de conciencia y sangrado de forma seriada.',
+              'Repetir neuroimagen si deterioro, cefalea intensa, vómitos, hipertensión brusca o sospecha de transformación hemorrágica.',
+              'Avisar por empeoramiento neurológico, disminución de conciencia, sangrado o nueva cefalea intensa.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -1419,6 +1545,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'arritmias-ventriculares') {
     return buildVentricularDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'ictus-isquemico') {
+    return buildIschemicStrokeDecisionPanelFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {

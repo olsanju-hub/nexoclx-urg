@@ -343,6 +343,10 @@ export const medicationCatalog = {
     sourceScope:
       'El módulo de ictus isquémico usa como referencia principal la guía AHA 2026 cargada en el proyecto; la obra base aporta apoyo práctico complementario sobre el manejo urgente del ictus.',
     sources: [
+      cimaSource(
+        'CIMA · Actilyse 20 mg polvo y disolvente para solución inyectable y para perfusión',
+        'https://cima.aemps.es/cima/dochtml/ft/59494/FT_59494.html',
+      ),
       protocolSource(
         'AHA ictus isquémico 2026 · trombólisis IV y selección de reperfusión',
         ahaIschemicStrokeReferenceEntry({
@@ -1107,6 +1111,10 @@ export const medicationCatalog = {
           pdfPages: [1],
           note: 'Referencia principal para control de PA antes y después de la trombólisis en ictus isquémico.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Trandate 100 mg/20 ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/55318/FT_55318.html',
       ),
     ],
   },
