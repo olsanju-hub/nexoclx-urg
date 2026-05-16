@@ -942,9 +942,135 @@ const buildFaDecisionPanelFlow = (protocol) => {
   };
 };
 
+const buildScaDecisionPanelFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Dolor o equivalente isquémico con ECG/troponina compatibles; no esperar biomarcadores si hay SCACEST.',
+        points: [
+          'Dolor torácico opresivo > 20 min, irradiado o con cortejo vegetativo.',
+          'Equivalentes: disnea, síncope, edema pulmonar, shock o arritmia grave.',
+          'Alarma: elevación persistente de ST, dolor refractario, inestabilidad o sospecha de complicación mecánica.',
+        ],
+        detailNodes: [
+          {
+            id: 'clinica-sca',
+            title: 'Cuándo pensar en SCA',
+            type: 'step',
+            summary: protocol.summary,
+            items: [
+              'Valorar factores de riesgo, antecedentes coronarios, revascularización previa y tratamiento antitrombótico actual.',
+              'No descartar SCA por clínica atípica en diabetes, edad avanzada, mujeres o insuficiencia renal.',
+              'Comparar con ECG previos si bloqueo de rama, marcapasos o alteraciones basales.',
+            ],
+          },
+          {
+            id: 'alertas-sca',
+            title: 'Datos de alarma',
+            type: 'alert',
+            severity: 'danger',
+            items: asArray(protocol.warnings).slice(0, 4),
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'ECG inmediato, monitorización, troponina seriada si no hay SCACEST y analítica para anticoagular/reperfusión.',
+        points: [
+          'ECG 12 derivaciones en < 10 min; repetir si dolor persiste o el ECG inicial no es diagnóstico.',
+          'Monitor, constantes, dos vías si alto riesgo y desfibrilador disponible.',
+          'Analítica: hs-cTn seriada, hemograma, bioquímica/creatinina, iones y coagulación.',
+          'Ecocardiografía si duda diagnóstica, shock, insuficiencia cardíaca o sospecha de complicación.',
+          'Rx tórax solo si cambia diagnóstico o manejo; no retrasar reperfusión.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-sca',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'SCACEST o equivalentes: activar reperfusión sin esperar troponina.',
+              'SCASEST: hs-cTn 0/1 h o 0/2 h si disponible; ascenso/descenso dinámico apoya IAM.',
+              'Creatinina y hemograma: ajustan contraste, anticoagulación y riesgo hemorrágico.',
+              'Eco: alteración segmentaria nueva, insuficiencia mitral aguda, taponamiento o disfunción ventricular cambian destino.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Separar SCACEST, SCASEST de muy alto/alto riesgo y cuadros que requieren ingreso monitorizado.',
+        points: [
+          'SCACEST: ICP primaria si llega en tiempo; fibrinólisis si demora > 120 min y no hay contraindicación.',
+          'SCASEST muy alto riesgo: shock, dolor refractario, arritmia maligna o insuficiencia cardíaca: angiografía inmediata.',
+          'SCASEST alto riesgo: troponina positiva, cambios dinámicos ST/T o GRACE alto si disponible: coronariografía < 24 h.',
+          'Killip III-IV o inestabilidad: área monitorizada/UCI y manejo invasivo urgente.',
+          'No usar fibrinólisis en SCASEST.',
+        ],
+        detailNodes: decisionNodes(protocol),
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Antiagregación, anticoagulación, antiisquémicos y reperfusión según rama; cada fármaco abre su pauta.',
+        points: treatmentInitialItems(protocol),
+        treatmentGroups: [
+          {
+            id: 'intervenciones-sca',
+            title: 'Decisiones tiempo-dependientes',
+            cards: cardiologyInterventionNodes(protocol),
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Todo SCA requiere destino monitorizado; alta solo tras descartar SCA con protocolo diagnóstico completo.',
+        points: [
+          'SCACEST: sala de hemodinámica o fibrinólisis + traslado a centro con ICP.',
+          'SCASEST muy alto/alto riesgo: ingreso monitorizado y cardiología/hemodinámica según tiempos.',
+          'UCI si shock, Killip III-IV, arritmias malignas, necesidad de soporte o complicación mecánica.',
+          'Observación si dolor resuelto pero diagnóstico aún no descartado: ECG/troponina seriados.',
+          'Alta solo si baja sospecha, ECG no isquémico, troponinas seriadas negativas y plan de revisión claro.',
+        ],
+        detailNodes: [
+          {
+            id: 'destino-sca',
+            title: 'Reevaluación y seguimiento',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Reevaluar dolor, ECG, constantes, sangrado y respuesta a antitrombóticos.',
+              'Tras fibrinólisis: comprobar resolución de ST/dolor; si falla, angiografía de rescate inmediata.',
+              'Al alta tras descarte: explicar alarma por dolor recurrente, disnea, síncope o sangrado.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'sindrome-coronario-agudo') {
+    return buildScaDecisionPanelFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {

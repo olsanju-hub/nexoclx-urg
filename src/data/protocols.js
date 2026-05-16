@@ -341,11 +341,11 @@ export const protocolCatalog = {
     status: 'implementado',
     summary: 'ECG, hs-cTn y riesgo para decidir reperfusión, coronariografía y antitrombosis sin retrasos.',
     quickChecks: [
-      'ECG de 12 derivaciones en los primeros 10 min',
-      'Detectar shock, edema agudo de pulmón o arritmias graves',
-      'Pedir hs-cTn y aplicar 0 h/1 h o 0 h/2 h si no hay SCACEST',
-      'Clasificar en SCACEST o SCASEST',
-      'Decidir reperfusión, coronariografía e ingreso monitorizado',
+      'ECG de 12 derivaciones en los primeros 10 min; repetir si dolor persiste o ECG no diagnóstico.',
+      'Monitorización, constantes y desfibrilador disponible si dolor activo, inestabilidad o arritmias.',
+      'hs-cTn seriada 0 h/1 h o 0 h/2 h si no hay SCACEST; no esperarla si SCACEST claro.',
+      'Analítica: hemograma, bioquímica/creatinina, iones y coagulación antes de anticoagulación/reperfusión.',
+      'Ecocardiografía si shock, insuficiencia cardíaca, duda diagnóstica o sospecha de complicación.',
     ],
     quickSummary: [
       {

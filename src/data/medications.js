@@ -1227,6 +1227,10 @@ export const medicationCatalog = {
           note: 'Tabla de dosis de aspirina en el síndrome coronario agudo.',
         }),
       ),
+      cimaSource(
+        'CIMA · Ácido acetilsalicílico Bayfarma 100/300 mg comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/62828/FT_62828.html',
+      ),
     ],
   },
   prasugrel: {
@@ -1265,6 +1269,10 @@ export const medicationCatalog = {
           pdfPages: [34, 41],
           note: 'Tabla de dosis y recomendaciones de elección del inhibidor P2Y12 en el SCA.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Prasugrel Stadafarma 10 mg comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/84066/FT_84066.html',
       ),
     ],
   },
@@ -1305,6 +1313,10 @@ export const medicationCatalog = {
           note: 'Dosis y recomendaciones de uso del ticagrelor en síndrome coronario agudo.',
         }),
       ),
+      cimaSource(
+        'CIMA · Brilique 90 mg comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/10655006/FT_10655006.html',
+      ),
     ],
   },
   clopidogrel: {
@@ -1343,6 +1355,10 @@ export const medicationCatalog = {
           pdfPages: [34],
           note: 'Dosis de carga y mantenimiento de clopidogrel en SCA.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Clopidogrel cinfamed 75 mg comprimidos',
+        'https://cima.aemps.es/cima/dochtml/ft/71622/FT_71622.html',
       ),
     ],
   },
@@ -1383,6 +1399,10 @@ export const medicationCatalog = {
           note: 'Tabla de dosis y recomendación de bolo de HNF durante la ICP.',
         }),
       ),
+      cimaSource(
+        'CIMA · Heparina sódica Sala 1.000/5.000 UI/ml',
+        'https://cima.aemps.es/cima/dochtml/ft/56465/FT_56465.html',
+      ),
     ],
   },
   'enoxaparina-sca': {
@@ -1422,6 +1442,10 @@ export const medicationCatalog = {
           note: 'Dosis de enoxaparina y papel como alternativa a HNF según la estrategia invasiva.',
         }),
       ),
+      cimaSource(
+        'CIMA · Clexane 15.000 UI (150 mg)/1 ml',
+        'https://cima.aemps.es/cima/dochtml/ft/63000/FichaTecnica_63000.html',
+      ),
     ],
   },
   'fondaparinux-sca': {
@@ -1460,6 +1484,10 @@ export const medicationCatalog = {
           pdfPages: [34, 41],
           note: 'Dosis de fondaparinux y recomendación como anticoagulación de elección cuando no se prevé angiografía < 24 h.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Arixtra 2,5 mg/0,5 ml',
+        'https://cima.aemps.es/cima/dochtml/ft/02206003/FT_02206003.html',
       ),
     ],
   },
@@ -1509,6 +1537,10 @@ export const medicationCatalog = {
           note: 'Uso sublingual e intravenoso de nitroglicerina en el síndrome coronario agudo.',
         }),
       ),
+      cimaSource(
+        'CIMA · Solinitrina 1 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/55332/FichaTecnica_55332.html',
+      ),
     ],
   },
   'morfina-sca': {
@@ -1547,6 +1579,10 @@ export const medicationCatalog = {
           pdfPages: [26],
           note: 'La guía contempla opiáceos IV como morfina 5-10 mg para dolor torácico intenso.',
         }),
+      ),
+      cimaSource(
+        'CIMA · Morfina B. Braun 10 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/42221/FichaTecnica_42221.html',
       ),
     ],
   },
