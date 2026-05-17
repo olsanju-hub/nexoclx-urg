@@ -19,6 +19,33 @@ const escFaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escScaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-sca-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const ahaIschemicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-isquemico-2026',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const ahaHemorrhagicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aha-ictus-hemorragico-2022',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -28,7 +55,27 @@ const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const wsesAppendicitisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'wses-appendicitis-2020',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const acgPancreatitisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'acg-pancreatitis-2024',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const roundToOne = (value) => Math.round(value * 10) / 10;
+
+const numeric = (value) => Number(value) || 0;
 
 export const calculateCockcroftGault = ({ age, sex, weightKg, serumCreatinineMgDl }) => {
   const ageNumber = Number(age);
@@ -196,6 +243,125 @@ export const calculateCurb65 = ({ confusion, ureaOver7, respiratoryRate30, lowBl
   };
 };
 
+export const calculateKillip = ({ classValue }) => {
+  const value = Number(classValue);
+  if (!value) return null;
+
+  const labels = {
+    1: 'Killip I',
+    2: 'Killip II',
+    3: 'Killip III',
+    4: 'Killip IV',
+  };
+
+  return {
+    value: labels[value],
+    unit: '',
+    interpretation:
+      value >= 3
+        ? 'Alto riesgo. Requiere monitorización estrecha/UCI según contexto y estrategia invasiva urgente si SCA.'
+        : value === 2
+          ? 'Insuficiencia cardíaca leve-moderada. Eleva riesgo y destino; monitorizar y tratar congestión.'
+          : 'Sin insuficiencia cardíaca clínica por Killip. No elimina otros criterios de alto riesgo.',
+    caution: 'Killip complementa ECG, troponina, hemodinámica y criterios ESC; no sustituye el juicio clínico.',
+  };
+};
+
+export const calculateNihss = (values) => {
+  const score = [
+    'levelOfConsciousness',
+    'locQuestions',
+    'locCommands',
+    'bestGaze',
+    'visual',
+    'facialPalsy',
+    'motorArmLeft',
+    'motorArmRight',
+    'motorLegLeft',
+    'motorLegRight',
+    'limbAtaxia',
+    'sensory',
+    'bestLanguage',
+    'dysarthria',
+    'extinction',
+  ].reduce((total, key) => total + numeric(values[key]), 0);
+
+  return {
+    value: score,
+    unit: 'puntos',
+    interpretation:
+      score >= 21
+        ? 'Déficit muy grave. Activar circuito ictus, valorar gran vaso/trombectomía y destino monitorizado/UCI según evolución.'
+        : score >= 16
+          ? 'Déficit moderado-grave. Priorizar angio-TC si sospecha gran vaso y comunicación estructurada con neurología.'
+          : score >= 5
+            ? 'Déficit moderado. Valorar reperfusión si déficit discapacitante y ventana compatible.'
+            : score >= 1
+              ? 'Déficit leve. No descarta tratamiento si el déficit es discapacitante o hay oclusión de gran vaso.'
+              : 'Sin déficit medible por NIHSS en este momento.',
+    caution: 'NIHSS no debe retrasar TAC, trombólisis ni trombectomía si el paciente cumple criterios.',
+  };
+};
+
+export const calculateIchScore = ({ gcsRange, volume30, intraventricular, infratentorial, age80 }) => {
+  const gcsPoints = gcsRange === '3-4' ? 2 : gcsRange === '5-12' ? 1 : 0;
+  const score = gcsPoints + [volume30, intraventricular, infratentorial, age80].filter(Boolean).length;
+
+  return {
+    value: score,
+    unit: 'puntos',
+    interpretation:
+      score >= 3
+        ? 'Riesgo alto. Priorizar UCI/neurocríticos, neurocirugía si procede y comunicación pronóstica estructurada.'
+        : score >= 1
+          ? 'Riesgo aumentado. Requiere ingreso monitorizado y vigilancia de deterioro/expansión.'
+          : 'Riesgo bajo por ICH Score, sin excluir ingreso monitorizado ni decisiones por localización, PA o anticoagulación.',
+    caution: 'No debe usarse para limitar tratamiento por sí solo; integra clínica, imagen, anticoagulación y preferencias.',
+  };
+};
+
+export const calculateAlvarado = ({
+  migration,
+  anorexia,
+  nauseaVomiting,
+  rightLowerQuadrantTenderness,
+  rebound,
+  fever,
+  leukocytosis,
+  neutrophilia,
+}) => {
+  const score =
+    [migration, anorexia, nauseaVomiting, rebound, fever, neutrophilia].filter(Boolean).length +
+    (rightLowerQuadrantTenderness ? 2 : 0) +
+    (leukocytosis ? 2 : 0);
+
+  return {
+    value: score,
+    unit: 'puntos',
+    interpretation:
+      score >= 7
+        ? 'Probabilidad alta. Avisar cirugía y valorar imagen/cirugía según estabilidad y red local.'
+        : score >= 5
+          ? 'Riesgo intermedio. Observación, reevaluación e imagen si persiste sospecha.'
+          : 'Riesgo bajo. Puede apoyar alta/observación corta solo si el juicio clínico y la reevaluación son tranquilizadores.',
+    caution: 'No usar en solitario: embarazo, ancianos, inmunosupresión y presentaciones atípicas reducen fiabilidad.',
+  };
+};
+
+export const calculateBisap = ({ bunOver25, impairedMentalStatus, sirs, ageOver60, pleuralEffusion }) => {
+  const score = [bunOver25, impairedMentalStatus, sirs, ageOver60, pleuralEffusion].filter(Boolean).length;
+
+  return {
+    value: score,
+    unit: 'puntos',
+    interpretation:
+      score >= 3
+        ? 'Alto riesgo de pancreatitis grave. Ingreso monitorizado, vigilancia estrecha y valorar UCI si fallo orgánico o mala perfusión.'
+        : 'Riesgo menor por BISAP, sin excluir ingreso si dolor, vómitos, comorbilidad, colangitis o mala evolución.',
+    caution: 'BISAP ayuda a estratificar; la conducta final depende de fallo orgánico, perfusión, imagen y evolución.',
+  };
+};
+
 export const calculatorCatalog = {
   'cha2ds2-va': {
     id: 'cha2ds2-va',
@@ -297,6 +463,96 @@ export const calculatorCatalog = {
       }),
     ],
   },
+  killip: {
+    id: 'killip',
+    title: 'Killip',
+    shortTitle: 'Killip',
+    moduleId: 'sindrome-coronario-agudo',
+    block: 'Síndrome coronario agudo',
+    chapter: 'ESC SCA 2023 · Riesgo inicial',
+    verifiedPage: 3720,
+    pdfPage: null,
+    status: 'implementado',
+    summary: 'Clasificación clínica de insuficiencia cardíaca/shock en SCA que modifica gravedad, destino y estrategia.',
+    bibliography: [
+      escScaEntry({
+        id: 'killip-sca-esc-2023',
+        note: 'ESC 2023 considera Killip > I marcador clínico de alto riesgo en SCA.',
+      }),
+    ],
+  },
+  nihss: {
+    id: 'nihss',
+    title: 'NIHSS',
+    shortTitle: 'NIHSS',
+    moduleId: 'ictus-isquemico',
+    block: 'Ictus isquémico',
+    chapter: 'AHA/ASA 2026 · Escala de gravedad',
+    verifiedPage: 1,
+    pdfPage: null,
+    status: 'implementado',
+    summary: 'Cuantifica déficit neurológico basal y tras reperfusión; ayuda a comunicar gravedad y seleccionar circuito.',
+    bibliography: [
+      ahaIschemicStrokeEntry({
+        id: 'nihss-aha-2026',
+        note: 'AHA/ASA 2026 recomienda usar una escala de gravedad, preferentemente NIHSS, en sospecha de ictus isquémico.',
+      }),
+    ],
+  },
+  'ich-score': {
+    id: 'ich-score',
+    title: 'ICH Score',
+    shortTitle: 'ICH Score',
+    moduleId: 'ictus-hemorragico',
+    block: 'Ictus hemorrágico',
+    chapter: 'AHA/ASA 2022 · Estratificación inicial',
+    verifiedPage: 1,
+    pdfPage: null,
+    status: 'implementado',
+    summary: 'Estratifica gravedad inicial de hemorragia intracerebral con GCS, volumen, IVH, localización y edad.',
+    bibliography: [
+      ahaHemorrhagicStrokeEntry({
+        id: 'ich-score-aha-2022',
+        note: 'AHA/ASA 2022 recomienda escalas basales de gravedad para comunicación y planificación, sin usarlas como único límite terapéutico.',
+      }),
+    ],
+  },
+  alvarado: {
+    id: 'alvarado',
+    title: 'Alvarado',
+    shortTitle: 'Alvarado',
+    moduleId: 'dolor-abdomen-quirurgico',
+    block: 'Abdomen quirúrgico',
+    chapter: 'WSES Apendicitis 2020 · Riesgo preimagen',
+    verifiedPage: 1,
+    pdfPage: null,
+    status: 'implementado',
+    summary: 'Apoya la estratificación de sospecha de apendicitis y la necesidad de observación, imagen o cirugía.',
+    bibliography: [
+      wsesAppendicitisEntry({
+        id: 'alvarado-wses-2020',
+        note: 'WSES 2020 describe Alvarado/AIR como apoyo para estimar probabilidad preimagen y orientar alta, imagen o cirugía.',
+      }),
+    ],
+  },
+  bisap: {
+    id: 'bisap',
+    title: 'BISAP',
+    shortTitle: 'BISAP',
+    moduleId: 'dolor-hepatobiliar-pancreatico',
+    block: 'Pancreatitis aguda',
+    chapter: 'ACG Pancreatitis 2024 · Gravedad inicial',
+    verifiedPage: 419,
+    pdfPage: null,
+    status: 'implementado',
+    summary: 'Estratifica riesgo inicial en pancreatitis aguda para vigilancia, ingreso monitorizado o UCI.',
+    bibliography: [
+      acgPancreatitisEntry({
+        id: 'bisap-acg-2024',
+        note: 'ACG 2024 incluye BISAP entre herramientas de estratificación y enfatiza valorar BUN, SIRS y fallo orgánico.',
+      }),
+    ],
+  },
 };
 
 export const implementedCalculators = Object.values(calculatorCatalog);
@@ -377,11 +633,11 @@ export const calculationAudit = [
   {
     id: 'killip',
     title: 'Clase Killip',
-    chapter: 'Cap. 26 · Síndrome coronario agudo',
-    verifiedPage: 220,
-    pdfPage: 245,
-    status: 'indexado',
-    note: 'Clasificación de gravedad usada en el mismo bloque clínico.',
+    chapter: 'ESC SCA 2023 · Síndrome coronario agudo',
+    verifiedPage: null,
+    pdfPage: null,
+    status: 'implementado',
+    note: 'Integrado en SCA para gravedad, destino monitorizado y estrategia urgente.',
   },
   {
     id: 'wells-tvp',
@@ -422,11 +678,11 @@ export const calculationAudit = [
   {
     id: 'alvarado',
     title: 'Escala de Alvarado modificada',
-    chapter: 'Cap. 50 · Dolor abdominal agudo',
-    verifiedPage: 349,
-    pdfPage: 374,
-    status: 'indexado',
-    note: 'Referida en el diagnóstico diferencial del abdomen agudo.',
+    chapter: 'WSES Apendicitis 2020 · Dolor abdominal agudo',
+    verifiedPage: null,
+    pdfPage: null,
+    status: 'implementado',
+    note: 'Integrada en abdomen quirúrgico para sospecha de apendicitis sin peritonitis franca.',
   },
   {
     id: 'glasgow',
@@ -440,11 +696,29 @@ export const calculationAudit = [
   {
     id: 'nihss',
     title: 'NIHSS',
-    chapter: 'Cap. 64 · Ictus',
-    verifiedPage: 446,
-    pdfPage: 471,
-    status: 'indexado',
-    note: 'Tabla de valoración neurológica para ictus.',
+    chapter: 'AHA/ASA 2026 · Ictus isquémico',
+    verifiedPage: null,
+    pdfPage: null,
+    status: 'implementado',
+    note: 'Integrado en ictus isquémico para cuantificar déficit, comunicar gravedad y orientar circuito.',
+  },
+  {
+    id: 'ich-score',
+    title: 'ICH Score',
+    chapter: 'AHA/ASA 2022 · Ictus hemorrágico',
+    verifiedPage: null,
+    pdfPage: null,
+    status: 'implementado',
+    note: 'Integrado en ictus hemorrágico para gravedad inicial y destino monitorizado.',
+  },
+  {
+    id: 'bisap',
+    title: 'BISAP',
+    chapter: 'ACG Pancreatitis 2024 · Pancreatitis aguda',
+    verifiedPage: null,
+    pdfPage: null,
+    status: 'implementado',
+    note: 'Integrado en hepatobiliar-pancreático para estratificar riesgo inicial de pancreatitis.',
   },
   {
     id: 'rankin-modificada',

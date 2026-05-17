@@ -9,10 +9,15 @@ import {
 } from 'lucide-react';
 import {
   calculateCha2ds2Va,
+  calculateAlvarado,
+  calculateBisap,
   calculateCockcroftGault,
   calculateCrb65,
   calculateCurb65,
   calculateHasBled,
+  calculateIchScore,
+  calculateKillip,
+  calculateNihss,
   getCalculator,
   implementedCalculators,
 } from './data/calculators';
@@ -77,6 +82,50 @@ const initialCalculatorInputs = {
     lowBloodPressure: false,
     age65: false,
   },
+  killip: {
+    classValue: '1',
+  },
+  nihss: {
+    levelOfConsciousness: '0',
+    locQuestions: '0',
+    locCommands: '0',
+    bestGaze: '0',
+    visual: '0',
+    facialPalsy: '0',
+    motorArmLeft: '0',
+    motorArmRight: '0',
+    motorLegLeft: '0',
+    motorLegRight: '0',
+    limbAtaxia: '0',
+    sensory: '0',
+    bestLanguage: '0',
+    dysarthria: '0',
+    extinction: '0',
+  },
+  'ich-score': {
+    gcsRange: '13-15',
+    volume30: false,
+    intraventricular: false,
+    infratentorial: false,
+    age80: false,
+  },
+  alvarado: {
+    migration: false,
+    anorexia: false,
+    nauseaVomiting: false,
+    rightLowerQuadrantTenderness: false,
+    rebound: false,
+    fever: false,
+    leukocytosis: false,
+    neutrophilia: false,
+  },
+  bisap: {
+    bunOver25: false,
+    impairedMentalStatus: false,
+    sirs: false,
+    ageOver60: false,
+    pleuralEffusion: false,
+  },
 };
 
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
@@ -100,6 +149,26 @@ const getCalculatorResult = (calculatorId, values) => {
 
   if (calculatorId === 'curb-65') {
     return calculateCurb65(values);
+  }
+
+  if (calculatorId === 'killip') {
+    return calculateKillip(values);
+  }
+
+  if (calculatorId === 'nihss') {
+    return calculateNihss(values);
+  }
+
+  if (calculatorId === 'ich-score') {
+    return calculateIchScore(values);
+  }
+
+  if (calculatorId === 'alvarado') {
+    return calculateAlvarado(values);
+  }
+
+  if (calculatorId === 'bisap') {
+    return calculateBisap(values);
   }
 
   return null;
@@ -699,6 +768,30 @@ const SelectField = ({ value, label, options, onChange }) => (
   </label>
 );
 
+const scoreOptions = (max) =>
+  Array.from({ length: max + 1 }, (_, value) => ({
+    value: String(value),
+    label: String(value),
+  }));
+
+const nihssFields = [
+  ['levelOfConsciousness', '1a. Nivel de conciencia', 3],
+  ['locQuestions', '1b. Preguntas LOC', 2],
+  ['locCommands', '1c. Órdenes LOC', 2],
+  ['bestGaze', '2. Mirada', 2],
+  ['visual', '3. Campos visuales', 3],
+  ['facialPalsy', '4. Paresia facial', 3],
+  ['motorArmLeft', '5a. Brazo izquierdo', 4],
+  ['motorArmRight', '5b. Brazo derecho', 4],
+  ['motorLegLeft', '6a. Pierna izquierda', 4],
+  ['motorLegRight', '6b. Pierna derecha', 4],
+  ['limbAtaxia', '7. Ataxia', 2],
+  ['sensory', '8. Sensibilidad', 2],
+  ['bestLanguage', '9. Lenguaje', 3],
+  ['dysarthria', '10. Disartria', 2],
+  ['extinction', '11. Extinción/inatención', 2],
+];
+
 const CalculatorResult = ({ result }) =>
   result ? (
     <div className="rounded-[1.15rem] border border-[rgba(0,113,227,0.20)] bg-[rgba(0,113,227,0.08)] px-4 py-3">
@@ -847,6 +940,91 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
               onChange={(value) => onChange('lowBloodPressure', value)}
             />
             <BooleanField checked={values.age65} label="Edad ≥ 65 años" onChange={(value) => onChange('age65', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'killip' ? (
+        <div className="space-y-3">
+          <SelectField
+            value={values.classValue}
+            label="Clase clínica"
+            options={[
+              { value: '1', label: 'I · Sin insuficiencia cardíaca' },
+              { value: '2', label: 'II · Crepitantes/S3/ingurgitación yugular' },
+              { value: '3', label: 'III · Edema agudo de pulmón' },
+              { value: '4', label: 'IV · Shock cardiogénico' },
+            ]}
+            onChange={(value) => onChange('classValue', value)}
+          />
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'nihss' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {nihssFields.map(([field, label, max]) => (
+              <SelectField
+                key={field}
+                value={values[field]}
+                label={label}
+                options={scoreOptions(max)}
+                onChange={(value) => onChange(field, value)}
+              />
+            ))}
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'ich-score' ? (
+        <div className="space-y-3">
+          <SelectField
+            value={values.gcsRange}
+            label="Glasgow"
+            options={[
+              { value: '13-15', label: '13-15 puntos' },
+              { value: '5-12', label: '5-12 puntos' },
+              { value: '3-4', label: '3-4 puntos' },
+            ]}
+            onChange={(value) => onChange('gcsRange', value)}
+          />
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={values.volume30} label="Volumen ≥ 30 mL" onChange={(value) => onChange('volume30', value)} />
+            <BooleanField checked={values.intraventricular} label="Extensión intraventricular" onChange={(value) => onChange('intraventricular', value)} />
+            <BooleanField checked={values.infratentorial} label="Origen infratentorial" onChange={(value) => onChange('infratentorial', value)} />
+            <BooleanField checked={values.age80} label="Edad ≥ 80 años" onChange={(value) => onChange('age80', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'alvarado' ? (
+        <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={values.migration} label="Migración a FID" onChange={(value) => onChange('migration', value)} />
+            <BooleanField checked={values.anorexia} label="Anorexia" onChange={(value) => onChange('anorexia', value)} />
+            <BooleanField checked={values.nauseaVomiting} label="Náuseas/vómitos" onChange={(value) => onChange('nauseaVomiting', value)} />
+            <BooleanField checked={values.rightLowerQuadrantTenderness} label="Dolor a palpación FID (2)" onChange={(value) => onChange('rightLowerQuadrantTenderness', value)} />
+            <BooleanField checked={values.rebound} label="Rebote/irritación" onChange={(value) => onChange('rebound', value)} />
+            <BooleanField checked={values.fever} label="Fiebre" onChange={(value) => onChange('fever', value)} />
+            <BooleanField checked={values.leukocytosis} label="Leucocitosis (2)" onChange={(value) => onChange('leukocytosis', value)} />
+            <BooleanField checked={values.neutrophilia} label="Neutrofilia/desviación izquierda" onChange={(value) => onChange('neutrophilia', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'bisap' ? (
+        <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={values.bunOver25} label="BUN > 25 mg/dL" onChange={(value) => onChange('bunOver25', value)} />
+            <BooleanField checked={values.impairedMentalStatus} label="Alteración mental" onChange={(value) => onChange('impairedMentalStatus', value)} />
+            <BooleanField checked={values.sirs} label="SIRS presente" onChange={(value) => onChange('sirs', value)} />
+            <BooleanField checked={values.ageOver60} label="Edad > 60 años" onChange={(value) => onChange('ageOver60', value)} />
+            <BooleanField checked={values.pleuralEffusion} label="Derrame pleural" onChange={(value) => onChange('pleuralEffusion', value)} />
           </div>
           <CalculatorResult result={result} />
         </div>

@@ -946,8 +946,9 @@ const buildSurgicalAbdomenFlow = (protocol) => ({
         'Peritonitis franca, neumoperitoneo, isquemia, sepsis sin foco alternativo o shock refractario: cirugía urgente.',
         'Estable pero sin diagnóstico claro: observación, estudio dirigido y reevaluación por cirugía.',
         'Diverticulitis no complicada radiológica y paciente sano/estable: valorar alta; complicada o grave: ingreso y antibiótico IV.',
-        'No usar Alvarado como botón: no hay calculadora implementada y no sustituye valoración quirúrgica.',
+        'Si sospecha apendicitis sin peritonitis: Alvarado ayuda a bajo/intermedio/alto riesgo y necesidad de imagen/cirugía.',
       ],
+      actions: [calculatorAction('alvarado')],
       detailNodes: [
         {
           id: 'criterios-escalada-abdomen',
@@ -1236,8 +1237,9 @@ const buildHepatobiliaryPancreaticFlow = (protocol) => ({
         'Cólico biliar resuelto, afebril, analítica sin alarma y tolera: alta con cirugía programada/seguimiento.',
         'Fiebre, ictericia, colangitis, colecistitis, pancreatitis o dolor persistente: observación/ingreso.',
         'Pancreatitis grave: hipoxemia, shock, oliguria, lactato alto, hematocrito elevado, fallo orgánico o mala perfusión.',
-        'No añadir BISAP como botón: no está implementada y no cambia conducta sin integración real.',
+        'En pancreatitis: BISAP ayuda a identificar alto riesgo y necesidad de vigilancia estrecha/UCI.',
       ],
+      actions: [calculatorAction('bisap')],
       detailNodes: [
         {
           id: 'escalada-hepatobiliar',
@@ -2313,7 +2315,7 @@ const buildInfectiousDigestiveAbdominalPainFlow = (protocol) => ({
         'Leve, estable, sin sangre ni alarma y tolera VO: rehidratación oral y alta con alarma.',
         'Mala tolerancia, deshidratación, dolor persistente o diagnóstico incierto: observación y reevaluación.',
         'Sepsis, inmunosupresión, diverticulitis complicada, absceso o peritonismo: ingreso y antibiótico/imagen.',
-        'No mostrar qSOFA como botón: no está implementada como calculadora funcional en la app.',
+        'Sepsis clínica, hipoperfusión o lactato elevado: ingreso, antibiótico precoz si foco probable y valorar UCI.',
       ],
       detailNodes: [
         {
@@ -2857,10 +2859,11 @@ const buildScaDecisionPanelFlow = (protocol) => {
         points: [
           'SCACEST: ICP primaria si llega en tiempo; fibrinólisis si demora > 120 min y no hay contraindicación.',
           'SCASEST muy alto riesgo: shock, dolor refractario, arritmia maligna o insuficiencia cardíaca: angiografía inmediata.',
-          'SCASEST alto riesgo: troponina positiva, cambios dinámicos ST/T o GRACE alto si disponible: coronariografía < 24 h.',
+          'SCASEST alto riesgo: troponina positiva, cambios dinámicos ST/T o criterios ESC de alto riesgo: coronariografía < 24 h.',
           'Killip III-IV o inestabilidad: área monitorizada/UCI y manejo invasivo urgente.',
           'No usar fibrinólisis en SCASEST.',
         ],
+        actions: [calculatorAction('killip')],
         detailNodes: decisionNodes(protocol),
       },
       {
@@ -3271,7 +3274,7 @@ const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
             items: [
               'No retrasar TAC ni activación por analíticas o pruebas secundarias.',
               'Preguntar anticoagulación, cirugía reciente, sangrado, ictus previo y comorbilidad relevante.',
-              'NIHSS y Rankin cambian selección terapéutica, pero en esta app aún no son calculadoras funcionales.',
+              'NIHSS cuantifica el déficit basal y ayuda a comunicar gravedad sin retrasar reperfusión.',
             ],
           },
         ],
@@ -3310,6 +3313,7 @@ const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
           'Sospecha/confirmación de gran vaso: no retrasar trombectomía por tratamientos secundarios.',
           'Si no candidato a reperfusión: soporte, evitar descenso brusco de PA y definir ingreso en unidad de ictus.',
         ],
+        actions: [calculatorAction('nihss')],
         detailNodes: decisionNodes(protocol),
       },
       {
@@ -3436,6 +3440,7 @@ const buildHemorrhagicStrokeDecisionPanelFlow = (protocol) => {
           'Anticoagulación activa: reversión lo antes posible según fármaco, última dosis, INR y función renal.',
           'Cerebelosa con deterioro, compresión de tronco o hidrocefalia: valoración neuroquirúrgica inmediata.',
         ],
+        actions: [calculatorAction('ich-score')],
         detailNodes: decisionNodes(protocol),
       },
       {

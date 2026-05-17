@@ -35,7 +35,7 @@ Principios actuales del proyecto:
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Protocolos` con organigramas clínicos para todos los protocolos implementados y acordeones por bloque clínico para evitar una lista plana interminable.
 - Protocolos reales operativos migrados a organigrama: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
-- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65` y `CURB-65`.
+- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado` y `BISAP`.
 - La sección `Medicamentos` deja de ser sección principal visible. Los tratamientos deben vivir dentro de cada protocolo como pautas concretas y auditadas.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
 - Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `NICE NG250 2025` como referencia principal de neumonía, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
@@ -228,13 +228,15 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | HAS-BLED | Guía ESC 2024 · Fibrilación auricular | 40 | Implementado | Integrado dentro del protocolo FA para vigilar riesgo hemorrágico y también accesible desde `Cálculos`. |
 | CRB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 9 | Implementado | Integrado para orientar riesgo y destino en atención inicial / ámbito ambulatorio. |
 | CURB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 11 | Implementado | Integrado para orientar riesgo y destino en ámbito hospitalario. |
+| Killip | ESC SCA 2023 · Síndrome coronario agudo | — | Implementado | Integrado en la decisión de gravedad/destino de SCA. |
+| NIHSS | AHA/ASA 2026 · Ictus isquémico | — | Implementado | Integrado en la decisión de código ictus, gravedad y comunicación clínica. |
+| ICH Score | AHA/ASA 2022 · Ictus hemorrágico | — | Implementado | Integra Glasgow, volumen, localización, extensión intraventricular y edad para gravedad inicial. |
+| Alvarado | WSES Apendicitis 2020 · Dolor abdominal agudo | — | Implementado | Integrado en abdomen quirúrgico si sospecha apendicitis sin peritonitis franca. |
+| BISAP | ACG Pancreatitis 2024 · Pancreatitis aguda | — | Implementado | Integrado en hepatobiliar-pancreático para riesgo de pancreatitis grave. |
 | TFG estimado (CKD-EPI) | Cap. 5 · Bioquímica sanguínea | 39 | Pendiente | Auditado, pero fuera del alcance del primer módulo real. |
 | Diferencia alveoloarterial de O2 (∆AaPO2) | Cap. 8 · Gasometría, pulsioximetría y capnografía | 66 | Pendiente | Detectado en bibliografía, no implementado. |
 | GRACE | Cap. 26 · Síndrome coronario agudo | 220 | Pendiente | Escala detectada para futuro módulo. |
-| Clase Killip | Cap. 26 · Síndrome coronario agudo | 220 | Pendiente | Clasificación detectada para futuro módulo. |
-| Escala de Alvarado modificada | Cap. 50 · Dolor abdominal agudo | 349 | Pendiente | Detectada, no implementada. |
 | Escala de coma de Glasgow | Cap. 62 · Coma | 429 | Pendiente | Detectada, no implementada. |
-| NIHSS | Cap. 64 · Ictus | 446 | Pendiente | Detectada, no implementada. |
 | Escala de Rankin modificada | Cap. 64 · Ictus | 442 | Pendiente | Detectada, no implementada. |
 | Escala de Cincinnati | Cap. 64 · Ictus | 446 | Pendiente | Detectada, no implementada. |
 | qSOFA / SOFA | Cap. 107 · Sepsis | 640 | Pendiente | Detectadas, no implementadas. |
