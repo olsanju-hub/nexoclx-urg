@@ -1174,6 +1174,264 @@ const buildSurgicalAbdomenFlow = (protocol) => ({
   ],
 });
 
+const buildHepatobiliaryPancreaticFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: brief(protocol.summary, 170),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Epigastrio/hipocondrio derecho con vómitos, ictericia, fiebre o irradiación a espalda.',
+      points: [
+        'Cólico biliar: dolor HCD/epigastrio, náuseas y desencadenante graso, sin fiebre ni ictericia persistente.',
+        'Colecistitis/colangitis: dolor prolongado, fiebre, escalofríos, Murphy, ictericia o colestasis.',
+        'Pancreatitis: epigastralgia transfixiva o en cinturón, vómitos, alcohol/litiasis y lipasa/amilasa elevadas.',
+        'Alarma: hipotensión, sepsis, ictericia febril, dolor persistente, hipoxemia, oliguria o mala perfusión.',
+      ],
+      detailNodes: [
+        {
+          id: 'entrada-hepatobiliar',
+          title: 'Entrada clínica',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            protocol.guardia?.clinica,
+            'En epigastralgia con factores cardiovasculares, ECG y troponina para no perder SCA inferior.',
+            'En dolor HCD con fiebre/ictericia, asumir infección biliar hasta demostrar lo contrario.',
+          ].filter(Boolean),
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Confirmar patrón biliar/pancreático y detectar infección, obstrucción o gravedad.',
+      points: [
+        'Hemograma, glucosa, urea/creatinina, iones, PCR/procalcitonina si infección, y perfil hepático con bilirrubina directa.',
+        'Lipasa o amilasa si epigastralgia, vómitos o sospecha pancreática.',
+        'Ecografía abdominal si sospecha biliar, colecistitis, colangitis, dilatación de vía biliar o ictericia.',
+        'TC si pancreatitis grave, mala evolución, complicación, eco no concluyente o duda diagnóstica relevante.',
+      ],
+      detailNodes: [
+        {
+          id: 'resultados-hepatobiliar',
+          title: 'Resultados que cambian conducta',
+          type: 'step',
+          items: [
+            'Colestasis, hiperbilirrubinemia directa o dilatación de vía biliar orientan a coledocolitiasis/colangitis.',
+            'Leucocitosis, PCR elevada, fiebre o sepsis apoyan colecistitis/colangitis o infección complicada.',
+            'Hematocrito, urea/BUN, creatinina y lactato ayudan a valorar perfusión y reposición en pancreatitis.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Distinguir cólico resuelto de colecistitis/colangitis, pancreatitis grave o complicación.',
+      points: [
+        'Cólico biliar resuelto, afebril, analítica sin alarma y tolera: alta con cirugía programada/seguimiento.',
+        'Fiebre, ictericia, colangitis, colecistitis, pancreatitis o dolor persistente: observación/ingreso.',
+        'Pancreatitis grave: hipoxemia, shock, oliguria, lactato alto, hematocrito elevado, fallo orgánico o mala perfusión.',
+        'No añadir BISAP como botón: no está implementada y no cambia conducta sin integración real.',
+      ],
+      detailNodes: [
+        {
+          id: 'escalada-hepatobiliar',
+          title: 'Escalada urgente',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Digestivo/cirugía si fiebre con ictericia, sepsis, colecistitis, colangitis o coledocolitiasis obstructiva.',
+            'UCI/Críticos si shock, hipoxemia, acidosis/lactato elevado, oliguria o fallo orgánico.',
+            'No retrasar control de foco si colangitis grave o sepsis biliar.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'Analgesia, vómitos y fluidos dirigidos; antibiótico solo si infección biliar/complicada.',
+      points: [
+        'Dieta absoluta si pancreatitis, colecistitis, colangitis, vómitos o procedimiento probable.',
+        'Pancreatitis sin shock: Ringer lactato 2.500-3.000 mL/24 h ajustado a comorbilidad y respuesta.',
+        'Si shock/hipoperfusión en pancreatitis: Ringer lactato 5-10 mL/kg/h hasta objetivos hemodinámicos.',
+        'Metoclopramida 10 mg IV cada 8 h si vómitos; metamizol 2 g IV cada 8 h para dolor pancreático si encaja seguridad.',
+        'Piperacilina/tazobactam 4/0,5 g IV cada 8 h en infección biliar complicada; cada 6 h si grave.',
+      ],
+      treatmentGroups: [
+        {
+          id: 'medidas-hepatobiliar',
+          title: 'Medidas iniciales',
+          cards: [
+            {
+              id: 'hbp-dieta-via',
+              title: 'Dieta absoluta + vía venosa',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Pancreatitis, colecistitis, colangitis, vómitos persistentes o procedimiento probable.',
+              items: [
+                'Dosis: no farmacológica.',
+                'Vía: venosa periférica si vómitos, dolor intenso, sepsis, pancreatitis o ingreso probable.',
+                'Frecuencia: reevaluación seriada.',
+                'Evitar si: no aplica.',
+                'Reevaluar: dolor, vómitos, diuresis, constantes y necesidad de ingreso/procedimiento.',
+              ],
+            },
+            {
+              id: 'hbp-ringer-lactato',
+              title: 'Ringer lactato',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Reposición inicial en pancreatitis, ajustada a comorbilidad y perfusión.',
+              items: [
+                'Dosis: 2.500-3.000 mL/24 h si no hay alteración hemodinámica.',
+                'Vía: IV.',
+                'Frecuencia/perfusión: 5-10 mL/kg/h si PAS <90 mmHg y FC >120 hasta objetivos.',
+                'Máximo: evitar sobrecarga; ajustar por insuficiencia cardiaca, renal o respiratoria.',
+                'Evitar si: hipercalcemia como causa de pancreatitis, donde Murillo prioriza salino fisiológico.',
+                'Reevaluar: FC <120, PAM 65-85 mmHg, diuresis >0,5 mL/kg/h, hematocrito 35-44%, creatinina y lactato.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'analgesia-vomitos-hbp',
+          title: 'Dolor y vómitos',
+          cards: [
+            {
+              id: 'hbp-metamizol',
+              title: 'Metamizol magnésico IV',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Escalón analgésico en pancreatitis/dolor intenso si encaja seguridad.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/63430/FT_63430.html',
+              items: [
+                'Dosis: 2 g.',
+                'Vía: IV diluido en 100 mL de suero fisiológico.',
+                'Frecuencia: cada 8 h en pancreatitis; cada 6 h en dolor abdominal general si procede.',
+                'Máximo: 4 g/día habitual; ficha técnica permite hasta 5 g/día si necesario.',
+                'Evitar si: alergia a pirazolonas, agranulocitosis previa, tercer trimestre de embarazo o inestabilidad sin monitorización.',
+                'Reevaluar: dolor, TA y signos de reacción adversa.',
+              ],
+            },
+            {
+              id: 'hbp-metoclopramida',
+              title: 'Metoclopramida',
+              type: 'treatment',
+              summary: 'Náuseas/vómitos si no precisa aspiración nasogástrica.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/78556/FichaTecnica_78556.html',
+              items: [
+                'Dosis: 10 mg.',
+                'Vía: IV.',
+                'Frecuencia: cada 8 h.',
+                'Máximo: 30 mg/día en adultos.',
+                'Evitar si: obstrucción/perforación digestiva, hemorragia digestiva, Parkinson o antecedente extrapiramidal relevante.',
+                'Reevaluar: vómitos, QT/interacciones, tolerancia y necesidad de sonda.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'antibiotico-biliar',
+          title: 'Antibiótico si infección biliar o pancreática complicada',
+          cards: [
+            {
+              id: 'hbp-piperacilina-tazobactam',
+              title: 'Piperacilina/tazobactam',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Colecistitis/colangitis complicada, sepsis biliar o pancreatitis infectada con indicación.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/68080/fichatecnica_68080.html',
+              items: [
+                'Dosis: 4 g/0,5 g.',
+                'Vía: IV en perfusión.',
+                'Frecuencia: cada 8 h; cada 6 h si infección particularmente grave.',
+                'Máximo: ajustar por función renal; ClCr 20-40: 4/0,5 g cada 8 h; ClCr <20: 4/0,5 g cada 12 h.',
+                'Evitar si: alergia a betalactámicos; revisar sodio y microbiología local.',
+                'Reevaluar: hemocultivos si sepsis, control de foco, CPRE/cirugía si procede y desescalada.',
+              ],
+            },
+          ],
+        },
+      ],
+      detailNodes: [
+        {
+          id: 'seguridad-hbp',
+          title: 'Seguridad antes de tratar',
+          type: 'step',
+          severity: 'warning',
+          items: [
+            'No usar antibiótico profiláctico en pancreatitis aguda sin infección: reservar para infección confirmada, gas en TC, colangitis u otra infección.',
+            'Revisar alergias, embarazo, función renal/hepática, QT/interacciones, riesgo de sobrecarga y necesidad de control de foco.',
+            'Si hay criterios de gravedad, vómitos frecuentes o íleo, valorar sonda nasogástrica con aspiración continua.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Alta solo en cólico biliar resuelto, estable y sin datos de infección u obstrucción.',
+      points: [
+        'Alta: cólico biliar resuelto, afebril, sin ictericia, tolera vía oral y seguimiento/cirugía programada.',
+        'Observación/ingreso: dolor persistente, vómitos, pancreatitis, colecistitis, colangitis o ictericia obstructiva.',
+        'Digestivo/cirugía: colangitis, coledocolitiasis, colecistitis, absceso, complicación o necesidad de CPRE/procedimiento.',
+        'UCI: shock, sepsis grave, hipoxemia, oliguria, acidosis/lactato elevado o fallo orgánico.',
+      ],
+      detailNodes: [
+        {
+          id: 'alarma-hbp-alta',
+          title: 'Signos de alarma',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            'Fiebre, escalofríos, ictericia, coluria, acolia o prurito intenso.',
+            'Dolor persistente o progresivo, vómitos, intolerancia oral o síncope.',
+            'Disnea, confusión, oliguria, mareo intenso o deterioro general.',
+          ],
+        },
+      ],
+    },
+  ],
+  sections: [
+    definitionSection(protocol),
+    {
+      id: 'que-pido',
+      title: PRIMARY_SECTION_TITLES.orders,
+      type: 'section',
+      summary: 'Perfil biliar/pancreático e imagen dirigida.',
+      children: [],
+    },
+    {
+      id: 'que-espero',
+      title: PRIMARY_SECTION_TITLES.findings,
+      type: 'section',
+      summary: 'Criterios de infección, obstrucción o pancreatitis grave.',
+      children: [],
+    },
+    {
+      id: 'tratamiento',
+      title: PRIMARY_SECTION_TITLES.treatment,
+      type: 'section',
+      summary: 'Pautas iniciales y tratamiento bajo demanda.',
+      children: [],
+    },
+    {
+      id: 'seguimiento',
+      title: PRIMARY_SECTION_TITLES.followUp,
+      type: 'section',
+      summary: 'Destino según gravedad y tolerancia.',
+      children: [],
+    },
+    referencesSection(protocol),
+  ],
+});
+
 const guardiaFlow = (protocol) => {
   const guardia = protocol.guardia;
 
@@ -2182,6 +2440,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'dolor-abdomen-quirurgico') {
     return buildSurgicalAbdomenFlow(protocol);
+  }
+
+  if (protocol.id === 'dolor-hepatobiliar-pancreatico') {
+    return buildHepatobiliaryPancreaticFlow(protocol);
   }
 
   if (protocol.guardia) {
