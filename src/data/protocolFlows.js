@@ -1432,6 +1432,315 @@ const buildHepatobiliaryPancreaticFlow = (protocol) => ({
   ],
 });
 
+const buildUrinaryAbdominalPainFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: brief(protocol.summary, 170),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Flanco/hipogastrio con cólico, hematuria, disuria, fiebre, vómitos o retención.',
+      points: [
+        'Cólico renal: dolor en flanco irradiado a ingle, cortejo vegetativo y microhematuria frecuente.',
+        'ITU alta/pielonefritis: fiebre, dolor lumbar, puñopercusión, mal estado o sepsis.',
+        'Complicado: monorreno, embarazo, varón, anciano, diabetes, inmunosupresión, IR, obstrucción o sonda/manipulación.',
+        'Alarma: fiebre con obstrucción, fracaso renal, anuria/oliguria, dolor no controlado, sepsis o vómitos persistentes.',
+      ],
+      detailNodes: [
+        {
+          id: 'entrada-urinaria',
+          title: 'Entrada clínica',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            protocol.guardia?.clinica,
+            'No dar alta si hay fiebre, obstrucción infectada, monorreno, fracaso renal, embarazo o dolor/vómitos no controlados.',
+            'Separar dolor cólico no complicado de infección urinaria alta o derivación urológica urgente.',
+          ].filter(Boolean),
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Orina, función renal e imagen solo si cambia alta, antibiótico, contraste o derivación.',
+      points: [
+        'Tira/sedimento de orina; urocultivo si fiebre, ITU alta, complicada, embarazo, sepsis o antibiótico.',
+        'Creatinina, urea, iones, hemograma y PCR si fiebre, ingreso, comorbilidad, monorreno o duda de alta.',
+        'Test de embarazo si procede antes de imagen, AINE o antibiótico.',
+        'Ecografía/TC si cólico complicado, fiebre, monorreno, fracaso renal, dolor persistente, duda diagnóstica o mala evolución.',
+      ],
+      detailNodes: [
+        {
+          id: 'imagen-urinaria',
+          title: 'Resultados que cambian conducta',
+          type: 'step',
+          items: [
+            'Hidronefrosis con fiebre o sepsis obliga a urología urgente y derivación/desobstrucción.',
+            'Creatinina elevada o ClCr bajo condiciona AINE, contraste y dosis antibiótica.',
+            'Piuria/nitritos con fiebre orientan a ITU alta; microhematuria apoya cólico pero no excluye apendicitis/diverticulitis cercana.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Alta solo si cólico no complicado, afebril, función renal segura y dolor controlado.',
+      points: [
+        'Cólico no complicado: afebril, dolor controlado, tolera VO, función renal sin alarma y seguimiento.',
+        'Ingreso/observación: dolor o vómitos persistentes, fiebre, monorreno, IR, embarazo, fragilidad o diagnóstico incierto.',
+        'Urología urgente: obstrucción infectada, anuria/oliguria, monorreno obstruido, sepsis, fracaso renal o dolor intratable.',
+        'Calcular Cockcroft-Gault si AINE, antibiótico, contraste o ingreso dependen de función renal.',
+      ],
+      actions: [calculatorAction('cockcroft-gault')],
+      detailNodes: [
+        {
+          id: 'criterios-urologia',
+          title: 'Criterios de escalada',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Fiebre/sepsis con obstrucción: antibiótico IV y valoración urológica urgente.',
+            'Retención urinaria: sondaje vesical si procede; si prostatitis aguda con retención, valorar cistostomía para evitar manipulación uretral.',
+            'Cólico con fracaso renal, monorreno, embarazo o dolor no controlado: no alta desde urgencias.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'AINE como primera línea si función renal y seguridad lo permiten; antibiótico solo si infección.',
+      points: [
+        'Dexketoprofeno 50 mg IM/IV cada 8-12 h para cólico renal; máximo 150 mg/día y no más de 2 días IV.',
+        'Paracetamol 1 g IV cada 6 h o metamizol 2 g IV/IM si AINE contraindicado o como rescate.',
+        'Metoclopramida 10 mg IV cada 8 h u ondansetrón 4-8 mg IV cada 12 h si vómitos.',
+        'Pielonefritis no complicada alta: ceftriaxona 1 g IM/IV dosis única y cefixima 400 mg VO cada 24 h hasta completar 7 días según cultivo.',
+        'Pielonefritis complicada o ITU alta con ingreso: ceftriaxona 2 g IV cada 24 h; sepsis grave: piperacilina/tazobactam 4/0,5 g IV cada 6-8 h.',
+      ],
+      treatmentGroups: [
+        {
+          id: 'colico-renal',
+          title: 'Cólico renal',
+          cards: [
+            {
+              id: 'urinario-dexketoprofeno',
+              title: 'Dexketoprofeno',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Primera línea si no hay contraindicación renal, hemorrágica, digestiva o embarazo avanzado.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/77962/FichaTecnica_77962.html',
+              items: [
+                'Dosis: 50 mg.',
+                'Vía: IM o IV diluido en 100 mL de suero fisiológico si perfusión.',
+                'Frecuencia: cada 8-12 h; repetir a las 6 h si necesario.',
+                'Duración: periodo sintomático agudo; IV no más de 2 días.',
+                'Máximo: 150 mg/día.',
+                'Evitar si: ClCr <50 mL/min, sangrado/úlcera activa, alergia a AINE, insuficiencia cardiaca grave o embarazo avanzado.',
+                'Reevaluar: dolor, TA, función renal, vómitos y necesidad de imagen/derivación.',
+              ],
+            },
+            {
+              id: 'urinario-paracetamol',
+              title: 'Paracetamol IV',
+              type: 'treatment',
+              summary: 'Alternativa o coadyuvante si AINE no encaja.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/74477/FichaTecnica_74477.html',
+              items: [
+                'Dosis: 1 g.',
+                'Vía: IV.',
+                'Frecuencia: cada 6 h.',
+                'Máximo: 4 g/día si >50 kg sin riesgo hepatotóxico; 3 g/día si riesgo hepatotóxico.',
+                'Evitar si: hepatopatía grave o uso concomitante de paracetamol.',
+                'Reevaluar: dolor y necesidad de rescate.',
+              ],
+            },
+            {
+              id: 'urinario-metamizol',
+              title: 'Metamizol magnésico',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Rescate analgésico si encaja seguridad individual.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/63430/FT_63430.html',
+              items: [
+                'Dosis: 2 g.',
+                'Vía: IM en asistencia inicial; IV diluido si ingreso o precisa perfusión.',
+                'Frecuencia: cada 8 h si ingreso; cada 6 h según dolor y seguridad.',
+                'Máximo: 4 g/día habitual; ficha técnica permite hasta 5 g/día si necesario.',
+                'Evitar si: alergia a pirazolonas, agranulocitosis previa, tercer trimestre de embarazo o inestabilidad sin monitorización.',
+                'Reevaluar: dolor, TA y hemograma si síntomas de discrasia.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'vomitos-retencion',
+          title: 'Vómitos y retención',
+          cards: [
+            {
+              id: 'urinario-metoclopramida',
+              title: 'Metoclopramida',
+              type: 'treatment',
+              summary: 'Vómitos que impiden hidratación, analgesia o alta segura.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/78556/FichaTecnica_78556.html',
+              items: [
+                'Dosis: 10 mg.',
+                'Vía: IV.',
+                'Frecuencia: cada 8 h.',
+                'Máximo: 30 mg/día en adultos.',
+                'Evitar si: obstrucción/perforación digestiva, Parkinson, epilepsia o antecedente extrapiramidal relevante.',
+                'Reevaluar: tolerancia oral, QT/interacciones y necesidad de observación.',
+              ],
+            },
+            {
+              id: 'urinario-sondaje',
+              title: 'Sondaje vesical',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Retención urinaria con globo o imposibilidad miccional.',
+              items: [
+                'Dosis: no farmacológica.',
+                'Vía: uretral si procede; cistostomía si prostatitis aguda con retención y criterio urológico.',
+                'Frecuencia: intervención única con control de diuresis.',
+                'Evitar si: sospecha de lesión uretral o contraindicación local.',
+                'Reevaluar: dolor, diuresis, hematuria, infección y necesidad de urología.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'itu-alta-pielonefritis',
+          title: 'ITU alta / pielonefritis',
+          cards: [
+            {
+              id: 'urinario-ceftriaxona',
+              title: 'Ceftriaxona',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Pielonefritis no complicada inicial o complicada sin riesgo multirresistente grave.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/66753/FichaTecnica_66753.html',
+              items: [
+                'Dosis: 1 g IM/IV dosis única si alta; 2 g IV si ingreso/complicada.',
+                'Vía: IM o IV.',
+                'Frecuencia: dosis única si alta; cada 24 h si ingreso.',
+                'Duración: continuar VO según urocultivo hasta completar 7 días en no complicada; ajustar en complicada.',
+                'Máximo: 4 g/día según ficha técnica; no exceder 2 g/día si fracaso renal preterminal con disfunción hepática.',
+                'Evitar si: alergia a cefalosporinas/betalactámicos relevante.',
+                'Reevaluar: fiebre, sepsis, urocultivo, función renal y obstrucción.',
+              ],
+            },
+            {
+              id: 'urinario-cefixima',
+              title: 'Cefixima',
+              type: 'treatment',
+              summary: 'Continuación oral en pielonefritis no complicada tras dosis inicial y urocultivo.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/66397/fichatecnica_66397.htm',
+              items: [
+                'Dosis: 400 mg.',
+                'Vía: VO.',
+                'Frecuencia: cada 24 h.',
+                'Duración: hasta completar 7 días según Murillo; ficha técnica recoge 10 días para algunas indicaciones.',
+                'Máximo: 400 mg/día; reducir a la mitad si ClCr <=20 mL/min.',
+                'Evitar si: alergia a cefalosporinas/betalactámicos relevante.',
+                'Reevaluar: urocultivo, fiebre, tolerancia oral y evolución en 48-72 h.',
+              ],
+            },
+            {
+              id: 'urinario-piperacilina-tazobactam',
+              title: 'Piperacilina/tazobactam',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Sepsis grave/shock séptico o riesgo de infección complicada según contexto local.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/68080/fichatecnica_68080.html',
+              items: [
+                'Dosis: 4 g/0,5 g.',
+                'Vía: IV en perfusión.',
+                'Frecuencia: cada 6-8 h.',
+                'Máximo: ajustar por función renal; ClCr 20-40: 4/0,5 g cada 8 h; ClCr <20: 4/0,5 g cada 12 h.',
+                'Evitar si: alergia a betalactámicos; revisar BLEE/microbiología local.',
+                'Reevaluar: urocultivo/hemocultivos, foco obstructivo, lactato, función renal y desescalada.',
+              ],
+            },
+          ],
+        },
+      ],
+      detailNodes: [
+        {
+          id: 'seguridad-urinaria',
+          title: 'Seguridad antes de tratar',
+          type: 'step',
+          severity: 'warning',
+          items: [
+            'Confirmar alergias, embarazo, función renal, monorreno, anticoagulación/sangrado y riesgo digestivo antes de AINE o antibiótico.',
+            'No forzar sobrehidratación en cólico renal no complicado; hidratar según tolerancia y estado clínico.',
+            'Si fiebre + obstrucción, el antibiótico no sustituye la desobstrucción: avisar urología.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Alta solo con dolor controlado, afebril, tolerancia oral y función renal segura.',
+      points: [
+        'Alta: cólico no complicado, afebril, sin obstrucción infectada, tolera VO y analgesia efectiva.',
+        'Observación: dolor/vómitos persistentes, diagnóstico incierto, necesidad de imagen o reevaluación.',
+        'Ingreso/urología: fiebre, pielonefritis complicada, obstrucción, monorreno, embarazo, IR, sepsis o retención compleja.',
+        'UCI: shock séptico, lactato elevado, hipotensión, deterioro neurológico o necesidad de soporte.',
+      ],
+      detailNodes: [
+        {
+          id: 'alarma-urinaria-alta',
+          title: 'Signos de alarma',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            'Fiebre, escalofríos, dolor no controlado, vómitos persistentes o anuria/oliguria.',
+            'Hematuria intensa, síncope, deterioro general o intolerancia a la medicación.',
+            'Reconsulta si no mejora o aparece clínica infecciosa tras alta por cólico.',
+          ],
+        },
+      ],
+    },
+  ],
+  sections: [
+    definitionSection(protocol),
+    {
+      id: 'que-pido',
+      title: PRIMARY_SECTION_TITLES.orders,
+      type: 'section',
+      summary: 'Orina, función renal e imagen si cambia conducta.',
+      children: [],
+    },
+    {
+      id: 'que-espero',
+      title: PRIMARY_SECTION_TITLES.findings,
+      type: 'section',
+      summary: 'Separar cólico no complicado de infección/obstrucción.',
+      children: [],
+    },
+    {
+      id: 'tratamiento',
+      title: PRIMARY_SECTION_TITLES.treatment,
+      type: 'section',
+      summary: 'Pautas iniciales y antibiótico si infección.',
+      children: [],
+    },
+    {
+      id: 'seguimiento',
+      title: PRIMARY_SECTION_TITLES.followUp,
+      type: 'section',
+      summary: 'Destino según dolor, fiebre, riñón y obstrucción.',
+      children: [],
+    },
+    referencesSection(protocol),
+  ],
+});
+
 const guardiaFlow = (protocol) => {
   const guardia = protocol.guardia;
 
@@ -2444,6 +2753,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'dolor-hepatobiliar-pancreatico') {
     return buildHepatobiliaryPancreaticFlow(protocol);
+  }
+
+  if (protocol.id === 'dolor-urinario') {
+    return buildUrinaryAbdominalPainFlow(protocol);
   }
 
   if (protocol.guardia) {
