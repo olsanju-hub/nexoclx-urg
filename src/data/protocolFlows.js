@@ -1741,6 +1741,258 @@ const buildUrinaryAbdominalPainFlow = (protocol) => ({
   ],
 });
 
+const buildGynecologicAbdominalPainFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: brief(protocol.summary, 170),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Dolor pélvico o bajo abdomen: primero descartar embarazo ectópico, torsión y sangrado.',
+      points: [
+        'Ectópico: amenorrea, metrorragia y dolor; puede presentarse sin clínica clásica.',
+        'Torsión: dolor anexial brusco intenso, náuseas/vómitos y masa/quiste conocido o sospechado.',
+        'EPI: dolor bajo, fiebre, flujo, dolor cervical/anexial, sangrado o riesgo ITS.',
+        'Alarma: test de embarazo positivo con dolor/sangrado, síncope, hipotensión, palidez, fiebre o defensa.',
+      ],
+      detailNodes: [
+        {
+          id: 'entrada-ginecologica',
+          title: 'Entrada clínica',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            protocol.guardia?.clinica,
+            'El embarazo ectópico puede simular cualquier proceso ginecológico; no dar alta sin orientar embarazo si es posible.',
+            'Torsión y ectópico inestable son tiempo-dependientes: avisar ginecología sin esperar pruebas secundarias.',
+          ].filter(Boolean),
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Test de embarazo, hemograma y ecografía si cambian cirugía, ingreso o antibiótico.',
+      points: [
+        'Test de embarazo obligatorio si posibilidad de gestación; β-HCG si positivo o duda diagnóstica.',
+        'Hemograma, grupo/Rh y coagulación si sangrado, síncope, embarazo positivo, mal estado o cirugía probable.',
+        'PCR/VSG y microbiología ITS si sospecha EPI; cribado VIH, clamidia y gonorrea cuando proceda.',
+        'Ecografía ginecológica/transvaginal si ectópico, torsión, quiste complicado, EPI complicada o diagnóstico incierto.',
+      ],
+      detailNodes: [
+        {
+          id: 'resultados-ginecologia',
+          title: 'Resultados que cambian conducta',
+          type: 'step',
+          items: [
+            'β-HCG positiva sin saco intrauterino con cifras por encima del umbral local obliga a descartar ectópico.',
+            'Líquido libre, masa anexial, dolor intenso o signos de shock orientan a cirugía/valoración urgente.',
+            'Absceso tuboovárico, peritonitis pélvica o mala evolución en EPI obligan a ingreso.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Separar estable ambulatoria de ectópico/torsión/EPI complicada con ingreso.',
+      points: [
+        'Inestable o shock con sospecha de ectópico: reanimación y ginecología/quirófano urgente.',
+        'Torsión probable: ginecología urgente aunque la ecografía no sea definitiva.',
+        'EPI ambulatoria solo si estadio leve, diagnóstico claro, tolera VO y sin criterios de ingreso.',
+        'Ingreso si embarazo, vómitos, T >=39 °C, diagnóstico incierto, reacción peritoneal, absceso o falta de respuesta en 48-72 h.',
+      ],
+      detailNodes: [
+        {
+          id: 'criterios-ingreso-gine',
+          title: 'Criterios de ingreso o derivación urgente',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Embarazo positivo con dolor/sangrado, síncope, hipotensión o signos de abdomen agudo.',
+            'Torsión probable, sangrado significativo, piosálpinx, absceso ovárico/tuboovárico o reacción peritoneal.',
+            'EPI con embarazo, náuseas/vómitos, temperatura >=39 °C, inmunodepresión, diagnóstico incierto o no respuesta.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'Estabilizar primero; analgesia segura y antibiótico concreto solo si EPI leve ambulatoria.',
+      points: [
+        'Ectópico inestable: decúbito, dos vías venosas, cristaloide según hemodinámica y ginecología/quirófano.',
+        'Paracetamol 1 g IV cada 6 h o metamizol 2 g IV/IM si encaja embarazo y seguridad.',
+        'EPI leve ambulatoria: ceftriaxona 250 mg IM dosis única + doxiciclina 100 mg VO cada 12 h + metronidazol 500 mg VO cada 12 h 14 días.',
+        'Si EPI complicada, embarazo, absceso, vómitos o mala evolución: ingreso y pauta parenteral por ginecología.',
+      ],
+      treatmentGroups: [
+        {
+          id: 'estabilizacion-gine',
+          title: 'Ectópico/torsión/sangrado',
+          cards: [
+            {
+              id: 'gine-estabilizacion',
+              title: 'Estabilización inicial',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Si shock, síncope, ectópico roto probable, sangrado o abdomen agudo.',
+              items: [
+                'Dosis: no farmacológica.',
+                'Vía: dos vías venosas si inestable; cristaloide según situación hemodinámica.',
+                'Frecuencia: monitorización continua si shock o sangrado.',
+                'Evitar si: no retrasar ginecología/quirófano por pruebas secundarias.',
+                'Reevaluar: TA, FC, perfusión, dolor, sangrado, Hb y necesidad de hemoderivados/procedimiento.',
+              ],
+            },
+            {
+              id: 'gine-paracetamol',
+              title: 'Paracetamol IV',
+              type: 'treatment',
+              summary: 'Analgesia inicial si precisa vía IV.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/74477/FichaTecnica_74477.html',
+              items: [
+                'Dosis: 1 g.',
+                'Vía: IV.',
+                'Frecuencia: cada 6 h.',
+                'Máximo: 4 g/día si >50 kg sin riesgo hepatotóxico; 3 g/día si riesgo hepatotóxico.',
+                'Evitar si: hepatopatía grave o uso concomitante de paracetamol.',
+                'Reevaluar: dolor, abdomen y necesidad de ginecología urgente.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'epi-ambulatoria',
+          title: 'EPI leve ambulatoria',
+          cards: [
+            {
+              id: 'gine-ceftriaxona',
+              title: 'Ceftriaxona',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Pauta ambulatoria de EPI leve junto a doxiciclina y metronidazol.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/62639/FichaTecnica_62639.html',
+              items: [
+                'Dosis: 250 mg.',
+                'Vía: IM.',
+                'Frecuencia: dosis única.',
+                'Duración: dosis única; el resto de pauta continúa 14 días.',
+                'Evitar si: alergia a cefalosporinas/betalactámicos relevante.',
+                'Reevaluar: mejoría clínica en 48-72 h; ingresar si no mejora.',
+              ],
+            },
+            {
+              id: 'gine-doxiciclina',
+              title: 'Doxiciclina',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Pauta ambulatoria de EPI leve junto a ceftriaxona y metronidazol.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/50404/FichaTecnica_50404.html',
+              items: [
+                'Dosis: 100 mg.',
+                'Vía: VO.',
+                'Frecuencia: cada 12 h.',
+                'Duración: 14 días.',
+                'Evitar si: embarazo o alergia a tetraciclinas.',
+                'Reevaluar: adherencia, tolerancia y resultado de microbiología/ITS.',
+              ],
+            },
+            {
+              id: 'gine-metronidazol',
+              title: 'Metronidazol',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Cobertura anaerobia en EPI ambulatoria leve.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/84614/FT_84614.html',
+              items: [
+                'Dosis: 500 mg.',
+                'Vía: VO.',
+                'Frecuencia: cada 12 h.',
+                'Duración: 14 días.',
+                'Evitar si: hipersensibilidad; evitar alcohol durante tratamiento.',
+                'Reevaluar: tolerancia digestiva y respuesta en 48-72 h.',
+              ],
+            },
+          ],
+        },
+      ],
+      detailNodes: [
+        {
+          id: 'seguridad-gine',
+          title: 'Seguridad antes de tratar',
+          type: 'step',
+          severity: 'warning',
+          items: [
+            'Confirmar embarazo, alergias, función renal/hepática, sangrado, anticoagulación y gravedad antes de analgésicos o antibiótico.',
+            'No tratar ambulatoriamente EPI con embarazo, vómitos, absceso, reacción peritoneal, T >=39 °C o diagnóstico incierto.',
+            'Avisar ginecología urgente si ectópico o torsión probable, incluso con exploración inicial poco expresiva.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Alta solo con embarazo urgente descartado, estabilidad y seguimiento claro.',
+      points: [
+        'Ginecología/quirófano: ectópico inestable, torsión probable, sangrado importante o abdomen agudo.',
+        'Ingreso: EPI complicada, embarazo, absceso, vómitos, fiebre alta, mala evolución o diagnóstico incierto.',
+        'Alta: dolor leve/controlado, estable, embarazo urgente descartado si procede y plan de revisión.',
+        'Revisión en 48-72 h si EPI ambulatoria; antes si empeora.',
+      ],
+      detailNodes: [
+        {
+          id: 'alarma-gine-alta',
+          title: 'Signos de alarma',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            'Síncope, mareo intenso, sangrado, fiebre, dolor creciente, vómitos o deterioro.',
+            'Test de embarazo positivo, nueva metrorragia o dolor unilateral intenso.',
+            'No mejoría de EPI en 48-72 h o intolerancia al antibiótico.',
+          ],
+        },
+      ],
+    },
+  ],
+  sections: [
+    definitionSection(protocol),
+    {
+      id: 'que-pido',
+      title: PRIMARY_SECTION_TITLES.orders,
+      type: 'section',
+      summary: 'Embarazo, sangrado, infección e imagen si cambia conducta.',
+      children: [],
+    },
+    {
+      id: 'que-espero',
+      title: PRIMARY_SECTION_TITLES.findings,
+      type: 'section',
+      summary: 'Descartar ectópico/torsión e identificar EPI complicada.',
+      children: [],
+    },
+    {
+      id: 'tratamiento',
+      title: PRIMARY_SECTION_TITLES.treatment,
+      type: 'section',
+      summary: 'Estabilización y pautas bajo demanda.',
+      children: [],
+    },
+    {
+      id: 'seguimiento',
+      title: PRIMARY_SECTION_TITLES.followUp,
+      type: 'section',
+      summary: 'Destino según embarazo, estabilidad e infección.',
+      children: [],
+    },
+    referencesSection(protocol),
+  ],
+});
+
 const guardiaFlow = (protocol) => {
   const guardia = protocol.guardia;
 
@@ -2757,6 +3009,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'dolor-urinario') {
     return buildUrinaryAbdominalPainFlow(protocol);
+  }
+
+  if (protocol.id === 'dolor-ginecologico') {
+    return buildGynecologicAbdominalPainFlow(protocol);
   }
 
   if (protocol.guardia) {
