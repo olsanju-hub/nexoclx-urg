@@ -2250,6 +2250,279 @@ const buildVascularAbdominalPainFlow = (protocol) => ({
   ],
 });
 
+const buildInfectiousDigestiveAbdominalPainFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: brief(protocol.summary, 170),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Fiebre, diarrea, dolor localizado o mal estado: distinguir cuadro leve de sepsis/complicación.',
+      points: [
+        'GEA leve: diarrea/vómitos con tolerancia parcial, sin sangre, sin sepsis ni dolor focal intenso.',
+        'Inflamatoria/complicada: fiebre, sangre, escalofríos, dolor localizado, inmunosupresión o duración >1 semana.',
+        'Diverticulitis: dolor FII continuo, fiebre, masa/empastamiento o PCR/leucocitosis.',
+        'Alarma: sepsis, deshidratación, inmunosupresión, dolor focal intenso, peritonismo, absceso o mala evolución.',
+      ],
+      detailNodes: [
+        {
+          id: 'entrada-infeccioso-digestiva',
+          title: 'Entrada clínica',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            protocol.guardia?.clinica,
+            'No todo dolor con diarrea necesita antibiótico; primero valorar gravedad, deshidratación, foco y riesgo.',
+            'En inmunosupresión, ancianos o comorbilidad relevante, bajar umbral para analítica, imagen y observación.',
+          ].filter(Boolean),
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Analítica y microbiología solo si cambian antibiótico, ingreso o aislamiento.',
+      points: [
+        'Constantes, hidratación, diuresis y exploración abdominal seriada si dolor localizado.',
+        'Hemograma, bioquímica/creatinina, iones y PCR si gravedad, fragilidad, fiebre, sangre, ingreso o mala tolerancia.',
+        'Gasometría/lactato y hemocultivos si sepsis, shock o mala perfusión.',
+        'Coprocultivo/toxina C. difficile solo si sangre, fiebre alta, brote, inmunosupresión, antibiótico reciente o cambia conducta.',
+        'TC si diverticulitis complicada, dolor focal intenso, sepsis, inmunosupresión, absceso o mala evolución.',
+      ],
+      detailNodes: [
+        {
+          id: 'resultados-infeccioso-digestivo',
+          title: 'Resultados que cambian conducta',
+          type: 'step',
+          items: [
+            'Hipotensión, confusión, lactato elevado, oliguria o mala perfusión obligan a manejo de sepsis.',
+            'Absceso, perforación, obstrucción, peritonismo o diverticulitis complicada cambian a ingreso/cirugía.',
+            'Insuficiencia renal o deshidratación modifica fluidos, AINE y antibióticos.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Alta si leve y tolera; ingreso si sepsis, deshidratación, inmunosupresión o complicación.',
+      points: [
+        'Leve, estable, sin sangre ni alarma y tolera VO: rehidratación oral y alta con alarma.',
+        'Mala tolerancia, deshidratación, dolor persistente o diagnóstico incierto: observación y reevaluación.',
+        'Sepsis, inmunosupresión, diverticulitis complicada, absceso o peritonismo: ingreso y antibiótico/imagen.',
+        'No mostrar qSOFA como botón: no está implementada como calculadora funcional en la app.',
+      ],
+      detailNodes: [
+        {
+          id: 'criterios-ingreso-infeccioso',
+          title: 'Criterios de ingreso',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Shock, lactato elevado, confusión, oliguria o necesidad de soporte.',
+            'Deshidratación relevante, vómitos persistentes o imposibilidad de vía oral.',
+            'Inmunosupresión, edad avanzada/frágil, comorbilidad grave, absceso, perforación o peritonismo.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'Rehidratación y síntomas; antibiótico solo si diarrea inflamatoria seleccionada, sepsis o complicación.',
+      points: [
+        'Rehidratación oral si leve y tolera; vía IV si deshidratación, sepsis, vómitos persistentes o fragilidad.',
+        'Metoclopramida 10 mg IV cada 8 h si vómitos impiden hidratación o medicación oral.',
+        'Paracetamol 1 g VO/IV cada 6 h para dolor/fiebre; evitar espasmolíticos en GEA.',
+        'No antibiótico empírico en la mayoría de GEA; valorar si fiebre >38 °C, sangre, inmunosupresión, >50 años, deshidratación o >1 semana.',
+        'Sepsis/diverticulitis complicada/absceso: piperacilina-tazobactam 4/0,5 g IV cada 6-8 h y control de foco.',
+      ],
+      treatmentGroups: [
+        {
+          id: 'hidratacion-infeccioso',
+          title: 'Hidratación y soporte',
+          cards: [
+            {
+              id: 'inf-dig-rehidratacion-oral',
+              title: 'Rehidratación oral',
+              type: 'treatment',
+              severity: 'success',
+              summary: 'GEA leve/moderada si tolera y no hay shock ni vómitos incoercibles.',
+              items: [
+                'Dosis: tomas pequeñas y frecuentes; ajustar a sed, pérdidas y diuresis.',
+                'Vía: VO.',
+                'Frecuencia: continua durante las primeras horas.',
+                'Evitar si: shock, bajo nivel de conciencia, íleo, vómitos incoercibles o alto riesgo de aspiración.',
+                'Reevaluar: diuresis, sed, mareo, constantes, vómitos y tolerancia.',
+              ],
+            },
+            {
+              id: 'inf-dig-fluidoterapia-iv',
+              title: 'Cristaloide IV',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Deshidratación relevante, sepsis, mala perfusión, fragilidad o vómitos persistentes.',
+              items: [
+                'Dosis: bolos o perfusión según TA, perfusión, diuresis, iones y comorbilidad.',
+                'Vía: IV.',
+                'Frecuencia: reevaluación tras cada carga o cambio de perfusión.',
+                'Máximo: evitar sobrecarga en cardiopatía, nefropatía o fragilidad.',
+                'Reevaluar: TA, FC, diuresis, lactato, sodio/potasio y tolerancia oral.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'sintomatico-infeccioso',
+          title: 'Síntomas',
+          cards: [
+            {
+              id: 'inf-dig-metoclopramida',
+              title: 'Metoclopramida',
+              type: 'treatment',
+              summary: 'Vómitos que impiden hidratación o medicación oral.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/78556/FichaTecnica_78556.html',
+              items: [
+                'Dosis: 10 mg.',
+                'Vía: IV o IM.',
+                'Frecuencia: cada 8 h.',
+                'Máximo: 30 mg/día en adultos.',
+                'Evitar si: obstrucción/perforación digestiva, Parkinson, epilepsia o antecedente extrapiramidal relevante.',
+                'Reevaluar: vómitos, tolerancia, QT/interacciones y necesidad de observación.',
+              ],
+            },
+            {
+              id: 'inf-dig-paracetamol',
+              title: 'Paracetamol',
+              type: 'treatment',
+              summary: 'Dolor o fiebre sin datos de abdomen quirúrgico que obliguen a escalar.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/74477/FichaTecnica_74477.html',
+              items: [
+                'Dosis: 1 g.',
+                'Vía: VO o IV.',
+                'Frecuencia: cada 6 h.',
+                'Máximo: 4 g/día si >50 kg sin riesgo hepatotóxico; 3 g/día si riesgo hepatotóxico.',
+                'Evitar si: hepatopatía grave o uso concomitante de paracetamol.',
+                'Reevaluar: dolor, fiebre y aparición de focalidad/peritonismo.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'antibiotico-infeccioso',
+          title: 'Antibiótico si sepsis o complicación',
+          cards: [
+            {
+              id: 'inf-dig-piperacilina-tazobactam',
+              title: 'Piperacilina/tazobactam',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Sepsis abdominal, diverticulitis complicada, absceso o infección intraabdominal complicada.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/68080/fichatecnica_68080.html',
+              items: [
+                'Dosis: 4 g/0,5 g.',
+                'Vía: IV en perfusión.',
+                'Frecuencia: cada 6-8 h.',
+                'Máximo: ajustar por función renal; ClCr 20-40: 4/0,5 g cada 8 h; ClCr <20: 4/0,5 g cada 12 h.',
+                'Evitar si: alergia a betalactámicos; adaptar a foco, cultivo y microbiología local.',
+                'Reevaluar: lactato, fiebre, dolor, foco, cultivos si proceden, función renal y desescalada.',
+              ],
+            },
+            {
+              id: 'inf-dig-ertapenem',
+              title: 'Ertapenem',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Alternativa IV descrita para diverticulitis complicada/infección intraabdominal si encaja contexto.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/83230/FT_83230.html',
+              items: [
+                'Dosis: 1 g.',
+                'Vía: IV en perfusión.',
+                'Frecuencia: cada 24 h.',
+                'Máximo: 1 g/día en adulto.',
+                'Evitar si: alergia a carbapenémicos o sospecha de patógeno no cubierto.',
+                'Reevaluar: control de foco, función renal, cultivos y desescalada.',
+              ],
+            },
+          ],
+        },
+      ],
+      detailNodes: [
+        {
+          id: 'seguridad-infeccioso',
+          title: 'Seguridad antes de tratar',
+          type: 'step',
+          severity: 'warning',
+          items: [
+            'Evitar loperamida si diarrea inflamatoria, fiebre alta, sangre, sospecha de C. difficile, íleo o colitis grave.',
+            'Confirmar alergias, función renal, QT/interacciones, embarazo y riesgo de deshidratación antes de fármacos.',
+            'El antibiótico no sustituye drenaje/control de foco si hay absceso, perforación o peritonitis.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Alta si leve y tolera; observación/ingreso si no hay seguridad clínica.',
+      points: [
+        'Alta: cuadro leve, estable, tolera VO, sin sangre, sin sepsis, sin inmunosupresión y alarma explicada.',
+        'Observación: mala tolerancia, deshidratación leve-moderada, dolor persistente o diagnóstico incierto.',
+        'Ingreso: sepsis, inmunosupresión, deshidratación relevante, diverticulitis complicada, absceso o peritonismo.',
+        'UCI: shock, lactato elevado, hipotensión, confusión, fallo orgánico o necesidad de soporte.',
+      ],
+      detailNodes: [
+        {
+          id: 'alarma-infeccioso-alta',
+          title: 'Signos de alarma',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            'Fiebre persistente, sangre en heces, dolor progresivo/localizado o distensión.',
+            'Vómitos persistentes, sed intensa, mareo, oliguria o deterioro general.',
+            'No mejoría, inmunosupresión o reaparición de fiebre/dolor tras alta.',
+          ],
+        },
+      ],
+    },
+  ],
+  sections: [
+    definitionSection(protocol),
+    {
+      id: 'que-pido',
+      title: PRIMARY_SECTION_TITLES.orders,
+      type: 'section',
+      summary: 'Analítica, microbiología e imagen solo si cambian conducta.',
+      children: [],
+    },
+    {
+      id: 'que-espero',
+      title: PRIMARY_SECTION_TITLES.findings,
+      type: 'section',
+      summary: 'Distinguir leve de sepsis, deshidratación o complicación.',
+      children: [],
+    },
+    {
+      id: 'tratamiento',
+      title: PRIMARY_SECTION_TITLES.treatment,
+      type: 'section',
+      summary: 'Hidratación, síntomas y antibiótico selectivo.',
+      children: [],
+    },
+    {
+      id: 'seguimiento',
+      title: PRIMARY_SECTION_TITLES.followUp,
+      type: 'section',
+      summary: 'Destino según tolerancia, riesgo y complicación.',
+      children: [],
+    },
+    referencesSection(protocol),
+  ],
+});
+
 const guardiaFlow = (protocol) => {
   const guardia = protocol.guardia;
 
@@ -3274,6 +3547,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'dolor-vascular') {
     return buildVascularAbdominalPainFlow(protocol);
+  }
+
+  if (protocol.id === 'dolor-infeccioso-digestivo') {
+    return buildInfectiousDigestiveAbdominalPainFlow(protocol);
   }
 
   if (protocol.guardia) {
