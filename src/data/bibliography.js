@@ -59,6 +59,11 @@ export const bibliographyCatalog = {
     title: 'WSES 2020: manejo de la diverticulitis colónica aguda en urgencias',
     shortTitle: 'WSES Diverticulitis 2020',
   },
+  'wses-ami-2022': {
+    id: 'wses-ami-2022',
+    title: 'WSES 2022: actualización de las guías de isquemia mesentérica aguda',
+    shortTitle: 'WSES Isquemia mesentérica 2022',
+  },
   'acg-pancreatitis-2024': {
     id: 'acg-pancreatitis-2024',
     title: 'American College of Gastroenterology guideline 2024: manejo de la pancreatitis aguda',

@@ -1993,6 +1993,263 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
   ],
 });
 
+const buildVascularAbdominalPainFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: brief(protocol.summary, 170),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Dolor abdominal brusco, desproporcionado o con shock: pensar en isquemia, aneurisma o disección.',
+      points: [
+        'Isquemia mesentérica: dolor intenso/desproporcionado, FA, embolia, aterosclerosis, lactato o acidosis.',
+        'Aneurisma/disección: dolor súbito abdominal/lumbar, síncope, hipotensión, masa pulsátil o riesgo vascular.',
+        'No tranquilizarse por exploración pobre si el dolor es desproporcionado o el paciente está anticoagulado/frágil.',
+        'Alarma: shock, síncope, lactato elevado, acidosis, peritonismo, sangrado o deterioro.',
+      ],
+      detailNodes: [
+        {
+          id: 'entrada-vascular',
+          title: 'Entrada clínica',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            protocol.guardia?.clinica,
+            'La sospecha vascular es tiempo-dependiente: avisar vascular/cirugía/UCI desde la valoración inicial.',
+            'Mantener alta sospecha en FA, aterosclerosis, edad avanzada, bajo gasto, vasopresores o dolor posprandial previo.',
+          ].filter(Boolean),
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Confirmar perfusión y pedir angio-TC sin retrasar soporte ni aviso especializado.',
+      points: [
+        'Monitorización, constantes, ECG si FA/riesgo cardiaco, dos vías venosas si inestable.',
+        'Gasometría venosa/arterial con lactato, hemograma, coagulación, bioquímica/creatinina, iones y grupo/reserva si shock.',
+        'Angio-TC abdominal urgente si sospecha vascular y situación lo permite.',
+        'Ecografía a pie de cama puede orientar aneurisma/hemoperitoneo, pero no descarta isquemia mesentérica.',
+      ],
+      detailNodes: [
+        {
+          id: 'resultados-vascular',
+          title: 'Resultados que cambian conducta',
+          type: 'step',
+          items: [
+            'Lactato/acidosis o deterioro elevan prioridad, pero un lactato normal no excluye isquemia mesentérica inicial.',
+            'Creatinina condiciona contraste, pero no debe bloquear angio-TC si la sospecha vital es alta.',
+            'Peritonismo o neumatosis/necrosis sugieren laparotomía urgente y control de foco.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Inestable o sospecha alta: circuito crítico vascular, no observación pasiva.',
+      points: [
+        'Sospecha de isquemia mesentérica: angio-TC urgente y equipo interdisciplinar para reperfusión/cirugía.',
+        'Peritonitis, shock o necrosis probable: cirugía urgente; UCI si soporte hemodinámico o acidosis.',
+        'Aneurisma roto/disección sospechada: vascular/cirugía y control hemodinámico según protocolo local.',
+        'No iniciar anticoagulación si sangrado activo, disección/aneurisma roto probable o contraindicación: decidir con vascular/cirugía.',
+      ],
+      detailNodes: [
+        {
+          id: 'criterios-vascular',
+          title: 'Criterios de máxima prioridad',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Dolor desproporcionado + FA/riesgo embolígeno.',
+            'Hipotensión, síncope, anemia aguda o sospecha de rotura aneurismática.',
+            'Acidosis, lactato elevado, peritonismo o deterioro durante observación.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'Soporte, analgesia, antibiótico/heparina solo si el escenario vascular lo justifica.',
+      points: [
+        'Dos vías venosas, monitorización, oxígeno si precisa y cristaloide si shock evitando sobrecarga.',
+        'Morfina 2,5-15 mg IV lenta titulada si dolor intenso y monitorización.',
+        'Isquemia mesentérica aguda: antibiótico amplio precoz; piperacilina/tazobactam 4/0,5 g IV cada 6-8 h.',
+        'Heparina sódica IV si isquemia mesentérica/embolismo arterial y no contraindicación: bolo 80 UI/kg y 18 UI/kg/h ajustado a TTPA.',
+      ],
+      treatmentGroups: [
+        {
+          id: 'soporte-vascular',
+          title: 'Soporte inicial',
+          cards: [
+            {
+              id: 'vascular-soporte',
+              title: 'Monitorización + dos vías venosas',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Sospecha vascular, shock, síncope, acidosis o dolor desproporcionado.',
+              items: [
+                'Dosis: no farmacológica.',
+                'Vía: dos vías venosas periféricas; valorar vía central/arterial en críticos.',
+                'Frecuencia: monitorización continua si inestable.',
+                'Evitar si: no retrasar angio-TC ni valoración vascular/cirugía.',
+                'Reevaluar: TA, FC, perfusión, diuresis, dolor, lactato y necesidad de UCI.',
+              ],
+            },
+            {
+              id: 'vascular-cristaloide',
+              title: 'Cristaloide IV',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Shock o hipoperfusión, con objetivos de perfusión y control de sobrecarga.',
+              items: [
+                'Dosis: bolos pequeños según TA, perfusión, lactato y comorbilidad.',
+                'Vía: IV.',
+                'Frecuencia: reevaluación tras cada bolo.',
+                'Máximo: evitar sobrecarga que empeore perfusión intestinal o respiración.',
+                'Reevaluar: PAM, diuresis, lactato, crepitantes y necesidad de vasopresor/UCI.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'dolor-vascular-tratamiento',
+          title: 'Dolor intenso',
+          cards: [
+            {
+              id: 'vascular-morfina',
+              title: 'Morfina',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Dolor vascular intenso con monitorización y reevaluación frecuente.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/42221/FichaTecnica_42221.html',
+              items: [
+                'Dosis: 2,5-15 mg titulados según respuesta.',
+                'Vía: IV lenta durante 4-5 min.',
+                'Frecuencia: individualizar; titular con dosis pequeñas y reevaluación.',
+                'Máximo: individualizar según respuesta, edad, función renal/respiratoria y sedación.',
+                'Evitar si: depresión respiratoria, hipotensión no controlada, bajo nivel de conciencia o alto riesgo sin monitorización.',
+                'Reevaluar: dolor, FR, SatO2, TA, sedación y necesidad de antídoto/soporte.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'isquemia-mesenterica',
+          title: 'Isquemia mesentérica aguda',
+          cards: [
+            {
+              id: 'vascular-piperacilina-tazobactam',
+              title: 'Piperacilina/tazobactam',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Antibiótico amplio precoz en isquemia mesentérica aguda o sepsis abdominal vascular.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/68080/fichatecnica_68080.html',
+              items: [
+                'Dosis: 4 g/0,5 g.',
+                'Vía: IV en perfusión.',
+                'Frecuencia: cada 6-8 h.',
+                'Máximo: ajustar por función renal; ClCr 20-40: 4/0,5 g cada 8 h; ClCr <20: 4/0,5 g cada 12 h.',
+                'Evitar si: alergia a betalactámicos; adaptar a microbiología local.',
+                'Reevaluar: control de foco, lactato, función renal, cultivos si sepsis y desescalada.',
+              ],
+            },
+            {
+              id: 'vascular-heparina-sodica',
+              title: 'Heparina sódica IV',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Si isquemia mesentérica/embolismo arterial y no hay contraindicación hemorrágica.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/56029/FichaTecnica_56029.html',
+              items: [
+                'Dosis: bolo inicial 80 UI/kg IV o 5.000 UI independientemente del peso.',
+                'Vía: IV.',
+                'Frecuencia/perfusión: 18 UI/kg/h o 1.300 UI/h, ajustando a TTPA.',
+                'Máximo: objetivo TTPA 1,5-2,5 veces control; individualizar por protocolo local.',
+                'Evitar si: sangrado activo, aneurisma roto/disección con hemorragia probable, cirugía inmediata sin consenso o contraindicación.',
+                'Reevaluar: TTPA, sangrado, plaquetas, necesidad de revascularización y decisión vascular/cirugía.',
+              ],
+            },
+          ],
+        },
+      ],
+      detailNodes: [
+        {
+          id: 'seguridad-vascular',
+          title: 'Seguridad antes de anticoagular',
+          type: 'step',
+          severity: 'warning',
+          items: [
+            'Confirmar escenario: isquemia mesentérica/embolismo arterial frente a aneurisma roto, disección o sangrado.',
+            'Revisar anticoagulación previa, plaquetas, coagulación, sangrado activo, cirugía inmediata y función renal.',
+            'La heparina no sustituye angio-TC, revascularización, laparotomía ni control de foco si están indicados.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Ingreso urgente; UCI si inestable, acidosis, lactato elevado o soporte.',
+      points: [
+        'Ingreso urgente en todo dolor vascular probable aunque mejore inicialmente.',
+        'Vascular/cirugía: isquemia mesentérica, aneurisma, disección, trombosis/embolia visceral o peritonismo.',
+        'UCI/Críticos: shock, lactato/acidosis, hipoxemia, vasopresor, sangrado o fallo orgánico.',
+        'No alta desde urgencias si persiste sospecha vascular o no se ha completado estudio/valoración especializada.',
+      ],
+      detailNodes: [
+        {
+          id: 'seguimiento-vascular',
+          title: 'Reevaluación',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Control seriado de dolor, abdomen, perfusión, TA, FC, diuresis, lactato y gasometría.',
+            'Escalar ante dolor creciente, defensa, hipotensión, acidosis o aumento de lactato.',
+            'Documentar tiempos: sospecha, angio-TC, aviso a vascular/cirugía y tratamiento inicial.',
+          ],
+        },
+      ],
+    },
+  ],
+  sections: [
+    definitionSection(protocol),
+    {
+      id: 'que-pido',
+      title: PRIMARY_SECTION_TITLES.orders,
+      type: 'section',
+      summary: 'Lactato, función renal, coagulación y angio-TC urgente.',
+      children: [],
+    },
+    {
+      id: 'que-espero',
+      title: PRIMARY_SECTION_TITLES.findings,
+      type: 'section',
+      summary: 'Criterios de isquemia, rotura, shock o cirugía.',
+      children: [],
+    },
+    {
+      id: 'tratamiento',
+      title: PRIMARY_SECTION_TITLES.treatment,
+      type: 'section',
+      summary: 'Soporte, antibiótico/heparina si procede y especialista.',
+      children: [],
+    },
+    {
+      id: 'seguimiento',
+      title: PRIMARY_SECTION_TITLES.followUp,
+      type: 'section',
+      summary: 'Ingreso urgente y UCI si inestable.',
+      children: [],
+    },
+    referencesSection(protocol),
+  ],
+});
+
 const guardiaFlow = (protocol) => {
   const guardia = protocol.guardia;
 
@@ -3013,6 +3270,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'dolor-ginecologico') {
     return buildGynecologicAbdominalPainFlow(protocol);
+  }
+
+  if (protocol.id === 'dolor-vascular') {
+    return buildVascularAbdominalPainFlow(protocol);
   }
 
   if (protocol.guardia) {
