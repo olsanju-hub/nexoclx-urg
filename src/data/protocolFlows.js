@@ -885,6 +885,295 @@ const buildPneumoniaFlow = (protocol) => ({
   ],
 });
 
+const buildSurgicalAbdomenFlow = (protocol) => ({
+  id: protocol.id,
+  title: protocol.longTitle ?? protocol.title,
+  specialty: protocol.section,
+  summary: brief(protocol.summary, 170),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Dolor abdominal con datos de irritación, obstrucción, perforación, sepsis o deterioro.',
+      points: [
+        'Pensar en abdomen quirúrgico ante defensa, rebote, dolor progresivo o dolor súbito intenso.',
+        'Apendicitis, perforación, obstrucción, diverticulitis complicada, peritonitis y hernia complicada.',
+        'Alarma: inestabilidad, sepsis, lactato elevado, neumoperitoneo, peritonismo o deterioro.',
+      ],
+      detailNodes: [
+        {
+          id: 'entrada-quirurgica',
+          title: 'Entrada clínica',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            protocol.guardia?.clinica,
+            'No tranquilizarse por exploración pobre en ancianos, inmunodeprimidos, alcohol/drogas, corticoides o analgesia previa.',
+            'Reevaluar abdomen y constantes de forma seriada si el diagnóstico inicial no es claro.',
+          ].filter(Boolean),
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Analítica dirigida e imagen solo si cambia cirugía, ingreso o diagnóstico diferencial.',
+      points: [
+        'Hemograma, bioquímica con creatinina/electrolitos, perfil hepático si procede y PCR/procalcitonina si sospecha infección.',
+        'Gasometría venosa con lactato si sepsis, shock, acidosis, insuficiencia renal o sospecha vascular.',
+        'Orina/tira reactiva y test de embarazo si procede; ECG/troponina si epigastralgia o riesgo cardiovascular.',
+        'TC abdominal si duda grave, diverticulitis, obstrucción, perforación, apendicitis con eco no concluyente o complicación.',
+      ],
+      detailNodes: [
+        {
+          id: 'imagen-abdomen-quirurgico',
+          title: 'Imagen que cambia conducta',
+          type: 'step',
+          items: [
+            'Rx tórax/abdomen si sospecha neumoperitoneo, obstrucción o cuerpo extraño.',
+            'Ecografía si colecistitis, hidronefrosis, aneurisma, hemoperitoneo, ectópico o irritación peritoneal sin origen claro.',
+            'TC es la prueba más sensible en la mayoría de causas de abdomen agudo no obstétrico cuando el paciente está estable.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Separar observación segura de cirugía urgente, reanimación y UCI.',
+      points: [
+        'Peritonitis franca, neumoperitoneo, isquemia, sepsis sin foco alternativo o shock refractario: cirugía urgente.',
+        'Estable pero sin diagnóstico claro: observación, estudio dirigido y reevaluación por cirugía.',
+        'Diverticulitis no complicada radiológica y paciente sano/estable: valorar alta; complicada o grave: ingreso y antibiótico IV.',
+        'No usar Alvarado como botón: no hay calculadora implementada y no sustituye valoración quirúrgica.',
+      ],
+      detailNodes: [
+        {
+          id: 'criterios-escalada-abdomen',
+          title: 'Criterios que obligan a escalar',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Inestabilidad o repercusión hemodinámica.',
+            'Neumoperitoneo o sospecha de perforación de víscera hueca.',
+            'Dolor con signos de sepsis sin otra explicación.',
+            'Sospecha de isquemia mesentérica.',
+            'Obstrucción, hernia complicada o deterioro clínico.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'Dieta absoluta, vía venosa, analgesia temprana, antiemético si precisa y antibiótico solo si indicado.',
+      points: [
+        'Dieta absoluta y vía venosa si cirugía, obstrucción, perforación, vómitos, sepsis o dolor moderado-grave.',
+        'Paracetamol 1 g IV cada 6 h o metamizol 2 g IV cada 6 h si encaja seguridad.',
+        'Metoclopramida 10 mg IM/IV cada 8 h si vómitos y no precisa sonda nasogástrica.',
+        'Antibiótico IV si indicación quirúrgica/infección intraabdominal complicada: piperacilina-tazobactam 4/0,5 g IV cada 8 h; cada 6 h si muy grave.',
+      ],
+      treatmentGroups: [
+        {
+          id: 'medidas-iniciales',
+          title: 'Medidas iniciales en Urgencias',
+          cards: [
+            {
+              id: 'abdomen-dieta-via',
+              title: 'Dieta absoluta + vía venosa',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Si cirugía probable, obstrucción, perforación, vómitos, sepsis o dolor moderado-grave.',
+              items: [
+                'Dosis: no farmacológica.',
+                'Vía: venosa periférica si precisa analgesia IV, fluidos, antibiótico o quirófano.',
+                'Frecuencia: reevaluación seriada tras cada intervención.',
+                'Evitar si: no aplica.',
+                'Reevaluar: abdomen, dolor, constantes, diuresis y lactato si gravedad.',
+              ],
+            },
+            {
+              id: 'abdomen-sonda',
+              title: 'Sonda nasogástrica',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Si obstrucción de intestino delgado o dilatación gástrica aguda.',
+              items: [
+                'Dosis: descompresión con aspiración continua si está indicada.',
+                'Vía: nasogástrica.',
+                'Frecuencia: mantener mientras haya indicación y control clínico.',
+                'Evitar si: no indicada o contraindicación local.',
+                'Reevaluar: vómitos, distensión, dolor y balance.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'analgesia-antiemetico',
+          title: 'Analgesia y vómitos',
+          cards: [
+            {
+              id: 'abdomen-paracetamol',
+              title: 'Paracetamol IV',
+              type: 'treatment',
+              summary: 'Dolor abdominal moderado si la vía oral no es adecuada.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/74477/FichaTecnica_74477.html',
+              items: [
+                'Dosis: 1 g.',
+                'Vía: IV.',
+                'Frecuencia: cada 6 h; intervalo mínimo 4 h si función renal normal.',
+                'Máximo: 4 g/día si >50 kg sin riesgo hepatotóxico; 3 g/día si riesgo hepatotóxico.',
+                'Evitar si: hepatopatía grave o sobredosis/uso concomitante de paracetamol.',
+                'Reevaluar: dolor y exploración; la analgesia no debe retrasar la búsqueda de causa.',
+              ],
+            },
+            {
+              id: 'abdomen-metamizol',
+              title: 'Metamizol magnésico IV',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Alternativa analgésica IV si encaja seguridad individual.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/63430/FT_63430.html',
+              items: [
+                'Dosis: 2 g.',
+                'Vía: IV diluido en 100 mL de suero fisiológico.',
+                'Frecuencia: cada 6 h.',
+                'Máximo: 4 g/día habitual; ficha técnica permite hasta 5 g/día si necesario.',
+                'Evitar si: alergia a pirazolonas, agranulocitosis previa, embarazo avanzado o inestabilidad sin monitorización.',
+                'Reevaluar: dolor, tensión arterial y aparición de reacción adversa.',
+              ],
+            },
+            {
+              id: 'abdomen-metoclopramida',
+              title: 'Metoclopramida',
+              type: 'treatment',
+              summary: 'Náuseas/vómitos si no está indicada la sonda nasogástrica.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/78556/FichaTecnica_78556.html',
+              items: [
+                'Dosis: 10 mg.',
+                'Vía: IM o IV.',
+                'Frecuencia: cada 8 h.',
+                'Máximo: 30 mg/día en adultos.',
+                'Evitar si: obstrucción/perforación digestiva, hemorragia digestiva, Parkinson o antecedente extrapiramidal relevante.',
+                'Reevaluar: vómitos, tolerancia, QT/interacciones y necesidad de imagen o sonda.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'antibiotico-intraabdominal',
+          title: 'Antibiótico si abdomen quirúrgico/infección complicada',
+          cards: [
+            {
+              id: 'abdomen-piperacilina-tazobactam',
+              title: 'Piperacilina/tazobactam',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Infección intraabdominal complicada, sepsis o gravedad; adaptar a protocolo local.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/68080/fichatecnica_68080.html',
+              items: [
+                'Dosis: 4 g/0,5 g.',
+                'Vía: IV en perfusión.',
+                'Frecuencia: cada 8 h; cada 6 h si infección particularmente grave.',
+                'Máximo: ajustar por función renal; ClCr 20-40: 4/0,5 g cada 8 h; ClCr <20: 4/0,5 g cada 12 h.',
+                'Evitar si: alergia a betalactámicos; revisar sodio y riesgo de BLEE según contexto.',
+                'Reevaluar: cultivos si proceden, foco quirúrgico, función renal y desescalada.',
+              ],
+            },
+            {
+              id: 'abdomen-ertapenem',
+              title: 'Ertapenem',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Alternativa IV descrita para infección intraabdominal cuando encaja microbiología/local.',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/83230/FT_83230.html',
+              items: [
+                'Dosis: 1 g.',
+                'Vía: IV en perfusión.',
+                'Frecuencia: cada 24 h.',
+                'Máximo: 1 g/día en adulto.',
+                'Evitar si: alergia a carbapenémicos o sospecha de patógeno no cubierto.',
+                'Reevaluar: necesidad de control de foco, función renal y desescalada.',
+              ],
+            },
+          ],
+        },
+      ],
+      detailNodes: [
+        {
+          id: 'seguridad-tratamiento-abdomen',
+          title: 'Seguridad antes de prescribir',
+          type: 'step',
+          severity: 'warning',
+          items: [
+            'Confirmar alergias, embarazo posible, función renal/hepática, sangrado/anticoagulación y fragilidad.',
+            'No iniciar antibiótico en todo dolor abdominal: reservar para indicación quirúrgica, sepsis, peritonitis, perforación o infección intraabdominal complicada.',
+            'No retrasar quirófano por pruebas secundarias si hay inestabilidad o peritonitis franca.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Alta solo si estable, tolera, diagnóstico benigno probable y reevaluación clara.',
+      points: [
+        'Observación si dolor agudo estable pero diagnóstico incierto o requiere reevaluación por cirugía.',
+        'Ingreso/cirugía si abdomen quirúrgico probable, peritonitis, obstrucción, perforación o mala evolución.',
+        'UCI/Críticos si shock, sepsis grave, lactato elevado, acidosis o necesidad de soporte.',
+        'Alta solo con constantes normales, vómitos controlados, tolerancia oral y signos de alarma explicados.',
+      ],
+      detailNodes: [
+        {
+          id: 'signos-alarma-alta-abdomen',
+          title: 'Signos de alarma al alta',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            'Dolor que se focaliza o empeora al toser/estornudar, o no mejora en 24 h.',
+            'Intolerancia oral o disminución de diuresis.',
+            'Síncope, sangre en vómitos/heces, fiebre persistente, escalofríos o distensión.',
+            'Cualquier síntoma nuevo o empeoramiento.',
+          ],
+        },
+      ],
+    },
+  ],
+  sections: [
+    definitionSection(protocol),
+    {
+      id: 'que-pido',
+      title: PRIMARY_SECTION_TITLES.orders,
+      type: 'section',
+      summary: 'Analítica dirigida e imagen si cambia conducta.',
+      children: [],
+    },
+    {
+      id: 'que-espero',
+      title: PRIMARY_SECTION_TITLES.findings,
+      type: 'section',
+      summary: 'Criterios de gravedad y decisión quirúrgica.',
+      children: [],
+    },
+    {
+      id: 'tratamiento',
+      title: PRIMARY_SECTION_TITLES.treatment,
+      type: 'section',
+      summary: 'Pautas iniciales y tratamiento bajo demanda.',
+      children: [],
+    },
+    {
+      id: 'seguimiento',
+      title: PRIMARY_SECTION_TITLES.followUp,
+      type: 'section',
+      summary: 'Destino y signos de alarma.',
+      children: [],
+    },
+    referencesSection(protocol),
+  ],
+});
+
 const guardiaFlow = (protocol) => {
   const guardia = protocol.guardia;
 
@@ -1889,6 +2178,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'neumonia-comunidad') {
     return buildPneumoniaFlow(protocol);
+  }
+
+  if (protocol.id === 'dolor-abdomen-quirurgico') {
+    return buildSurgicalAbdomenFlow(protocol);
   }
 
   if (protocol.guardia) {
