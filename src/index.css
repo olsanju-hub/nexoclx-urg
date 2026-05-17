@@ -47,6 +47,12 @@
     box-sizing: border-box;
   }
 
+  *,
+  *::before,
+  *::after {
+    min-width: 0;
+  }
+
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
@@ -60,6 +66,22 @@
       linear-gradient(180deg, #f7f8fb 0%, #eef1f7 100%);
     color: var(--text);
     overflow-x: hidden;
+  }
+
+  p,
+  li,
+  dd,
+  dt,
+  h1,
+  h2,
+  h3,
+  h4,
+  button,
+  input,
+  select,
+  a,
+  span {
+    overflow-wrap: break-word;
   }
 
   body,
@@ -345,6 +367,7 @@
     display: flex;
     width: 100%;
     min-width: 0;
+    min-height: 3.4rem;
     align-items: center;
     justify-content: space-between;
     gap: 0.72rem;
@@ -381,10 +404,9 @@
 
   .specialty-chip-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.45rem;
-    overflow-x: auto;
-    padding-bottom: 0.1rem;
-    scrollbar-width: none;
+    overflow-x: visible;
   }
 
   .home-specialty-grid {
@@ -399,6 +421,8 @@
 
   .specialty-chip {
     flex: 0 0 auto;
+    max-width: 100%;
+    min-height: 2.75rem;
     border: 1px solid rgba(60, 60, 67, 0.16);
     border-radius: 1.2rem;
     background: rgba(255, 255, 255, 0.92);
@@ -406,7 +430,8 @@
     padding: 0.74rem 0.95rem;
     font-size: 0.82rem;
     font-weight: 700;
-    white-space: nowrap;
+    line-height: 1.18;
+    white-space: normal;
     transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
   }
 
@@ -498,6 +523,7 @@
   .list-row {
     display: flex;
     width: 100%;
+    min-height: 3.5rem;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
@@ -514,6 +540,11 @@
       box-shadow 180ms ease;
   }
 
+  .list-row > div,
+  .protocol-compact-card > div {
+    min-width: 0;
+  }
+
   .list-row:hover {
     transform: translateY(-1px);
     border-color: rgba(0, 113, 227, 0.22);
@@ -523,6 +554,7 @@
 
   .app-input {
     width: 100%;
+    min-height: 2.9rem;
     border: 1px solid var(--line);
     border-radius: 1rem;
     background: #fff;
@@ -717,8 +749,8 @@
   }
 
   .flow-sections {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 0.65rem;
     padding: 0.65rem;
     max-width: 100%;
@@ -1042,12 +1074,17 @@
     display: flex;
     width: 100%;
     min-width: 0;
+    min-height: 4rem;
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.75rem;
     background: transparent;
     padding: 0.86rem;
     text-align: left;
+  }
+
+  .decision-panel-card-button > span:first-child {
+    min-width: 0;
   }
 
   .decision-panel-card-title {
@@ -1114,6 +1151,7 @@
 
   .pauta-card {
     min-width: 0;
+    width: 100%;
     border: 1px solid var(--line);
     border-left: 3px solid var(--accent-500);
     border-radius: 0.9rem;
@@ -1132,7 +1170,7 @@
   .pauta-card-header {
     display: flex;
     min-width: 0;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.58rem;
   }
 
@@ -1148,6 +1186,7 @@
   .pauta-card-link {
     color: inherit;
     text-decoration: none;
+    overflow-wrap: anywhere;
   }
 
   .pauta-card-link:hover {
@@ -1174,21 +1213,23 @@
   }
 
   .pauta-card-list {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 0.38rem;
     margin: 0.62rem 0 0;
   }
 
   .pauta-card-row {
-    display: grid;
-    grid-template-columns: minmax(5.6rem, 0.4fr) minmax(0, 1fr);
-    gap: 0.5rem;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.16rem;
     border-top: 1px solid var(--line);
     padding-top: 0.38rem;
   }
 
   .pauta-card-row-full {
-    grid-template-columns: minmax(0, 1fr);
+    display: block;
   }
 
   .pauta-card-row dt {
@@ -1201,8 +1242,8 @@
   .pauta-card-row dd {
     margin: 0;
     color: var(--text-soft);
-    font-size: 0.78rem;
-    line-height: 1.34;
+    font-size: 0.82rem;
+    line-height: 1.38;
     overflow-wrap: break-word;
   }
 }
@@ -1229,8 +1270,8 @@
     }
 
     .flow-sections {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
+      display: flex;
+      flex-direction: column;
     }
   }
 }
@@ -1337,19 +1378,6 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .flow-sections {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: start;
-    }
-
-    .flow-section {
-      min-width: 0;
-    }
-
-    .flow-section:last-child {
-      grid-column: 1 / -1;
-    }
-
     .decision-panel-grid {
       display: flex;
       flex-direction: column;
@@ -1361,22 +1389,13 @@
     }
 
     .pauta-card-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
     }
   }
 }
 
 @media (min-width: 1024px) {
   @layer components {
-    .flow-sections {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      align-items: start;
-    }
-
-    .flow-section:last-child {
-      grid-column: 1 / -1;
-    }
-
     .decision-panel-grid {
       display: flex;
       flex-direction: column;
@@ -1388,7 +1407,7 @@
     }
 
     .pauta-card-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
     }
   }
 }
@@ -1461,8 +1480,8 @@
   }
 
   .flow-sections {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) !important;
+    display: flex !important;
+    flex-direction: column !important;
     align-items: stretch !important;
   }
 
@@ -1506,24 +1525,24 @@
   }
 
   .flow-sections {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    align-items: start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
   }
 
   .flow-section:last-child {
-    grid-column: 1 / -1 !important;
+    grid-column: auto !important;
   }
 }
 
 @media (min-width: 1024px) {
   .flow-sections {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    align-items: start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
   }
 
   .flow-section:last-child {
-    grid-column: 1 / -1 !important;
+    grid-column: auto !important;
   }
 }
