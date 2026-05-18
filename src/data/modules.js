@@ -127,6 +127,24 @@ const rcukAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =
     note,
   });
 
+const ginaAsthmaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gina-asma-2025',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const gemaAsthmaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gema-asma',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -379,6 +397,11 @@ export const protocolSpecialties = [
     id: 'infecciosas',
     title: 'Infecciosas',
     note: 'Neumonía, sepsis y otros síndromes infecciosos.',
+  },
+  {
+    id: 'respiratorio',
+    title: 'Respiratorio',
+    note: 'Asma, EPOC y otros cuadros respiratorios urgentes.',
   },
   {
     id: 'urgencias',
@@ -738,6 +761,40 @@ export const motivoConsultaModules = [
         verifiedPages: [1],
         pdfPages: [1],
         note: 'Tratamiento urgente y repetición de adrenalina IM.',
+      }),
+    ],
+  },
+  {
+    id: 'asma-exacerbacion',
+    title: 'Crisis asmática',
+    shortTitle: 'Asma',
+    chapter: 'Cap. 40 + GINA/GEMA',
+    section: 'Respiratorio',
+    specialtyId: 'respiratorio',
+    verifiedPage: 290,
+    pdfPage: 315,
+    status: 'implementado',
+    implemented: true,
+    summary: 'Gravedad, PEF si disponible, broncodilatadores, corticoide precoz y destino de la crisis asmática.',
+    bibliography: [
+      referenceEntry({
+        id: 'asma-murillo-module',
+        indexPage: 290,
+        verifiedPage: 290,
+        pdfPage: 315,
+        note: 'Capítulo base de ataque de asma en urgencias.',
+      }),
+      ginaAsthmaEntry({
+        id: 'asma-gina-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia internacional actual para exacerbaciones asmáticas.',
+      }),
+      gemaAsthmaEntry({
+        id: 'asma-gema-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia española para clasificación y manejo de crisis asmática.',
       }),
     ],
   },

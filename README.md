@@ -266,6 +266,11 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Atropina | Bradicardia sintomática | Bradicardias | Implementado | ESC Bradicardias 2021 + CIMA. |
 | Amiodarona IV | QRS ancho / TV | Arritmias ventriculares | Implementado | ESC Arritmias ventriculares 2022 + CIMA. |
 | Sulfato de magnesio IV | TV polimórfica / torsades | Arritmias ventriculares | Implementado | ESC Arritmias ventriculares 2022 + Murillo 7.ª ed. |
+| Salbutamol | Broncodilatador SABA | Crisis asmática | Implementado | Murillo 7.ª ed. + GINA/GEMA + CIMA. |
+| Bromuro de ipratropio | Broncodilatador SAMA | Crisis asmática | Implementado | Murillo 7.ª ed. + GEMA + CIMA. |
+| Prednisona | Corticoide sistémico | Crisis asmática | Implementado | Murillo 7.ª ed. + GINA + CIMA. |
+| Hidrocortisona | Corticoide IV | Crisis asmática | Implementado | Murillo 7.ª ed. + CIMA. |
+| Sulfato de magnesio IV | Rescate broncodilatador | Crisis asmática | Implementado | Murillo 7.ª ed. + GINA + CIMA. |
 
 ### Plantillas de imagen
 
@@ -292,6 +297,8 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | *EAU Guidelines on Urological Infections, edición 2025* | Activa · corroboración urológica | Referencia textual para pielonefritis, ITU complicada y obstrucción infectada. |
 | *ACOG Practice Bulletin No. 193: Tubal Ectopic Pregnancy, 2018; reafirmado 2025* | Activa · corroboración ginecológica | Referencia textual para dolor pélvico con sospecha de ectópico. |
 | *Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021* | Activa · corroboración sepsis | Referencia textual para sepsis, shock y deterioro abdominal. |
+| *Global Initiative for Asthma. Global Strategy for Asthma Management and Prevention, 2025* | Activa · corroboración asma | Referencia textual para exacerbaciones asmáticas, gravedad y tratamiento inicial. |
+| *Guía Española para el Manejo del Asma* | Activa · corroboración asma | Referencia textual española para clasificación y manejo de crisis asmática. |
 
 ## Índice clínico comprobado
 
@@ -322,6 +329,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Crisis epilépticas | Cap. 63 | 435 | 435 | 460 | Auditado | Sin discrepancia. |
 | Ictus | Cap. 64 | 442 | 442 | 467 | Auditado | El arranque conceptual está en la página indexada; el rótulo del capítulo aparece en la siguiente. |
 | Sepsis | Cap. 107 | 640 | 640 | 665 | Auditado | Sin discrepancia. |
+| Ataque de asma | Cap. 40 | 290 | 290 | 315 | Implementado | Crisis asmática integrada como ficha clínica respiratoria. |
 
 ## Bitácora del proyecto
 
@@ -347,6 +355,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | 2026-04-05 | Corrección de icono PWA | PWA / branding | Se unificó el icono interno y externo y se añadieron `manifest`, `apple-touch-icon` y `service worker` para que la instalación use icono real. |
 | 2026-05-18 | Protocolo de crisis convulsiva / epilepsia | Neurología / Urgencias | Se implementó como ficha clínica activa con diagnóstico, pruebas, decisión, tratamiento escalonado, destino, CIMA y bibliografía textual. |
 | 2026-05-18 | Anafilaxia y dosis calculadas | Urgencias / cálculos / medicamentos | Se añadió Anafilaxia y calculadoras directas para adrenalina IM, antiepilépticos, FA, SCA, alteplasa en ictus y heparina vascular cuando dependen del peso. |
+| 2026-05-18 | Crisis asmática | Respiratorio / medicamentos | Se añadió Asma como protocolo independiente con gravedad, pruebas útiles, broncodilatadores, corticoide precoz, magnesio y destino. |
 
 ## Pendiente
 

@@ -127,6 +127,24 @@ const rcukAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =
     note,
   });
 
+const ginaAsthmaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gina-asma-2025',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const gemaAsthmaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gema-asma',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -879,6 +897,61 @@ export const protocolCatalog = {
         verifiedPages: [1],
         pdfPages: [1],
         note: 'Adrenalina IM como primera línea y repetición según respuesta.',
+      }),
+    ],
+  },
+  'asma-exacerbacion': {
+    id: 'asma-exacerbacion',
+    title: 'Crisis asmática',
+    longTitle: 'Crisis asmática / exacerbación asmática',
+    chapter: 'Cap. 40 + GINA/GEMA',
+    section: 'Urgencias del aparato respiratorio',
+    indexPage: 290,
+    verifiedPage: 290,
+    pdfPage: 315,
+    status: 'implementado',
+    summary: 'Exacerbación asmática con gravedad, pruebas útiles, broncodilatadores, corticoide precoz y destino.',
+    quickChecks: [
+      'Disnea, tos, opresión torácica, sibilancias o aumento de medicación de rescate.',
+      'Valorar habla, tiraje, frecuencia respiratoria, SatO2, auscultación y agotamiento.',
+      'Silencio auscultatorio, confusión, cianosis, hipotensión o bradicardia son datos de riesgo vital.',
+      'PEF si está disponible y no retrasa tratamiento; gasometría si grave, mala respuesta o sospecha hipercapnia.',
+      'Alta solo tras respuesta completa, estabilidad y plan terapéutico claro.',
+    ],
+    warnings: [
+      'No retrasar broncodilatadores ni corticoide por pruebas complementarias.',
+      'La adrenalina IM no es tratamiento rutinario de crisis asmática; reservar para anafilaxia asociada u otra indicación clara.',
+      'Hipercapnia, agotamiento o alteración mental indican riesgo de fracaso respiratorio.',
+    ],
+    medicationGroups: [
+      {
+        title: 'Broncodilatadores',
+        medicationIds: ['salbutamol-asma', 'ipratropio-asma'],
+      },
+      {
+        title: 'Corticoide y rescate',
+        medicationIds: ['prednisona-asma', 'hidrocortisona-asma', 'magnesio-asma'],
+      },
+    ],
+    bibliography: [
+      referenceEntry({
+        id: 'asma-murillo-cap40',
+        indexPage: 290,
+        verifiedPage: 290,
+        pdfPage: 315,
+        note: 'Capítulo 40: gravedad, PEF, broncodilatadores, corticoides, magnesio y destino.',
+      }),
+      ginaAsthmaEntry({
+        id: 'asma-gina-2025',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Estrategia actual para exacerbaciones, gravedad, oxígeno y tratamiento inicial.',
+      }),
+      gemaAsthmaEntry({
+        id: 'asma-gema',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Guía española de referencia para clasificación y manejo de exacerbaciones asmáticas.',
       }),
     ],
   },

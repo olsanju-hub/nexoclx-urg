@@ -3860,6 +3860,169 @@ const buildAnaphylaxisFlow = (protocol) => {
   };
 };
 
+const buildAsthmaExacerbationFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Disnea, tos, opresión o sibilancias con aumento de rescate; buscar datos de gravedad.',
+        points: [
+          'Disnea, tos, opresión torácica, sibilancias o aumento de SABA respecto a su situación basal.',
+          'Dificultad para hablar, tiraje, taquipnea, taquicardia o SatO2 baja orientan a crisis relevante.',
+          'Silencio auscultatorio, agotamiento, confusión, cianosis, hipotensión o bradicardia son alarma.',
+          'Antecedente de asma grave, ingreso/UCI, intubación previa o corticoides recientes aumenta riesgo.',
+          'Valorar anafilaxia, infección, neumotórax, TEP o causa cardiaca si clínica no encaja.',
+        ],
+        detailNodes: [
+          {
+            id: 'red-flags-asma',
+            title: 'Riesgo vital',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'Alteración del nivel de conciencia, agotamiento, silencio auscultatorio o cianosis obligan a manejo avanzado.',
+              'Hipercapnia o normalización de PaCO2 en paciente agotado es mala señal.',
+              'Mala respuesta tras tratamiento inicial exige observación estrecha, ingreso o UCI según evolución.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Constantes y SatO2 siempre; PEF si no retrasa tratamiento; gasometría e imagen solo si cambian conducta.',
+        points: [
+          'Constantes, SatO2, frecuencia respiratoria y cardiaca; PEF si disponible y no retrasa tratamiento.',
+          'Gasometría si crisis grave, mala respuesta, agotamiento, hipoxemia o sospecha de hipercapnia.',
+          'Rx tórax solo si mala evolución, fiebre, dolor torácico, sospecha neumonía/neumotórax o diagnóstico alternativo.',
+          'ECG si dolor torácico, arritmia, edad/riesgo cardiovascular o beta-agonistas repetidos.',
+          'Analítica si crisis grave, ingreso, sospecha infección, hipopotasemia o tratamiento intensivo.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-asma-detalle',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'PEF <50% o descenso marcado tras tratamiento apoya gravedad y necesidad de vigilancia.',
+              'Hipoxemia persistente, acidosis o hipercapnia obligan a escalar soporte y valorar UCI.',
+              'Neumotórax, neumonía o insuficiencia cardiaca modifican tratamiento y destino.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Clasificar leve/moderada, grave o riesgo vital y decidir respuesta, observación, ingreso o UCI.',
+        points: [
+          'Leve/moderada: habla conservada, sin agotamiento ni alarma y respuesta clara al broncodilatador.',
+          'Grave: dificultad para hablar, tiraje, FR/FC elevadas, SatO2 baja, PEF reducido o respuesta incompleta.',
+          'Riesgo vital: silencio auscultatorio, cianosis, confusión, agotamiento, hipotensión, bradicardia o hipercapnia.',
+          'Buena respuesta: mejoría sostenida de síntomas, SatO2 y PEF si se mide; plan de alta posible.',
+          'Mala respuesta: repetir broncodilatador, añadir ipratropio/corticoide, considerar magnesio e ingreso/UCI.',
+        ],
+        detailNodes: [
+          {
+            id: 'decision-asma-destino',
+            title: 'Escalada',
+            type: 'decision',
+            severity: 'warning',
+            items: [
+              'Observación si necesita broncodilatadores repetidos, respuesta parcial o factores de riesgo.',
+              'Ingreso si crisis grave, hipoxemia persistente, comorbilidad, agotamiento o mala respuesta.',
+              'UCI si deterioro, hipercapnia, alteración mental, silencio auscultatorio o necesidad de ventilación/intubación.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Oxígeno si hipoxemia, SABA repetido, ipratropio si moderada-grave, corticoide precoz y magnesio si refractaria.',
+        points: [
+          'Oxígeno si hipoxemia; en adulto orientar a SatO2 93-95% salvo otra indicación clínica.',
+          'Salbutamol inhalado/nebulizado de inicio y repetir según respuesta durante la primera hora.',
+          'Añadir ipratropio si crisis moderada-grave, grave o mala respuesta inicial.',
+          'Corticoide sistémico precoz; vía oral si tolera, IV si no puede deglutir, vomita o precisa ventilación.',
+          'Sulfato de magnesio IV si crisis grave/refractaria; adrenalina IM solo si anafilaxia asociada.',
+        ],
+        treatmentGroups: [
+          {
+            id: 'soporte-asma',
+            title: 'Soporte inicial',
+            cards: [
+              {
+                id: 'oxigeno-asma',
+                title: 'Oxígeno y monitorización',
+                type: 'treatment',
+                severity: 'info',
+                summary: 'Administrar si hipoxemia o crisis grave mientras actúan broncodilatadores y corticoide.',
+                items: [
+                  'Fármaco/intervención: oxígeno, monitorización y posición cómoda.',
+                  'Dosis: titular para SatO2 93-95% en adultos si no hay otra indicación.',
+                  'Vía: gafas, mascarilla o nebulización según situación clínica.',
+                  'Evitar: retrasar broncodilatadores o corticoide por pruebas complementarias.',
+                  'Reevaluar: SatO2, habla, tiraje, auscultación, FR/FC y PEF si disponible.',
+                ],
+              },
+              {
+                id: 'anafilaxia-asma',
+                title: 'Anafilaxia asociada',
+                type: 'treatment',
+                severity: 'danger',
+                summary: 'Si hay anafilaxia, la prioridad es adrenalina IM y soporte específico.',
+                items: [
+                  'Fármaco/intervención: manejar como anafilaxia si hay exposición probable con compromiso respiratorio/circulatorio.',
+                  'Dosis: usar protocolo de Anafilaxia para adrenalina IM.',
+                  'Vía: IM en muslo si anafilaxia probable.',
+                  'Evitar: tratar una anafilaxia solo con salbutamol, antihistamínicos o corticoide.',
+                  'Reevaluar: PA, SatO2, broncoespasmo, estridor y necesidad de adrenalina repetida.',
+                ],
+              },
+            ],
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta solo con respuesta completa; observar, ingresar o UCI si respuesta parcial, gravedad o riesgo.',
+        points: [
+          'Alta si respuesta completa, SatO2 adecuada, sin signos de gravedad, PEF mejorado si se usa y plan escrito.',
+          'Observación si respuesta parcial, necesidad de broncodilatadores repetidos o factores de riesgo.',
+          'Ingreso si crisis grave, hipoxemia persistente, mala respuesta, comorbilidad, agotamiento o riesgo social.',
+          'UCI si deterioro, hipercapnia, agotamiento, alteración mental, silencio auscultatorio o necesidad de VNI/intubación.',
+          'Revisar técnica inhalatoria, tratamiento controlador, rescate y signos de alarma antes del alta.',
+        ],
+        detailNodes: [
+          {
+            id: 'alta-asma',
+            title: 'Alta segura',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Confirmar mejoría sostenida tras espaciar broncodilatadores y ausencia de datos de riesgo vital.',
+              'Indicar corticoide pautado si procede, rescate, revisión temprana y ajuste de controlador.',
+              'Volver por disnea progresiva, necesidad creciente de rescate, dificultad para hablar, cianosis, somnolencia o mala respuesta.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -3895,6 +4058,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'anafilaxia') {
     return buildAnaphylaxisFlow(protocol);
+  }
+
+  if (protocol.id === 'asma-exacerbacion') {
+    return buildAsthmaExacerbationFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {

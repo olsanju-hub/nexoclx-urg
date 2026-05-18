@@ -69,6 +69,26 @@ export const bibliographyCatalog = {
     title: 'Resuscitation Council UK: Emergency treatment of anaphylaxis, guideline for healthcare providers',
     shortTitle: 'RCUK Anafilaxia 2021',
   },
+  'gina-asma-2025': {
+    id: 'gina-asma-2025',
+    title: 'Global Initiative for Asthma. Global Strategy for Asthma Management and Prevention, 2025',
+    shortTitle: 'GINA 2025',
+  },
+  'gema-asma': {
+    id: 'gema-asma',
+    title: 'Guía Española para el Manejo del Asma',
+    shortTitle: 'GEMA',
+  },
+  'gold-epoc-2025': {
+    id: 'gold-epoc-2025',
+    title: 'Global Initiative for Chronic Obstructive Lung Disease. Global Strategy for Diagnosis, Management, and Prevention of COPD, 2025',
+    shortTitle: 'GOLD 2025',
+  },
+  'gesepoc-2021': {
+    id: 'gesepoc-2021',
+    title: 'GesEPOC 2021: guía española de la EPOC. Diagnóstico y tratamiento del síndrome de agudización',
+    shortTitle: 'GesEPOC 2021',
+  },
   'nice-ng250-2025': {
     id: 'nice-ng250-2025',
     title: 'NICE NG250: Neumonía: diagnóstico y manejo',

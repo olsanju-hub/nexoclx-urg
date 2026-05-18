@@ -329,6 +329,7 @@ const protocolSearchAliases = {
   'dolor-urinario': ['colico renal', 'urologia', 'litiasis', 'flanco'],
   'crisis-convulsiva-epilepsia': ['convulsion', 'convulsiones', 'epilepsia', 'estatus epileptico', 'status epilepticus', 'primera crisis'],
   anafilaxia: ['reaccion alergica', 'alergia grave', 'adrenalina', 'shock anafilactico', 'urticaria', 'angioedema', 'broncoespasmo'],
+  'asma-exacerbacion': ['asma', 'crisis asmatica', 'exacerbacion asmatica', 'broncoespasmo', 'sibilancias', 'disnea', 'salbutamol', 'prednisona', 'ipratropio'],
 };
 
 const getProtocolCalculatorCount = (moduleId) => implementedCalculators.filter((calculator) => calculator.moduleId === moduleId).length;
