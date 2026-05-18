@@ -1414,7 +1414,7 @@ export const calculatorCatalog = {
   },
 };
 
-export const implementedCalculators = Object.values(calculatorCatalog);
+export const implementedCalculators = Object.values(calculatorCatalog).filter((calculator) => calculator.status === 'implementado');
 
 export const calculationAudit = [
   {

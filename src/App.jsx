@@ -37,7 +37,7 @@ import {
 } from './data/calculators';
 import { ClinicalFlowTree } from './components/ClinicalFlowTree';
 import { getMotivoModule, groupModulesBySpecialty, motivoConsultaModules } from './data/modules';
-import { getProtocolFlow } from './data/protocolFlows';
+import { getProtocolFlow, protocolFlowCatalog } from './data/protocolFlows';
 import { getProcedureFlow, procedureList } from './data/procedures';
 import { getProtocol as getLegacyProtocol } from './data/protocols';
 
@@ -352,6 +352,7 @@ const getPageLabel = (route) => {
 const uniqueByKey = (items, keyBuilder) => Array.from(new Map(items.map((item) => [keyBuilder(item), item])).values());
 const normalizeSearch = (value = '') => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const matchesSearch = (needle, ...parts) => parts.some((part) => normalizeSearch(part).includes(needle));
+const isOperativeProtocol = (module) => Boolean(module?.implemented && protocolFlowCatalog[module.id]);
 
 const getModulePrimaryReferences = (moduleId) => {
   const protocol = getLegacyProtocol(moduleId);
@@ -360,14 +361,14 @@ const getModulePrimaryReferences = (moduleId) => {
 };
 
 const buildSpecialtyCollections = () =>
-  groupModulesBySpecialty(motivoConsultaModules).map((group) => {
-    const implementedModules = group.modules.filter((module) => module.implemented);
-    const moduleIds = new Set(implementedModules.map((module) => module.id));
+  groupModulesBySpecialty(motivoConsultaModules, { implementedOnly: true }).map((group) => {
+    const operativeModules = group.modules.filter(isOperativeProtocol);
+    const moduleIds = new Set(operativeModules.map((module) => module.id));
     const calculators = implementedCalculators
       .filter((calculator) => moduleIds.has(calculator.moduleId))
       .sort((left, right) => left.title.localeCompare(right.title, 'es'));
     const bibliography = uniqueByKey(
-      implementedModules.flatMap((module) =>
+      operativeModules.flatMap((module) =>
         getModulePrimaryReferences(module.id).map((entry) => ({
           ...entry,
           moduleTitle: module.title,
@@ -378,12 +379,13 @@ const buildSpecialtyCollections = () =>
 
     return {
       ...group,
-      protocols: group.modules,
+      modules: operativeModules,
+      protocols: operativeModules,
       calculators,
       medications: [],
       bibliography,
     };
-  });
+  }).filter((group) => group.protocols.length > 0);
 
 const frequentProtocolIds = [
   'fibrilacion-auricular',
@@ -428,7 +430,7 @@ const filterProtocolModules = (modules, query, specialtyId = 'todos') => {
   return modules.filter((module) => {
     const specialtyMatches = specialtyId === 'todos' || module.specialtyId === specialtyId;
     const queryMatches = !needle || matchesSearch(needle, getProtocolSearchText(module));
-    return specialtyMatches && queryMatches;
+    return isOperativeProtocol(module) && specialtyMatches && queryMatches;
   });
 };
 
@@ -575,8 +577,8 @@ const PrimaryNavigation = ({ activeKey, onSelect, collapsed, onToggle }) => (
         aria-label={collapsed ? 'Mostrar navegación' : 'Ocultar navegación'}
         aria-expanded={!collapsed}
       >
-        <Minimize2 className="h-3.5 w-3.5" />
-        <span>{collapsed ? 'Mostrar' : 'Ocultar'}</span>
+        {collapsed ? <ChevronRight className="h-4 w-4" /> : <Minimize2 className="h-3.5 w-3.5" />}
+        <span className="mobile-nav-toggle-label">{collapsed ? 'Mostrar' : 'Ocultar'}</span>
       </button>
       {!collapsed ? (
         <div className="mobile-nav-grid" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
@@ -1697,7 +1699,7 @@ const App = () => {
   const openModule = (moduleId, returnTo = { view: 'protocols' }) => {
     const module = getMotivoModule(moduleId);
 
-    if (!module.implemented) {
+    if (!isOperativeProtocol(module)) {
       return;
     }
 
