@@ -28,14 +28,15 @@ Principios actuales del proyecto:
 - bibliografía presente, pero no dominante
 - cálculos implementados solo cuando un módulo real los necesita
 - fichas farmacológicas con fuente explícita
-- navegación contextual entre protocolo, cálculo y tratamiento
+- navegación contextual entre protocolo, procedimiento, cálculo y tratamiento
 
 ## Estado actual
 
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Protocolos` con organigramas clínicos para todos los protocolos implementados y acordeones por bloque clínico para evitar una lista plana interminable.
 - Protocolos reales operativos migrados a ficha clínica: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `crisis convulsiva / epilepsia en urgencias`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
-- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado` y `BISAP`.
+- Sección `Procedimientos` activa con `VMNI`.
+- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado`, `BISAP` y calculadoras de VMNI.
 - La sección `Medicamentos` deja de ser sección principal visible. Los tratamientos deben vivir dentro de cada protocolo como pautas concretas y auditadas.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
 - Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `Murillo 7.ª ed.`, `SEN Epilepsia 2023`, `NICE NG217` y `AES 2016` como fuentes del protocolo de crisis convulsiva/estatus, `NICE NG250 2025` como referencia principal de neumonía, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
@@ -56,8 +57,10 @@ Principios actuales del proyecto:
 | Módulos de ictus | Activos | `Ictus isquémico` e `ictus hemorrágico` con diagnóstico, tratamiento y destino. | Quedan agrupados en `Neurología` con bibliografía textual. |
 | Crisis convulsiva / epilepsia | Activo | Ficha clínica para crisis autolimitada, crisis en curso, primera crisis, crisis provocada y estatus epiléptico. | Queda en `Neurología`, con relación secundaria funcional con urgencias y tratamiento escalonado con CIMA. |
 | Anafilaxia | Activo | Ficha clínica para sospecha, pruebas mínimas, decisión de gravedad, adrenalina IM y destino. | Queda en `Urgencias` con calculadora directa de adrenalina IM por peso. |
+| Procedimientos | Activa | Índice técnico operativo, empezando por `VMNI`. | Enlazado desde EPOC y Asma cuando se menciona soporte ventilatorio no invasivo. |
+| VMNI | Activo | Procedimiento operativo para indicaciones, contraindicaciones, preparación, modos, ajustes, reevaluación y fracaso. | Incluye calculadoras propias de peso predicho, VT, PS, oxigenación y reevaluación. |
 | Dolor abdominal por escenarios | Activo | Protocolos de un vistazo para epigastrio, hipocondrio derecho, fosas iliacas, flanco, pelvis, peritonismo y sospecha vascular. | Cada cuadro queda en su especialidad principal: `Digestivo`, `Cirugía general`, `Urología`, `Ginecología` o `Vascular`. |
-| Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo. |
+| Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo o procedimiento. |
 | Medicamentos | No visible como sección principal | Los datos farmacológicos pueden seguir existiendo como soporte interno mientras se integran pautas auditadas dentro de cada protocolo. | No debe mostrarse como módulo independiente ni como navegación principal. |
 | Bibliografía | Activa | Da acceso a la obra base y a referencias estructuradas. | Cada módulo guarda sus referencias y páginas verificadas. |
 | Plantillas de imagen | En desarrollo | Solo existe la estructura inicial para `RX tórax sistemática`. | Quedará conectada a bibliografía específica cuando esa fuente esté en el repo. |
@@ -69,11 +72,12 @@ Principios actuales del proyecto:
 3. La pantalla `Especialidades` agrupa los módulos por bloque clínico y muestra recursos relacionados para que el crecimiento no se convierta en una lista plana.
 4. Al abrir un protocolo implementado, la vista se renderiza como organigrama clínico con nodos expandibles.
 5. Los módulos de `ictus` entran por `Neurología` y se resuelven como organigrama de manejo urgente, no como capítulo de estudio.
-6. Desde el protocolo se puede abrir un cálculo concreto cuando cambia la conducta.
+6. Desde el protocolo se puede abrir un cálculo concreto o un procedimiento cuando cambia la conducta.
 7. Los tratamientos farmacológicos deben mostrarse dentro del protocolo, no como dependencia de una sección externa de medicamentos.
 8. Los mismos cálculos siguen existiendo en la sección general de `Cálculos`.
-9. Las fichas farmacológicas pueden mantenerse en datos internos si siguen siendo necesarias para no romper módulos existentes, pero no como sección principal visible.
-10. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
+9. `Procedimientos` agrupa técnicas operativas y no sustituye protocolos locales ni valoración de UCI/Neumología.
+10. Las fichas farmacológicas pueden mantenerse en datos internos si siguen siendo necesarias para no romper módulos existentes, pero no como sección principal visible.
+11. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
 
 ### Cómo se conectan los módulos
 
@@ -236,6 +240,12 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | ICH Score | AHA/ASA 2022 · Ictus hemorrágico | — | Implementado | Integra Glasgow, volumen, localización, extensión intraventricular y edad para gravedad inicial. |
 | Alvarado | WSES Apendicitis 2020 · Dolor abdominal agudo | — | Implementado | Integrado en abdomen quirúrgico si sospecha apendicitis sin peritonitis franca. |
 | BISAP | ACG Pancreatitis 2024 · Pancreatitis aguda | — | Implementado | Integrado en hepatobiliar-pancreático para riesgo de pancreatitis grave. |
+| Peso ideal / predicho | Procedimiento VMNI | — | Implementado | Integrado en VMNI para estimar volumen corriente objetivo. |
+| Volumen corriente objetivo | Procedimiento VMNI | — | Implementado | Calcula rango de VT a partir de peso predicho y ml/kg. |
+| Presión de soporte | Procedimiento VMNI | — | Implementado | Calcula PS = IPAP − EPAP. |
+| PaO2/FiO2 | Procedimiento VMNI | — | Implementado | Índice de oxigenación integrado en VMNI. |
+| SpO2/FiO2 | Procedimiento VMNI | — | Implementado | Índice aproximado integrado en VMNI, sin sustituir gasometría. |
+| Reevaluación VMNI | Procedimiento VMNI | — | Implementado | Compara pH, PaCO2, FR y SatO2 para orientar respuesta a 1-2 h. |
 | TFG estimado (CKD-EPI) | Cap. 5 · Bioquímica sanguínea | 39 | Pendiente | Auditado, pero fuera del alcance del primer módulo real. |
 | Diferencia alveoloarterial de O2 (∆AaPO2) | Cap. 8 · Gasometría, pulsioximetría y capnografía | 66 | Pendiente | Detectado en bibliografía, no implementado. |
 | GRACE | Cap. 26 · Síndrome coronario agudo | 220 | Pendiente | Escala detectada para futuro módulo. |
@@ -309,6 +319,9 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | *Guía Española para el Manejo del Asma* | Activa · corroboración asma | Referencia textual española para clasificación y manejo de crisis asmática. |
 | *Global Initiative for Chronic Obstructive Lung Disease. Global Strategy for Diagnosis, Management, and Prevention of COPD, 2025* | Activa · corroboración EPOC | Referencia textual para exacerbaciones, oxígeno, corticoide, antibiótico y soporte ventilatorio. |
 | *GesEPOC 2021: guía española de la EPOC. Diagnóstico y tratamiento del síndrome de agudización* | Activa · corroboración EPOC | Referencia textual española para diagnóstico y tratamiento de la agudización. |
+| *Philips Respironics V60/V60 Plus. Manual de usuario* | Local · no público | Fuente técnica local para modos, circuito, mascarilla/puerto, alarmas, fugas y Auto-Trak. El PDF queda en `.local-biblio/` y no se enlaza desde la app. |
+| *Official ERS/ATS clinical practice guidelines: noninvasive ventilation for acute respiratory failure* | Activa · corroboración VMNI | Referencia textual para indicaciones y seguimiento de VMNI en insuficiencia respiratoria aguda. |
+| *Documento español de consenso sobre soporte respiratorio no invasivo y terapia de alto flujo* | Activa · corroboración VMNI | Referencia textual para seguridad, organización y monitorización del soporte respiratorio no invasivo. |
 
 ## Índice clínico comprobado
 
@@ -368,6 +381,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | 2026-05-18 | Anafilaxia y dosis calculadas | Urgencias / cálculos / medicamentos | Se añadió Anafilaxia y calculadoras directas para adrenalina IM, antiepilépticos, FA, SCA, alteplasa en ictus y heparina vascular cuando dependen del peso. |
 | 2026-05-18 | Crisis asmática | Respiratorio / medicamentos | Se añadió Asma como protocolo independiente con gravedad, pruebas útiles, broncodilatadores, corticoide precoz, magnesio y destino. |
 | 2026-05-18 | Agudización de EPOC | Respiratorio / medicamentos | Se añadió EPOC como protocolo independiente con gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios y VNI. |
+| 2026-05-18 | Procedimientos y VMNI | Procedimientos / cálculos | Se añadió la sección Procedimientos, el procedimiento VMNI, calculadoras técnicas y enlaces desde Asma/EPOC. |
 
 ## Pendiente
 

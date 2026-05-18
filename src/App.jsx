@@ -4,8 +4,10 @@ import {
   Calculator,
   ChevronRight,
   ClipboardList,
+  Minimize2,
   LayoutDashboard,
   Search,
+  Wrench,
 } from 'lucide-react';
 import {
   calculateCha2ds2Va,
@@ -24,12 +26,19 @@ import {
   calculateSeizureDose,
   calculateStrokeThrombolysisDose,
   calculateVascularHeparinDose,
+  calculateVmniPao2Fio2,
+  calculateVmniPredictedWeight,
+  calculateVmniPressureSupport,
+  calculateVmniReassessment,
+  calculateVmniSpo2Fio2,
+  calculateVmniTidalVolume,
   getCalculator,
   implementedCalculators,
 } from './data/calculators';
 import { ClinicalFlowTree } from './components/ClinicalFlowTree';
 import { getMotivoModule, groupModulesBySpecialty, motivoConsultaModules } from './data/modules';
 import { getProtocolFlow } from './data/protocolFlows';
+import { getProcedureFlow, procedureList } from './data/procedures';
 import { getProtocol as getLegacyProtocol } from './data/protocols';
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
@@ -46,6 +55,7 @@ const pageClass = 'mx-auto max-w-[72rem] space-y-3 sm:space-y-5 xl:space-y-6';
 const primaryNavItems = [
   { key: 'home', label: 'Inicio', icon: LayoutDashboard },
   { key: 'protocols', label: 'Protocolos', icon: ClipboardList },
+  { key: 'procedures', label: 'Procedimientos', icon: Wrench },
   { key: 'calculations', label: 'Cálculos', icon: Calculator },
 ];
 
@@ -157,6 +167,37 @@ const initialCalculatorInputs = {
   'vascular-heparin-dose': {
     weightKg: '',
   },
+  'vmni-predicted-weight': {
+    sex: 'male',
+    heightCm: '',
+  },
+  'vmni-tidal-volume': {
+    predictedWeightKg: '',
+    mlKgLow: '6',
+    mlKgHigh: '8',
+  },
+  'vmni-pressure-support': {
+    ipap: '',
+    epap: '',
+  },
+  'vmni-pao2-fio2': {
+    pao2: '',
+    fio2: '',
+  },
+  'vmni-spo2-fio2': {
+    spo2: '',
+    fio2: '',
+  },
+  'vmni-reassessment': {
+    initialPh: '',
+    followUpPh: '',
+    initialPaco2: '',
+    followUpPaco2: '',
+    initialRr: '',
+    currentRr: '',
+    initialSpo2: '',
+    currentSpo2: '',
+  },
 };
 
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
@@ -226,6 +267,30 @@ const getCalculatorResult = (calculatorId, values) => {
     return calculateVascularHeparinDose(values);
   }
 
+  if (calculatorId === 'vmni-predicted-weight') {
+    return calculateVmniPredictedWeight(values);
+  }
+
+  if (calculatorId === 'vmni-tidal-volume') {
+    return calculateVmniTidalVolume(values);
+  }
+
+  if (calculatorId === 'vmni-pressure-support') {
+    return calculateVmniPressureSupport(values);
+  }
+
+  if (calculatorId === 'vmni-pao2-fio2') {
+    return calculateVmniPao2Fio2(values);
+  }
+
+  if (calculatorId === 'vmni-spo2-fio2') {
+    return calculateVmniSpo2Fio2(values);
+  }
+
+  if (calculatorId === 'vmni-reassessment') {
+    return calculateVmniReassessment(values);
+  }
+
   return null;
 };
 
@@ -244,6 +309,10 @@ const getPrimarySection = (view) => {
     return 'protocols';
   }
 
+  if (view === 'procedure' || view === 'procedures') {
+    return 'procedures';
+  }
+
   if (view === 'calculator' || view === 'calculations') {
     return 'calculations';
   }
@@ -257,6 +326,10 @@ const getPageLabel = (route) => {
     return getProtocolFlow(protocolId).title;
   }
 
+  if (route.view === 'procedure') {
+    return getProcedureFlow(route.procedureId ?? 'vmni').title;
+  }
+
   if (route.view === 'calculator') {
     return getCalculator(route.calculatorId).title;
   }
@@ -267,6 +340,10 @@ const getPageLabel = (route) => {
 
   if (route.view === 'calculations') {
     return 'Cálculos';
+  }
+
+  if (route.view === 'procedures') {
+    return 'Procedimientos';
   }
 
   return 'Inicio clínico';
@@ -362,6 +439,16 @@ const filterCalculatorItems = (query) => {
   return implementedCalculators.filter((calculator) =>
     matchesSearch(needle, calculator.title, calculator.summary, calculator.block, calculator.moduleId),
   );
+};
+
+const getProcedureSearchText = (procedure) =>
+  [procedure.title, procedure.longTitle, procedure.summary, procedure.section, ...(procedure.searchTerms ?? [])].join(' ');
+
+const filterProcedureItems = (query) => {
+  const needle = normalizeSearch(query);
+  if (!needle) return procedureList;
+
+  return procedureList.filter((procedure) => matchesSearch(needle, getProcedureSearchText(procedure)));
 };
 
 const filterSpecialtyCollections = (groups, query) => {
@@ -478,27 +565,41 @@ const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
   </header>
 );
 
-const PrimaryNavigation = ({ activeKey, onSelect }) => (
-  <nav className="mobile-nav lg:hidden">
-    <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
-      {primaryNavItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = activeKey === item.key;
+const PrimaryNavigation = ({ activeKey, onSelect, collapsed, onToggle }) => (
+  <nav className={`mobile-nav lg:hidden ${collapsed ? 'mobile-nav-collapsed' : ''}`}>
+    <div className="mobile-nav-shell">
+      <button
+        type="button"
+        className="mobile-nav-toggle"
+        onClick={onToggle}
+        aria-label={collapsed ? 'Mostrar navegación' : 'Ocultar navegación'}
+        aria-expanded={!collapsed}
+      >
+        <Minimize2 className="h-3.5 w-3.5" />
+        <span>{collapsed ? 'Mostrar' : 'Ocultar'}</span>
+      </button>
+      {!collapsed ? (
+        <div className="mobile-nav-grid" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
+          {primaryNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeKey === item.key;
 
-        return (
-          <button
-            key={item.key}
-            type="button"
-            onClick={() => onSelect(item.key)}
-            className={`mobile-nav-pill ${isActive ? 'mobile-nav-pill-active' : ''}`}
-          >
-            <span className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
-              <Icon className="h-[1.125rem] w-[1.125rem]" />
-            </span>
-            <span>{item.label}</span>
-          </button>
-        );
-      })}
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => onSelect(item.key)}
+                className={`mobile-nav-pill ${isActive ? 'mobile-nav-pill-active' : ''}`}
+              >
+                <span className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
+                  <Icon className="h-[1.125rem] w-[1.125rem]" />
+                </span>
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   </nav>
 );
@@ -1203,6 +1304,81 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
           <CalculatorResult result={result} />
         </div>
       ) : null}
+
+      {calculatorId === 'vmni-predicted-weight' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SelectField
+              value={values.sex}
+              label="Sexo"
+              options={[
+                { value: 'male', label: 'Hombre' },
+                { value: 'female', label: 'Mujer' },
+              ]}
+              onChange={(value) => onChange('sex', value)}
+            />
+            <NumberField value={values.heightCm} label="Talla (cm)" placeholder="Ej. 170" onChange={(value) => onChange('heightCm', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'vmni-tidal-volume' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <NumberField value={values.predictedWeightKg} label="Peso predicho (kg)" placeholder="Ej. 65" onChange={(value) => onChange('predictedWeightKg', value)} />
+            <NumberField value={values.mlKgLow} label="ml/kg mínimo" placeholder="6" onChange={(value) => onChange('mlKgLow', value)} />
+            <NumberField value={values.mlKgHigh} label="ml/kg máximo" placeholder="8" onChange={(value) => onChange('mlKgHigh', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'vmni-pressure-support' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.ipap} label="IPAP (cmH2O)" placeholder="Ej. 14" onChange={(value) => onChange('ipap', value)} />
+            <NumberField value={values.epap} label="EPAP (cmH2O)" placeholder="Ej. 5" onChange={(value) => onChange('epap', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'vmni-pao2-fio2' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.pao2} label="PaO2 (mmHg)" placeholder="Ej. 68" onChange={(value) => onChange('pao2', value)} />
+            <NumberField value={values.fio2} label="FiO2 (%) o fracción" placeholder="Ej. 40 o 0.40" onChange={(value) => onChange('fio2', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'vmni-spo2-fio2' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.spo2} label="SpO2 (%)" placeholder="Ej. 92" onChange={(value) => onChange('spo2', value)} />
+            <NumberField value={values.fio2} label="FiO2 (%) o fracción" placeholder="Ej. 40 o 0.40" onChange={(value) => onChange('fio2', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'vmni-reassessment' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.initialPh} label="pH inicial" placeholder="Ej. 7.28" onChange={(value) => onChange('initialPh', value)} />
+            <NumberField value={values.followUpPh} label="pH 1-2 h" placeholder="Ej. 7.33" onChange={(value) => onChange('followUpPh', value)} />
+            <NumberField value={values.initialPaco2} label="PaCO2 inicial" placeholder="Ej. 68" onChange={(value) => onChange('initialPaco2', value)} />
+            <NumberField value={values.followUpPaco2} label="PaCO2 1-2 h" placeholder="Ej. 60" onChange={(value) => onChange('followUpPaco2', value)} />
+            <NumberField value={values.initialRr} label="FR inicial" placeholder="Ej. 32" onChange={(value) => onChange('initialRr', value)} />
+            <NumberField value={values.currentRr} label="FR actual" placeholder="Ej. 24" onChange={(value) => onChange('currentRr', value)} />
+            <NumberField value={values.initialSpo2} label="SatO2 inicial" placeholder="Ej. 86" onChange={(value) => onChange('initialSpo2', value)} />
+            <NumberField value={values.currentSpo2} label="SatO2 actual" placeholder="Ej. 91" onChange={(value) => onChange('currentSpo2', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
     </section>
   );
 };
@@ -1235,6 +1411,7 @@ const HomeView = ({
   onSpecialtyOpen,
   onModuleOpen,
   onCalculatorOpen,
+  onProcedureOpen,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -1242,8 +1419,9 @@ const HomeView = ({
   const simplifiedProtocols = specialtyCollections.flatMap((group) => group.protocols);
   const hasSearchQuery = Boolean(normalizeSearch(deferredSearchQuery));
   const protocolResults = filterProtocolModules(simplifiedProtocols, deferredSearchQuery).slice(0, 8);
+  const procedureResults = filterProcedureItems(deferredSearchQuery).slice(0, 4);
   const calculatorResults = filterCalculatorItems(deferredSearchQuery).slice(0, 4);
-  const hasSearchResults = protocolResults.length > 0 || calculatorResults.length > 0;
+  const hasSearchResults = protocolResults.length > 0 || procedureResults.length > 0 || calculatorResults.length > 0;
   const frequentProtocols = frequentProtocolIds
     .map((id) => simplifiedProtocols.find((module) => module.id === id))
     .filter(Boolean);
@@ -1266,6 +1444,9 @@ const HomeView = ({
             <div className="space-y-2">
               {protocolResults.map((module) => (
                 <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
+              ))}
+              {procedureResults.map((procedure) => (
+                <ProtocolCompactCard key={procedure.id} module={procedure} onClick={() => onProcedureOpen(procedure.id)} />
               ))}
               {calculatorResults.map((calculator) => (
                 <CalculatorCompactRow key={calculator.id} calculator={calculator} onClick={() => onCalculatorOpen(calculator.id)} />
@@ -1291,6 +1472,9 @@ const HomeView = ({
           <section className="compact-section compact-section-secondary">
             <SectionTitle title="Frecuentes" />
             <div className="compact-list">
+              {procedureList.map((procedure) => (
+                <ProtocolCompactCard key={procedure.id} module={procedure} onClick={() => onProcedureOpen(procedure.id)} compact />
+              ))}
               {frequentProtocols.map((module) => (
                 <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} compact />
               ))}
@@ -1364,12 +1548,78 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
   );
 };
 
-const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen }) => {
+const ProceduresView = ({ onBack, onProcedureOpen, onCalculatorOpen }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const procedures = filterProcedureItems(deferredSearchQuery);
+  const procedureCalculatorIds = new Set(procedureList.flatMap((procedure) => procedure.calculatorIds ?? []));
+  const procedureCalculators = implementedCalculators.filter((calculator) => procedureCalculatorIds.has(calculator.id));
+
+  return (
+    <div className={pageClass}>
+      <BackBar label="Inicio" onClick={onBack} />
+
+      <section className="compact-section">
+        <SectionTitle title="Procedimientos" note="Técnicas operativas para guardia." />
+        <SearchField
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Buscar procedimiento"
+        />
+      </section>
+
+      <section className="compact-section">
+        <div className="space-y-2">
+          {procedures.map((procedure) => (
+            <ProtocolCompactCard key={procedure.id} module={procedure} onClick={() => onProcedureOpen(procedure.id)} />
+          ))}
+        </div>
+      </section>
+
+      <DetailPanel title="Calculadoras VMNI" note="Acceso secundario; desde VMNI también aparecen en el punto de uso.">
+        <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
+          {procedureCalculators.map((calculator) => (
+            <ListActionRow
+              key={calculator.id}
+              title={calculator.title}
+              meta={calculator.summary}
+              onClick={() => onCalculatorOpen(calculator.id)}
+            />
+          ))}
+        </div>
+      </DetailPanel>
+    </div>
+  );
+};
+
+const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen, onProcedureOpen }) => {
   const flow = getProtocolFlow(protocolId);
 
   return (
     <div className={pageClass}>
-      <ClinicalFlowTree protocol={flow} onCalculatorOpen={onCalculatorOpen} onBack={onBack} backLabel="Protocolos" />
+      <ClinicalFlowTree
+        protocol={flow}
+        onCalculatorOpen={onCalculatorOpen}
+        onProcedureOpen={onProcedureOpen}
+        onBack={onBack}
+        backLabel="Protocolos"
+      />
+    </div>
+  );
+};
+
+const ProcedureFlowView = ({ procedureId, onBack, onCalculatorOpen }) => {
+  const flow = getProcedureFlow(procedureId);
+
+  return (
+    <div className={pageClass}>
+      <ClinicalFlowTree
+        protocol={flow}
+        onCalculatorOpen={onCalculatorOpen}
+        onBack={onBack}
+        backLabel="Procedimientos"
+        kindLabel="Procedimiento"
+      />
     </div>
   );
 };
@@ -1422,6 +1672,7 @@ const App = () => {
   const [route, setRoute] = useState({ view: 'home' });
   const [isScrolled, setIsScrolled] = useState(false);
   const [calculatorInputs, setCalculatorInputs] = useState(initialCalculatorInputs);
+  const [isMobileNavCollapsed, setIsMobileNavCollapsed] = useState(() => sessionStorage.getItem('nexoclx-mobile-nav-collapsed') === 'true');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1431,6 +1682,10 @@ const App = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('nexoclx-mobile-nav-collapsed', String(isMobileNavCollapsed));
+  }, [isMobileNavCollapsed]);
 
   const navigate = (nextRoute) => {
     startTransition(() => {
@@ -1457,6 +1712,10 @@ const App = () => {
     navigate({ view: 'calculations', returnTo });
   };
 
+  const openProcedure = (procedureId, returnTo = { view: 'procedures' }) => {
+    navigate({ view: 'procedure', procedureId, returnTo });
+  };
+
   const openCalculator = (calculatorId, returnTo = { view: 'home' }) => {
     navigate({ view: 'calculator', calculatorId, returnTo });
   };
@@ -1481,6 +1740,11 @@ const App = () => {
       return;
     }
 
+    if (sectionKey === 'procedures') {
+      navigate({ view: 'procedures' });
+      return;
+    }
+
   if (sectionKey === 'calculations') {
     openCalculations({ view: 'home' });
     return;
@@ -1502,6 +1766,23 @@ const App = () => {
           protocolId={protocolId}
           onBack={handleBack}
           onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
+          onProcedureOpen={(procedureId) => openProcedure(procedureId, protocolReturnTo)}
+        />
+      );
+    }
+
+    if (route.view === 'procedure') {
+      const procedureId = route.procedureId ?? 'vmni';
+      const procedureReturnTo = {
+        view: 'procedure',
+        procedureId,
+      };
+
+      return (
+        <ProcedureFlowView
+          procedureId={procedureId}
+          onBack={handleBack}
+          onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, procedureReturnTo)}
         />
       );
     }
@@ -1513,6 +1794,16 @@ const App = () => {
           onModuleOpen={(moduleId) => openModule(moduleId, { view: 'protocols' })}
           onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'protocols' })}
           focusSpecialtyId={route.focusSpecialtyId ?? null}
+        />
+      );
+    }
+
+    if (route.view === 'procedures') {
+      return (
+        <ProceduresView
+          onBack={() => navigate({ view: 'home' })}
+          onProcedureOpen={(procedureId) => openProcedure(procedureId, { view: 'procedures' })}
+          onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'procedures' })}
         />
       );
     }
@@ -1544,13 +1835,19 @@ const App = () => {
         onSpecialtyOpen={openSpecialty}
         onModuleOpen={(moduleId) => openModule(moduleId, { view: 'home' })}
         onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'home' })}
+        onProcedureOpen={(procedureId) => openProcedure(procedureId, { view: 'home' })}
       />
     );
   };
 
   return (
     <div className="min-h-screen text-[var(--text)]">
-      <PrimaryNavigation activeKey={getPrimarySection(route.view)} onSelect={handlePrimaryNavigation} />
+      <PrimaryNavigation
+        activeKey={getPrimarySection(route.view)}
+        onSelect={handlePrimaryNavigation}
+        collapsed={isMobileNavCollapsed}
+        onToggle={() => setIsMobileNavCollapsed((current) => !current)}
+      />
       <AppHeader
         isScrolled={isScrolled}
         pageLabel={getPageLabel(route)}
@@ -1558,7 +1855,7 @@ const App = () => {
         onHome={() => navigate({ view: 'home' })}
         onSelect={handlePrimaryNavigation}
       />
-      <main className="app-main">
+      <main className={`app-main ${isMobileNavCollapsed ? 'app-main-nav-collapsed' : ''}`}>
         <div className="app-main-inner">{renderView()}</div>
       </main>
     </div>

@@ -138,6 +138,11 @@ const calculatorAction = (calculatorId) => {
   };
 };
 
+const procedureAction = (procedureId, label) => ({
+  procedureId,
+  label,
+});
+
 const treatmentCalculatorNodes = (protocol, calculators) => {
   if (protocol.id === 'fibrilacion-auricular') {
     const calculatorMap = {
@@ -3952,6 +3957,7 @@ const buildAsthmaExacerbationFlow = (protocol) => {
           'Corticoide sistémico precoz; vía oral si tolera, IV si no puede deglutir, vomita o precisa ventilación.',
           'Sulfato de magnesio IV si crisis grave/refractaria; adrenalina IM solo si anafilaxia asociada.',
         ],
+        actions: [procedureAction('vmni', 'Ver procedimiento VMNI')],
         treatmentGroups: [
           {
             id: 'soporte-asma',
@@ -4090,7 +4096,7 @@ const buildCopdExacerbationFlow = (protocol) => {
           'Antibiótico si esputo purulento con aumento de disnea/volumen, neumonía, ventilación o gravedad.',
           'VNI si acidosis respiratoria/hipercapnia, disnea con trabajo respiratorio o hipoxemia persistente pese a oxígeno controlado.',
         ],
-        actions: [calculatorAction('cockcroft-gault')],
+        actions: [procedureAction('vmni', 'Ver procedimiento VMNI'), calculatorAction('cockcroft-gault')],
         detailNodes: [
           {
             id: 'decision-epoc-vni',
@@ -4116,7 +4122,7 @@ const buildCopdExacerbationFlow = (protocol) => {
           'Antibiótico solo con purulencia/aumento de síntomas, neumonía, ventilación o gravedad.',
           'VNI si acidosis respiratoria o hipercapnia con criterios; fluidos solo si deshidratación o shock.',
         ],
-        actions: [calculatorAction('cockcroft-gault')],
+        actions: [procedureAction('vmni', 'Ver procedimiento VMNI'), calculatorAction('cockcroft-gault')],
         treatmentGroups: [
           {
             id: 'soporte-epoc',

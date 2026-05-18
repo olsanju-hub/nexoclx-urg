@@ -100,6 +100,24 @@ const senEpilepsyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const localV60Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'philips-v60-local',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const ersAtsVmniEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'ers-ats-vmni-2017',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const roundToOne = (value) => Math.round(value * 10) / 10;
 const roundToTwo = (value) => Math.round(value * 100) / 100;
 
@@ -778,6 +796,144 @@ export const calculateVascularHeparinDose = ({ weightKg }) => {
   });
 };
 
+const normalizeFio2 = (fio2) => {
+  const value = Number(fio2);
+  if (!value || value <= 0) return 0;
+  return value > 1 ? value / 100 : value;
+};
+
+export const calculateVmniPredictedWeight = ({ sex, heightCm }) => {
+  const height = Number(heightCm);
+  if (!height || height <= 0) return null;
+
+  const inchesOverFiveFeet = Math.max(0, (height - 152.4) / 2.54);
+  const predicted = sex === 'female' ? 45.5 + 2.3 * inchesOverFiveFeet : 50 + 2.3 * inchesOverFiveFeet;
+
+  return {
+    value: roundToOne(predicted),
+    unit: 'kg',
+    interpretation: 'Peso predicho útil para estimar volumen corriente objetivo y evitar sobredimensionar por peso real.',
+    caution: 'En talla < 152 cm se muestra el peso base de la fórmula; ajustar con criterio clínico local.',
+  };
+};
+
+export const calculateVmniTidalVolume = ({ predictedWeightKg, mlKgLow, mlKgHigh }) => {
+  const weight = Number(predictedWeightKg);
+  const low = Number(mlKgLow);
+  const high = Number(mlKgHigh);
+  if (!weight || !low || !high || low <= 0 || high <= 0) return null;
+
+  const min = roundToOne(weight * Math.min(low, high));
+  const max = roundToOne(weight * Math.max(low, high));
+
+  return {
+    value: `${min}-${max}`,
+    unit: 'mL',
+    interpretation: 'Rango orientativo de VT objetivo para vigilar ventilación, fugas y tolerancia durante VMNI.',
+    caution: 'No es un objetivo rígido: prioriza clínica, pH/PaCO2, fugas, asincronía y riesgo de fracaso.',
+  };
+};
+
+export const calculateVmniPressureSupport = ({ ipap, epap }) => {
+  const ipapValue = Number(ipap);
+  const epapValue = Number(epap);
+  if (!ipapValue || !epapValue || ipapValue <= 0 || epapValue < 0) return null;
+
+  const pressureSupport = roundToOne(ipapValue - epapValue);
+
+  return {
+    value: pressureSupport,
+    unit: 'cmH2O',
+    interpretation:
+      pressureSupport > 0
+        ? 'PS = IPAP - EPAP. Más PS suele aumentar ventilación; revisa tolerancia, fugas, volúmenes y PaCO2.'
+        : 'IPAP debe ser mayor que EPAP para aportar soporte inspiratorio efectivo en S/T.',
+    caution: 'Si necesitas cambios rápidos o la clínica empeora, reevaluar indicación y escalada.',
+  };
+};
+
+export const calculateVmniPao2Fio2 = ({ pao2, fio2 }) => {
+  const pao2Value = Number(pao2);
+  const fio2Fraction = normalizeFio2(fio2);
+  if (!pao2Value || !fio2Fraction) return null;
+
+  const ratio = pao2Value / fio2Fraction;
+
+  return {
+    value: Math.round(ratio),
+    unit: 'mmHg',
+    interpretation:
+      ratio < 100
+        ? 'Hipoxemia muy grave. Revalorar soporte, causa, UCI/intubación y respuesta inmediata.'
+        : ratio < 200
+          ? 'Hipoxemia moderada-grave. Vigilar estrechamente y buscar fracaso precoz.'
+          : ratio < 300
+            ? 'Hipoxemia leve-moderada. Interpretar con clínica y evolución.'
+            : 'Oxigenación conservada o mejorada para este índice.',
+    caution: 'Usar FiO2 como fracción o porcentaje. El índice no sustituye valoración clínica ni tendencia.',
+  };
+};
+
+export const calculateVmniSpo2Fio2 = ({ spo2, fio2 }) => {
+  const spo2Value = Number(spo2);
+  const fio2Fraction = normalizeFio2(fio2);
+  if (!spo2Value || !fio2Fraction) return null;
+
+  const ratio = spo2Value / fio2Fraction;
+
+  return {
+    value: Math.round(ratio),
+    unit: '',
+    interpretation:
+      ratio < 235
+        ? 'Relación baja. Orienta a hipoxemia relevante; si la decisión es crítica, confirmar con gasometría.'
+        : ratio < 315
+          ? 'Relación intermedia. Seguir tendencia, trabajo respiratorio y necesidad de FiO2.'
+          : 'Relación orientativamente favorable si la lectura de SpO2 es fiable.',
+    caution: 'Orientativo: no sustituye gasometría cuando se necesita PaO2, PaCO2 o pH.',
+  };
+};
+
+export const calculateVmniReassessment = ({
+  initialPh,
+  followUpPh,
+  initialPaco2,
+  followUpPaco2,
+  initialRr,
+  currentRr,
+  initialSpo2,
+  currentSpo2,
+}) => {
+  const ph0 = Number(initialPh);
+  const ph1 = Number(followUpPh);
+  const co20 = Number(initialPaco2);
+  const co21 = Number(followUpPaco2);
+  const rr0 = Number(initialRr);
+  const rr1 = Number(currentRr);
+  const spo20 = Number(initialSpo2);
+  const spo21 = Number(currentSpo2);
+
+  if (!ph0 || !ph1 || !co20 || !co21 || !rr0 || !rr1 || !spo20 || !spo21) return null;
+
+  const phImproves = ph1 > ph0;
+  const co2Improves = co21 < co20;
+  const rrImproves = rr1 < rr0;
+  const spo2Improves = spo21 >= spo20;
+  const positives = [phImproves, co2Improves, rrImproves, spo2Improves].filter(Boolean).length;
+  const worsens = ph1 < ph0 || co21 > co20 || rr1 > rr0 + 2 || spo21 < spo20;
+
+  return {
+    value: positives,
+    unit: 'criterios favorables',
+    interpretation: worsens
+      ? 'Empeora o no sigue una tendencia segura. Reevaluar fugas, ajustes, causa y escalada/UCI sin retrasar intubación si hay deterioro.'
+      : positives >= 3
+        ? 'Tendencia favorable. Mantener vigilancia, ajustar confort/fugas y repetir control según evolución.'
+        : 'Respuesta insuficiente o parcial. Revisar indicación, ajustes, sincronía y necesidad de ayuda experta.',
+    caution: 'No decide intubación automáticamente. La clínica, el nivel de conciencia y la disponibilidad de soporte avanzado mandan.',
+  };
+};
+
 export const calculatorCatalog = {
   'cha2ds2-va': {
     id: 'cha2ds2-va',
@@ -1121,6 +1277,138 @@ export const calculatorCatalog = {
         verifiedPage: 340,
         pdfPage: 365,
         note: 'Módulo de dolor abdominal vascular con anticoagulación si isquemia/embolismo y no contraindicación.',
+      }),
+    ],
+  },
+  'vmni-predicted-weight': {
+    id: 'vmni-predicted-weight',
+    title: 'Peso ideal / predicho',
+    shortTitle: 'Peso predicho',
+    moduleId: 'vmni',
+    block: 'VMNI',
+    chapter: 'Procedimiento VMNI',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Peso predicho por sexo y talla para estimar volumen corriente objetivo.',
+    bibliography: [
+      ersAtsVmniEntry({
+        id: 'vmni-predicted-weight-ersats',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Monitorización de respuesta ventilatoria durante VMNI; el peso predicho apoya la lectura de volumen corriente.',
+      }),
+    ],
+  },
+  'vmni-tidal-volume': {
+    id: 'vmni-tidal-volume',
+    title: 'Volumen corriente objetivo',
+    shortTitle: 'VT objetivo',
+    moduleId: 'vmni',
+    block: 'VMNI',
+    chapter: 'Procedimiento VMNI',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Rango de VT orientativo a partir de peso predicho y ml/kg seleccionados.',
+    bibliography: [
+      localV60Entry({
+        id: 'vmni-vt-v60',
+        verifiedPages: [4, 6],
+        pdfPages: [4, 6],
+        note: 'El equipo muestra volúmenes y puede usar objetivos de volumen en modos específicos; interpretar con fugas y tolerancia.',
+      }),
+      ersAtsVmniEntry({
+        id: 'vmni-vt-ersats',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'La respuesta ventilatoria se interpreta junto a clínica, gasometría y riesgo de fracaso.',
+      }),
+    ],
+  },
+  'vmni-pressure-support': {
+    id: 'vmni-pressure-support',
+    title: 'Presión de soporte',
+    shortTitle: 'PS',
+    moduleId: 'vmni',
+    block: 'VMNI',
+    chapter: 'Procedimiento VMNI',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Calcula PS = IPAP − EPAP para interpretar el soporte ventilatorio.',
+    bibliography: [
+      localV60Entry({
+        id: 'vmni-ps-v60',
+        verifiedPages: [4, 6],
+        pdfPages: [4, 6],
+        note: 'Modos con IPAP/EPAP y ajustes de presión en VMNI.',
+      }),
+    ],
+  },
+  'vmni-pao2-fio2': {
+    id: 'vmni-pao2-fio2',
+    title: 'PaO2/FiO2',
+    shortTitle: 'P/F',
+    moduleId: 'vmni',
+    block: 'VMNI',
+    chapter: 'Procedimiento VMNI',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Índice de oxigenación con PaO2 y FiO2 configurada.',
+    bibliography: [
+      ersAtsVmniEntry({
+        id: 'vmni-pao2fio2-ersats',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'La oxigenación y la necesidad de escalada se interpretan junto a trabajo respiratorio y evolución.',
+      }),
+    ],
+  },
+  'vmni-spo2-fio2': {
+    id: 'vmni-spo2-fio2',
+    title: 'SpO2/FiO2',
+    shortTitle: 'S/F',
+    moduleId: 'vmni',
+    block: 'VMNI',
+    chapter: 'Procedimiento VMNI',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Índice aproximado si no hay PaO2 inmediata; no sustituye gasometría.',
+    bibliography: [
+      ersAtsVmniEntry({
+        id: 'vmni-spo2fio2-ersats',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'La respuesta a VMNI debe confirmarse con gasometría cuando hay hipercapnia/acidosis o decisión crítica.',
+      }),
+    ],
+  },
+  'vmni-reassessment': {
+    id: 'vmni-reassessment',
+    title: 'Reevaluación VMNI',
+    shortTitle: 'Reevaluación',
+    moduleId: 'vmni',
+    block: 'VMNI',
+    chapter: 'Procedimiento VMNI',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Compara pH, PaCO2, FR y SatO2 para orientar respuesta a 1-2 h.',
+    bibliography: [
+      ersAtsVmniEntry({
+        id: 'vmni-reevaluacion-ersats',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Monitorización estrecha de respuesta y acceso rápido a intubación si no mejora.',
+      }),
+      localV60Entry({
+        id: 'vmni-reevaluacion-v60',
+        verifiedPages: [6, 9],
+        pdfPages: [6, 9],
+        note: 'Revisión de fugas, alarmas y sincronía en el equipo local.',
       }),
     ],
   },

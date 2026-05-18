@@ -89,6 +89,21 @@ export const bibliographyCatalog = {
     title: 'GesEPOC 2021: guía española de la EPOC. Diagnóstico y tratamiento del síndrome de agudización',
     shortTitle: 'GesEPOC 2021',
   },
+  'philips-v60-local': {
+    id: 'philips-v60-local',
+    title: 'Philips Respironics V60/V60 Plus. Manual de usuario',
+    shortTitle: 'Manual V60 local',
+  },
+  'ers-ats-vmni-2017': {
+    id: 'ers-ats-vmni-2017',
+    title: 'Official ERS/ATS clinical practice guidelines: noninvasive ventilation for acute respiratory failure',
+    shortTitle: 'ERS/ATS VMNI 2017',
+  },
+  'separ-semes-semicyuc-srni': {
+    id: 'separ-semes-semicyuc-srni',
+    title: 'Documento español de consenso sobre soporte respiratorio no invasivo y terapia de alto flujo',
+    shortTitle: 'Consenso SRNI español',
+  },
   'nice-ng250-2025': {
     id: 'nice-ng250-2025',
     title: 'NICE NG250: Neumonía: diagnóstico y manejo',
