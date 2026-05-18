@@ -346,8 +346,9 @@ const ClinicalSheetNode = ({ node, onCalculatorOpen }) => {
   );
 };
 
-const PautaBlock = ({ card }) => {
+const PautaBlock = ({ card, onCalculatorOpen }) => {
   const detailItems = card.items?.length ? card.items : card.summary ? [card.summary] : [];
+  const calculatorId = card.calculatorId ?? card.calculatorAction?.calculatorId ?? card.dosingCalculator?.calculatorId;
   const title = card.sourceUrl ? (
     <a href={card.sourceUrl} target="_blank" rel="noreferrer" className="clinical-sheet-link">
       {card.title}
@@ -362,6 +363,13 @@ const PautaBlock = ({ card }) => {
       {card.medication ? <p className="clinical-sheet-kicker">{card.medication}</p> : null}
       {card.summary ? <p className="clinical-sheet-muted">{card.summary}</p> : null}
       <FieldList items={detailItems} />
+      {calculatorId ? (
+        <div className="clinical-sheet-actions">
+          <button type="button" className="clinical-calc-button" onClick={() => onCalculatorOpen?.(calculatorId)}>
+            Calcular dosis
+          </button>
+        </div>
+      ) : null}
     </article>
   );
 };
@@ -476,7 +484,7 @@ const DecisionPanelSection = ({ section, onCalculatorOpen }) => {
               <h3>{group.title}</h3>
               <div className="clinical-pauta-list">
                 {group.cards.map((card) => (
-                  <PautaBlock key={card.id} card={card} />
+                  <PautaBlock key={card.id} card={card} onCalculatorOpen={onCalculatorOpen} />
                 ))}
               </div>
             </div>

@@ -80,6 +80,24 @@ const medicationDetailItems = (medication) => {
   ].filter(Boolean);
 };
 
+const medicationDosingCalculators = {
+  'midazolam-convulsiones': 'seizure-dose',
+  'diazepam-convulsiones': 'seizure-dose',
+  'lorazepam-estatus': 'seizure-dose',
+  'valproato-estatus': 'seizure-dose',
+  'fenitoina-estatus': 'seizure-dose',
+  'heparina-sodica': 'sca-dose',
+  'enoxaparina-sca': 'sca-dose',
+  'tenecteplasa-sca': 'sca-dose',
+  'alteplasa-sca': 'sca-dose',
+  amiodarona: 'fa-dose',
+  'flecainida-fa': 'fa-dose',
+  'propafenona-fa': 'fa-dose',
+  enoxaparina: 'fa-dose',
+  'alteplasa-ictus': 'stroke-thrombolysis-dose',
+  'adrenalina-anafilaxia': 'anaphylaxis-adrenaline',
+};
+
 const medicationNode = (medicationId) => {
   const medication = getMedication(medicationId);
   const doseSummary = medication.contextDose ?? medication.dose ?? medication.contextUse ?? medication.indication;
@@ -95,6 +113,7 @@ const medicationNode = (medicationId) => {
     items: medicationDetailItems(medication),
     medication: medication.family,
     sourceUrl: cimaSource?.url,
+    calculatorId: medicationDosingCalculators[medication.id],
   };
 };
 
@@ -2083,7 +2102,6 @@ const buildVascularAbdominalPainFlow = (protocol) => ({
         'Isquemia mesentérica aguda: antibiótico amplio precoz; piperacilina/tazobactam 4/0,5 g IV cada 6-8 h.',
         'Heparina sódica IV si isquemia mesentérica/embolismo arterial y no contraindicación: bolo 80 UI/kg y 18 UI/kg/h ajustado a TTPA.',
       ],
-      actions: [calculatorAction('vascular-heparin-dose')],
       treatmentGroups: [
         {
           id: 'soporte-vascular',
@@ -2168,6 +2186,7 @@ const buildVascularAbdominalPainFlow = (protocol) => ({
               severity: 'danger',
               summary: 'Si isquemia mesentérica/embolismo arterial y no hay contraindicación hemorrágica.',
               sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/56029/FichaTecnica_56029.html',
+              calculatorId: 'vascular-heparin-dose',
               items: [
                 'Dosis: bolo inicial 80 UI/kg IV o 5.000 UI independientemente del peso.',
                 'Vía: IV.',
@@ -2751,7 +2770,6 @@ const buildFaDecisionPanelFlow = (protocol) => {
         title: 'Tratamiento',
         summary: 'Control de estabilidad, frecuencia/ritmo y anticoagulación según duración, riesgo y función renal.',
         points: treatmentInitialItems(protocol),
-        actions: [calculatorAction('fa-dose')],
         treatmentGroups: [
           {
             id: 'intervenciones-fa',
@@ -2873,7 +2891,6 @@ const buildScaDecisionPanelFlow = (protocol) => {
         title: 'Tratamiento',
         summary: 'Antiagregación, anticoagulación, antiisquémicos y reperfusión según rama; cada fármaco abre su pauta.',
         points: treatmentInitialItems(protocol),
-        actions: [calculatorAction('sca-dose')],
         treatmentGroups: [
           {
             id: 'intervenciones-sca',
@@ -3330,7 +3347,6 @@ const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
           'Trombectomía si oclusión de gran vaso y criterios; activar traslado/neurorradiología sin demoras.',
           'Evitar antiagregación/anticoagulación en las primeras 24 h tras trombólisis hasta nueva imagen.',
         ],
-        actions: [calculatorAction('stroke-thrombolysis-dose')],
         treatmentGroups: medicationGroups.map((group) => ({
           id: `grupo-${slugify(group.title)}`,
           title: group.title,
@@ -3598,7 +3614,6 @@ const buildSeizureEmergencyFlow = (protocol) => {
           'Benzodiacepina si crisis >5 min o repetida sin recuperación.',
           'Si persiste: segunda línea IV y aviso a neurología/UCI; estatus refractario requiere UCI/anestesia/intubación.',
         ],
-        actions: [calculatorAction('seizure-dose')],
         treatmentGroups: [
           {
             id: 'medidas-iniciales-convulsiones',
@@ -3775,7 +3790,6 @@ const buildAnaphylaxisFlow = (protocol) => {
           'Antihistamínico y corticoide solo como adyuvantes, nunca sustitutos de adrenalina.',
           'Shock refractario: UCI/anestesia, vía aérea y adrenalina IV/perfusión según protocolo local experto.',
         ],
-        actions: [calculatorAction('anaphylaxis-adrenaline')],
         treatmentGroups: [
           {
             id: 'soporte-anafilaxia',
