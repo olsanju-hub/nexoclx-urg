@@ -109,6 +109,24 @@ const aesStatusEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const niceAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-cg134-anafilaxia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const rcukAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'rcuk-anafilaxia-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -805,6 +823,62 @@ export const protocolCatalog = {
         verifiedPages: [48, 49, 50, 51],
         pdfPages: [48, 49, 50, 51],
         note: 'Algoritmo farmacológico del estatus epiléptico convulsivo.',
+      }),
+    ],
+  },
+  anafilaxia: {
+    id: 'anafilaxia',
+    title: 'Anafilaxia',
+    longTitle: 'Anafilaxia / shock anafiláctico',
+    chapter: 'Cap. 190 + NICE/RCUK',
+    section: 'Urgencias',
+    indexPage: 1059,
+    verifiedPage: 1059,
+    pdfPage: 1084,
+    status: 'implementado',
+    summary: 'Diagnóstico clínico, adrenalina IM inmediata, soporte y observación tras resolución.',
+    quickChecks: [
+      'Inicio agudo tras exposición probable con afectación cutánea, respiratoria, cardiovascular o digestiva persistente.',
+      'La anafilaxia puede existir sin urticaria; no esperar analítica para tratar.',
+      'Adrenalina IM en muslo si compromiso respiratorio, cardiovascular o anafilaxia probable.',
+      'Monitorizar si gravedad, adrenalina repetida, hipotensión, broncoespasmo, estridor o comorbilidad.',
+      'Alta solo tras estabilidad completa, educación, plan escrito y derivación a alergología.',
+    ],
+    warnings: [
+      'No retrasar adrenalina por pruebas complementarias.',
+      'Antihistamínicos y corticoides no sustituyen adrenalina IM.',
+      'Adrenalina IV/perfusión solo en entorno monitorizado y con personal experto.',
+    ],
+    calculatorIds: ['anaphylaxis-adrenaline'],
+    medicationGroups: [
+      {
+        title: 'Primera línea',
+        medicationIds: ['adrenalina-anafilaxia'],
+      },
+      {
+        title: 'Adyuvantes',
+        medicationIds: ['salbutamol-anafilaxia', 'dexclorfeniramina-anafilaxia', 'metilprednisolona-anafilaxia'],
+      },
+    ],
+    bibliography: [
+      referenceEntry({
+        id: 'anafilaxia-murillo-cap190',
+        indexPage: 1059,
+        verifiedPage: 1059,
+        pdfPage: 1084,
+        note: 'Capítulo 190: diagnóstico clínico, gravedad, pruebas que no retrasan tratamiento, adrenalina y observación.',
+      }),
+      niceAnaphylaxisEntry({
+        id: 'anafilaxia-nice-cg134',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Observación, información al alta, autoinyectores y derivación a alergología.',
+      }),
+      rcukAnaphylaxisEntry({
+        id: 'anafilaxia-rcuk-2021',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Adrenalina IM como primera línea y repetición según respuesta.',
       }),
     ],
   },

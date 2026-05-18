@@ -109,6 +109,24 @@ const aesStatusReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }
     note,
   });
 
+const niceAnaphylaxisReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-cg134-anafilaxia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const rcukAnaphylaxisReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'rcuk-anafilaxia-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const externalSource = (label, url) => ({ label, url, type: 'external' });
 const cimaSource = (label, url) => ({ label, url, type: 'cima' });
 const protocolSource = (label, bibliography) => ({ label, bibliography, type: 'protocol' });
@@ -2436,6 +2454,168 @@ export const medicationCatalog = {
           verifiedPage: 439,
           pdfPage: 464,
           note: 'Fenitoína IV como segunda línea, velocidad máxima y contraindicaciones cardiovasculares.',
+        }),
+      ),
+    ],
+  },
+  'adrenalina-anafilaxia': {
+    id: 'adrenalina-anafilaxia',
+    name: 'Adrenalina',
+    protocolId: 'anafilaxia',
+    family: 'Primera línea',
+    indication: 'Anafilaxia probable, shock anafiláctico o compromiso respiratorio/cardiovascular.',
+    contextUse: 'Administrar IM en cara anterolateral del muslo sin esperar pruebas.',
+    contextDose:
+      'Adulto: 0,5 mg IM de adrenalina 1 mg/ml. Pediatría: 0,01 mg/kg IM; usar calculadora y no superar 0,3 mg en la pauta pediátrica visible.',
+    contextRoute: 'Intramuscular en cara anterolateral del muslo.',
+    contextFrequency: 'Repetir cada 5-15 min si persiste compromiso respiratorio o circulatorio.',
+    followUpPlan: 'Reevaluar ABC, SatO2, PA, estridor/broncoespasmo y necesidad de UCI o perfusión en entorno experto.',
+    dose:
+      'Adulto: 0,5 mg IM. Pediatría: 0,01 mg/kg IM con máximo 0,3 mg en esta pauta visible.',
+    route: 'IM en muslo.',
+    frequency: 'Repetible cada 5-15 min según respuesta.',
+    duration: 'Tratamiento agudo con observación posterior.',
+    contraindications: [
+      'No retrasar por contraindicaciones relativas en anafilaxia grave.',
+      'Evitar vía IV sin monitorización y personal experto.',
+    ],
+    renalAdjustment: 'No requiere ajuste renal en la dosis IM de emergencia.',
+    hepaticAdjustment: 'No requiere ajuste hepático en la dosis IM de emergencia.',
+    practicalNotes: [
+      'Antihistamínicos y corticoides son adyuvantes; no sustituyen adrenalina.',
+      'Si la situación es crítica, administrar dosis estándar mientras se obtiene peso exacto.',
+    ],
+    sourceScope: 'Dosis IM de Murillo, RCUK y ficha técnica CIMA de adrenalina 1 mg/ml.',
+    sources: [
+      cimaSource('CIMA · Adrenalina Basi 1 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/89175/FT_89175.html'),
+      protocolSource(
+        'Murillo 7.ª edición · anafilaxia',
+        referenceEntry({
+          id: 'adrenalina-anafilaxia-murillo',
+          indexPage: 1059,
+          verifiedPage: 1059,
+          pdfPage: 1084,
+          note: 'Adrenalina IM como tratamiento de primera línea y repetición en anafilaxia.',
+        }),
+      ),
+      protocolSource(
+        'RCUK · tratamiento de anafilaxia',
+        rcukAnaphylaxisReferenceEntry({
+          id: 'adrenalina-anafilaxia-rcuk',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Adrenalina IM y repetición según respuesta respiratoria/circulatoria.',
+        }),
+      ),
+    ],
+  },
+  'salbutamol-anafilaxia': {
+    id: 'salbutamol-anafilaxia',
+    name: 'Salbutamol',
+    protocolId: 'anafilaxia',
+    family: 'Adyuvante respiratorio',
+    indication: 'Broncoespasmo persistente asociado a anafilaxia tras adrenalina IM y soporte.',
+    contextUse: 'Adyuvante inhalado; no sustituye adrenalina.',
+    contextDose: '2,5-5 mg nebulizado; repetir según respuesta clínica y vigilancia.',
+    contextRoute: 'Inhalado por nebulizador.',
+    contextFrequency: 'Puede repetirse hasta 4 veces al día según ficha técnica; en urgencias reevaluar respuesta y gravedad.',
+    followUpPlan: 'Reevaluar SatO2, trabajo respiratorio, auscultación y necesidad de soporte avanzado.',
+    dose: '2,5-5 mg nebulizado.',
+    route: 'Inhalado por nebulizador.',
+    frequency: 'Repetir según respuesta y vigilancia.',
+    duration: 'Uso agudo como adyuvante.',
+    contraindications: ['No usar como sustituto de adrenalina en anafilaxia.', 'Precaución si taquiarritmia o isquemia activa.'],
+    renalAdjustment: 'No precisa ajuste renal específico en la pauta inhalada aguda.',
+    hepaticAdjustment: 'No precisa ajuste hepático específico en la pauta inhalada aguda.',
+    practicalNotes: ['Mantener oxígeno y monitorización si hay hipoxemia o gravedad.'],
+    sourceScope: 'Dosis inhalada verificada en ficha técnica CIMA; uso como adyuvante respiratorio en anafilaxia.',
+    sources: [
+      cimaSource('CIMA · Ventolin 5 mg/ml solución para inhalación por nebulizador', 'https://cima.aemps.es/cima/dochtml/ft/55147/FichaTecnica_55147.html'),
+      protocolSource(
+        'Murillo 7.ª edición · anafilaxia',
+        referenceEntry({
+          id: 'salbutamol-anafilaxia-murillo',
+          indexPage: 1059,
+          verifiedPage: 1060,
+          pdfPage: 1085,
+          note: 'Soporte respiratorio y tratamiento adyuvante del broncoespasmo.',
+        }),
+      ),
+    ],
+  },
+  'dexclorfeniramina-anafilaxia': {
+    id: 'dexclorfeniramina-anafilaxia',
+    name: 'Dexclorfeniramina',
+    protocolId: 'anafilaxia',
+    family: 'Adyuvante cutáneo',
+    indication: 'Urticaria, prurito o síntomas cutáneos tras controlar el compromiso vital.',
+    contextUse: 'Adyuvante; administrar tras adrenalina si había anafilaxia.',
+    contextDose: 'Adulto: 5 mg IM o IV lento.',
+    contextRoute: 'IM o IV lento.',
+    contextFrequency: 'Dosis aguda individualizada según respuesta.',
+    followUpPlan: 'Reevaluar sedación, PA y recurrencia de síntomas; no usar para retrasar adrenalina.',
+    dose: '5 mg IM o IV lento en adulto.',
+    route: 'IM o IV.',
+    frequency: 'Dosis aguda según respuesta.',
+    duration: 'Uso agudo como adyuvante.',
+    contraindications: ['No sustituye adrenalina.', 'Precaución por sedación, edad avanzada, glaucoma o retención urinaria.'],
+    renalAdjustment: 'Usar con precaución en fragilidad; no se fija ajuste renal agudo.',
+    hepaticAdjustment: 'Precaución en hepatopatía por sedación prolongada.',
+    practicalNotes: ['Puede ayudar a síntomas cutáneos, pero no previene shock ni obstrucción de vía aérea.'],
+    sourceScope: 'Ficha técnica CIMA de dexclorfeniramina inyectable y uso adyuvante tras control de manifestaciones agudas.',
+    sources: [
+      cimaSource('CIMA · Polaramine 5 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/40135/FichaTecnica_40135.html'),
+      protocolSource(
+        'Murillo 7.ª edición · anafilaxia',
+        referenceEntry({
+          id: 'dexclorfeniramina-anafilaxia-murillo',
+          indexPage: 1059,
+          verifiedPage: 1060,
+          pdfPage: 1085,
+          note: 'Tratamiento adyuvante tras medidas prioritarias en reacción anafiláctica.',
+        }),
+      ),
+    ],
+  },
+  'metilprednisolona-anafilaxia': {
+    id: 'metilprednisolona-anafilaxia',
+    name: 'Metilprednisolona',
+    protocolId: 'anafilaxia',
+    family: 'Adyuvante antiinflamatorio',
+    indication: 'Adyuvante si broncoespasmo, asma, reacción persistente o riesgo de recurrencia; no sustituye adrenalina.',
+    contextUse: 'Usar después de adrenalina y soporte si se considera indicado.',
+    contextDose: 'Adulto: 80 mg IV como dosis práctica inicial.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Dosis inicial; continuidad según evolución y protocolo local.',
+    followUpPlan: 'Reevaluar síntomas respiratorios/cutáneos, glucemia, PA y riesgo de recurrencia.',
+    dose: '80 mg IV en adulto.',
+    route: 'IV.',
+    frequency: 'Dosis inicial; reevaluar continuidad.',
+    duration: 'Uso agudo como adyuvante.',
+    contraindications: ['No sustituye adrenalina.', 'Precaución en hiperglucemia, infección activa o alto riesgo de efectos adversos.'],
+    renalAdjustment: 'No requiere ajuste renal puntual, pero vigilar comorbilidad.',
+    hepaticAdjustment: 'Precaución si hepatopatía grave.',
+    practicalNotes: ['El beneficio no es inmediato; no debe retrasar adrenalina ni soporte ABC.'],
+    sourceScope: 'Dosis acotada a pauta adulta de urgencias; CIMA se usa para ficha técnica del inyectable.',
+    sources: [
+      cimaSource('CIMA · Metilprednisolona Normon solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/71864/FichaTecnica_71864.html'),
+      protocolSource(
+        'Murillo 7.ª edición · anafilaxia',
+        referenceEntry({
+          id: 'metilprednisolona-anafilaxia-murillo',
+          indexPage: 1059,
+          verifiedPage: 1060,
+          pdfPage: 1085,
+          note: 'Corticoide como adyuvante, nunca como sustituto de adrenalina.',
+        }),
+      ),
+      protocolSource(
+        'NICE CG134 · anafilaxia',
+        niceAnaphylaxisReferenceEntry({
+          id: 'metilprednisolona-anafilaxia-nice',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Observación y seguimiento tras tratamiento de emergencia.',
         }),
       ),
     ],

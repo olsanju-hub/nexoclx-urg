@@ -10,14 +10,20 @@ import {
 import {
   calculateCha2ds2Va,
   calculateAlvarado,
+  calculateAnaphylaxisAdrenaline,
   calculateBisap,
   calculateCockcroftGault,
   calculateCrb65,
   calculateCurb65,
+  calculateFaDose,
   calculateHasBled,
   calculateIchScore,
   calculateKillip,
   calculateNihss,
+  calculateScaDose,
+  calculateSeizureDose,
+  calculateStrokeThrombolysisDose,
+  calculateVascularHeparinDose,
   getCalculator,
   implementedCalculators,
 } from './data/calculators';
@@ -126,6 +132,31 @@ const initialCalculatorInputs = {
     ageOver60: false,
     pleuralEffusion: false,
   },
+  'seizure-dose': {
+    medication: 'midazolam-no-iv',
+    weightKg: '',
+  },
+  'anaphylaxis-adrenaline': {
+    weightKg: '',
+    ageGroup: 'adult',
+  },
+  'sca-dose': {
+    medication: 'heparina-icp',
+    weightKg: '',
+    age: '',
+    renalSevere: false,
+  },
+  'fa-dose': {
+    medication: 'amiodarona',
+    weightKg: '',
+    renalSevere: false,
+  },
+  'stroke-thrombolysis-dose': {
+    weightKg: '',
+  },
+  'vascular-heparin-dose': {
+    weightKg: '',
+  },
 };
 
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
@@ -169,6 +200,30 @@ const getCalculatorResult = (calculatorId, values) => {
 
   if (calculatorId === 'bisap') {
     return calculateBisap(values);
+  }
+
+  if (calculatorId === 'seizure-dose') {
+    return calculateSeizureDose(values);
+  }
+
+  if (calculatorId === 'anaphylaxis-adrenaline') {
+    return calculateAnaphylaxisAdrenaline(values);
+  }
+
+  if (calculatorId === 'sca-dose') {
+    return calculateScaDose(values);
+  }
+
+  if (calculatorId === 'fa-dose') {
+    return calculateFaDose(values);
+  }
+
+  if (calculatorId === 'stroke-thrombolysis-dose') {
+    return calculateStrokeThrombolysisDose(values);
+  }
+
+  if (calculatorId === 'vascular-heparin-dose') {
+    return calculateVascularHeparinDose(values);
   }
 
   return null;
@@ -273,6 +328,7 @@ const protocolSearchAliases = {
   'arritmias-ventriculares': ['tv', 'fv', 'torsades', 'taquicardia ventricular'],
   'dolor-urinario': ['colico renal', 'urologia', 'litiasis', 'flanco'],
   'crisis-convulsiva-epilepsia': ['convulsion', 'convulsiones', 'epilepsia', 'estatus epileptico', 'status epilepticus', 'primera crisis'],
+  anafilaxia: ['reaccion alergica', 'alergia grave', 'adrenalina', 'shock anafilactico', 'urticaria', 'angioedema', 'broncoespasmo'],
 };
 
 const getProtocolCalculatorCount = (moduleId) => implementedCalculators.filter((calculator) => calculator.moduleId === moduleId).length;
@@ -800,6 +856,16 @@ const CalculatorResult = ({ result }) =>
         {result.value} <span className="text-sm font-medium text-[var(--text-muted)]">{result.unit}</span>
       </p>
       <p className="mt-1 text-sm text-[var(--text-soft)]">{result.interpretation}</p>
+      {result.fields ? (
+        <dl className="mt-3 space-y-1.5 text-sm">
+          {Object.entries(result.fields).map(([label, value]) => (
+            <div key={label} className="grid gap-0.5 sm:grid-cols-[10rem_1fr]">
+              <dt className="font-semibold text-[var(--text-muted)]">{label}:</dt>
+              <dd className="min-w-0 text-[var(--text)]">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
       {result.caution ? <p className="mt-2 text-xs text-[var(--text-muted)]">{result.caution}</p> : null}
     </div>
   ) : (
@@ -1027,6 +1093,111 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
             <BooleanField checked={values.ageOver60} label="Edad > 60 años" onChange={(value) => onChange('ageOver60', value)} />
             <BooleanField checked={values.pleuralEffusion} label="Derrame pleural" onChange={(value) => onChange('pleuralEffusion', value)} />
           </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'seizure-dose' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SelectField
+              value={values.medication}
+              label="Fármaco"
+              options={[
+                { value: 'midazolam-no-iv', label: 'Midazolam sin vía IV' },
+                { value: 'midazolam-iv', label: 'Midazolam IV' },
+                { value: 'diazepam-rectal', label: 'Diazepam rectal' },
+                { value: 'lorazepam', label: 'Lorazepam IV' },
+                { value: 'valproato', label: 'Valproato IV' },
+                { value: 'fenitoina', label: 'Fenitoína IV' },
+              ]}
+              onChange={(value) => onChange('medication', value)}
+            />
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 70" onChange={(value) => onChange('weightKg', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'anaphylaxis-adrenaline' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 25" onChange={(value) => onChange('weightKg', value)} />
+            <SelectField
+              value={values.ageGroup}
+              label="Grupo"
+              options={[
+                { value: 'adult', label: 'Adulto/adolescente' },
+                { value: 'pediatric', label: 'Pediátrico' },
+              ]}
+              onChange={(value) => onChange('ageGroup', value)}
+            />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'sca-dose' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SelectField
+              value={values.medication}
+              label="Pauta"
+              options={[
+                { value: 'heparina-icp', label: 'Heparina sódica ICP' },
+                { value: 'enoxaparina', label: 'Enoxaparina' },
+                { value: 'tenecteplasa', label: 'Tenecteplasa' },
+                { value: 'alteplasa-sca', label: 'Alteplasa SCA' },
+              ]}
+              onChange={(value) => onChange('medication', value)}
+            />
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 78" onChange={(value) => onChange('weightKg', value)} />
+            <NumberField value={values.age} label="Edad" placeholder="Ej. 76" onChange={(value) => onChange('age', value)} />
+          </div>
+          <BooleanField
+            checked={values.renalSevere}
+            label="ClCr < 30 ml/min si enoxaparina"
+            onChange={(value) => onChange('renalSevere', value)}
+          />
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'fa-dose' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SelectField
+              value={values.medication}
+              label="Pauta"
+              options={[
+                { value: 'amiodarona', label: 'Amiodarona IV' },
+                { value: 'flecainida', label: 'Flecainida IV' },
+                { value: 'propafenona', label: 'Propafenona IV' },
+                { value: 'enoxaparina-fa', label: 'Enoxaparina FA' },
+              ]}
+              onChange={(value) => onChange('medication', value)}
+            />
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 72" onChange={(value) => onChange('weightKg', value)} />
+          </div>
+          <BooleanField
+            checked={values.renalSevere}
+            label="ClCr 15-30 ml/min si enoxaparina"
+            onChange={(value) => onChange('renalSevere', value)}
+          />
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'stroke-thrombolysis-dose' ? (
+        <div className="space-y-3">
+          <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 80" onChange={(value) => onChange('weightKg', value)} />
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'vascular-heparin-dose' ? (
+        <div className="space-y-3">
+          <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 75" onChange={(value) => onChange('weightKg', value)} />
           <CalculatorResult result={result} />
         </div>
       ) : null}

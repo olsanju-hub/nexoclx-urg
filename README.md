@@ -55,6 +55,7 @@ Principios actuales del proyecto:
 | Módulo de arritmias ventriculares | Activo | Organigrama para pulso, inestabilidad, TV monomorfa y torsades / TV polimórfica. | El tratamiento farmacológico vive dentro del protocolo. |
 | Módulos de ictus | Activos | `Ictus isquémico` e `ictus hemorrágico` con diagnóstico, tratamiento y destino. | Quedan agrupados en `Neurología` con bibliografía textual. |
 | Crisis convulsiva / epilepsia | Activo | Ficha clínica para crisis autolimitada, crisis en curso, primera crisis, crisis provocada y estatus epiléptico. | Queda en `Neurología`, con relación secundaria funcional con urgencias y tratamiento escalonado con CIMA. |
+| Anafilaxia | Activo | Ficha clínica para sospecha, pruebas mínimas, decisión de gravedad, adrenalina IM y destino. | Queda en `Urgencias` con calculadora directa de adrenalina IM por peso. |
 | Dolor abdominal por escenarios | Activo | Protocolos de un vistazo para epigastrio, hipocondrio derecho, fosas iliacas, flanco, pelvis, peritonismo y sospecha vascular. | Cada cuadro queda en su especialidad principal: `Digestivo`, `Cirugía general`, `Urología`, `Ginecología` o `Vascular`. |
 | Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo. |
 | Medicamentos | No visible como sección principal | Los datos farmacológicos pueden seguir existiendo como soporte interno mientras se integran pautas auditadas dentro de cada protocolo. | No debe mostrarse como módulo independiente ni como navegación principal. |
@@ -180,6 +181,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 - `src/data/calculators.js`
   - catálogo de cálculos implementados
   - lógica funcional de las calculadoras disponibles
+  - incluye calculadoras de dosis integradas cuando una pauta depende de peso, edad o función renal y cambia conducta práctica
   - auditoría completa de escalas detectadas en la obra base
 
 - `src/data/medications.js`
@@ -344,6 +346,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | 2026-04-05 | Rearquitectura móvil de navegación | Home / Protocolos / módulo FA | La app pasó a abrir siempre en `Home`, se creó una pantalla propia de `Protocolos` y FA se dividió en subpantallas breves para reducir scroll. |
 | 2026-04-05 | Corrección de icono PWA | PWA / branding | Se unificó el icono interno y externo y se añadieron `manifest`, `apple-touch-icon` y `service worker` para que la instalación use icono real. |
 | 2026-05-18 | Protocolo de crisis convulsiva / epilepsia | Neurología / Urgencias | Se implementó como ficha clínica activa con diagnóstico, pruebas, decisión, tratamiento escalonado, destino, CIMA y bibliografía textual. |
+| 2026-05-18 | Anafilaxia y dosis calculadas | Urgencias / cálculos / medicamentos | Se añadió Anafilaxia y calculadoras directas para adrenalina IM, antiepilépticos, FA, SCA, alteplasa en ictus y heparina vascular cuando dependen del peso. |
 
 ## Pendiente
 

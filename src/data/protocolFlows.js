@@ -2083,6 +2083,7 @@ const buildVascularAbdominalPainFlow = (protocol) => ({
         'Isquemia mesentérica aguda: antibiótico amplio precoz; piperacilina/tazobactam 4/0,5 g IV cada 6-8 h.',
         'Heparina sódica IV si isquemia mesentérica/embolismo arterial y no contraindicación: bolo 80 UI/kg y 18 UI/kg/h ajustado a TTPA.',
       ],
+      actions: [calculatorAction('vascular-heparin-dose')],
       treatmentGroups: [
         {
           id: 'soporte-vascular',
@@ -2750,6 +2751,7 @@ const buildFaDecisionPanelFlow = (protocol) => {
         title: 'Tratamiento',
         summary: 'Control de estabilidad, frecuencia/ritmo y anticoagulación según duración, riesgo y función renal.',
         points: treatmentInitialItems(protocol),
+        actions: [calculatorAction('fa-dose')],
         treatmentGroups: [
           {
             id: 'intervenciones-fa',
@@ -2871,6 +2873,7 @@ const buildScaDecisionPanelFlow = (protocol) => {
         title: 'Tratamiento',
         summary: 'Antiagregación, anticoagulación, antiisquémicos y reperfusión según rama; cada fármaco abre su pauta.',
         points: treatmentInitialItems(protocol),
+        actions: [calculatorAction('sca-dose')],
         treatmentGroups: [
           {
             id: 'intervenciones-sca',
@@ -3327,6 +3330,7 @@ const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
           'Trombectomía si oclusión de gran vaso y criterios; activar traslado/neurorradiología sin demoras.',
           'Evitar antiagregación/anticoagulación en las primeras 24 h tras trombólisis hasta nueva imagen.',
         ],
+        actions: [calculatorAction('stroke-thrombolysis-dose')],
         treatmentGroups: medicationGroups.map((group) => ({
           id: `grupo-${slugify(group.title)}`,
           title: group.title,
@@ -3594,6 +3598,7 @@ const buildSeizureEmergencyFlow = (protocol) => {
           'Benzodiacepina si crisis >5 min o repetida sin recuperación.',
           'Si persiste: segunda línea IV y aviso a neurología/UCI; estatus refractario requiere UCI/anestesia/intubación.',
         ],
+        actions: [calculatorAction('seizure-dose')],
         treatmentGroups: [
           {
             id: 'medidas-iniciales-convulsiones',
@@ -3678,6 +3683,169 @@ const buildSeizureEmergencyFlow = (protocol) => {
   };
 };
 
+const buildAnaphylaxisFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Inicio agudo tras exposición probable con piel/mucosas, respiratorio, cardiovascular o digestivo.',
+        points: [
+          'Inicio agudo tras exposición probable a alérgeno, fármaco, alimento, picadura u otro desencadenante.',
+          'Piel/mucosas: urticaria, prurito, flushing o angioedema; puede faltar la urticaria.',
+          'Respiratorio: disnea, broncoespasmo, estridor, hipoxemia o dificultad para hablar.',
+          'Cardiovascular: hipotensión, síncope, colapso o shock.',
+          'Digestivo persistente: vómitos, dolor abdominal o diarrea, sobre todo si se asocia a otro sistema.',
+        ],
+        detailNodes: [
+          {
+            id: 'red-flags-anafilaxia',
+            title: 'Datos de alarma',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'Estridor, broncoespasmo grave, SatO2 baja, hipotensión, síncope o deterioro del nivel de conciencia.',
+              'Necesidad de adrenalina repetida, exposición a veneno/fármaco, asma, edad avanzada o comorbilidad cardiovascular.',
+              'La ausencia de urticaria no descarta anafilaxia si hay compromiso respiratorio o circulatorio.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Diagnóstico clínico: constantes y monitorización si gravedad; no retrasar adrenalina.',
+        points: [
+          'Diagnóstico clínico: no esperar analítica ni triptasa para tratar.',
+          'Constantes, SatO2 y monitorización si gravedad, hipotensión, broncoespasmo, estridor o adrenalina repetida.',
+          'Glucemia si alteración del nivel de conciencia; ECG si inestabilidad, edad/riesgo o adrenalina repetida.',
+          'Triptasa sérica si disponible y no retrasa tratamiento; gasometría/lactato si shock o insuficiencia respiratoria.',
+          'Buscar desencadenante, medicación previa, asma, betabloqueantes/IECA y reacción bifásica previa.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-anafilaxia-detalle',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'Hipoxemia, lactato elevado, hipotensión persistente o necesidad de adrenalina repetida obligan a monitorización y posible UCI.',
+              'ECG ayuda si dolor torácico, arritmia, cardiopatía o uso repetido de adrenalina.',
+              'La triptasa apoya el diagnóstico retrospectivo y la derivación, pero no decide el tratamiento inmediato.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Diferenciar reacción leve de anafilaxia; si hay compromiso respiratorio/circulatorio, adrenalina IM inmediata.',
+        points: [
+          'Anafilaxia probable: afectación respiratoria o cardiovascular, o dos sistemas tras exposición probable.',
+          'Reacción leve: piel/mucosas aisladas sin disnea, estridor, broncoespasmo, hipotensión, síncope ni síntomas progresivos.',
+          'Shock anafiláctico: hipotensión, mala perfusión, síncope o colapso; monitorizar y escalar soporte.',
+          'Broncoespasmo/estridor: adrenalina IM, oxígeno y soporte; valorar vía aérea precoz si progresivo.',
+          'Tras resolución, decidir observación, ingreso/UCI y derivación a alergología.',
+        ],
+        detailNodes: [
+          {
+            id: 'decision-anafilaxia',
+            title: 'Nivel de cuidados',
+            type: 'decision',
+            severity: 'warning',
+            items: [
+              'UCI/intubación si shock persistente, estridor progresivo, depresión respiratoria o necesidad de perfusión de adrenalina.',
+              'Observación tras anafilaxia incluso si mejora; mayor vigilancia si adrenalina repetida o comorbilidad.',
+              'La adrenalina IV/perfusión queda reservada a entorno monitorizado con personal experto.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Adrenalina IM es primera línea; soporte ABC y adyuvantes sin retrasar lo vital.',
+        points: [
+          'ABC, retirar desencadenante si es posible, posición cómoda o decúbito si hipotensión y oxígeno si hipoxemia.',
+          'Adrenalina IM inmediata si anafilaxia probable con compromiso respiratorio/circulatorio.',
+          'Fluidoterapia IV si hipotensión o shock; broncodilatador inhalado si broncoespasmo persistente.',
+          'Antihistamínico y corticoide solo como adyuvantes, nunca sustitutos de adrenalina.',
+          'Shock refractario: UCI/anestesia, vía aérea y adrenalina IV/perfusión según protocolo local experto.',
+        ],
+        actions: [calculatorAction('anaphylaxis-adrenaline')],
+        treatmentGroups: [
+          {
+            id: 'soporte-anafilaxia',
+            title: 'Soporte inicial',
+            cards: [
+              {
+                id: 'abc-anafilaxia',
+                title: 'ABC y soporte',
+                type: 'treatment',
+                severity: 'danger',
+                summary: 'No retrasar adrenalina si hay compromiso respiratorio o circulatorio.',
+                items: [
+                  'Fármaco/intervención: ABC, retirada del desencadenante si es posible, oxígeno si hipoxemia y monitorización si gravedad.',
+                  'Dosis: oxígeno titulado a SatO2; fluidos IV en bolos según PA, perfusión y comorbilidad.',
+                  'Vía: oxígeno inhalado; suero IV si hipotensión o shock.',
+                  'Evitar: bipedestación en hipotensión, retrasar adrenalina por canalizar vía o esperar pruebas.',
+                  'Reevaluar: SatO2, PA, pulso, estridor, broncoespasmo, urticaria/angioedema y respuesta a adrenalina.',
+                ],
+              },
+              {
+                id: 'adrenalina-iv-anafilaxia',
+                title: 'Shock refractario',
+                type: 'treatment',
+                severity: 'danger',
+                summary: 'Escalar a UCI/anestesia si no responde a adrenalina IM y fluidos.',
+                items: [
+                  'Fármaco/intervención: adrenalina IV/perfusión solo en entorno monitorizado y con personal experto.',
+                  'Dosis: según protocolo local de críticos; no se muestra una pauta única desde esta ficha.',
+                  'Vía: IV monitorizada, preferentemente en UCI/área de reanimación.',
+                  'Evitar: bolos IV no diluidos o sin monitorización.',
+                  'Reevaluar: PAM, perfusión, ECG, lactato, necesidad de intubación y reacción bifásica.',
+                ],
+              },
+            ],
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta solo tras estabilidad completa; observación, ingreso o UCI según gravedad y riesgo de recurrencia.',
+        points: [
+          'Observación tras anafilaxia; más prolongada si adrenalina repetida, shock, broncoespasmo/estridor o comorbilidad.',
+          'Ingreso/UCI si shock, estridor, broncoespasmo grave, hipotensión persistente, depresión respiratoria o necesidad de intubación/perfusión.',
+          'Alta solo si estabilidad completa, educación, evitación del desencadenante, plan escrito y adrenalina autoinyectable si procede.',
+          'Derivar a alergología y explicar signos de alarma: disnea, mareo/síncope, urticaria progresiva, vómitos persistentes o edema facial/laríngeo.',
+        ],
+        detailNodes: [
+          {
+            id: 'alta-anafilaxia',
+            title: 'Alta segura',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Entregar recomendaciones escritas, plan de actuación y demostración del autoinyector si está indicado.',
+              'Evitar el desencadenante sospechoso hasta valoración especializada.',
+              'Volver de inmediato por recurrencia respiratoria, cardiovascular, angioedema, síncope o síntomas progresivos.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -3709,6 +3877,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'crisis-convulsiva-epilepsia') {
     return buildSeizureEmergencyFlow(protocol);
+  }
+
+  if (protocol.id === 'anafilaxia') {
+    return buildAnaphylaxisFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {

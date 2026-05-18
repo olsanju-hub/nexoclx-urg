@@ -73,9 +73,45 @@ const acgPancreatitisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =
     note,
   });
 
+const rcukAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'rcuk-anafilaxia-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const niceAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-cg134-anafilaxia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const senEpilepsyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'sen-epilepsia-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const roundToOne = (value) => Math.round(value * 10) / 10;
+const roundToTwo = (value) => Math.round(value * 100) / 100;
 
 const numeric = (value) => Number(value) || 0;
+
+const doseResult = ({ title, value, unit = '', fields, interpretation, caution }) => ({
+  value,
+  unit,
+  fields,
+  interpretation,
+  caution,
+});
 
 export const calculateCockcroftGault = ({ age, sex, weightKg, serumCreatinineMgDl }) => {
   const ageNumber = Number(age);
@@ -362,6 +398,386 @@ export const calculateBisap = ({ bunOver25, impairedMentalStatus, sirs, ageOver6
   };
 };
 
+export const calculateSeizureDose = ({ medication, weightKg }) => {
+  const weight = numeric(weightKg);
+  if (!weight) return null;
+
+  const common = {
+    peso: `${weight} kg`,
+  };
+
+  if (medication === 'midazolam-no-iv') {
+    const raw = roundToTwo(weight * 0.2);
+    const dose = Math.min(raw, 10);
+    return doseResult({
+      value: `${dose} mg`,
+      fields: {
+        'Fármaco': 'Midazolam',
+        'Peso': common.peso,
+        'Dosis calculada': `${dose} mg${raw > 10 ? ' (0,2 mg/kg limitado por máximo)' : ' (0,2 mg/kg)'}`,
+        'Máximo aplicado si procede': '10 mg',
+        'Vía': 'IM, bucal o intranasal',
+        'Repetición/frecuencia': 'Repetir si persiste la crisis con monitorización respiratoria.',
+        'Evitar si': 'Depresión respiratoria sin soporte disponible.',
+        'Reevaluar': 'Cese de crisis, SatO2, ventilación, PA y necesidad de segunda línea IV.',
+      },
+      interpretation: 'Primera línea si crisis >5 min o repetida sin recuperación y no conviene retrasar por vía IV.',
+      caution: 'No retrasa ABC ni soporte ventilatorio.',
+    });
+  }
+
+  if (medication === 'midazolam-iv') {
+    const dose = roundToTwo(weight * 0.1);
+    return doseResult({
+      value: `${dose} mg`,
+      fields: {
+        'Fármaco': 'Midazolam',
+        'Peso': common.peso,
+        'Dosis calculada': `${dose} mg (0,1 mg/kg)`,
+        'Máximo aplicado si procede': `Límite total acumulado descrito: ${roundToTwo(weight * 0.4)} mg (0,4 mg/kg).`,
+        'Vía': 'IV lenta',
+        'Repetición/frecuencia': 'Repetir si persiste la crisis y hay soporte respiratorio.',
+        'Evitar si': 'Depresión respiratoria sin capacidad de soporte de vía aérea.',
+        'Reevaluar': 'Ventilación y necesidad de segunda línea si no cede.',
+      },
+      interpretation: 'Opción IV de primera línea cuando ya hay acceso venoso.',
+      caution: 'Evita repetir benzodiacepinas indefinidamente.',
+    });
+  }
+
+  if (medication === 'diazepam-rectal') {
+    const dose = roundToTwo(weight * 0.5);
+    return doseResult({
+      value: `${dose} mg`,
+      fields: {
+        'Fármaco': 'Diazepam',
+        'Peso': common.peso,
+        'Dosis calculada': `${dose} mg (0,5 mg/kg)`,
+        'Máximo aplicado si procede': 'No se aplica máximo cerrado en esta pauta local; vigilar sedación.',
+        'Vía': 'Rectal',
+        'Repetición/frecuencia': 'Usar como alternativa si no hay vía IV y no hay midazolam adecuado.',
+        'Evitar si': 'Depresión respiratoria, miastenia o intoxicación por depresores del SNC.',
+        'Reevaluar': 'Cese de crisis, ventilación y paso a segunda línea si persiste.',
+      },
+      interpretation: 'Alternativa si no hay acceso IV y no se dispone de midazolam adecuado.',
+      caution: 'En adulto con vía IV, la pauta actual visible usa diazepam IV 10 mg lento.',
+    });
+  }
+
+  if (medication === 'lorazepam') {
+    const raw = roundToTwo(weight * 0.1);
+    const dose = Math.min(raw, 4);
+    return doseResult({
+      value: `${dose} mg`,
+      fields: {
+        'Fármaco': 'Lorazepam',
+        'Peso': common.peso,
+        'Dosis calculada': `${dose} mg (0,1 mg/kg)`,
+        'Máximo aplicado si procede': '4 mg/dosis; máximo 2 dosis.',
+        'Vía': 'IV',
+        'Repetición/frecuencia': 'Valorar segunda dosis si persiste a los 10-15 min.',
+        'Evitar si': 'Depresión respiratoria relevante sin soporte ventilatorio disponible.',
+        'Reevaluar': 'Cese de crisis, ventilación, SatO2, PA y necesidad de segunda línea.',
+      },
+      interpretation: 'Opción IV si está disponible y se puede vigilar vía aérea.',
+      caution: 'Disponer de soporte de vía aérea antes de repetir benzodiacepina.',
+    });
+  }
+
+  if (medication === 'valproato') {
+    const low = roundToTwo(weight * 15);
+    const high = roundToTwo(weight * 25);
+    return doseResult({
+      value: `${low}-${high} mg`,
+      fields: {
+        'Fármaco': 'Valproato sódico',
+        'Peso': common.peso,
+        'Dosis calculada': `${low}-${high} mg (15-25 mg/kg)`,
+        'Máximo aplicado si procede': 'Usar 25 mg/kg como techo de carga mostrado.',
+        'Vía': 'IV lento',
+        'Repetición/frecuencia': 'Carga en 3-5 min; perfusión 1 mg/kg/h si se continúa.',
+        'Evitar si': 'Embarazo, posibilidad de embarazo con alternativa, hepatopatía, pancreatopatía o trastorno del ciclo de la urea.',
+        'Reevaluar': 'Crisis, perfil hepático, plaquetas/coagulación y plan de neurología.',
+      },
+      interpretation: 'Segunda línea si persiste tras benzodiacepina y no hay contraindicación.',
+      caution: 'Revisar contraindicaciones antes de administrarlo.',
+    });
+  }
+
+  if (medication === 'fenitoina') {
+    const load = roundToTwo(weight * 18);
+    const maintenanceLow = roundToTwo(weight * 5);
+    const maintenanceHigh = roundToTwo(weight * 7);
+    return doseResult({
+      value: `${load} mg`,
+      fields: {
+        'Fármaco': 'Fenitoína',
+        'Peso': common.peso,
+        'Dosis calculada': `${load} mg carga (18 mg/kg)`,
+        'Máximo aplicado si procede': 'Velocidad máxima 50 mg/min; no diluir en glucosado.',
+        'Vía': 'IV en suero fisiológico',
+        'Repetición/frecuencia': `Mantenimiento si procede: ${maintenanceLow}-${maintenanceHigh} mg/día repartido en 3-4 dosis.`,
+        'Evitar si': 'Bradicardia sinusal, bloqueo SA/AV, Adams-Stokes, hipotensión grave o alto riesgo cardíaco.',
+        'Reevaluar': 'ECG, PA, respiración, cese de crisis y niveles/toxicidad si continúa.',
+      },
+      interpretation: 'Segunda línea si persiste el estatus y se puede monitorizar ECG/PA.',
+      caution: 'Administrar con monitorización continua.',
+    });
+  }
+
+  return null;
+};
+
+export const calculateAnaphylaxisAdrenaline = ({ weightKg, ageGroup }) => {
+  const weight = numeric(weightKg);
+  if (!weight) return null;
+
+  const raw = roundToTwo(weight * 0.01);
+  const maxDose = ageGroup === 'adult' ? 0.5 : 0.3;
+  const dose = Math.min(raw, maxDose);
+  const volume = roundToTwo(dose);
+
+  return doseResult({
+    value: `${dose} mg`,
+    fields: {
+      'Fármaco': 'Adrenalina 1 mg/ml',
+      'Peso': `${weight} kg`,
+      'Edad/grupo si aplica': ageGroup === 'adult' ? 'Adulto/adolescente' : 'Pediátrico',
+      'Dosis calculada': `${dose} mg (${volume} ml de 1 mg/ml)`,
+      'Máximo aplicado si procede': `${maxDose} mg`,
+      'Vía': 'IM en cara anterolateral del muslo',
+      'Repetición/frecuencia': 'Repetir cada 5-15 min si persiste compromiso respiratorio/circulatorio.',
+      'Evitar si': 'No retrasar por contraindicaciones relativas en anafilaxia grave; evitar vía IV sin monitorización experta.',
+      'Reevaluar': 'ABC, SatO2, PA, estridor/broncoespasmo, urticaria/angioedema y necesidad de UCI.',
+    },
+    interpretation: 'Primera línea en anafilaxia probable con compromiso respiratorio o cardiovascular.',
+    caution: 'Si la situación es crítica, no demorar la administración por completar el cálculo.',
+  });
+};
+
+export const calculateScaDose = ({ medication, weightKg, age, renalSevere }) => {
+  const weight = numeric(weightKg);
+  if (!weight) return null;
+
+  if (medication === 'heparina-icp') {
+    return doseResult({
+      value: `${Math.round(weight * 70)}-${Math.round(weight * 100)} UI`,
+      fields: {
+        'Fármaco': 'Heparina sódica',
+        'Peso': `${weight} kg`,
+        'Dosis calculada': `${Math.round(weight * 70)}-${Math.round(weight * 100)} UI`,
+        'Máximo aplicado si procede': 'No mostrado; usar protocolo de hemodinámica si ACT/anti-GPIIbIIIa modifica dosis.',
+        'Vía': 'IV bolo durante ICP',
+        'Repetición/frecuencia': 'Bolo inicial según estrategia invasiva.',
+        'Evitar si': 'Sangrado activo, HIT o contraindicación hemorrágica relevante.',
+        'Reevaluar': 'Sangrado, plaquetas y estrategia invasiva.',
+      },
+      interpretation: 'Cálculo de bolo en ICP según pauta visible del SCA.',
+      caution: 'Si la estrategia cambia, usar protocolo de cardiología/hemodinámica local.',
+    });
+  }
+
+  if (medication === 'enoxaparina') {
+    const dose = roundToOne(weight);
+    return doseResult({
+      value: `${dose} mg`,
+      fields: {
+        'Fármaco': 'Enoxaparina',
+        'Peso': `${weight} kg`,
+        'Dosis calculada': `${dose} mg (1 mg/kg)`,
+        'Máximo aplicado si procede': 'No se muestra máximo cerrado; ajustar a presentación y riesgo hemorrágico.',
+        'Vía': 'SC; bolo IV 0,3 mg/kg si última SC >8 h antes de ICP',
+        'Repetición/frecuencia': renalSevere ? 'Cada 24 h si ClCr <30 ml/min.' : 'Cada 12 h si ClCr ≥30 ml/min.',
+        'Evitar si': 'Sangrado activo, diatesis hemorrágica o contraindicación de anticoagulación.',
+        'Reevaluar': 'Función renal, sangrado, plaquetas y momento de coronariografía.',
+      },
+      interpretation: 'Pauta de SCA con ajuste de intervalo por función renal.',
+      caution: 'Usar Cockcroft-Gault si la función renal no está clara.',
+    });
+  }
+
+  if (medication === 'tenecteplasa') {
+    const ageNumber = numeric(age);
+    const base =
+      weight < 60 ? 30 : weight < 70 ? 35 : weight < 80 ? 40 : weight < 90 ? 45 : 50;
+    const dose = ageNumber >= 75 ? base / 2 : base;
+    return doseResult({
+      value: `${dose} mg`,
+      fields: {
+        'Fármaco': 'Tenecteplasa',
+        'Peso': `${weight} kg`,
+        'Edad/grupo si aplica': ageNumber ? `${ageNumber} años` : 'Edad no indicada',
+        'Dosis calculada': `${dose} mg en bolo IV`,
+        'Máximo aplicado si procede': ageNumber >= 75 ? 'Mitad de dosis por edad ≥75 años; máximo base 50 mg.' : 'Máximo 50 mg.',
+        'Vía': 'IV bolo',
+        'Repetición/frecuencia': 'Dosis única.',
+        'Evitar si': 'Contraindicación mayor de fibrinólisis o ICP primaria disponible en tiempo.',
+        'Reevaluar': 'Reperfusión a 60-90 min, sangrado, arritmias y necesidad de angiografía de rescate.',
+      },
+      interpretation: 'Fibrinólisis de SCACEST si no hay ICP primaria en tiempo y no hay contraindicación.',
+      caution: 'No usar en SCASEST.',
+    });
+  }
+
+  if (medication === 'alteplasa-sca') {
+    const firstInfusion = Math.min(roundToTwo(weight * 0.75), 50);
+    const secondInfusion = Math.min(roundToTwo(weight * 0.5), 35);
+    const total = roundToTwo(15 + firstInfusion + secondInfusion);
+    return doseResult({
+      value: `${total} mg total`,
+      fields: {
+        'Fármaco': 'Alteplasa',
+        'Peso': `${weight} kg`,
+        'Dosis calculada': `15 mg bolo + ${firstInfusion} mg en 30 min + ${secondInfusion} mg en 60 min`,
+        'Máximo aplicado si procede': 'Máximo total 100 mg; tramos máximos 50 mg y 35 mg.',
+        'Vía': 'IV',
+        'Repetición/frecuencia': 'Bolo y perfusión acelerada de 90 min.',
+        'Evitar si': 'Contraindicación mayor de fibrinólisis o SCASEST.',
+        'Reevaluar': 'Reperfusión, sangrado y traslado a centro con ICP.',
+      },
+      interpretation: 'Alternativa fibrinolítica en SCACEST si no hay ICP primaria en tiempo.',
+      caution: 'Requiere antitrombótico coadyuvante y monitorización.',
+    });
+  }
+
+  return null;
+};
+
+export const calculateFaDose = ({ medication, weightKg, renalSevere }) => {
+  const weight = numeric(weightKg);
+  if (!weight) return null;
+
+  if (medication === 'amiodarona') {
+    const low = roundToTwo(weight * 5);
+    const high = roundToTwo(weight * 7);
+    return doseResult({
+      value: `${low}-${high} mg`,
+      fields: {
+        'Fármaco': 'Amiodarona',
+        'Peso': `${weight} kg`,
+        'Dosis calculada': `${low}-${high} mg (5-7 mg/kg)`,
+        'Máximo aplicado si procede': 'Límite práctico de carga diaria visible: 1,2-1,8 g/24 h según respuesta.',
+        'Vía': 'IV',
+        'Repetición/frecuencia': 'Carga inicial; completar perfusión según respuesta y monitorización.',
+        'Evitar si': 'QT largo, bradicardia marcada, BAV avanzado sin marcapasos o hipotensión grave.',
+        'Reevaluar': 'Ritmo, QT, PA, frecuencia, K/Mg y necesidad de cardioversión eléctrica.',
+      },
+      interpretation: 'Opción de control de ritmo/frecuencia en FA seleccionada, especialmente si cardiopatía estructural.',
+      caution: 'Monitorizar ECG y hemodinámica.',
+    });
+  }
+
+  if (medication === 'flecainida') {
+    const low = roundToTwo(weight * 1.5);
+    const high = roundToTwo(weight * 3);
+    return doseResult({
+      value: `${low}-${high} mg`,
+      fields: {
+        'Fármaco': 'Flecainida',
+        'Peso': `${weight} kg`,
+        'Dosis calculada': `${low}-${high} mg (1,5-3 mg/kg)`,
+        'Máximo aplicado si procede': 'No se aplica máximo cerrado en esta calculadora; respetar pauta local y monitorización.',
+        'Vía': 'IV en 20 min',
+        'Repetición/frecuencia': 'Dosis única de cardioversión farmacológica.',
+        'Evitar si': 'Cardiopatía estructural, enfermedad coronaria, HFrEF, QRS ancho o sospecha de preexcitación no controlada.',
+        'Reevaluar': 'QRS, QT, PA, ritmo y necesidad de cardioversión eléctrica.',
+      },
+      interpretation: 'Solo en FA estable seleccionada sin cardiopatía estructural significativa.',
+      caution: 'No combinar con antiarrítmicos clase III en el mismo momento.',
+    });
+  }
+
+  if (medication === 'propafenona') {
+    const low = roundToTwo(weight * 1.5);
+    const high = roundToTwo(weight * 2);
+    return doseResult({
+      value: `${low}-${high} mg`,
+      fields: {
+        'Fármaco': 'Propafenona',
+        'Peso': `${weight} kg`,
+        'Dosis calculada': `${low}-${high} mg (1,5-2 mg/kg)`,
+        'Máximo aplicado si procede': 'No se aplica máximo cerrado en esta calculadora; respetar pauta local y monitorización.',
+        'Vía': 'IV en 20 min',
+        'Repetición/frecuencia': 'Dosis única de cardioversión farmacológica.',
+        'Evitar si': 'Cardiopatía estructural, HFrEF, enfermedad coronaria, broncoespasmo grave o trastorno de conducción relevante.',
+        'Reevaluar': 'QRS, QT, PA, ritmo y necesidad de cardioversión eléctrica.',
+      },
+      interpretation: 'Solo en FA estable seleccionada sin cardiopatía estructural significativa.',
+      caution: 'Monitorización ECG durante y después de la administración.',
+    });
+  }
+
+  if (medication === 'enoxaparina-fa') {
+    const dose = roundToOne(weight);
+    return doseResult({
+      value: `${dose} mg`,
+      fields: {
+        'Fármaco': 'Enoxaparina',
+        'Peso': `${weight} kg`,
+        'Dosis calculada': `${dose} mg (1 mg/kg)`,
+        'Máximo aplicado si procede': 'No se muestra máximo cerrado; ajustar a presentación, sangrado y contexto.',
+        'Vía': 'SC',
+        'Repetición/frecuencia': renalSevere ? 'Cada 24 h si ClCr 15-30 ml/min.' : 'Cada 12 h si ClCr ≥30 ml/min.',
+        'Evitar si': 'Sangrado activo, HIT, contraindicación de anticoagulación o ClCr <15 ml/min fuera de indicación especializada.',
+        'Reevaluar': 'Cockcroft-Gault, sangrado, plaquetas y transición a anticoagulación definitiva.',
+      },
+      interpretation: 'Puente anticoagulante si se elige HBPM en FA y el contexto lo justifica.',
+      caution: 'No duplica la decisión CHA2DS2-VA/HAS-BLED; solo calcula dosis si ya se decidió usarla.',
+    });
+  }
+
+  return null;
+};
+
+export const calculateStrokeThrombolysisDose = ({ weightKg }) => {
+  const weight = numeric(weightKg);
+  if (!weight) return null;
+
+  const total = Math.min(roundToTwo(weight * 0.9), 90);
+  const bolus = roundToTwo(total * 0.1);
+  const infusion = roundToTwo(total - bolus);
+
+  return doseResult({
+    value: `${total} mg total`,
+    fields: {
+      'Fármaco': 'Alteplasa',
+      'Peso': `${weight} kg`,
+      'Dosis calculada': `${total} mg total: ${bolus} mg bolo + ${infusion} mg perfusión`,
+      'Máximo aplicado si procede': '90 mg total.',
+      'Vía': 'IV',
+      'Repetición/frecuencia': '10% en bolo inicial y 90% en 60 min.',
+      'Evitar si': 'Contraindicación de fibrinólisis, hemorragia intracraneal o criterios de exclusión del código ictus.',
+      'Reevaluar': 'NIHSS, PA, sangrado, angioedema y necesidad de trombectomía/traslado.',
+    },
+    interpretation: 'Trombolisis IV si candidato confirmado por código ictus.',
+    caution: 'No iniciar sin verificar criterios de inclusión/exclusión y neuroimagen.',
+  });
+};
+
+export const calculateVascularHeparinDose = ({ weightKg }) => {
+  const weight = numeric(weightKg);
+  if (!weight) return null;
+
+  const bolus = Math.round(weight * 80);
+  const infusion = Math.round(weight * 18);
+
+  return doseResult({
+    value: `${bolus} UI bolo`,
+    fields: {
+      'Fármaco': 'Heparina sódica',
+      'Peso': `${weight} kg`,
+      'Dosis calculada': `${bolus} UI bolo + ${infusion} UI/h perfusión`,
+      'Máximo aplicado si procede': 'Alternativa visible: bolo 5.000 UI y perfusión 1.300 UI/h según contexto.',
+      'Vía': 'IV',
+      'Repetición/frecuencia': 'Perfusión continua ajustada a TTPA.',
+      'Evitar si': 'Sangrado activo, disección/aneurisma con cirugía inmediata sin indicación, HIT o contraindicación especializada.',
+      'Reevaluar': 'TTPA, sangrado, plaquetas, lactato, dolor y plan vascular/cirugía.',
+    },
+    interpretation: 'Apoyo al cálculo si vascular/cirugía indica anticoagulación en isquemia mesentérica/embolismo arterial.',
+    caution: 'No iniciar anticoagulación empírica desde el módulo sin decisión especializada si el diagnóstico no está claro.',
+  });
+};
+
 export const calculatorCatalog = {
   'cha2ds2-va': {
     id: 'cha2ds2-va',
@@ -553,6 +969,161 @@ export const calculatorCatalog = {
       }),
     ],
   },
+  'seizure-dose': {
+    id: 'seizure-dose',
+    title: 'Dosis antiepilépticos por peso',
+    shortTitle: 'Dosis crisis',
+    moduleId: 'crisis-convulsiva-epilepsia',
+    block: 'Crisis convulsiva / epilepsia',
+    chapter: 'Cap. 63 + SEN/NICE/AES',
+    verifiedPage: 438,
+    pdfPage: 463,
+    status: 'implementado',
+    summary: 'Calcula dosis de fármacos usados en crisis prolongada o estatus cuando dependen del peso.',
+    bibliography: [
+      referenceEntry({
+        id: 'seizure-dose-murillo',
+        indexPage: 435,
+        verifiedPage: 438,
+        pdfPage: 463,
+        note: 'Dosis por peso de benzodiacepinas y segunda línea en crisis prolongada/estatus.',
+      }),
+      senEpilepsyEntry({
+        id: 'seizure-dose-sen',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia española de apoyo para crisis epilépticas y epilepsia en urgencias.',
+      }),
+    ],
+  },
+  'anaphylaxis-adrenaline': {
+    id: 'anaphylaxis-adrenaline',
+    title: 'Adrenalina IM por peso',
+    shortTitle: 'Adrenalina IM',
+    moduleId: 'anafilaxia',
+    block: 'Anafilaxia',
+    chapter: 'Cap. 190 + NICE/RCUK',
+    verifiedPage: 1059,
+    pdfPage: 1084,
+    status: 'implementado',
+    summary: 'Calcula adrenalina IM 1 mg/ml por peso y grupo adulto/pediátrico con máximo aplicado.',
+    bibliography: [
+      referenceEntry({
+        id: 'anaphylaxis-adrenaline-murillo',
+        indexPage: 1059,
+        verifiedPage: 1059,
+        pdfPage: 1084,
+        note: 'Adrenalina IM como primera línea y repetición en anafilaxia.',
+      }),
+      niceAnaphylaxisEntry({
+        id: 'anaphylaxis-adrenaline-nice',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Observación y alta tras tratamiento de emergencia de anafilaxia.',
+      }),
+      rcukAnaphylaxisEntry({
+        id: 'anaphylaxis-adrenaline-rcuk',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Adrenalina IM, dosis por grupo y repetición según respuesta.',
+      }),
+    ],
+  },
+  'sca-dose': {
+    id: 'sca-dose',
+    title: 'Dosis SCA por peso',
+    shortTitle: 'Dosis SCA',
+    moduleId: 'sindrome-coronario-agudo',
+    block: 'Síndrome coronario agudo',
+    chapter: 'ESC SCA 2023 + Cap. 26',
+    verifiedPage: 224,
+    pdfPage: 249,
+    status: 'implementado',
+    summary: 'Calcula anticoagulación/fibrinólisis del SCA cuando depende de peso, edad o función renal.',
+    bibliography: [
+      escScaEntry({
+        id: 'sca-dose-esc',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Anticoagulación y fibrinólisis en SCA según estrategia clínica.',
+      }),
+      referenceEntry({
+        id: 'sca-dose-murillo',
+        indexPage: 214,
+        verifiedPage: 224,
+        pdfPage: 249,
+        note: 'Dosis de heparina, enoxaparina y fibrinolíticos en SCA.',
+      }),
+    ],
+  },
+  'fa-dose': {
+    id: 'fa-dose',
+    title: 'Dosis FA por peso',
+    shortTitle: 'Dosis FA',
+    moduleId: 'fibrilacion-auricular',
+    block: 'Fibrilación auricular',
+    chapter: 'ESC FA 2024 + CIMA',
+    verifiedPage: 43,
+    pdfPage: 43,
+    status: 'implementado',
+    summary: 'Calcula fármacos ya visibles de FA cuando la pauta depende de peso o función renal.',
+    bibliography: [
+      escFaEntry({
+        id: 'fa-dose-esc',
+        verifiedPages: [43, 44, 45, 46, 47, 48],
+        pdfPages: [43, 44, 45, 46, 47, 48],
+        note: 'Cardioversión, antiarrítmicos y anticoagulación según contexto de FA.',
+      }),
+    ],
+  },
+  'stroke-thrombolysis-dose': {
+    id: 'stroke-thrombolysis-dose',
+    title: 'Alteplasa ictus por peso',
+    shortTitle: 'Alteplasa ictus',
+    moduleId: 'ictus-isquemico',
+    block: 'Ictus isquémico',
+    chapter: 'AHA/ASA 2026 + Cap. 64',
+    verifiedPage: 442,
+    pdfPage: 467,
+    status: 'implementado',
+    summary: 'Calcula alteplasa IV 0,9 mg/kg con máximo y reparto bolo/perfusión.',
+    bibliography: [
+      ahaIschemicStrokeEntry({
+        id: 'stroke-thrombolysis-aha',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Trombolisis IV en candidato seleccionado dentro del circuito de ictus.',
+      }),
+      referenceEntry({
+        id: 'stroke-thrombolysis-murillo',
+        indexPage: 442,
+        verifiedPage: 442,
+        pdfPage: 467,
+        note: 'Dosis de trombolisis intravenosa en ictus isquémico.',
+      }),
+    ],
+  },
+  'vascular-heparin-dose': {
+    id: 'vascular-heparin-dose',
+    title: 'Heparina vascular por peso',
+    shortTitle: 'Heparina vascular',
+    moduleId: 'dolor-vascular',
+    block: 'Vascular abdominal',
+    chapter: 'Dolor abdominal vascular',
+    verifiedPage: 340,
+    pdfPage: 365,
+    status: 'implementado',
+    summary: 'Calcula bolo y perfusión de heparina IV cuando vascular/cirugía indica anticoagulación.',
+    bibliography: [
+      referenceEntry({
+        id: 'vascular-heparin-murillo',
+        indexPage: 340,
+        verifiedPage: 340,
+        pdfPage: 365,
+        note: 'Módulo de dolor abdominal vascular con anticoagulación si isquemia/embolismo y no contraindicación.',
+      }),
+    ],
+  },
 };
 
 export const implementedCalculators = Object.values(calculatorCatalog);
@@ -719,6 +1290,60 @@ export const calculationAudit = [
     pdfPage: null,
     status: 'implementado',
     note: 'Integrado en hepatobiliar-pancreático para estratificar riesgo inicial de pancreatitis.',
+  },
+  {
+    id: 'seizure-dose',
+    title: 'Dosis antiepilépticos por peso',
+    chapter: 'Cap. 63 · Crisis epilépticas',
+    verifiedPage: 438,
+    pdfPage: 463,
+    status: 'implementado',
+    note: 'Integrado en tratamiento de crisis convulsiva para midazolam, diazepam rectal, valproato y fenitoína.',
+  },
+  {
+    id: 'anaphylaxis-adrenaline',
+    title: 'Adrenalina IM por peso',
+    chapter: 'Cap. 190 · Anafilaxia',
+    verifiedPage: 1059,
+    pdfPage: 1084,
+    status: 'implementado',
+    note: 'Integrado en anafilaxia para calcular adrenalina IM por peso y grupo adulto/pediátrico.',
+  },
+  {
+    id: 'sca-dose',
+    title: 'Dosis SCA por peso',
+    chapter: 'Cap. 26 · Síndrome coronario agudo',
+    verifiedPage: 224,
+    pdfPage: 249,
+    status: 'implementado',
+    note: 'Integrado en SCA para heparina, enoxaparina, tenecteplasa y alteplasa.',
+  },
+  {
+    id: 'fa-dose',
+    title: 'Dosis FA por peso',
+    chapter: 'ESC FA 2024 · Fibrilación auricular',
+    verifiedPage: 43,
+    pdfPage: 43,
+    status: 'implementado',
+    note: 'Integrado en FA para antiarrítmicos y enoxaparina cuando se usa una pauta ponderal.',
+  },
+  {
+    id: 'stroke-thrombolysis-dose',
+    title: 'Alteplasa ictus por peso',
+    chapter: 'Cap. 64 · Ictus',
+    verifiedPage: 442,
+    pdfPage: 467,
+    status: 'implementado',
+    note: 'Integrado en ictus isquémico para calcular 0,9 mg/kg, máximo 90 mg, bolo y perfusión.',
+  },
+  {
+    id: 'vascular-heparin-dose',
+    title: 'Heparina vascular por peso',
+    chapter: 'Cap. 50 · Dolor abdominal vascular',
+    verifiedPage: 340,
+    pdfPage: 365,
+    status: 'implementado',
+    note: 'Integrado en vascular abdominal cuando se decide anticoagulación con heparina IV.',
   },
   {
     id: 'rankin-modificada',

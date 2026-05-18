@@ -109,6 +109,24 @@ const aesStatusEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const niceAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-cg134-anafilaxia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const rcukAnaphylaxisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'rcuk-anafilaxia-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -361,6 +379,11 @@ export const protocolSpecialties = [
     id: 'infecciosas',
     title: 'Infecciosas',
     note: 'Neumonía, sepsis y otros síndromes infecciosos.',
+  },
+  {
+    id: 'urgencias',
+    title: 'Urgencias',
+    note: 'Cuadros transversales tiempo-dependientes y soporte inicial.',
   },
 ];
 
@@ -681,6 +704,40 @@ export const motivoConsultaModules = [
         verifiedPages: [48, 49, 50, 51],
         pdfPages: [48, 49, 50, 51],
         note: 'Tratamiento escalonado del estatus convulsivo.',
+      }),
+    ],
+  },
+  {
+    id: 'anafilaxia',
+    title: 'Anafilaxia',
+    shortTitle: 'Anafilaxia',
+    chapter: 'Cap. 190 + NICE/RCUK',
+    section: 'Urgencias',
+    specialtyId: 'urgencias',
+    verifiedPage: 1059,
+    pdfPage: 1084,
+    status: 'implementado',
+    implemented: true,
+    summary: 'Diagnóstico clínico, adrenalina IM inmediata, soporte y observación tras resolución.',
+    bibliography: [
+      referenceEntry({
+        id: 'anafilaxia-murillo-module',
+        indexPage: 1059,
+        verifiedPage: 1059,
+        pdfPage: 1084,
+        note: 'Capítulo base para urticaria, angioedema y anafilaxia en urgencias.',
+      }),
+      niceAnaphylaxisEntry({
+        id: 'anafilaxia-nice-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Valoración, observación, alta segura y derivación tras anafilaxia.',
+      }),
+      rcukAnaphylaxisEntry({
+        id: 'anafilaxia-rcuk-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Tratamiento urgente y repetición de adrenalina IM.',
       }),
     ],
   },

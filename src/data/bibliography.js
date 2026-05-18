@@ -59,6 +59,16 @@ export const bibliographyCatalog = {
     title: 'American Epilepsy Society guideline: treatment of convulsive status epilepticus in children and adults',
     shortTitle: 'AES Estatus 2016',
   },
+  'nice-cg134-anafilaxia': {
+    id: 'nice-cg134-anafilaxia',
+    title: 'NICE CG134: Anaphylaxis: assessment and referral after emergency treatment',
+    shortTitle: 'NICE CG134 Anafilaxia',
+  },
+  'rcuk-anafilaxia-2021': {
+    id: 'rcuk-anafilaxia-2021',
+    title: 'Resuscitation Council UK: Emergency treatment of anaphylaxis, guideline for healthcare providers',
+    shortTitle: 'RCUK Anafilaxia 2021',
+  },
   'nice-ng250-2025': {
     id: 'nice-ng250-2025',
     title: 'NICE NG250: Neumonía: diagnóstico y manejo',
