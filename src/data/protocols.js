@@ -82,6 +82,33 @@ const ahaHemorrhagicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note
     note,
   });
 
+const senEpilepsyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'sen-epilepsia-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const niceEpilepsyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng217-epilepsia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const aesStatusEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aes-estatus-2016',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -716,6 +743,68 @@ export const protocolCatalog = {
         verifiedPages: [442, 443, 444, 445],
         pdfPages: [467, 468, 469, 470],
         note: 'Apoyo práctico secundario del capítulo de ictus en la obra base.',
+      }),
+    ],
+  },
+  'crisis-convulsiva-epilepsia': {
+    id: 'crisis-convulsiva-epilepsia',
+    title: 'Crisis convulsiva / epilepsia en urgencias',
+    longTitle: 'Crisis convulsiva / epilepsia en urgencias',
+    chapter: 'Cap. 63 + SEN/NICE/AES',
+    section: 'Urgencias neurológicas',
+    indexPage: 435,
+    verifiedPage: 435,
+    pdfPage: 460,
+    status: 'implementado',
+    summary:
+      'Crisis autolimitada, primera crisis, crisis provocada y estatus epiléptico con tratamiento escalonado.',
+    quickChecks: [
+      'Glucemia capilar inmediata, constantes, SatO2 y protección ABC.',
+      'Diferenciar crisis finalizada con recuperación completa, crisis en curso, crisis recurrente y estatus.',
+      'Buscar causa provocada: hipoglucemia, fiebre/infección, tóxicos, abstinencia, iones, ictus, TCE o infección SNC.',
+      'TC craneal si primera crisis, focalidad, traumatismo, anticoagulación, inmunosupresión, fiebre/meningismo o déficit persistente.',
+      'Benzodiacepina si crisis >5 min o repetida sin recuperación; segunda línea IV si persiste.',
+    ],
+    warnings: [
+      'No introducir objetos en la boca ni forzar la apertura mandibular durante la crisis.',
+      'No retrasar benzodiacepina si la crisis dura >5 min o se repite sin recuperación.',
+      'Estatus, depresión respiratoria o necesidad de anestesia/intubación exige UCI.',
+    ],
+    medicationGroups: [
+      {
+        title: 'Benzodiacepina de primera línea',
+        medicationIds: ['midazolam-convulsiones', 'diazepam-convulsiones', 'lorazepam-estatus'],
+      },
+      {
+        title: 'Segunda línea en estatus',
+        medicationIds: ['levetiracetam-estatus', 'valproato-estatus', 'fenitoina-estatus'],
+      },
+    ],
+    bibliography: [
+      referenceEntry({
+        id: 'convulsiones-murillo-cap63',
+        indexPage: 435,
+        verifiedPage: 435,
+        pdfPage: 460,
+        note: 'Capítulo 63: sospecha, pruebas iniciales, criterios de TC/ingreso y tratamiento de crisis/estatus.',
+      }),
+      senEpilepsyEntry({
+        id: 'convulsiones-sen-2023',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia española de apoyo para urgencias en crisis epilépticas y epilepsia.',
+      }),
+      niceEpilepsyEntry({
+        id: 'convulsiones-nice-ng217',
+        verifiedPages: [7],
+        pdfPages: [7],
+        note: 'Tratamiento de crisis prolongadas, repetidas y estatus convulsivo.',
+      }),
+      aesStatusEntry({
+        id: 'convulsiones-aes-2016',
+        verifiedPages: [48, 49, 50, 51],
+        pdfPages: [48, 49, 50, 51],
+        note: 'Algoritmo farmacológico del estatus epiléptico convulsivo.',
       }),
     ],
   },

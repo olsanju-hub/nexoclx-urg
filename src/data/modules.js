@@ -82,6 +82,33 @@ const ahaHemorrhagicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note
     note,
   });
 
+const senEpilepsyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'sen-epilepsia-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const niceEpilepsyEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng217-epilepsia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const aesStatusEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aes-estatus-2016',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -613,6 +640,47 @@ export const motivoConsultaModules = [
         indexPage: 442,
         pdfPage: 467,
         note: 'Apoyo práctico secundario del capítulo de ictus en la obra base.',
+      }),
+    ],
+  },
+  {
+    id: 'crisis-convulsiva-epilepsia',
+    title: 'Crisis convulsiva / epilepsia en urgencias',
+    shortTitle: 'Crisis convulsiva',
+    chapter: 'Cap. 63 + SEN/NICE/AES',
+    section: 'Neurología',
+    specialtyId: 'neurologia',
+    verifiedPage: 435,
+    pdfPage: 460,
+    status: 'implementado',
+    implemented: true,
+    summary:
+      'Convulsión, epilepsia, primera crisis, crisis provocada y estatus epiléptico con tratamiento urgente escalonado.',
+    bibliography: [
+      referenceEntry({
+        id: 'convulsiones-murillo-module',
+        indexPage: 435,
+        verifiedPage: 435,
+        pdfPage: 460,
+        note: 'Capítulo base para crisis epilépticas y estatus en urgencias.',
+      }),
+      senEpilepsyEntry({
+        id: 'convulsiones-sen-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Apoyo de sociedad neurológica española para urgencias en epilepsia.',
+      }),
+      niceEpilepsyEntry({
+        id: 'convulsiones-nice-module',
+        verifiedPages: [7],
+        pdfPages: [7],
+        note: 'Tratamiento urgente de crisis prolongadas y estatus.',
+      }),
+      aesStatusEntry({
+        id: 'convulsiones-aes-module',
+        verifiedPages: [48, 49, 50, 51],
+        pdfPages: [48, 49, 50, 51],
+        note: 'Tratamiento escalonado del estatus convulsivo.',
       }),
     ],
   },

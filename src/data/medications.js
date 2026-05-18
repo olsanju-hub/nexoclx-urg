@@ -82,6 +82,33 @@ const ahaHemorrhagicStrokeReferenceEntry = ({ id, verifiedPages = [], pdfPages =
     note,
   });
 
+const senEpilepsyReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'sen-epilepsia-2023',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const niceEpilepsyReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng217-epilepsia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const aesStatusReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'aes-estatus-2016',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const externalSource = (label, url) => ({ label, url, type: 'external' });
 const cimaSource = (label, url) => ({ label, url, type: 'cima' });
 const protocolSource = (label, bibliography) => ({ label, bibliography, type: 'protocol' });
@@ -2134,6 +2161,285 @@ export const medicationCatalog = {
       ),
     ],
   },
+  'midazolam-convulsiones': {
+    id: 'midazolam-convulsiones',
+    name: 'Midazolam',
+    protocolId: 'crisis-convulsiva-epilepsia',
+    family: 'Benzodiacepina de primera línea',
+    indication: 'Crisis convulsiva que dura más de 5 min o crisis repetida sin recuperación completa.',
+    contextUse: 'Primera benzodiacepina si no hay vía IV o si la vía más rápida es IM, bucal o intranasal.',
+    contextDose:
+      'Sin vía IV: 0,2 mg/kg IM, bucal o intranasal; máximo 10 mg. Con vía IV: 0,1 mg/kg IV; repetir si precisa sin superar 0,4 mg/kg total.',
+    contextRoute: 'Intramuscular, bucal, intranasal o intravenosa según acceso y entorno.',
+    contextFrequency: 'Una dosis inicial; repetir si persiste la crisis con monitorización respiratoria.',
+    followUpPlan: 'Si no cede tras benzodiacepina adecuada, pasar a segunda línea IV y avisar UCI/neurología.',
+    dose:
+      'Sin vía IV: 0,2 mg/kg IM, bucal o intranasal; máximo 10 mg. Con vía IV: 0,1 mg/kg IV; repetir si precisa sin superar 0,4 mg/kg total.',
+    route: 'IM, bucal, intranasal o IV.',
+    frequency: 'Dosis aguda repetible si persiste la crisis, evitando retrasar segunda línea.',
+    duration: 'Uso agudo con reevaluación inmediata de crisis, vía aérea, SatO2 y PA.',
+    contraindications: [
+      'Depresión respiratoria relevante sin posibilidad de soporte de vía aérea.',
+      'Hipersensibilidad a benzodiacepinas o intoxicación por depresores del SNC con compromiso ventilatorio.',
+    ],
+    renalAdjustment: 'Sin ajuste renal fijo en la pauta aguda; vigilar sedación y ventilación.',
+    hepaticAdjustment: 'Precaución en insuficiencia hepática por riesgo de sedación prolongada.',
+    practicalNotes: [
+      'No introducir objetos en la boca ni retrasar la medicación por obtener vía venosa.',
+      'Preparar soporte ventilatorio si precisa repetir benzodiacepina.',
+    ],
+    sourceScope:
+      'Dosis de crisis prolongada y estatus verificada en Murillo; CIMA se usa como ficha técnica oficial del medicamento.',
+    sources: [
+      cimaSource('CIMA · Midazolam Sala solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/65415/FT_65415.html'),
+      protocolSource(
+        'Murillo 7.ª edición · crisis epilépticas',
+        referenceEntry({
+          id: 'midazolam-convulsiones-murillo',
+          indexPage: 435,
+          verifiedPage: 438,
+          pdfPage: 463,
+          note: 'Benzodiacepina inicial sin vía IV o por vía IV en crisis prolongada/estatus.',
+        }),
+      ),
+      protocolSource(
+        'NICE NG217 · estatus convulsivo',
+        niceEpilepsyReferenceEntry({
+          id: 'midazolam-convulsiones-nice',
+          verifiedPages: [7],
+          pdfPages: [7],
+          note: 'Tratamiento urgente de crisis prolongadas y estatus convulsivo.',
+        }),
+      ),
+    ],
+  },
+  'diazepam-convulsiones': {
+    id: 'diazepam-convulsiones',
+    name: 'Diazepam',
+    protocolId: 'crisis-convulsiva-epilepsia',
+    family: 'Benzodiacepina de primera línea',
+    indication: 'Alternativa benzodiacepínica en crisis convulsiva prolongada o estatus.',
+    contextUse: 'Usar IV si hay vía; rectal si no hay vía IV y no se dispone de midazolam adecuado.',
+    contextDose:
+      'IV: 10 mg lento a 2 mg/min; repetir 10 mg si no cede. Rectal si no hay vía IV: 0,5 mg/kg.',
+    contextRoute: 'Intravenosa o rectal.',
+    contextFrequency: 'Repetir una dosis si persiste la crisis, con vigilancia estrecha de respiración y PA.',
+    followUpPlan: 'Si persiste tras benzodiacepina adecuada, iniciar segunda línea IV y avisar UCI/neurología.',
+    dose: 'IV: 10 mg lento a 2 mg/min; repetir 10 mg si no cede. Rectal si no hay vía IV: 0,5 mg/kg.',
+    route: 'IV o rectal.',
+    frequency: 'Dosis aguda; repetir si persiste la crisis y no hay depresión respiratoria no controlada.',
+    duration: 'Uso agudo con transición a segunda línea si no hay respuesta.',
+    contraindications: [
+      'Depresión respiratoria o apnea sin soporte disponible.',
+      'Miastenia gravis, insuficiencia respiratoria grave o intoxicación por depresores del SNC con compromiso ventilatorio.',
+    ],
+    renalAdjustment: 'Usar la menor dosis eficaz en fragilidad o comorbilidad; no hay ajuste renal fijo para la dosis aguda.',
+    hepaticAdjustment: 'Reducir dosis y extremar vigilancia si insuficiencia hepática o edad avanzada.',
+    practicalNotes: [
+      'La administración IV rápida aumenta riesgo de apnea.',
+      'No repetir benzodiacepinas de forma indefinida; escalar a segunda línea.',
+    ],
+    sourceScope: 'Dosis de Murillo y ficha técnica CIMA de diazepam inyectable.',
+    sources: [
+      cimaSource('CIMA · Diazepam Basi 5 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/89559/FT_89559.html'),
+      protocolSource(
+        'Murillo 7.ª edición · crisis epilépticas',
+        referenceEntry({
+          id: 'diazepam-convulsiones-murillo',
+          indexPage: 435,
+          verifiedPage: 438,
+          pdfPage: 463,
+          note: 'Diazepam IV y rectal en crisis prolongada/estatus.',
+        }),
+      ),
+    ],
+  },
+  'lorazepam-estatus': {
+    id: 'lorazepam-estatus',
+    name: 'Lorazepam',
+    protocolId: 'crisis-convulsiva-epilepsia',
+    family: 'Benzodiacepina de primera línea',
+    indication: 'Control del estatus epiléptico convulsivo si está disponible por vía IV.',
+    contextUse: 'Opción IV de primera línea en estatus epiléptico convulsivo con vía venosa.',
+    contextDose: '4 mg IV; en pediatría 0,1 mg/kg IV con máximo 4 mg/dosis.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Si la convulsión dura más de 10-15 min, valorar una segunda dosis; máximo 2 dosis.',
+    followUpPlan: 'Si no responde a benzodiacepina adecuada, pasar a segunda línea IV y activar UCI/neurología.',
+    dose: '4 mg IV; en pediatría 0,1 mg/kg IV con máximo 4 mg/dosis.',
+    route: 'IV.',
+    frequency: 'Puede repetirse una vez si persiste la crisis tras 10-15 min.',
+    duration: 'Uso agudo; reevaluar ventilación y estado neurológico tras cada dosis.',
+    contraindications: [
+      'Depresión respiratoria relevante sin soporte ventilatorio disponible.',
+      'Hipersensibilidad a lorazepam o a benzodiacepinas.',
+    ],
+    renalAdjustment: 'Precaución por excipientes y sedación; no fija ajuste renal de dosis aguda.',
+    hepaticAdjustment: 'Usar con cautela en insuficiencia hepática grave.',
+    practicalNotes: [
+      'Disponer de material de vía aérea antes de administrar.',
+      'No retrasar segunda línea IV si dos dosis de benzodiacepina no controlan la crisis.',
+    ],
+    sourceScope: 'Pauta de ficha técnica CIMA y recomendación de benzodiacepina de primera línea en AES/NICE.',
+    sources: [
+      cimaSource('CIMA · Temelor 4 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/88360/FT_88360.html'),
+      protocolSource(
+        'AES · estatus convulsivo',
+        aesStatusReferenceEntry({
+          id: 'lorazepam-estatus-aes',
+          verifiedPages: [48, 49],
+          pdfPages: [48, 49],
+          note: 'Benzodiacepinas IV/IM como tratamiento inicial del estatus convulsivo.',
+        }),
+      ),
+      protocolSource(
+        'NICE NG217 · estatus convulsivo',
+        niceEpilepsyReferenceEntry({
+          id: 'lorazepam-estatus-nice',
+          verifiedPages: [7],
+          pdfPages: [7],
+          note: 'Escalada tras benzodiacepinas en estatus convulsivo.',
+        }),
+      ),
+    ],
+  },
+  'levetiracetam-estatus': {
+    id: 'levetiracetam-estatus',
+    name: 'Levetiracetam',
+    protocolId: 'crisis-convulsiva-epilepsia',
+    family: 'Segunda línea en estatus',
+    indication: 'Estatus epiléptico convulsivo que persiste tras benzodiacepina adecuada.',
+    contextUse: 'Segunda línea IV si persiste la crisis o hay alto riesgo de recurrencia inmediata.',
+    contextDose: '3.000-4.000 mg IV diluidos en 100 ml de suero fisiológico en 10-15 min.',
+    contextRoute: 'Perfusión intravenosa.',
+    contextFrequency: 'Dosis de carga; si continúa, 1.000-1.500 mg IV cada 12 h con ajuste renal.',
+    followUpPlan: 'Reevaluar cese de crisis; si persiste, considerar otra segunda línea o UCI/anestesia según protocolo local.',
+    dose: 'Carga 3.000-4.000 mg IV en 100 ml de suero fisiológico en 10-15 min; mantenimiento 1.000-1.500 mg/12 h si se indica.',
+    route: 'IV.',
+    frequency: 'Dosis de carga y mantenimiento cada 12 h si se continúa.',
+    duration: 'Según causa, recurrencia y plan de neurología.',
+    contraindications: ['Hipersensibilidad a levetiracetam o derivados de pirrolidona.'],
+    renalAdjustment: 'Ajustar mantenimiento a función renal; calcular aclaramiento si va a continuar.',
+    hepaticAdjustment: 'Sin ajuste hepático habitual; revisar si insuficiencia hepática grave con deterioro renal.',
+    practicalNotes: [
+      'No deprime respiración como benzodiacepinas, pero no sustituye soporte ABC.',
+      'Útil si se quiere evitar interacciones de fenitoína/valproato.',
+    ],
+    sourceScope: 'Dosis de carga en Murillo; ficha CIMA confirma formulación IV, perfusión y seguridad de dosis IV altas.',
+    sources: [
+      cimaSource(
+        'CIMA · Levetiracetam Kalceks 100 mg/ml concentrado para perfusión',
+        'https://cima.aemps.es/cima/dochtml/ft/91051/FT_91051.html',
+      ),
+      protocolSource(
+        'Murillo 7.ª edición · estatus establecido',
+        referenceEntry({
+          id: 'levetiracetam-estatus-murillo',
+          indexPage: 435,
+          verifiedPage: 439,
+          pdfPage: 464,
+          note: 'Levetiracetam IV como segunda línea del estatus establecido.',
+        }),
+      ),
+      protocolSource(
+        'AES · estatus convulsivo',
+        aesStatusReferenceEntry({
+          id: 'levetiracetam-estatus-aes',
+          verifiedPages: [50, 51],
+          pdfPages: [50, 51],
+          note: 'Opciones de segunda línea tras benzodiacepina inicial.',
+        }),
+      ),
+    ],
+  },
+  'valproato-estatus': {
+    id: 'valproato-estatus',
+    name: 'Valproato sódico',
+    protocolId: 'crisis-convulsiva-epilepsia',
+    family: 'Segunda línea en estatus',
+    indication: 'Estatus epiléptico que persiste tras benzodiacepina, si no hay contraindicación.',
+    contextUse: 'Segunda línea IV cuando no hay embarazo, hepatopatía ni otra contraindicación relevante.',
+    contextDose: '15-25 mg/kg IV lento en 3-5 min; después 1 mg/kg/h si se continúa.',
+    contextRoute: 'Intravenosa.',
+    contextFrequency: 'Dosis de carga; perfusión posterior si se decide mantenimiento.',
+    followUpPlan: 'Reevaluar respuesta y seguridad hepática/hematológica; evitar en mujeres con posibilidad de embarazo si hay alternativas.',
+    dose: '15-25 mg/kg IV lento en 3-5 min; después 1 mg/kg/h si se continúa.',
+    route: 'IV.',
+    frequency: 'Carga única y perfusión posterior según respuesta.',
+    duration: 'Uso agudo y continuación solo con plan de neurología.',
+    contraindications: [
+      'Embarazo o mujer en edad fértil salvo que no exista alternativa adecuada y se cumpla el plan de prevención.',
+      'Hepatitis, hepatopatía significativa, pancreatopatía, porfiria hepática o trastornos del ciclo de la urea.',
+    ],
+    renalAdjustment: 'Puede requerir ajuste o monitorización estrecha en insuficiencia renal; valorar niveles y clínica.',
+    hepaticAdjustment: 'Contraindicado en hepatopatía significativa o disfunción hepática grave.',
+    practicalNotes: [
+      'Evitar si sospecha mitocondrial/POLG o alto riesgo hepático.',
+      'Revisar plaquetas, coagulación y perfil hepático si se mantiene.',
+    ],
+    sourceScope: 'Dosis armonizada con ficha CIMA y Murillo; advertencias principales de CIMA.',
+    sources: [
+      cimaSource('CIMA · Depakine 100 mg/ml inyectable', 'https://cima.aemps.es/cima/dochtml/ft/60352/FichaTecnica_60352.html'),
+      protocolSource(
+        'Murillo 7.ª edición · estatus establecido',
+        referenceEntry({
+          id: 'valproato-estatus-murillo',
+          indexPage: 435,
+          verifiedPage: 439,
+          pdfPage: 464,
+          note: 'Valproato IV como segunda línea y perfusión posterior en estatus establecido.',
+        }),
+      ),
+      protocolSource(
+        'NICE NG217 · estatus convulsivo',
+        niceEpilepsyReferenceEntry({
+          id: 'valproato-estatus-nice',
+          verifiedPages: [7],
+          pdfPages: [7],
+          note: 'Opciones IV de segunda línea tras dos dosis de benzodiacepina.',
+        }),
+      ),
+    ],
+  },
+  'fenitoina-estatus': {
+    id: 'fenitoina-estatus',
+    name: 'Fenitoína',
+    protocolId: 'crisis-convulsiva-epilepsia',
+    family: 'Segunda línea en estatus',
+    indication: 'Estatus epiléptico tónico-clónico persistente tras benzodiacepina adecuada.',
+    contextUse: 'Segunda línea IV cuando se elige fenitoína y se puede monitorizar ECG/PA.',
+    contextDose: '18 mg/kg IV en suero fisiológico; velocidad máxima 50 mg/min.',
+    contextRoute: 'Intravenosa en suero fisiológico.',
+    contextFrequency: 'Carga única; mantenimiento 5-7 mg/kg/día IV repartido en 3-4 dosis si se continúa.',
+    followUpPlan: 'Monitorizar ECG, PA y respiración; si no responde, escalar a UCI/anestesia o alternativa según protocolo local.',
+    dose: 'Carga 18 mg/kg IV; mantenimiento 5-7 mg/kg/día IV repartido en 3-4 dosis si se continúa.',
+    route: 'IV, diluida exclusivamente en suero fisiológico.',
+    frequency: 'Carga inicial; mantenimiento fraccionado si procede.',
+    duration: 'Uso agudo; continuidad según niveles, respuesta y neurología.',
+    contraindications: [
+      'Bradicardia sinusal, bloqueo sinoauricular, bloqueo AV de segundo/tercer grado o síndrome de Adams-Stokes.',
+      'Hipotensión grave o insuficiencia cardiaca con riesgo de deterioro por perfusión rápida.',
+    ],
+    renalAdjustment: 'No hay ajuste renal simple; interpretar niveles con albúmina baja o uremia y vigilar toxicidad.',
+    hepaticAdjustment: 'Reducir o monitorizar estrechamente en hepatopatía por metabolismo hepático.',
+    practicalNotes: [
+      'No diluir en glucosado.',
+      'Requiere monitorización continua de ECG y presión arterial durante la administración.',
+    ],
+    sourceScope: 'Dosis y velocidad verificadas en Murillo y ficha CIMA de fenitoína inyectable.',
+    sources: [
+      cimaSource('CIMA · Fenitoína Altan 50 mg/ml solución inyectable', 'https://cima.aemps.es/cima/dochtml/ft/65372/FichaTecnica_65372.html'),
+      protocolSource(
+        'Murillo 7.ª edición · estatus establecido',
+        referenceEntry({
+          id: 'fenitoina-estatus-murillo',
+          indexPage: 435,
+          verifiedPage: 439,
+          pdfPage: 464,
+          note: 'Fenitoína IV como segunda línea, velocidad máxima y contraindicaciones cardiovasculares.',
+        }),
+      ),
+    ],
+  },
 };
 
 export const medicationList = Object.values(medicationCatalog);
@@ -2211,6 +2517,18 @@ export const medicationGroups = [
     id: 'ictus',
     title: 'Ictus',
     items: ['alteplasa-ictus', 'labetalol-ictus'],
+  },
+  {
+    id: 'convulsiones-estatus',
+    title: 'Crisis convulsiva / estatus',
+    items: [
+      'midazolam-convulsiones',
+      'diazepam-convulsiones',
+      'lorazepam-estatus',
+      'levetiracetam-estatus',
+      'valproato-estatus',
+      'fenitoina-estatus',
+    ],
   },
 ];
 

@@ -272,6 +272,7 @@ const protocolSearchAliases = {
   bradicardias: ['bradicardia', 'bloqueo av'],
   'arritmias-ventriculares': ['tv', 'fv', 'torsades', 'taquicardia ventricular'],
   'dolor-urinario': ['colico renal', 'urologia', 'litiasis', 'flanco'],
+  'crisis-convulsiva-epilepsia': ['convulsion', 'convulsiones', 'epilepsia', 'estatus epileptico', 'status epilepticus', 'primera crisis'],
 };
 
 const getProtocolCalculatorCount = (moduleId) => implementedCalculators.filter((calculator) => calculator.moduleId === moduleId).length;

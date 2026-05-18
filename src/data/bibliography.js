@@ -44,6 +44,21 @@ export const bibliographyCatalog = {
     title: '2022 Guideline for the Management of Patients With Spontaneous Intracerebral Hemorrhage',
     shortTitle: 'AHA Ictus hemorrágico 2022',
   },
+  'sen-epilepsia-2023': {
+    id: 'sen-epilepsia-2023',
+    title: 'Guía Epilepsia SEN 2023: urgencias en crisis epilépticas y epilepsia',
+    shortTitle: 'SEN Epilepsia 2023',
+  },
+  'nice-ng217-epilepsia': {
+    id: 'nice-ng217-epilepsia',
+    title: 'NICE NG217: Epilepsies in children, young people and adults',
+    shortTitle: 'NICE NG217 Epilepsia',
+  },
+  'aes-estatus-2016': {
+    id: 'aes-estatus-2016',
+    title: 'American Epilepsy Society guideline: treatment of convulsive status epilepticus in children and adults',
+    shortTitle: 'AES Estatus 2016',
+  },
   'nice-ng250-2025': {
     id: 'nice-ng250-2025',
     title: 'NICE NG250: Neumonía: diagnóstico y manejo',

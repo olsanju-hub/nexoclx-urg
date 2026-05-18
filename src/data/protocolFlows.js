@@ -3501,6 +3501,183 @@ const buildHemorrhagicStrokeDecisionPanelFlow = (protocol) => {
   };
 };
 
+const buildSeizureEmergencyFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Diferenciar crisis autolimitada, crisis en curso, primera crisis, causa provocada y estatus.',
+        points: [
+          'Crisis epiléptica autolimitada: episodio tónico-clónico o focal con recuperación postictal progresiva.',
+          'Crisis en curso o repetida sin recuperación completa obliga a tratar como urgencia tiempo-dependiente.',
+          'Estatus epiléptico convulsivo: crisis ≥5 min o crisis repetidas sin recuperar conciencia.',
+          'Primera crisis o cambio de semiología exige buscar causa estructural, metabólica, tóxica o infecciosa.',
+          'Provocada: hipoglucemia, fiebre, tóxicos, abstinencia, Na/Ca/Mg, ictus, TCE o infección del SNC.',
+        ],
+        detailNodes: [
+          {
+            id: 'red-flags-convulsiones',
+            title: 'Datos de alarma',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'Crisis >5 min, series de crisis, mala recuperación, focalidad persistente, fiebre/meningismo o traumatismo.',
+              'Anticoagulación, inmunosupresión, embarazo, cefalea intensa, déficit nuevo o sospecha de lesión estructural.',
+              'Hipoxemia, acidosis, depresión respiratoria o necesidad de repetir benzodiacepina.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Glucemia y constantes primero; analítica, tóxicos, niveles y neuroimagen si cambian conducta.',
+        points: [
+          'Glucemia capilar inmediata, constantes, SatO2 y ECG si síncope/arrítmico, tóxicos, QT o comorbilidad lo sugieren.',
+          'Analítica: hemograma, iones, calcio, magnesio, función renal/hepática; CK si crisis prolongada.',
+          'Tóxicos si procede y niveles de antiepilépticos si toma tratamiento y están disponibles.',
+          'Gasometría/lactato si crisis prolongada, hipoxia, acidosis, shock o mala recuperación.',
+          'TC craneal si primera crisis, focalidad, TCE, anticoagulación, cefalea intensa, inmunosupresión, fiebre/meningismo, déficit persistente o sospecha estructural.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-convulsiones-detalle',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'Hipoglucemia, hiponatremia, hipocalcemia o hipomagnesemia orientan a corrección causal inmediata.',
+              'TC anormal, déficit persistente o sospecha de infección SNC cambia a ingreso y valoración neurológica/neuroquirúrgica.',
+              'Punción lumbar solo si sospecha infección del SNC y tras imagen si procede por focalidad, inmunosupresión o hipertensión intracraneal.',
+              'Niveles bajos de antiepilépticos ayudan a ajustar tratamiento si ya toma medicación.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Separar recuperación completa de primera crisis, recurrencia, causa provocada y estatus.',
+        points: [
+          'Crisis conocida, aislada y recuperación completa: investigar desencadenante y valorar alta si no hay alarma.',
+          'Primera crisis: observación, búsqueda causal, neuroimagen si criterios y derivación a neurología.',
+          'Crisis recurrente, focalidad o mala recuperación: observación/ingreso y ajuste con neurología.',
+          'Crisis provocada: corregir hipoglucemia, fiebre/infección, tóxicos/abstinencia o alteración hidroelectrolítica.',
+          'Estatus o depresión respiratoria: tratamiento escalonado, monitorización, UCI si persiste o precisa vía aérea.',
+        ],
+        detailNodes: [
+          {
+            id: 'decision-neuroimagen-ingreso',
+            title: 'Neuroimagen, ingreso y UCI',
+            type: 'decision',
+            severity: 'warning',
+            items: [
+              'Neuroimagen urgente si primera crisis con alarma, focalidad, TCE, anticoagulación, inmunosupresión, fiebre/meningismo o déficit persistente.',
+              'Ingreso si crisis seriadas, focalidad desconocida, causa estructural/infecciosa/metabólica relevante o ajuste terapéutico complejo.',
+              'UCI si estatus, necesidad de intubación, depresión respiratoria, anestesia o perfusión continua.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'ABC y causa reversible; benzodiacepina si >5 min; segunda línea IV si persiste.',
+        points: [
+          'ABC, monitorizar, proteger de traumatismos, oxígeno si hipoxemia y no introducir objetos en la boca.',
+          'Posición lateral en postictal; aspirar secreciones y preparar vía aérea si mala ventilación.',
+          'Glucosa IV si hipoglucemia confirmada; tiamina antes si alcoholismo o desnutrición.',
+          'Benzodiacepina si crisis >5 min o repetida sin recuperación.',
+          'Si persiste: segunda línea IV y aviso a neurología/UCI; estatus refractario requiere UCI/anestesia/intubación.',
+        ],
+        treatmentGroups: [
+          {
+            id: 'medidas-iniciales-convulsiones',
+            title: 'Medidas iniciales',
+            cards: [
+              {
+                id: 'abc-convulsiones',
+                title: 'ABC y seguridad',
+                type: 'treatment',
+                severity: 'info',
+                summary: 'Priorizar vía aérea, respiración, circulación y prevención de lesiones.',
+                items: [
+                  'Fármaco/intervención: ABC, monitorización y protección física.',
+                  'Dosis: no aplica.',
+                  'Vía: oxígeno si hipoxemia; vía venosa si crisis prolongada, recurrencia o tratamiento IV probable.',
+                  'Evitar: objetos en la boca, inmovilización forzada y retraso de benzodiacepina si >5 min.',
+                  'Reevaluar: SatO2, ventilación, PA, glucemia, cese de crisis y recuperación postictal.',
+                ],
+              },
+              {
+                id: 'hipoglucemia-convulsiones',
+                title: 'Hipoglucemia',
+                type: 'treatment',
+                severity: 'warning',
+                summary: 'Corregir de inmediato si la glucemia capilar confirma hipoglucemia.',
+                items: [
+                  'Fármaco/intervención: glucosa IV si hipoglucemia confirmada.',
+                  'Dosis: usar pauta local de hipoglucemia; no se muestra dosis única desde este protocolo.',
+                  'Vía: intravenosa si compromiso neurológico.',
+                  'Evitar: sueros glucosados sin hipoglucemia confirmada como rutina en estatus.',
+                  'Reevaluar: recuperación, glucemia repetida y causa de la hipoglucemia.',
+                ],
+              },
+              {
+                id: 'estatus-refractario',
+                title: 'Estatus refractario',
+                type: 'treatment',
+                severity: 'danger',
+                summary: 'Persistencia pese a benzodiacepina y segunda línea: activar UCI/anestesia.',
+                items: [
+                  'Fármaco/intervención: intubación, anestesia y perfusión según protocolo local.',
+                  'Dosis: no se muestra una pauta única porque depende del fármaco/anestesia local y monitorización EEG.',
+                  'Vía: UCI con soporte ventilatorio y monitorización continua.',
+                  'Evitar: repetir benzodiacepinas indefinidamente sin escalar.',
+                  'Reevaluar: cese clínico/EEG, ventilación, hemodinámica y causa reversible.',
+                ],
+              },
+            ],
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta solo si recuperación completa y sin alarma; observación, ingreso o UCI si riesgo.',
+        points: [
+          'Alta si crisis aislada conocida, recuperación completa, causa corregida y sin datos de alarma.',
+          'Observación si primera crisis, crisis prolongada, lesión, intoxicación, alteración metabólica o mala recuperación.',
+          'Ingreso/neurología si crisis recurrentes, focalidad, causa estructural, infección SNC o ajuste terapéutico complejo.',
+          'UCI si estatus, depresión respiratoria, necesidad de intubación, anestesia o perfusión continua.',
+        ],
+        detailNodes: [
+          {
+            id: 'seguimiento-convulsiones',
+            title: 'Seguimiento y alarma',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Neurología preferente tras primera crisis o si hay cambio de patrón, recurrencia, déficit o duda de tratamiento.',
+              'Explicar regreso urgente por nueva crisis, fiebre/meningismo, cefalea intensa, déficit, somnolencia progresiva o traumatismo.',
+              'No conducir ni realizar actividades de riesgo hasta valoración y normativa aplicable.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -3528,6 +3705,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'ictus-hemorragico') {
     return buildHemorrhagicStrokeDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'crisis-convulsiva-epilepsia') {
+    return buildSeizureEmergencyFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {
