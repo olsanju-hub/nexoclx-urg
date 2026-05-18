@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
 
 const severityLabels = {
   info: 'Info',
@@ -502,7 +502,7 @@ const DecisionPanelSection = ({ section, onCalculatorOpen }) => {
   );
 };
 
-const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
+const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onBack, backLabel = 'Protocolos' }) => {
   const [activePanel, setActivePanel] = useState('sospecha');
   const [referencesOpen, setReferencesOpen] = useState(false);
   const panelSections = buildDecisionPanelSections(protocol);
@@ -521,8 +521,16 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
   return (
     <div className="clinical-flow-tree decision-panel-tree clinical-sheet">
       <header className="clinical-sheet-hero">
-        <div>
+        <div className="clinical-sheet-hero-top">
+          {onBack ? (
+            <button type="button" className="clinical-sheet-back-button" onClick={onBack}>
+              <ArrowLeft className="h-3.5 w-3.5" />
+              {backLabel}
+            </button>
+          ) : null}
           <p className="clinical-sheet-kicker">Protocolo</p>
+        </div>
+        <div className="clinical-sheet-title-block">
           <h2>{protocol.title}</h2>
           <p>{protocol.specialty}</p>
         </div>
@@ -564,6 +572,6 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
   );
 };
 
-export const ClinicalFlowTree = ({ protocol, onCalculatorOpen }) => {
-  return <DecisionPanelProtocol protocol={protocol} onCalculatorOpen={onCalculatorOpen} />;
+export const ClinicalFlowTree = ({ protocol, onCalculatorOpen, onBack, backLabel }) => {
+  return <DecisionPanelProtocol protocol={protocol} onCalculatorOpen={onCalculatorOpen} onBack={onBack} backLabel={backLabel} />;
 };

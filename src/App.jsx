@@ -1195,8 +1195,7 @@ const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen }) => {
 
   return (
     <div className={pageClass}>
-      <BackBar label="Protocolos" onClick={onBack} />
-      <ClinicalFlowTree protocol={flow} onCalculatorOpen={onCalculatorOpen} />
+      <ClinicalFlowTree protocol={flow} onCalculatorOpen={onCalculatorOpen} onBack={onBack} backLabel="Protocolos" />
     </div>
   );
 };
