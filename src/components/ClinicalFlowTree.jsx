@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill, Stethoscope } from 'lucide-react';
+import { AlertTriangle, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
 
 const severityLabels = {
   info: 'Info',
@@ -264,10 +264,92 @@ const FlowSection = ({ section, onCalculatorOpen }) => {
   );
 };
 
-const PautaCard = ({ card }) => {
+const FieldList = ({ items = [], className = '' }) => {
+  const rows = items.filter(Boolean).map((item) => {
+    const [label, ...rest] = item.split(': ');
+    const value = rest.join(': ');
+    return { item, label, value };
+  });
+
+  if (!rows.length) return null;
+
+  return (
+    <dl className={`clinical-sheet-field-list ${className}`}>
+      {rows.map(({ item, label, value }) =>
+        value ? (
+          <div key={item} className="clinical-sheet-field-row">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ) : (
+          <div key={item} className="clinical-sheet-field-row clinical-sheet-field-row-full">
+            <dd>{item}</dd>
+          </div>
+        ),
+      )}
+    </dl>
+  );
+};
+
+const ClinicalSheetNode = ({ node, onCalculatorOpen }) => {
+  const [open, setOpen] = useState(false);
+  const hasDetails = Boolean(node.children?.length || node.items?.length > 3 || node.references?.length);
+  const visibleItems = node.items?.slice(0, open ? undefined : 3) ?? [];
+
+  if (node.calculatorId) {
+    return (
+      <button type="button" className="clinical-calc-button" onClick={() => onCalculatorOpen?.(node.calculatorId)}>
+        {node.action ?? `Calcular ${node.title}`}
+      </button>
+    );
+  }
+
+  return (
+    <div className={`clinical-sheet-node clinical-sheet-node-${node.severity ?? 'info'}`}>
+      <div className="clinical-sheet-node-header">
+        <h4>{node.title}</h4>
+        {hasDetails ? (
+          <button type="button" className="clinical-sheet-more" onClick={() => setOpen((current) => !current)}>
+            {open ? 'Ver menos' : 'Ver más'}
+          </button>
+        ) : null}
+      </div>
+
+      {node.summary ? <p className="clinical-sheet-muted">{node.summary}</p> : null}
+
+      {visibleItems.length ? (
+        <ul className="clinical-sheet-list clinical-sheet-list-compact">
+          {visibleItems.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : null}
+
+      {node.action && !node.calculatorId ? <p className="clinical-sheet-muted">{node.action}</p> : null}
+
+      {open && node.references?.length ? (
+        <ul className="clinical-sheet-list clinical-sheet-references-list">
+          {node.references.map((reference) => (
+            <li key={reference}>{reference}</li>
+          ))}
+        </ul>
+      ) : null}
+
+      {open && node.children?.length ? (
+        <div className="clinical-sheet-detail-stack">
+          {node.children.map((child) => (
+            <ClinicalSheetNode key={child.id} node={child} onCalculatorOpen={onCalculatorOpen} />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+const PautaBlock = ({ card }) => {
   const detailItems = card.items?.length ? card.items : card.summary ? [card.summary] : [];
   const title = card.sourceUrl ? (
-    <a href={card.sourceUrl} target="_blank" rel="noreferrer" className="pauta-card-link">
+    <a href={card.sourceUrl} target="_blank" rel="noreferrer" className="clinical-sheet-link">
       {card.title}
     </a>
   ) : (
@@ -275,35 +357,11 @@ const PautaCard = ({ card }) => {
   );
 
   return (
-    <article className={`pauta-card pauta-card-${card.severity ?? 'info'}`}>
-      <div className="pauta-card-header">
-        <span className="flow-node-icon">
-          <TypeIcon type={card.type} />
-        </span>
-        <span className="min-w-0">
-          <span className="pauta-card-title">{title}</span>
-          {card.medication ? <span className="pauta-card-meta">{card.medication}</span> : null}
-        </span>
-      </div>
-      {card.summary ? <p className="pauta-card-summary">{card.summary}</p> : null}
-      {detailItems.length ? (
-        <dl className="pauta-card-list">
-          {detailItems.map((item) => {
-            const [label, ...rest] = item.split(': ');
-            const value = rest.join(': ');
-            return value ? (
-              <div key={item} className="pauta-card-row">
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ) : (
-              <div key={item} className="pauta-card-row pauta-card-row-full">
-                <dd>{item}</dd>
-              </div>
-            );
-          })}
-        </dl>
-      ) : null}
+    <article className={`clinical-pauta clinical-pauta-${card.severity ?? 'info'}`}>
+      <h4>{title}</h4>
+      {card.medication ? <p className="clinical-sheet-kicker">{card.medication}</p> : null}
+      {card.summary ? <p className="clinical-sheet-muted">{card.summary}</p> : null}
+      <FieldList items={detailItems} />
     </article>
   );
 };
@@ -376,66 +434,65 @@ const buildDecisionPanelSections = (protocol) => {
   });
 };
 
-const DecisionPanelSection = ({ section, active, onToggle, onCalculatorOpen }) => {
+const DecisionPanelSection = ({ section, onCalculatorOpen }) => {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const points = uniquePreviewItems(section.points).slice(0, MAX_SECTION_ITEMS);
+  const hasDetails = Boolean(section.detailNodes?.length);
 
   return (
-    <section className={`decision-panel-card ${active ? 'decision-panel-card-active' : ''}`}>
-      <button type="button" className="decision-panel-card-button" onClick={onToggle} aria-expanded={active}>
-        <span>
-          <span className="decision-panel-card-title">{section.title}</span>
-          {section.summary ? <span className="decision-panel-card-summary">{section.summary}</span> : null}
-        </span>
-        <span className="flow-section-toggle">
-          {active ? 'Cerrar' : 'Ver detalle'}
-          <ChevronRight className={`flow-node-chevron ${active ? 'rotate-90' : ''}`} />
-        </span>
-      </button>
-
-      <div className="decision-panel-card-preview">
-        {points.length ? (
-          <ul className="flow-section-preview-list">
-            {points.map((point) => (
-              <li key={point}>{point}</li>
-            ))}
-          </ul>
-        ) : null}
-        {section.actions?.length ? (
-          <div className="flow-section-actions">
-            {section.actions.map((action) => (
-              <button
-                key={action.calculatorId}
-                type="button"
-                className="flow-node-action flow-node-action-button"
-                onClick={() => onCalculatorOpen?.(action.calculatorId)}
-              >
-                {action.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
+    <section className="clinical-sheet-section" aria-labelledby={`clinical-sheet-${section.id}`}>
+      <div className="clinical-sheet-section-head">
+        <h3 id={`clinical-sheet-${section.id}`}>{section.title}</h3>
+        {section.summary ? <p>{section.summary}</p> : null}
       </div>
 
-      {active ? (
-        <div className="decision-panel-detail">
-          {section.treatmentGroups?.length ? (
-            <div className="pauta-group-list">
-              {section.treatmentGroups.map((group) => (
-                <div key={group.id} className="pauta-group">
-                  <h3>{group.title}</h3>
-                  <div className="pauta-card-grid">
-                    {group.cards.map((card) => (
-                      <PautaCard key={card.id} card={card} />
-                    ))}
-                  </div>
-                </div>
-              ))}
+      {points.length ? (
+        <ul className="clinical-sheet-list">
+          {points.map((point) => (
+            <li key={point}>{point}</li>
+          ))}
+        </ul>
+      ) : null}
+
+      {section.actions?.length ? (
+        <div className="clinical-sheet-actions">
+          {section.actions.map((action) => (
+            <button
+              key={action.calculatorId}
+              type="button"
+              className="clinical-calc-button"
+              onClick={() => onCalculatorOpen?.(action.calculatorId)}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {section.treatmentGroups?.length ? (
+        <div className="clinical-treatment-list">
+          {section.treatmentGroups.map((group) => (
+            <div key={group.id} className="clinical-treatment-group">
+              <h3>{group.title}</h3>
+              <div className="clinical-pauta-list">
+                {group.cards.map((card) => (
+                  <PautaBlock key={card.id} card={card} />
+                ))}
+              </div>
             </div>
-          ) : null}
-          {section.detailNodes?.length ? (
-            <div className="flow-section-body decision-panel-nodes">
+          ))}
+        </div>
+      ) : null}
+
+      {hasDetails ? (
+        <div className="clinical-sheet-details">
+          <button type="button" className="clinical-sheet-more" onClick={() => setDetailsOpen((current) => !current)}>
+            {detailsOpen ? 'Ocultar detalle' : 'Ver más'}
+          </button>
+          {detailsOpen ? (
+            <div className="clinical-sheet-detail-stack">
               {section.detailNodes.map((node) => (
-                <FlowNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} />
+                <ClinicalSheetNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} />
               ))}
             </div>
           ) : null}
@@ -446,62 +503,58 @@ const DecisionPanelSection = ({ section, active, onToggle, onCalculatorOpen }) =
 };
 
 const DecisionPanelProtocol = ({ protocol, onCalculatorOpen }) => {
-  const [activePanel, setActivePanel] = useState(null);
+  const [activePanel, setActivePanel] = useState('sospecha');
   const [referencesOpen, setReferencesOpen] = useState(false);
   const panelSections = buildDecisionPanelSections(protocol);
   const referencesSection = protocol.sections.find((section) => section.type === 'references');
+  const activeSection = panelSections.find((section) => section.id === activePanel) ?? panelSections[0];
 
-  const togglePanel = (panelId) => {
+  const selectPanel = (panelId) => {
     setReferencesOpen(false);
-    setActivePanel((current) => (current === panelId ? null : panelId));
+    setActivePanel(panelId);
   };
 
   const toggleReferences = () => {
-    setActivePanel(null);
     setReferencesOpen((current) => !current);
   };
 
   return (
-    <div className="clinical-flow-tree decision-panel-tree">
-      <header className="flow-hero">
-        <div className="flow-hero-icon">
-          <Stethoscope className="h-5 w-5" />
-        </div>
+    <div className="clinical-flow-tree decision-panel-tree clinical-sheet">
+      <header className="clinical-sheet-hero">
         <div>
-          <p className="flow-hero-kicker">Protocolo</p>
+          <p className="clinical-sheet-kicker">Protocolo</p>
           <h2>{protocol.title}</h2>
           <p>{protocol.specialty}</p>
         </div>
       </header>
 
-      <div className="decision-panel-grid">
+      <div className="clinical-sheet-tabs" role="tablist" aria-label="Secciones del protocolo">
         {panelSections.map((section) => (
-          <DecisionPanelSection
+          <button
             key={section.id}
-            section={section}
-            active={activePanel === section.id}
-            onToggle={() => togglePanel(section.id)}
-            onCalculatorOpen={onCalculatorOpen}
-          />
+            type="button"
+            role="tab"
+            aria-selected={activePanel === section.id}
+            className={`clinical-sheet-tab ${activePanel === section.id ? 'clinical-sheet-tab-active' : ''}`}
+            onClick={() => selectPanel(section.id)}
+          >
+            {section.title}
+          </button>
         ))}
       </div>
 
+      {activeSection ? <DecisionPanelSection section={activeSection} onCalculatorOpen={onCalculatorOpen} /> : null}
+
       {referencesSection ? (
-        <section className="decision-panel-references">
-          <button type="button" className="flow-section-header" onClick={toggleReferences} aria-expanded={referencesOpen}>
-            <span>
-              <span className="flow-section-kicker">Fuentes</span>
-              <span className="flow-section-title">{referencesSection.title}</span>
-            </span>
-            <span className="flow-section-toggle">
-              {referencesOpen ? 'Ocultar' : 'Ver detalle'}
-              <ChevronRight className={`flow-node-chevron ${referencesOpen ? 'rotate-90' : ''}`} />
-            </span>
+        <section className="clinical-sheet-references">
+          <button type="button" className="clinical-sheet-reference-button" onClick={toggleReferences} aria-expanded={referencesOpen}>
+            <span>Bibliografía textual</span>
+            <span>{referencesOpen ? 'Ocultar' : 'Ver fuentes'}</span>
           </button>
           {referencesOpen ? (
-            <div className="flow-section-body">
+            <div className="clinical-sheet-reference-body">
               {referencesSection.children?.map((node) => (
-                <FlowNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} />
+                <ClinicalSheetNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} />
               ))}
             </div>
           ) : null}
