@@ -145,6 +145,24 @@ const gemaAsthmaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const goldCopdEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gold-epoc-2025',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const gesepocEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gesepoc-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -795,6 +813,40 @@ export const motivoConsultaModules = [
         verifiedPages: [1],
         pdfPages: [1],
         note: 'Referencia española para clasificación y manejo de crisis asmática.',
+      }),
+    ],
+  },
+  {
+    id: 'epoc-agudizacion',
+    title: 'Agudización de EPOC',
+    shortTitle: 'EPOC',
+    chapter: 'Cap. 41 + GOLD/GesEPOC',
+    section: 'Respiratorio',
+    specialtyId: 'respiratorio',
+    verifiedPage: 294,
+    pdfPage: 319,
+    status: 'implementado',
+    implemented: true,
+    summary: 'Disnea, esputo, gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios y VNI.',
+    bibliography: [
+      referenceEntry({
+        id: 'epoc-murillo-module',
+        indexPage: 294,
+        verifiedPage: 294,
+        pdfPage: 319,
+        note: 'Capítulo base de EPOC agudizada en urgencias.',
+      }),
+      goldCopdEntry({
+        id: 'epoc-gold-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia internacional actual para agudización de EPOC.',
+      }),
+      gesepocEntry({
+        id: 'epoc-gesepoc-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia española para diagnóstico y tratamiento del síndrome de agudización.',
       }),
     ],
   },

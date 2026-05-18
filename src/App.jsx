@@ -330,6 +330,7 @@ const protocolSearchAliases = {
   'crisis-convulsiva-epilepsia': ['convulsion', 'convulsiones', 'epilepsia', 'estatus epileptico', 'status epilepticus', 'primera crisis'],
   anafilaxia: ['reaccion alergica', 'alergia grave', 'adrenalina', 'shock anafilactico', 'urticaria', 'angioedema', 'broncoespasmo'],
   'asma-exacerbacion': ['asma', 'crisis asmatica', 'exacerbacion asmatica', 'broncoespasmo', 'sibilancias', 'disnea', 'salbutamol', 'prednisona', 'ipratropio'],
+  'epoc-agudizacion': ['epoc', 'agudizacion epoc', 'exacerbacion epoc', 'aepoc', 'disnea', 'broncoespasmo', 'hipercapnia', 'insuficiencia respiratoria', 'vni', 'antibiotico epoc'],
 };
 
 const getProtocolCalculatorCount = (moduleId) => implementedCalculators.filter((calculator) => calculator.moduleId === moduleId).length;

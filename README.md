@@ -271,6 +271,14 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Prednisona | Corticoide sistémico | Crisis asmática | Implementado | Murillo 7.ª ed. + GINA + CIMA. |
 | Hidrocortisona | Corticoide IV | Crisis asmática | Implementado | Murillo 7.ª ed. + CIMA. |
 | Sulfato de magnesio IV | Rescate broncodilatador | Crisis asmática | Implementado | Murillo 7.ª ed. + GINA + CIMA. |
+| Salbutamol | Broncodilatador SABA | Agudización de EPOC | Implementado | Murillo 7.ª ed. + GOLD + CIMA. |
+| Bromuro de ipratropio | Broncodilatador SAMA | Agudización de EPOC | Implementado | Murillo 7.ª ed. + GesEPOC + CIMA. |
+| Prednisona | Corticoide sistémico | Agudización de EPOC | Implementado | Murillo 7.ª ed. + GOLD + CIMA. |
+| Metilprednisolona | Corticoide IV | Agudización de EPOC | Implementado | Murillo 7.ª ed. + CIMA. |
+| Amoxicilina/ácido clavulánico | Antibiótico | Agudización de EPOC | Implementado | Murillo 7.ª ed. + GesEPOC + CIMA. |
+| Azitromicina | Antibiótico macrólido | Agudización de EPOC | Implementado | Murillo 7.ª ed. + CIMA. |
+| Levofloxacino | Antibiótico fluoroquinolona | Agudización de EPOC | Implementado | Murillo 7.ª ed. + CIMA. |
+| Ceftriaxona | Antibiótico IV | Agudización de EPOC | Implementado | Murillo 7.ª ed. + CIMA. |
 
 ### Plantillas de imagen
 
@@ -299,6 +307,8 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | *Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021* | Activa · corroboración sepsis | Referencia textual para sepsis, shock y deterioro abdominal. |
 | *Global Initiative for Asthma. Global Strategy for Asthma Management and Prevention, 2025* | Activa · corroboración asma | Referencia textual para exacerbaciones asmáticas, gravedad y tratamiento inicial. |
 | *Guía Española para el Manejo del Asma* | Activa · corroboración asma | Referencia textual española para clasificación y manejo de crisis asmática. |
+| *Global Initiative for Chronic Obstructive Lung Disease. Global Strategy for Diagnosis, Management, and Prevention of COPD, 2025* | Activa · corroboración EPOC | Referencia textual para exacerbaciones, oxígeno, corticoide, antibiótico y soporte ventilatorio. |
+| *GesEPOC 2021: guía española de la EPOC. Diagnóstico y tratamiento del síndrome de agudización* | Activa · corroboración EPOC | Referencia textual española para diagnóstico y tratamiento de la agudización. |
 
 ## Índice clínico comprobado
 
@@ -330,6 +340,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Ictus | Cap. 64 | 442 | 442 | 467 | Auditado | El arranque conceptual está en la página indexada; el rótulo del capítulo aparece en la siguiente. |
 | Sepsis | Cap. 107 | 640 | 640 | 665 | Auditado | Sin discrepancia. |
 | Ataque de asma | Cap. 40 | 290 | 290 | 315 | Implementado | Crisis asmática integrada como ficha clínica respiratoria. |
+| EPOC agudizada | Cap. 41 | 294 | 294 | 319 | Implementado | Agudización de EPOC integrada como ficha clínica respiratoria. |
 
 ## Bitácora del proyecto
 
@@ -356,6 +367,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | 2026-05-18 | Protocolo de crisis convulsiva / epilepsia | Neurología / Urgencias | Se implementó como ficha clínica activa con diagnóstico, pruebas, decisión, tratamiento escalonado, destino, CIMA y bibliografía textual. |
 | 2026-05-18 | Anafilaxia y dosis calculadas | Urgencias / cálculos / medicamentos | Se añadió Anafilaxia y calculadoras directas para adrenalina IM, antiepilépticos, FA, SCA, alteplasa en ictus y heparina vascular cuando dependen del peso. |
 | 2026-05-18 | Crisis asmática | Respiratorio / medicamentos | Se añadió Asma como protocolo independiente con gravedad, pruebas útiles, broncodilatadores, corticoide precoz, magnesio y destino. |
+| 2026-05-18 | Agudización de EPOC | Respiratorio / medicamentos | Se añadió EPOC como protocolo independiente con gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios y VNI. |
 
 ## Pendiente
 

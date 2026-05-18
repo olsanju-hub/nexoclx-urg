@@ -4023,6 +4023,171 @@ const buildAsthmaExacerbationFlow = (protocol) => {
   };
 };
 
+const buildCopdExacerbationFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'EPOC conocida o probable con aumento de disnea, esputo o purulencia; buscar alarma respiratoria.',
+        points: [
+          'Paciente con EPOC conocida o sospechada y aumento agudo de disnea o intolerancia al esfuerzo.',
+          'Aumento del volumen de esputo o purulencia, tos, sibilancias o broncoespasmo.',
+          'Confusión, somnolencia, cianosis, agotamiento, hipotensión, sepsis o uso de musculatura accesoria son alarma.',
+          'Buscar desencadenantes: infección, neumonía, insuficiencia cardiaca, arritmia, TEP, neumotórax o mala adherencia.',
+          'Diferenciar de asma, anafilaxia y causa cardiaca si la historia respiratoria no es clara.',
+        ],
+        detailNodes: [
+          {
+            id: 'red-flags-epoc',
+            title: 'Datos de alarma',
+            type: 'alert',
+            severity: 'danger',
+            items: [
+              'Somnolencia, confusión, agotamiento o respiración paradójica sugieren fracaso ventilatorio.',
+              'Hipotensión, sepsis, arritmia o dolor torácico obligan a buscar causa alternativa o asociada.',
+              'Hipoxemia persistente pese a oxígeno controlado o sospecha de hipercapnia cambia destino y soporte.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Constantes, SatO2 y gasometría si gravedad; Rx/ECG/analítica para descartar complicaciones.',
+        points: [
+          'Constantes, SatO2, frecuencia respiratoria y trabajo respiratorio desde la llegada.',
+          'Gasometría arterial o venosa si SatO2 baja, disnea grave, somnolencia, hipercapnia/acidosis probable o VNI.',
+          'Rx tórax si moderado-grave, ingreso o sospecha de neumonía, neumotórax, insuficiencia cardiaca u otra causa.',
+          'ECG si dolor torácico, arritmia, insuficiencia cardiaca o riesgo cardiovascular.',
+          'Analítica: hemograma, bioquímica, función renal, iones y PCR si infección/ingreso; microbiología si grave, ingreso o mala evolución.',
+        ],
+        detailNodes: [
+          {
+            id: 'pruebas-epoc-detalle',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'pH <7,35 con PaCO2 >45 mmHg orienta a insuficiencia respiratoria hipercápnica y VNI si no hay contraindicación.',
+              'Neumonía, neumotórax, edema pulmonar o TEP cambian tratamiento y destino.',
+              'Creatinina alterada obliga a revisar antibiótico, contraste y fármacos con ajuste renal.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Clasificar leve, moderada o grave; decidir antibiótico, VNI, ingreso o UCI.',
+        points: [
+          'Leve: aumento de síntomas sin insuficiencia respiratoria ni datos de alarma; posible manejo ambulatorio si responde.',
+          'Moderada: precisa tratamiento en urgencias, broncodilatadores repetidos, corticoide o vigilancia.',
+          'Grave: hipoxemia persistente, hipercapnia/acidosis, neumonía, comorbilidad, mala respuesta o fragilidad.',
+          'Antibiótico si esputo purulento con aumento de disnea/volumen, neumonía, ventilación o gravedad.',
+          'VNI si acidosis respiratoria/hipercapnia, disnea con trabajo respiratorio o hipoxemia persistente pese a oxígeno controlado.',
+        ],
+        actions: [calculatorAction('cockcroft-gault')],
+        detailNodes: [
+          {
+            id: 'decision-epoc-vni',
+            title: 'VNI / UCI',
+            type: 'decision',
+            severity: 'warning',
+            items: [
+              'VNI si pH <7,35 y PaCO2 >45 mmHg, FR elevada, fatiga o hipoxemia persistente sin contraindicación.',
+              'UCI si pH muy bajo, fracaso de VNI, alteración mental, shock, arritmia grave, agotamiento o necesidad de intubación.',
+              'No retrasar intubación si hay deterioro neurológico, broncoaspiración, inestabilidad o imposibilidad de VNI.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Oxígeno controlado, SABA/SAMA, corticoide sistémico, antibiótico solo con criterios y VNI si acidosis.',
+        points: [
+          'Oxígeno controlado con objetivo SatO2 88-92% si EPOC/riesgo de hipercapnia; evitar hiperoxia.',
+          'Salbutamol e ipratropio inhalados/nebulizados; cambiar a dispositivos habituales antes del alta.',
+          'Corticoide sistémico: vía oral si tolera; IV si grave o no tolera vía oral.',
+          'Antibiótico solo con purulencia/aumento de síntomas, neumonía, ventilación o gravedad.',
+          'VNI si acidosis respiratoria o hipercapnia con criterios; fluidos solo si deshidratación o shock.',
+        ],
+        actions: [calculatorAction('cockcroft-gault')],
+        treatmentGroups: [
+          {
+            id: 'soporte-epoc',
+            title: 'Soporte inicial',
+            cards: [
+              {
+                id: 'oxigeno-epoc',
+                title: 'Oxígeno controlado',
+                type: 'treatment',
+                severity: 'warning',
+                summary: 'Titular oxígeno evitando hiperoxia en EPOC con riesgo de hipercapnia.',
+                items: [
+                  'Fármaco/intervención: oxígeno controlado y monitorización.',
+                  'Dosis: objetivo SatO2 88-92% si riesgo hipercapnia/EPOC.',
+                  'Vía: gafas nasales o Venturi según gravedad; evitar flujo excesivo no monitorizado.',
+                  'Evitar: SatO2 altas mantenidas si hay riesgo de retención de CO2.',
+                  'Reevaluar: SatO2, FR, conciencia y gasometría si grave o VNI.',
+                ],
+              },
+              {
+                id: 'vni-epoc',
+                title: 'Ventilación no invasiva',
+                type: 'treatment',
+                severity: 'danger',
+                summary: 'Indicada si acidosis hipercápnica o trabajo respiratorio importante sin contraindicación.',
+                items: [
+                  'Fármaco/intervención: VNI en área monitorizada.',
+                  'Dosis: ajustar presiones según tolerancia, fuga, pH, PaCO2 y trabajo respiratorio.',
+                  'Vía: interfaz no invasiva con vigilancia estrecha.',
+                  'Evitar: VNI si indicación clara de intubación, alto riesgo de aspiración, neumotórax no drenado o inestabilidad no controlada.',
+                  'Reevaluar: adaptación, FR, conciencia, pH/PaCO2 y respuesta en 1-2 h.',
+                ],
+              },
+            ],
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta si leve y estable; observación, ingreso o UCI según oxigenación, gasometría, respuesta y comorbilidad.',
+        points: [
+          'Alta si leve, buena respuesta, SatO2 objetivo estable, tolerancia oral, soporte domiciliario y plan claro.',
+          'Observación si respuesta parcial, comorbilidad, duda diagnóstica o necesidad de broncodilatadores repetidos.',
+          'Ingreso si hipoxemia, hipercapnia, acidosis, neumonía, mala respuesta, comorbilidad o fragilidad.',
+          'UCI si acidosis grave, fracaso de VNI, alteración mental, shock, agotamiento o necesidad de intubación.',
+          'Antes del alta: inhaladores, técnica, corticoide/antibiótico si procede, seguimiento y signos de alarma.',
+        ],
+        detailNodes: [
+          {
+            id: 'alta-epoc',
+            title: 'Alta segura',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Confirmar estabilidad respiratoria tras espaciar broncodilatadores y con oxígeno basal o objetivo individual.',
+              'Revisar inhaladores, tabaco, vacunas si procede y control precoz en atención primaria/neumología.',
+              'Volver por disnea progresiva, somnolencia, cianosis, fiebre persistente, esputo purulento creciente, dolor torácico o mala tolerancia oral.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -4062,6 +4227,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'asma-exacerbacion') {
     return buildAsthmaExacerbationFlow(protocol);
+  }
+
+  if (protocol.id === 'epoc-agudizacion') {
+    return buildCopdExacerbationFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {

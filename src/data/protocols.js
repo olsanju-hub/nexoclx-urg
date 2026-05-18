@@ -145,6 +145,24 @@ const gemaAsthmaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const goldCopdEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gold-epoc-2025',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const gesepocEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'gesepoc-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -952,6 +970,66 @@ export const protocolCatalog = {
         verifiedPages: [1],
         pdfPages: [1],
         note: 'Guía española de referencia para clasificación y manejo de exacerbaciones asmáticas.',
+      }),
+    ],
+  },
+  'epoc-agudizacion': {
+    id: 'epoc-agudizacion',
+    title: 'Agudización de EPOC',
+    longTitle: 'Agudización de EPOC',
+    chapter: 'Cap. 41 + GOLD/GesEPOC',
+    section: 'Urgencias del aparato respiratorio',
+    indexPage: 294,
+    verifiedPage: 294,
+    pdfPage: 319,
+    status: 'implementado',
+    summary: 'AEPOC con gravedad, gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios y VNI.',
+    quickChecks: [
+      'EPOC conocida o sospechada con aumento de disnea, volumen o purulencia del esputo.',
+      'Buscar confusión, somnolencia, cianosis, uso de musculatura accesoria, agotamiento, hipotensión o sepsis.',
+      'Gasometría si SatO2 baja, disnea grave, somnolencia, hipercapnia/acidosis probable o VNI.',
+      'Oxígeno controlado con objetivo 88-92% si riesgo de hipercapnia.',
+      'Antibiótico solo si purulencia, aumento de síntomas, neumonía, ventilación o gravedad.',
+    ],
+    warnings: [
+      'Evitar hiperoxia en EPOC con riesgo de hipercapnia.',
+      'No usar antibiótico sin criterios clínicos o gravedad que lo justifique.',
+      'Acidosis respiratoria, hipercapnia, agotamiento o alteración mental obligan a valorar VNI/UCI.',
+    ],
+    calculatorIds: ['cockcroft-gault'],
+    medicationGroups: [
+      {
+        title: 'Broncodilatadores',
+        medicationIds: ['salbutamol-epoc', 'ipratropio-epoc'],
+      },
+      {
+        title: 'Corticoide sistémico',
+        medicationIds: ['prednisona-epoc', 'metilprednisolona-epoc'],
+      },
+      {
+        title: 'Antibiótico si criterios',
+        medicationIds: ['amoxicilina-clavulanico-epoc', 'azitromicina-epoc', 'levofloxacino-epoc', 'ceftriaxona-epoc'],
+      },
+    ],
+    bibliography: [
+      referenceEntry({
+        id: 'epoc-murillo-cap41',
+        indexPage: 294,
+        verifiedPage: 294,
+        pdfPage: 319,
+        note: 'Capítulo 41: definición, gravedad, gasometría, VNI, broncodilatadores, corticoides y antibióticos.',
+      }),
+      goldCopdEntry({
+        id: 'epoc-gold-2025',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia internacional actual para exacerbaciones de EPOC, oxígeno, corticoide, antibiótico y ventilación.',
+      }),
+      gesepocEntry({
+        id: 'epoc-gesepoc-2021',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Guía española para diagnóstico y tratamiento del síndrome de agudización de EPOC.',
       }),
     ],
   },
