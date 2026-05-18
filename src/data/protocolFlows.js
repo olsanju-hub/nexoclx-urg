@@ -466,14 +466,14 @@ const genericTreatmentSection = (protocol) => {
         id: 'tratamiento-urgencias',
         title: 'Pautas en Urgencias',
         type: 'treatment',
-        summary: 'Fármacos y medidas concretas cuando están auditadas.',
+        summary: 'Fármacos y medidas iniciales con dosis y criterios de uso cuando proceda.',
         children: [
           ...cardiologyInterventionNodes(protocol),
           ...medicationGroups.map((group) => ({
             id: `grupo-${slugify(group.title)}`,
             title: group.title,
             type: 'treatment',
-            summary: 'Abrir para ver fármacos y dosis.',
+            summary: 'Pautas con dosis, vía y criterios de seguridad.',
             children: asArray(group.medicationIds).map(medicationNode),
           })),
         ],
@@ -2748,7 +2748,7 @@ const buildFaDecisionPanelFlow = (protocol) => {
       {
         id: 'tratamiento',
         title: 'Tratamiento',
-        summary: 'Pautas de guardia en tarjetas; máximos, contraindicaciones y ajustes quedan dentro de cada pauta.',
+        summary: 'Control de estabilidad, frecuencia/ritmo y anticoagulación según duración, riesgo y función renal.',
         points: treatmentInitialItems(protocol),
         treatmentGroups: [
           {
@@ -3205,7 +3205,7 @@ const buildVentricularDecisionPanelFlow = (protocol) => {
       {
         id: 'tratamiento',
         title: 'Tratamiento',
-        summary: 'Electricidad, RCP y fármacos en tarjetas; no convertir la parada en texto largo.',
+        summary: 'Priorizar desfibrilación o cardioversión cuando corresponda, RCP de alta calidad y fármacos según ritmo y respuesta.',
         points: treatmentInitialItems(protocol),
         treatmentGroups: [
           {
@@ -3319,7 +3319,7 @@ const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
       {
         id: 'tratamiento',
         title: 'Tratamiento',
-        summary: 'Reperfusión si candidato y control tensional dirigido; cada pauta queda en tarjeta.',
+        summary: 'Reperfusión si candidato, control tensional dirigido y vigilancia de complicaciones.',
         points: [
           'Alteplasa 0,9 mg/kg IV, máximo 90 mg: 10% bolo y 90% en 60 min si candidato.',
           'Controlar PA < 185/110 mmHg antes de trombólisis; mantener < 180/105 mmHg después.',
