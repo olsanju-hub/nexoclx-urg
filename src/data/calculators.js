@@ -123,6 +123,44 @@ const roundToTwo = (value) => Math.round(value * 100) / 100;
 
 const numeric = (value) => Number(value) || 0;
 
+const fluidLossesTotal = ({
+  vomitingMl,
+  diarrheaMl,
+  drainsMl,
+  bleedingMl,
+  feverSweatMl,
+  estimatedLossesMl,
+}) =>
+  numeric(vomitingMl) +
+  numeric(diarrheaMl) +
+  numeric(drainsMl) +
+  numeric(bleedingMl) +
+  numeric(feverSweatMl) +
+  numeric(estimatedLossesMl);
+
+const fluidBalanceWarnings = ({ urineMl, urineHours, weightKg, netBalance }) => {
+  const urine = numeric(urineMl);
+  const hours = numeric(urineHours);
+  const weight = numeric(weightKg);
+  const warnings = [];
+
+  if (urine && hours) {
+    const urineMlHour = urine / hours;
+    const urineMlKgHour = weight ? urineMlHour / weight : null;
+    const lowUrine = urineMlKgHour !== null ? urineMlKgHour < 0.5 : urineMlHour < 30;
+
+    if (lowUrine) {
+      warnings.push('Oliguria: reevaluar perfusión, TA, lactato/gasometría, creatinina, congestión y necesidad de escalar.');
+    }
+  }
+
+  if (netBalance > 1500 || (weight && netBalance / weight > 20)) {
+    warnings.push('Riesgo de sobrecarga: reevaluar congestión, oxigenación y perfusión antes de aportar más volumen.');
+  }
+
+  return warnings;
+};
+
 const doseResult = ({ title, value, unit = '', fields, interpretation, caution }) => ({
   value,
   unit,
@@ -934,6 +972,102 @@ export const calculateVmniReassessment = ({
   };
 };
 
+export const calculateFluidRemaining = ({
+  targetMl,
+  crystalloidGivenMl,
+  urineMl,
+  urineHours,
+  weightKg,
+  vomitingMl,
+  diarrheaMl,
+  drainsMl,
+  bleedingMl,
+  feverSweatMl,
+}) => {
+  const target = numeric(targetMl);
+  const given = numeric(crystalloidGivenMl);
+
+  if (!target && !given) return null;
+
+  const urine = numeric(urineMl);
+  const hours = numeric(urineHours);
+  const weight = numeric(weightKg);
+  const losses = fluidLossesTotal({ vomitingMl, diarrheaMl, drainsMl, bleedingMl, feverSweatMl });
+  const remaining = target ? Math.max(target - given, 0) : 0;
+  const netBalance = given - urine - losses;
+  const urineMlHour = urine && hours ? urine / hours : null;
+  const urineMlKgHour = urineMlHour && weight ? urineMlHour / weight : null;
+  const warnings = fluidBalanceWarnings({ urineMl, urineHours, weightKg, netBalance });
+
+  return {
+    value: Math.round(remaining),
+    unit: 'mL pendientes',
+    interpretation: 'Cálculo principal: objetivo total menos cristaloide ya administrado. La diuresis no se resta del objetivo inicial de resucitación.',
+    fields: {
+      'Objetivo total': target ? `${Math.round(target)} mL` : 'No indicado',
+      'Cristaloide administrado': `${Math.round(given)} mL`,
+      'Volumen pendiente': `${Math.round(remaining)} mL`,
+      'Diuresis': urine ? `${Math.round(urine)} mL` : 'No introducida',
+      'Diuresis ml/h': urineMlHour ? `${roundToOne(urineMlHour)} mL/h` : 'No calculable',
+      'Diuresis ml/kg/h': urineMlKgHour ? `${roundToTwo(urineMlKgHour)} mL/kg/h` : 'No calculable',
+      'Otras pérdidas': `${Math.round(losses)} mL`,
+      'Balance neto aproximado': `${Math.round(netBalance)} mL`,
+    },
+    caution:
+      warnings.length > 0
+        ? warnings.join(' ')
+        : 'Usar diuresis y balance como datos de reevaluación; no indicar nuevos bolos solo por oliguria aislada.',
+  };
+};
+
+export const calculateSimpleFluidBalance = ({
+  ivIntakeMl,
+  oralIntakeMl,
+  urineMl,
+  urineHours,
+  weightKg,
+  vomitingDiarrheaDrainsMl,
+  estimatedLossesMl,
+}) => {
+  const iv = numeric(ivIntakeMl);
+  const oral = numeric(oralIntakeMl);
+  const urine = numeric(urineMl);
+  const hours = numeric(urineHours);
+  const weight = numeric(weightKg);
+  const otherLosses = numeric(vomitingDiarrheaDrainsMl) + numeric(estimatedLossesMl);
+  const totalIntake = iv + oral;
+  const netBalance = totalIntake - urine - otherLosses;
+  const urineMlHour = urine && hours ? urine / hours : null;
+  const urineMlKgHour = urineMlHour && weight ? urineMlHour / weight : null;
+  const warnings = fluidBalanceWarnings({ urineMl, urineHours, weightKg, netBalance });
+
+  if (!totalIntake && !urine && !otherLosses) return null;
+
+  return {
+    value: Math.round(netBalance),
+    unit: 'mL netos',
+    interpretation:
+      netBalance > 0
+        ? 'Balance positivo aproximado. Interpretar con perfusión, congestión, función renal y evolución.'
+        : netBalance < 0
+          ? 'Balance negativo aproximado. Interpretar con clínica, pérdidas activas, TA, lactato y función renal.'
+          : 'Balance neutro aproximado.',
+    fields: {
+      'Ingresos IV': `${Math.round(iv)} mL`,
+      'Ingresos orales': `${Math.round(oral)} mL`,
+      'Diuresis': `${Math.round(urine)} mL`,
+      'Diuresis ml/h': urineMlHour ? `${roundToOne(urineMlHour)} mL/h` : 'No calculable',
+      'Diuresis ml/kg/h': urineMlKgHour ? `${roundToTwo(urineMlKgHour)} mL/kg/h` : 'No calculable',
+      'Otras pérdidas': `${Math.round(otherLosses)} mL`,
+      'Balance neto': `${Math.round(netBalance)} mL`,
+    },
+    caution:
+      warnings.length > 0
+        ? warnings.join(' ')
+        : 'La diuresis aislada no decide bolos, UCI, intubación ni vasopresor; obliga a reevaluar el contexto.',
+  };
+};
+
 export const calculatorCatalog = {
   'cha2ds2-va': {
     id: 'cha2ds2-va',
@@ -1409,6 +1543,48 @@ export const calculatorCatalog = {
         verifiedPages: [6, 9],
         pdfPages: [6, 9],
         note: 'Revisión de fugas, alarmas y sincronía en el equipo local.',
+      }),
+    ],
+  },
+  'fluid-remaining': {
+    id: 'fluid-remaining',
+    title: 'Volumen pendiente / líquidos ya administrados',
+    shortTitle: 'Volumen pendiente',
+    moduleId: 'urgencias',
+    block: 'Urgencias',
+    chapter: 'Cap. 18 · Shock',
+    verifiedPage: 154,
+    pdfPage: 179,
+    status: 'implementado',
+    summary: 'Calcula objetivo menos cristaloide administrado y añade diuresis/balance como reevaluación.',
+    bibliography: [
+      referenceEntry({
+        id: 'fluid-remaining-murillo',
+        indexPage: 154,
+        verifiedPage: 154,
+        pdfPage: 179,
+        note: 'Apoyo práctico para reevaluación de perfusión, respuesta y riesgo de sobrecarga durante resucitación.',
+      }),
+    ],
+  },
+  'simple-fluid-balance': {
+    id: 'simple-fluid-balance',
+    title: 'Balance simple',
+    shortTitle: 'Balance simple',
+    moduleId: 'urgencias',
+    block: 'Urgencias',
+    chapter: 'Cap. 18 · Shock',
+    verifiedPage: 154,
+    pdfPage: 179,
+    status: 'implementado',
+    summary: 'Balance aproximado con ingresos, diuresis y pérdidas, incluyendo ml/kg/h si hay peso y tiempo.',
+    bibliography: [
+      referenceEntry({
+        id: 'simple-fluid-balance-murillo',
+        indexPage: 154,
+        verifiedPage: 154,
+        pdfPage: 179,
+        note: 'Apoyo práctico para seguimiento de perfusión, diuresis y sobrecarga durante reevaluación clínica.',
       }),
     ],
   },

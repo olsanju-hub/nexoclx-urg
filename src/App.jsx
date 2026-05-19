@@ -18,12 +18,14 @@ import {
   calculateCrb65,
   calculateCurb65,
   calculateFaDose,
+  calculateFluidRemaining,
   calculateHasBled,
   calculateIchScore,
   calculateKillip,
   calculateNihss,
   calculateScaDose,
   calculateSeizureDose,
+  calculateSimpleFluidBalance,
   calculateStrokeThrombolysisDose,
   calculateVascularHeparinDose,
   calculateVmniPao2Fio2,
@@ -198,6 +200,27 @@ const initialCalculatorInputs = {
     initialSpo2: '',
     currentSpo2: '',
   },
+  'fluid-remaining': {
+    targetMl: '',
+    crystalloidGivenMl: '',
+    urineMl: '',
+    urineHours: '',
+    weightKg: '',
+    vomitingMl: '',
+    diarrheaMl: '',
+    drainsMl: '',
+    bleedingMl: '',
+    feverSweatMl: '',
+  },
+  'simple-fluid-balance': {
+    ivIntakeMl: '',
+    oralIntakeMl: '',
+    urineMl: '',
+    urineHours: '',
+    weightKg: '',
+    vomitingDiarrheaDrainsMl: '',
+    estimatedLossesMl: '',
+  },
 };
 
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
@@ -289,6 +312,14 @@ const getCalculatorResult = (calculatorId, values) => {
 
   if (calculatorId === 'vmni-reassessment') {
     return calculateVmniReassessment(values);
+  }
+
+  if (calculatorId === 'fluid-remaining') {
+    return calculateFluidRemaining(values);
+  }
+
+  if (calculatorId === 'simple-fluid-balance') {
+    return calculateSimpleFluidBalance(values);
   }
 
   return null;
@@ -1378,6 +1409,49 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
             <NumberField value={values.initialSpo2} label="SatO2 inicial" placeholder="Ej. 86" onChange={(value) => onChange('initialSpo2', value)} />
             <NumberField value={values.currentSpo2} label="SatO2 actual" placeholder="Ej. 91" onChange={(value) => onChange('currentSpo2', value)} />
           </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'fluid-remaining' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.targetMl} label="Objetivo total (mL)" placeholder="Ej. 2000" onChange={(value) => onChange('targetMl', value)} />
+            <NumberField value={values.crystalloidGivenMl} label="Cristaloide administrado (mL)" placeholder="Ej. 1250" onChange={(value) => onChange('crystalloidGivenMl', value)} />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <NumberField value={values.urineMl} label="Diuresis (mL)" placeholder="Ej. 120" onChange={(value) => onChange('urineMl', value)} />
+            <NumberField value={values.urineHours} label="Periodo diuresis (h)" placeholder="Ej. 4" onChange={(value) => onChange('urineHours', value)} />
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 70" onChange={(value) => onChange('weightKg', value)} />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.vomitingMl} label="Vómitos (mL)" placeholder="Opcional" onChange={(value) => onChange('vomitingMl', value)} />
+            <NumberField value={values.diarrheaMl} label="Diarrea (mL)" placeholder="Opcional" onChange={(value) => onChange('diarrheaMl', value)} />
+            <NumberField value={values.drainsMl} label="Drenajes (mL)" placeholder="Opcional" onChange={(value) => onChange('drainsMl', value)} />
+            <NumberField value={values.bleedingMl} label="Sangrado estimado (mL)" placeholder="Opcional" onChange={(value) => onChange('bleedingMl', value)} />
+            <NumberField value={values.feverSweatMl} label="Fiebre/sudoración estimada (mL)" placeholder="Opcional" onChange={(value) => onChange('feverSweatMl', value)} />
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+            La diuresis y las pérdidas se muestran como balance y reevaluación; no modifican automáticamente el volumen pendiente inicial.
+          </p>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'simple-fluid-balance' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.ivIntakeMl} label="Ingresos IV (mL)" placeholder="Ej. 1500" onChange={(value) => onChange('ivIntakeMl', value)} />
+            <NumberField value={values.oralIntakeMl} label="Ingresos orales (mL)" placeholder="Opcional" onChange={(value) => onChange('oralIntakeMl', value)} />
+            <NumberField value={values.urineMl} label="Diuresis (mL)" placeholder="Ej. 500" onChange={(value) => onChange('urineMl', value)} />
+            <NumberField value={values.urineHours} label="Periodo diuresis (h)" placeholder="Ej. 8" onChange={(value) => onChange('urineHours', value)} />
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 70" onChange={(value) => onChange('weightKg', value)} />
+            <NumberField value={values.vomitingDiarrheaDrainsMl} label="Vómitos/diarrea/drenajes (mL)" placeholder="Opcional" onChange={(value) => onChange('vomitingDiarrheaDrainsMl', value)} />
+            <NumberField value={values.estimatedLossesMl} label="Pérdidas estimadas (mL)" placeholder="Opcional" onChange={(value) => onChange('estimatedLossesMl', value)} />
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+            Balance orientativo: no indica bolos, UCI, intubación ni vasopresor sin reevaluación clínica completa.
+          </p>
           <CalculatorResult result={result} />
         </div>
       ) : null}
