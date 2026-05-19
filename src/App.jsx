@@ -18,12 +18,16 @@ import {
   calculateCrb65,
   calculateCurb65,
   calculateFaDose,
+  calculateFluidBolusByWeight,
   calculateFluidRemaining,
   calculateHasBled,
   calculateIchScore,
+  calculateInfusionRate,
   calculateKillip,
+  calculateAdultMaintenanceFluids,
   calculateNihss,
   calculateScaDose,
+  calculateSepsisThirtyMlKg,
   calculateSeizureDose,
   calculateSimpleFluidBalance,
   calculateStrokeThrombolysisDose,
@@ -221,6 +225,23 @@ const initialCalculatorInputs = {
     vomitingDiarrheaDrainsMl: '',
     estimatedLossesMl: '',
   },
+  'fluid-bolus-weight': {
+    weightKg: '',
+    mlKg: '10',
+    maxBolusMl: '500',
+  },
+  'sepsis-30mlkg': {
+    weightKg: '',
+    crystalloidGivenMl: '',
+  },
+  'maintenance-fluids-adult': {
+    weightKg: '',
+    mlKgDay: '25',
+  },
+  'infusion-rate': {
+    volumeMl: '',
+    hours: '',
+  },
 };
 
 const compactSentence = (value) => value.split('. ')[0]?.trim() ?? value;
@@ -320,6 +341,22 @@ const getCalculatorResult = (calculatorId, values) => {
 
   if (calculatorId === 'simple-fluid-balance') {
     return calculateSimpleFluidBalance(values);
+  }
+
+  if (calculatorId === 'fluid-bolus-weight') {
+    return calculateFluidBolusByWeight(values);
+  }
+
+  if (calculatorId === 'sepsis-30mlkg') {
+    return calculateSepsisThirtyMlKg(values);
+  }
+
+  if (calculatorId === 'maintenance-fluids-adult') {
+    return calculateAdultMaintenanceFluids(values);
+  }
+
+  if (calculatorId === 'infusion-rate') {
+    return calculateInfusionRate(values);
   }
 
   return null;
@@ -441,6 +478,7 @@ const protocolSearchAliases = {
   anafilaxia: ['reaccion alergica', 'alergia grave', 'adrenalina', 'shock anafilactico', 'urticaria', 'angioedema', 'broncoespasmo'],
   'asma-exacerbacion': ['asma', 'crisis asmatica', 'exacerbacion asmatica', 'broncoespasmo', 'sibilancias', 'disnea', 'salbutamol', 'prednisona', 'ipratropio'],
   'epoc-agudizacion': ['epoc', 'agudizacion epoc', 'exacerbacion epoc', 'aepoc', 'disnea', 'broncoespasmo', 'hipercapnia', 'insuficiencia respiratoria', 'vni', 'antibiotico epoc'],
+  sepsis: ['sepsis', 'shock septico', 'infeccion grave', 'lactato', 'hipotension', 'hipoperfusion', 'bacteriemia', 'antibiotico', 'fluidoterapia', 'vasopresores'],
 };
 
 const getProtocolCalculatorCount = (moduleId) => implementedCalculators.filter((calculator) => calculator.moduleId === moduleId).length;
@@ -1455,6 +1493,53 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
           <CalculatorResult result={result} />
         </div>
       ) : null}
+
+      {calculatorId === 'fluid-bolus-weight' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 70" onChange={(value) => onChange('weightKg', value)} />
+            <NumberField value={values.mlKg} label="mL/kg" placeholder="Ej. 10" onChange={(value) => onChange('mlKg', value)} />
+            <NumberField value={values.maxBolusMl} label="Máximo por bolo (mL)" placeholder="Ej. 500" onChange={(value) => onChange('maxBolusMl', value)} />
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+            Herramienta de cálculo; la decisión de repetir bolos depende de respuesta clínica, perfusión y sobrecarga.
+          </p>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'sepsis-30mlkg' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 70" onChange={(value) => onChange('weightKg', value)} />
+            <NumberField value={values.crystalloidGivenMl} label="Cristaloide administrado (mL)" placeholder="Ej. 1000" onChange={(value) => onChange('crystalloidGivenMl', value)} />
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+            Usar solo si hay hipoperfusión inducida por sepsis o shock séptico; individualizar si existe riesgo de sobrecarga.
+          </p>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'maintenance-fluids-adult' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.weightKg} label="Peso (kg)" placeholder="Ej. 70" onChange={(value) => onChange('weightKg', value)} />
+            <NumberField value={values.mlKgDay} label="mL/kg/día" placeholder="25-30" onChange={(value) => onChange('mlKgDay', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'infusion-rate' ? (
+        <div className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <NumberField value={values.volumeMl} label="Volumen (mL)" placeholder="Ej. 1000" onChange={(value) => onChange('volumeMl', value)} />
+            <NumberField value={values.hours} label="Tiempo (h)" placeholder="Ej. 8" onChange={(value) => onChange('hours', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
     </section>
   );
 };
@@ -1668,7 +1753,7 @@ const ProceduresView = ({ onBack, onProcedureOpen, onCalculatorOpen }) => {
   );
 };
 
-const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen, onProcedureOpen }) => {
+const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen, onProcedureOpen, onProtocolOpen }) => {
   const flow = getProtocolFlow(protocolId);
 
   return (
@@ -1677,6 +1762,7 @@ const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen, onProc
         protocol={flow}
         onCalculatorOpen={onCalculatorOpen}
         onProcedureOpen={onProcedureOpen}
+        onProtocolOpen={onProtocolOpen}
         onBack={onBack}
         backLabel="Protocolos"
       />
@@ -1684,7 +1770,7 @@ const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen, onProc
   );
 };
 
-const ProcedureFlowView = ({ procedureId, onBack, onCalculatorOpen }) => {
+const ProcedureFlowView = ({ procedureId, onBack, onCalculatorOpen, onProtocolOpen }) => {
   const flow = getProcedureFlow(procedureId);
 
   return (
@@ -1692,6 +1778,7 @@ const ProcedureFlowView = ({ procedureId, onBack, onCalculatorOpen }) => {
       <ClinicalFlowTree
         protocol={flow}
         onCalculatorOpen={onCalculatorOpen}
+        onProtocolOpen={onProtocolOpen}
         onBack={onBack}
         backLabel="Procedimientos"
         kindLabel="Procedimiento"
@@ -1843,6 +1930,7 @@ const App = () => {
           onBack={handleBack}
           onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
           onProcedureOpen={(procedureId) => openProcedure(procedureId, protocolReturnTo)}
+          onProtocolOpen={(nextProtocolId) => openModule(nextProtocolId, protocolReturnTo)}
         />
       );
     }
@@ -1859,6 +1947,7 @@ const App = () => {
           procedureId={procedureId}
           onBack={handleBack}
           onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, procedureReturnTo)}
+          onProtocolOpen={(protocolId) => openModule(protocolId, procedureReturnTo)}
         />
       );
     }

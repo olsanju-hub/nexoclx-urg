@@ -291,7 +291,7 @@ const FieldList = ({ items = [], className = '' }) => {
   );
 };
 
-const ClinicalSheetNode = ({ node, onCalculatorOpen, onProcedureOpen }) => {
+const ClinicalSheetNode = ({ node, onCalculatorOpen, onProcedureOpen, onProtocolOpen }) => {
   const [open, setOpen] = useState(false);
   const hasDetails = Boolean(node.children?.length || node.items?.length > 3 || node.references?.length);
   const visibleItems = node.items?.slice(0, open ? undefined : 3) ?? [];
@@ -307,6 +307,14 @@ const ClinicalSheetNode = ({ node, onCalculatorOpen, onProcedureOpen }) => {
   if (node.procedureId) {
     return (
       <button type="button" className="clinical-calc-button" onClick={() => onProcedureOpen?.(node.procedureId)}>
+        {node.action ?? `Ver ${node.title}`}
+      </button>
+    );
+  }
+
+  if (node.protocolId) {
+    return (
+      <button type="button" className="clinical-calc-button" onClick={() => onProtocolOpen?.(node.protocolId)}>
         {node.action ?? `Ver ${node.title}`}
       </button>
     );
@@ -346,7 +354,7 @@ const ClinicalSheetNode = ({ node, onCalculatorOpen, onProcedureOpen }) => {
       {open && node.children?.length ? (
         <div className="clinical-sheet-detail-stack">
           {node.children.map((child) => (
-            <ClinicalSheetNode key={child.id} node={child} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} />
+            <ClinicalSheetNode key={child.id} node={child} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
           ))}
         </div>
       ) : null}
@@ -450,7 +458,7 @@ const buildDecisionPanelSections = (protocol) => {
   });
 };
 
-const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen }) => {
+const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen, onProtocolOpen }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const points = uniquePreviewItems(section.points).slice(0, MAX_SECTION_ITEMS);
   const hasDetails = Boolean(section.detailNodes?.length);
@@ -474,11 +482,15 @@ const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen }) =>
         <div className="clinical-sheet-actions">
           {section.actions.map((action) => (
             <button
-              key={action.calculatorId ?? action.procedureId}
+              key={action.calculatorId ?? action.procedureId ?? action.protocolId}
               type="button"
               className="clinical-calc-button"
               onClick={() =>
-                action.procedureId ? onProcedureOpen?.(action.procedureId) : onCalculatorOpen?.(action.calculatorId)
+                action.protocolId
+                  ? onProtocolOpen?.(action.protocolId)
+                  : action.procedureId
+                    ? onProcedureOpen?.(action.procedureId)
+                    : onCalculatorOpen?.(action.calculatorId)
               }
             >
               {action.label}
@@ -510,7 +522,7 @@ const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen }) =>
           {detailsOpen ? (
             <div className="clinical-sheet-detail-stack">
               {section.detailNodes.map((node) => (
-                <ClinicalSheetNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} />
+                <ClinicalSheetNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
               ))}
             </div>
           ) : null}
@@ -520,7 +532,7 @@ const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen }) =>
   );
 };
 
-const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, onBack, backLabel = 'Protocolos', kindLabel = 'Protocolo' }) => {
+const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, onProtocolOpen, onBack, backLabel = 'Protocolos', kindLabel = 'Protocolo' }) => {
   const [activePanel, setActivePanel] = useState('sospecha');
   const [referencesOpen, setReferencesOpen] = useState(false);
   const panelSections = buildDecisionPanelSections(protocol);
@@ -583,7 +595,7 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
       </div>
 
       {activeSection ? (
-        <DecisionPanelSection section={activeSection} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} />
+        <DecisionPanelSection section={activeSection} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
       ) : null}
 
       {referencesSection ? (
@@ -595,7 +607,7 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
           {referencesOpen ? (
             <div className="clinical-sheet-reference-body">
               {referencesSection.children?.map((node) => (
-                <ClinicalSheetNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} />
+                <ClinicalSheetNode key={node.id} node={node} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
               ))}
             </div>
           ) : null}
@@ -605,12 +617,13 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
   );
 };
 
-export const ClinicalFlowTree = ({ protocol, onCalculatorOpen, onProcedureOpen, onBack, backLabel, kindLabel }) => {
+export const ClinicalFlowTree = ({ protocol, onCalculatorOpen, onProcedureOpen, onProtocolOpen, onBack, backLabel, kindLabel }) => {
   return (
     <DecisionPanelProtocol
       protocol={protocol}
       onCalculatorOpen={onCalculatorOpen}
       onProcedureOpen={onProcedureOpen}
+      onProtocolOpen={onProtocolOpen}
       onBack={onBack}
       backLabel={backLabel}
       kindLabel={kindLabel}

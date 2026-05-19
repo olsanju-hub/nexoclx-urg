@@ -34,9 +34,9 @@ Principios actuales del proyecto:
 
 - Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
 - Pantalla propia de `Protocolos` con organigramas clínicos para todos los protocolos implementados y acordeones por bloque clínico para evitar una lista plana interminable.
-- Protocolos reales operativos migrados a ficha clínica: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `crisis convulsiva / epilepsia en urgencias`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
-- Sección `Procedimientos` activa con `VMNI`.
-- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado`, `BISAP` y calculadoras de VMNI.
+- Protocolos reales operativos migrados a ficha clínica: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `crisis convulsiva / epilepsia en urgencias`, `sepsis / shock séptico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
+- Sección `Procedimientos` activa con `VMNI` y `Fluidoterapia IV en urgencias`.
+- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado`, `BISAP`, calculadoras de VMNI y calculadoras de fluidoterapia IV/balance.
 - La sección `Medicamentos` deja de ser sección principal visible. Los tratamientos deben vivir dentro de cada protocolo como pautas concretas y auditadas.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
 - Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `Murillo 7.ª ed.`, `SEN Epilepsia 2023`, `NICE NG217` y `AES 2016` como fuentes del protocolo de crisis convulsiva/estatus, `NICE NG250 2025` como referencia principal de neumonía, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
@@ -57,8 +57,10 @@ Principios actuales del proyecto:
 | Módulos de ictus | Activos | `Ictus isquémico` e `ictus hemorrágico` con diagnóstico, tratamiento y destino. | Quedan agrupados en `Neurología` con bibliografía textual. |
 | Crisis convulsiva / epilepsia | Activo | Ficha clínica para crisis autolimitada, crisis en curso, primera crisis, crisis provocada y estatus epiléptico. | Queda en `Neurología`, con relación secundaria funcional con urgencias y tratamiento escalonado con CIMA. |
 | Anafilaxia | Activo | Ficha clínica para sospecha, pruebas mínimas, decisión de gravedad, adrenalina IM y destino. | Queda en `Urgencias` con calculadora directa de adrenalina IM por peso. |
-| Procedimientos | Activa | Índice técnico operativo, empezando por `VMNI`. | Enlazado desde EPOC y Asma cuando se menciona soporte ventilatorio no invasivo. |
+| Sepsis / shock séptico | Activo | Ficha clínica para sospecha, pruebas, decisión, tratamiento inicial, fluidoterapia, foco y destino. | Enlaza `Fluidoterapia IV en urgencias`, `30 mL/kg sepsis`, `volumen pendiente` y `balance simple`. |
+| Procedimientos | Activa | Índice técnico operativo con `VMNI` y `Fluidoterapia IV en urgencias`. | Enlaza procedimientos desde protocolos cuando cambian conducta. |
 | VMNI | Activo | Procedimiento operativo para indicaciones, contraindicaciones, preparación, modos, ajustes, reevaluación y fracaso. | Incluye calculadoras propias de peso predicho, VT, PS, oxigenación y reevaluación. |
+| Fluidoterapia IV en urgencias | Activo | Procedimiento operativo para indicación, elección de líquido, cantidad/ritmo, reevaluación y precauciones. | Incluye cálculo de bolo por peso, 30 mL/kg sepsis, volumen pendiente, mantenimiento, balance y velocidad de perfusión. |
 | Dolor abdominal por escenarios | Activo | Protocolos de un vistazo para epigastrio, hipocondrio derecho, fosas iliacas, flanco, pelvis, peritonismo y sospecha vascular. | Cada cuadro queda en su especialidad principal: `Digestivo`, `Cirugía general`, `Urología`, `Ginecología` o `Vascular`. |
 | Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo o procedimiento. |
 | Medicamentos | No visible como sección principal | Los datos farmacológicos pueden seguir existiendo como soporte interno mientras se integran pautas auditadas dentro de cada protocolo. | No debe mostrarse como módulo independiente ni como navegación principal. |
@@ -394,7 +396,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 
 ### Pendiente clínico
 
-- Desarrollar protocolos reales para `sepsis`, `shock` o `ICC`.
+- Desarrollar protocolos reales para `shock` o `ICC`.
 - Mantener en cada nuevo protocolo la misma conexión entre decisión clínica, cálculos, medicación y bibliografía.
 - Evitar siempre que la interfaz prometa una funcionalidad aún no implementada.
 

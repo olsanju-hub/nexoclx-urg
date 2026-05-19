@@ -45,6 +45,24 @@ const ginaAsthmaEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const niceFluidEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-cg174-fluidoterapia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const sscSepsisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'ssc-sepsis-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const procedureCatalog = {
   vmni: {
     id: 'vmni',
@@ -108,12 +126,68 @@ export const procedureCatalog = {
       }),
     ],
   },
+  'fluidoterapia-iv': {
+    id: 'fluidoterapia-iv',
+    title: 'Fluidoterapia IV en urgencias',
+    longTitle: 'Fluidoterapia IV en urgencias',
+    section: 'Procedimientos',
+    specialtyId: 'urgencias',
+    relatedSpecialties: ['infecciosas'],
+    status: 'implementado',
+    implemented: true,
+    summary: 'Indicación, elección de líquido, cantidad, ritmo y reevaluación de líquidos IV en urgencias.',
+    searchTerms: [
+      'fluidoterapia',
+      'liquidos iv',
+      'sueroterapia',
+      'suero fisiologico',
+      'ssf',
+      'ringer lactato',
+      'plasmalyte',
+      'glucosado',
+      'glucosalino',
+      'mantenimiento',
+      'resucitacion',
+      'reposicion',
+      'deshidratacion',
+      'hipovolemia',
+      'sepsis',
+      'shock',
+    ],
+    calculatorIds: [
+      'fluid-bolus-weight',
+      'sepsis-30mlkg',
+      'fluid-remaining',
+      'maintenance-fluids-adult',
+      'simple-fluid-balance',
+      'infusion-rate',
+    ],
+    bibliography: [
+      niceFluidEntry({
+        id: 'fluidoterapia-nice-cg174',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Fuente principal para indicación, tipo de fluido, resucitación, mantenimiento, reposición y reevaluación.',
+      }),
+      sscSepsisEntry({
+        id: 'fluidoterapia-ssc-sepsis',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Apoyo para resucitación inicial en sepsis con hipoperfusión o shock séptico.',
+      }),
+    ],
+  },
 };
 
 export const procedureList = Object.values(procedureCatalog);
 
 const calculatorAction = (calculatorId, label) => ({
   calculatorId,
+  label,
+});
+
+const protocolAction = (protocolId, label) => ({
+  protocolId,
   label,
 });
 
@@ -311,8 +385,133 @@ const buildVmniProcedure = (procedure) => ({
   references: asReferenceItems(procedure.bibliography),
 });
 
+const buildFluidTherapyProcedure = (procedure) => ({
+  id: procedure.id,
+  title: procedure.title,
+  longTitle: procedure.longTitle,
+  specialty: 'Procedimientos',
+  section: 'Urgencias',
+  summary: procedure.summary,
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'indicacion',
+      title: 'Indicación',
+      summary: 'Definir por qué se pauta líquido IV y revisar respuesta de forma activa.',
+      points: [
+        'Resucitación: hipovolemia, shock o hipoperfusión con necesidad de bolo y reevaluación.',
+        'Mantenimiento: paciente sin vía oral/enteral suficiente y sin objetivo de resucitación.',
+        'Reposición: pérdidas digestivas, drenajes, sangrado, fiebre/sudoración o diuresis osmótica.',
+        'Redistribución: sepsis, pancreatitis, perioperatorio u otros estados con tercer espacio.',
+        'Reevaluación: revisar objetivo, respuesta y riesgo de sobrecarga tras cada intervención.',
+      ],
+      actions: [protocolAction('sepsis', 'Usar junto con protocolo Sepsis si infección grave')],
+      detailNodes: [
+        {
+          id: 'fluidoterapia-5r',
+          title: 'Las 5 R',
+          type: 'decision',
+          severity: 'info',
+          items: [
+            'Resucitación: bolo rápido si shock/hipoperfusión.',
+            'Mantenimiento: cubrir necesidades basales si no puede beber/comer.',
+            'Reposición: compensar pérdidas medidas o estimadas.',
+            'Redistribución: anticipar tercer espacio y respuesta variable.',
+            'Reevaluación: detener, cambiar o continuar según respuesta y toxicidad.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'eleccion',
+      title: 'Elección del líquido',
+      summary: 'Elegir cristaloide según objetivo, electrolitos, comorbilidad y compatibilidad.',
+      points: [
+        'Cristaloide balanceado/Ringer lactato/Plasma-Lyte: opción habitual de resucitación si disponible y no contraindicado.',
+        'Suero salino 0,9%: útil en hipocloremia/alcalosis por vómitos, hiponatremia hipovolémica seleccionada o compatibilidad concreta.',
+        'Evitar grandes volúmenes de salino si aparece acidosis hiperclorémica o carga de cloro relevante.',
+        'Glucosado 5% aporta agua libre/glucosa; no usar como resucitación hemodinámica.',
+        'Sueros con potasio solo con K conocido, diuresis y función renal razonables; evitar si hiperpotasemia o IR significativa sin control.',
+      ],
+      detailNodes: [
+        {
+          id: 'fluidoterapia-glucosalino',
+          title: 'Glucosalino y mantenimiento',
+          type: 'step',
+          items: [
+            'Glucosalino: considerar en mantenimiento o situaciones seleccionadas según protocolo local, sodio y glucemia.',
+            'No usar soluciones hipotónicas de forma automática en pacientes con riesgo de hiponatremia.',
+            'Revisar Na, K, Cl, glucemia y creatinina si el tratamiento se prolonga.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'cantidad-ritmo',
+      title: 'Cantidad y ritmo',
+      summary: 'Separar bolo de resucitación, objetivo de sepsis, mantenimiento y reposición de pérdidas.',
+      points: [
+        'Resucitación general: bolo de cristaloide 500 mL rápido, por ejemplo en menos de 15 min si shock/hipovolemia, y reevaluar.',
+        'Sepsis con hipoperfusión/shock: valorar 30 mL/kg en primeras 3 h, individualizando si riesgo de sobrecarga.',
+        'Mantenimiento: estimar 25-30 mL/kg/día si no puede vía oral/enteral y ajustar por edad, fiebre, pérdidas y comorbilidad.',
+        'Reposición: sustituir pérdidas según tipo, electrolitos y balance; no confundir con objetivo inicial de resucitación.',
+        'Calcular velocidad de perfusión cuando se prescriba volumen en un tiempo concreto.',
+      ],
+      actions: [
+        calculatorAction('fluid-bolus-weight', 'Calcular bolo por peso'),
+        calculatorAction('sepsis-30mlkg', 'Calcular 30 mL/kg sepsis'),
+        calculatorAction('fluid-remaining', 'Calcular volumen pendiente'),
+        calculatorAction('maintenance-fluids-adult', 'Calcular mantenimiento'),
+        calculatorAction('simple-fluid-balance', 'Calcular balance simple'),
+        calculatorAction('infusion-rate', 'Calcular velocidad de perfusión'),
+      ],
+      detailNodes: [
+        {
+          id: 'fluidoterapia-no-automatizar',
+          title: 'No automatizar por diuresis',
+          type: 'alert',
+          severity: 'warning',
+          items: [
+            'La diuresis informa perfusión y balance, pero no resta automáticamente el volumen pendiente de resucitación.',
+            'La oliguria aislada no indica repetir bolos: reevaluar TA, lactato, creatinina, congestión, perfusión y causa.',
+            'Si shock persiste tras fluidos adecuados, valorar vasopresor/UCI sin retraso.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'reevaluacion',
+      title: 'Reevaluación',
+      summary: 'Tras cada bolo o cambio de ritmo, reevaluar perfusión, respiratorio, balance y analítica.',
+      points: [
+        'TA, FC, FR, SatO2, relleno capilar, piel, estado mental y respuesta clínica al bolo.',
+        'Diuresis, balance neto y pérdidas activas sin convertirlos en orden automática de nuevos bolos.',
+        'Lactato si shock/sepsis; gasometría si gravedad, acidosis o insuficiencia respiratoria.',
+        'Iones, creatinina, glucemia y cloro si fluidos mantenidos o grandes volúmenes.',
+        'Auscultación pulmonar, edema e ingurgitación yugular para detectar sobrecarga.',
+      ],
+      actions: [calculatorAction('simple-fluid-balance', 'Calcular balance simple')],
+    },
+    {
+      id: 'precauciones',
+      title: 'Precauciones',
+      summary: 'Reducir, individualizar o escalar si hay comorbilidad, toxicidad o shock persistente.',
+      points: [
+        'Insuficiencia cardiaca, ERC, cirrosis, anciano/frágil o edema pulmonar: bolos más cautos y reevaluación estrecha.',
+        'Hiponatremia, hiperpotasemia, acidosis o alteración renal obligan a elegir fluido y ritmo con más control.',
+        'Sepsis con mala respuesta a fluidos: valorar vasopresores, control de foco y UCI.',
+        'No retrasar antibiótico, control de foco ni soporte avanzado por completar cálculos de fluidoterapia.',
+        'Documentar objetivo, líquido, volumen, ritmo, respuesta y motivo para continuar o detener.',
+      ],
+      actions: [protocolAction('sepsis', 'Abrir protocolo Sepsis')],
+    },
+  ],
+  references: asReferenceItems(procedure.bibliography),
+});
+
 export const procedureFlowCatalog = {
   vmni: buildVmniProcedure(procedureCatalog.vmni),
+  'fluidoterapia-iv': buildFluidTherapyProcedure(procedureCatalog['fluidoterapia-iv']),
 };
 
 export const procedureFlowList = Object.values(procedureFlowCatalog);

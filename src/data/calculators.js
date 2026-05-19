@@ -118,6 +118,24 @@ const ersAtsVmniEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const niceFluidEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-cg174-fluidoterapia',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const sscSepsisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'ssc-sepsis-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const roundToOne = (value) => Math.round(value * 10) / 10;
 const roundToTwo = (value) => Math.round(value * 100) / 100;
 
@@ -1068,6 +1086,105 @@ export const calculateSimpleFluidBalance = ({
   };
 };
 
+export const calculateFluidBolusByWeight = ({ weightKg, mlKg = 10, maxBolusMl = 500 }) => {
+  const weight = numeric(weightKg);
+  const dose = numeric(mlKg);
+  const max = numeric(maxBolusMl);
+
+  if (!weight || !dose) return null;
+
+  const calculated = weight * dose;
+  const bolus = max ? Math.min(calculated, max) : calculated;
+  const maxApplied = max && calculated > max;
+
+  return {
+    value: Math.round(bolus),
+    unit: 'mL',
+    interpretation: 'Bolo orientativo para reevaluación clínica; no sustituye valoración de perfusión, congestión ni respuesta.',
+    fields: {
+      Peso: `${weight} kg`,
+      'Rango usado': `${dose} mL/kg`,
+      'Volumen calculado': `${Math.round(calculated)} mL`,
+      'Máximo aplicado': maxApplied ? `${Math.round(max)} mL` : 'No',
+      Vía: 'IV',
+      Reevaluar: 'TA, FC, relleno capilar, trabajo respiratorio, SatO2, auscultación, diuresis y lactato si procede.',
+    },
+    caution: 'En anciano, insuficiencia cardiaca, ERC o cirrosis, usar bolos más cautos y reevaluar con mayor frecuencia.',
+  };
+};
+
+export const calculateSepsisThirtyMlKg = ({ weightKg, crystalloidGivenMl }) => {
+  const weight = numeric(weightKg);
+  const given = numeric(crystalloidGivenMl);
+
+  if (!weight) return null;
+
+  const target = weight * 30;
+  const remaining = Math.max(target - given, 0);
+
+  return {
+    value: Math.round(remaining),
+    unit: 'mL pendientes',
+    interpretation:
+      'Objetivo orientativo 30 mL/kg si hay hipoperfusión inducida por sepsis o shock séptico. Individualizar y reevaluar respuesta y sobrecarga.',
+    fields: {
+      Peso: `${weight} kg`,
+      'Objetivo 30 mL/kg': `${Math.round(target)} mL`,
+      'Cristaloide administrado': `${Math.round(given)} mL`,
+      'Volumen pendiente': `${Math.round(remaining)} mL`,
+      Plazo: 'Primeras 3 h si sepsis con hipoperfusión o shock séptico, según contexto clínico.',
+      Reevaluar: 'Perfusión, TA/PAM, lactato, diuresis, congestión pulmonar, necesidad de vasopresor/UCI.',
+    },
+    caution: 'No administrar de forma automática si hay riesgo de sobrecarga; no retrasar vasopresor/UCI si shock persiste.',
+  };
+};
+
+export const calculateAdultMaintenanceFluids = ({ weightKg, mlKgDay = 25 }) => {
+  const weight = numeric(weightKg);
+  const dose = numeric(mlKgDay);
+
+  if (!weight || !dose) return null;
+
+  const daily = weight * dose;
+  const hourly = daily / 24;
+
+  return {
+    value: Math.round(daily),
+    unit: 'mL/día',
+    interpretation: 'Mantenimiento adulto orientativo si no puede recibir vía oral/enteral; ajustar por pérdidas, comorbilidad y electrolitos.',
+    fields: {
+      Peso: `${weight} kg`,
+      'Rango usado': `${dose} mL/kg/día`,
+      'Volumen diario': `${Math.round(daily)} mL/día`,
+      'Velocidad aproximada': `${Math.round(hourly)} mL/h`,
+      Reevaluar: 'Na/K/Cl, glucemia, creatinina, balance, edema, diuresis y tolerancia oral.',
+    },
+    caution: 'Reducir o individualizar en fragilidad, insuficiencia cardiaca, ERC, cirrosis, riesgo de sobrecarga o hiponatremia.',
+  };
+};
+
+export const calculateInfusionRate = ({ volumeMl, hours }) => {
+  const volume = numeric(volumeMl);
+  const duration = numeric(hours);
+
+  if (!volume || !duration) return null;
+
+  const rate = volume / duration;
+
+  return {
+    value: Math.round(rate),
+    unit: 'mL/h',
+    interpretation: 'Velocidad de perfusión para el volumen y tiempo indicados; ajustar a respuesta clínica y prescripción local.',
+    fields: {
+      Volumen: `${Math.round(volume)} mL`,
+      Tiempo: `${duration} h`,
+      'Velocidad': `${roundToOne(rate)} mL/h`,
+      Reevaluar: 'Vía venosa, bomba, objetivo terapéutico, balance, electrolitos y tolerancia.',
+    },
+    caution: 'No decide el volumen total ni el tipo de líquido; solo convierte volumen/tiempo en mL/h.',
+  };
+};
+
 export const calculatorCatalog = {
   'cha2ds2-va': {
     id: 'cha2ds2-va',
@@ -1558,6 +1675,12 @@ export const calculatorCatalog = {
     status: 'implementado',
     summary: 'Calcula objetivo menos cristaloide administrado y añade diuresis/balance como reevaluación.',
     bibliography: [
+      niceFluidEntry({
+        id: 'fluid-remaining-nice',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Cálculo de volumen administrado/pendiente integrado con reevaluación clínica y balance.',
+      }),
       referenceEntry({
         id: 'fluid-remaining-murillo',
         indexPage: 154,
@@ -1579,12 +1702,99 @@ export const calculatorCatalog = {
     status: 'implementado',
     summary: 'Balance aproximado con ingresos, diuresis y pérdidas, incluyendo ml/kg/h si hay peso y tiempo.',
     bibliography: [
+      niceFluidEntry({
+        id: 'simple-fluid-balance-nice',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'NICE estructura indicación, pérdidas y reevaluación en fluidoterapia IV.',
+      }),
       referenceEntry({
         id: 'simple-fluid-balance-murillo',
         indexPage: 154,
         verifiedPage: 154,
         pdfPage: 179,
         note: 'Apoyo práctico para seguimiento de perfusión, diuresis y sobrecarga durante reevaluación clínica.',
+      }),
+    ],
+  },
+  'fluid-bolus-weight': {
+    id: 'fluid-bolus-weight',
+    title: 'Bolo de cristaloide por peso',
+    shortTitle: 'Bolo por peso',
+    moduleId: 'urgencias',
+    block: 'Fluidoterapia IV',
+    chapter: 'NICE CG174 · Fluidoterapia IV',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Calcula un bolo orientativo por mL/kg con máximo configurable y obliga a reevaluar.',
+    bibliography: [
+      niceFluidEntry({
+        id: 'fluid-bolus-nice',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'NICE recomienda bolos de cristaloide para resucitación con reevaluación clínica.',
+      }),
+    ],
+  },
+  'sepsis-30mlkg': {
+    id: 'sepsis-30mlkg',
+    title: 'Sepsis 30 mL/kg',
+    shortTitle: '30 mL/kg sepsis',
+    moduleId: 'sepsis',
+    block: 'Sepsis',
+    chapter: 'SSC Sepsis 2021',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Calcula objetivo 30 mL/kg y volumen pendiente en sepsis con hipoperfusión o shock.',
+    bibliography: [
+      sscSepsisEntry({
+        id: 'sepsis-30mlkg-ssc',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'SSC 2021 sugiere al menos 30 mL/kg en primeras 3 h si hipoperfusión inducida por sepsis o shock séptico.',
+      }),
+    ],
+  },
+  'maintenance-fluids-adult': {
+    id: 'maintenance-fluids-adult',
+    title: 'Mantenimiento adulto',
+    shortTitle: 'Mantenimiento',
+    moduleId: 'urgencias',
+    block: 'Fluidoterapia IV',
+    chapter: 'NICE CG174 · Fluidoterapia IV',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Estima mantenimiento diario adulto por peso y mL/kg/día seleccionado.',
+    bibliography: [
+      niceFluidEntry({
+        id: 'maintenance-fluids-nice',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'NICE describe necesidades habituales de mantenimiento y ajuste por contexto clínico.',
+      }),
+    ],
+  },
+  'infusion-rate': {
+    id: 'infusion-rate',
+    title: 'Velocidad de perfusión',
+    shortTitle: 'mL/h',
+    moduleId: 'urgencias',
+    block: 'Fluidoterapia IV',
+    chapter: 'Cálculo de perfusión',
+    verifiedPage: 154,
+    pdfPage: 179,
+    status: 'implementado',
+    summary: 'Convierte volumen y tiempo en velocidad mL/h.',
+    bibliography: [
+      referenceEntry({
+        id: 'infusion-rate-murillo',
+        indexPage: 154,
+        verifiedPage: 154,
+        pdfPage: 179,
+        note: 'Cálculo operativo de administración IV con reevaluación clínica.',
       }),
     ],
   },

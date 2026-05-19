@@ -4194,6 +4194,196 @@ const buildCopdExacerbationFlow = (protocol) => {
   };
 };
 
+const buildSepsisFlow = (protocol) => ({
+  ...genericFlow(protocol),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Sospechar sepsis ante infección con hipoperfusión, disfunción orgánica o deterioro clínico.',
+      points: [
+        'Infección sospechada o confirmada con deterioro, fragilidad, inmunosupresión o comorbilidad relevante.',
+        'Hipotensión, mala perfusión, relleno capilar lento, piel moteada, oliguria o lactato elevado si disponible.',
+        'Alteración mental, taquipnea/disnea, hipoxemia, fiebre o hipotermia.',
+        'Shock séptico: hipotensión/hipoperfusión persistente con necesidad de soporte pese a resucitación inicial.',
+        'Anciano, inmunosuprimido o frágil puede presentar poca fiebre y deterioro inespecífico.',
+      ],
+      detailNodes: [
+        {
+          id: 'sepsis-alarmas',
+          title: 'Datos de alarma',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'PAS baja, PAM baja, lactato elevado, confusión, oliguria o piel fría/moteada.',
+            'Insuficiencia respiratoria, acidosis, coagulopatía, fracaso renal o hepático.',
+            'Neutropenia, inmunosupresión, embarazo/puerperio, edad avanzada o foco no controlado.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Medir gravedad, buscar foco y tomar cultivos sin retrasar antibiótico urgente.',
+      points: [
+        'Constantes completas y monitorización si gravedad: TA/PAM, FC, FR, SatO2, temperatura y estado mental.',
+        'Lactato, hemograma, bioquímica, función renal, iones; hepático y coagulación si gravedad o disfunción.',
+        'Gasometría si shock, insuficiencia respiratoria, acidosis o lactato elevado.',
+        'Hemocultivos antes del antibiótico si no retrasa; cultivos según foco y sedimento/orina si urinario.',
+        'Imagen por foco y estabilidad: Rx tórax, ecografía, TC u otras pruebas sin retrasar control de foco si inestable.',
+      ],
+      detailNodes: [
+        {
+          id: 'sepsis-resultados',
+          title: 'Resultados que cambian conducta',
+          type: 'step',
+          items: [
+            'Lactato elevado o ascendente obliga a resucitación, reevaluación y destino monitorizado.',
+            'Creatinina, iones y función hepática modifican fluidos, contraste, antibiótico y seguridad.',
+            'Foco drenable, obstrucción infectada, peritonitis, empiema o material infectado exige control de foco precoz.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Diferenciar infección, sepsis probable y shock séptico; decidir antibiótico, fluidos, foco y UCI.',
+      points: [
+        'Infección sin sepsis: estable, sin hipoperfusión ni disfunción; tratamiento según foco y vigilancia.',
+        'Sepsis probable: infección con disfunción, lactato elevado, hipotensión, alteración mental, oliguria o mala perfusión.',
+        'Shock séptico: hipotensión/hipoperfusión persistente; no retrasar UCI, vasopresor ni control de foco.',
+        'No usar qSOFA como único cribado; priorizar juicio clínico, lactato, constantes y disfunción orgánica.',
+        'Control de foco urgente si hay foco drenable, obstrucción, isquemia, necrosis o dispositivo infectado.',
+      ],
+      actions: [procedureAction('fluidoterapia-iv', 'Ver Fluidoterapia IV en urgencias'), calculatorAction('sepsis-30mlkg')],
+      detailNodes: [
+        {
+          id: 'sepsis-qsofa',
+          title: 'qSOFA / SOFA',
+          type: 'decision',
+          severity: 'warning',
+          items: [
+            'qSOFA puede orientar riesgo, pero no debe sustituir la valoración clínica completa ni el seguimiento de disfunción orgánica.',
+            'La ausencia de qSOFA positivo no descarta sepsis ni debe retrasar tratamiento si el paciente impresiona grave.',
+            'SOFA requiere datos completos de órgano y laboratorio; usarlo cuando esté disponible sin retrasar medidas iniciales.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'ABCDE, oxígeno si hipoxemia, antibiótico precoz, fluidos si hipoperfusión, control de foco y UCI si shock.',
+      points: [
+        'ABCDE, monitorización, dos vías si grave, oxígeno si hipoxemia y reevaluación clínica frecuente.',
+        'Hemocultivos antes del antibiótico si no retrasa; antibiótico precoz según foco, gravedad, alergias y resistencias locales.',
+        'Cristaloide IV si hipoperfusión o shock; valorar 30 mL/kg en primeras 3 h con reevaluación frecuente.',
+        'Usar Fluidoterapia IV para tipo, volumen, ritmo, balance y riesgo de sobrecarga.',
+        'Noradrenalina si shock persiste tras fluidos adecuados o durante resucitación si precisa, en entorno monitorizado/UCI/protocolo local.',
+      ],
+      actions: [
+        procedureAction('fluidoterapia-iv', 'Ver Fluidoterapia IV en urgencias'),
+        calculatorAction('fluid-remaining'),
+        calculatorAction('sepsis-30mlkg'),
+        calculatorAction('simple-fluid-balance'),
+      ],
+      treatmentGroups: [
+        {
+          id: 'sepsis-soporte',
+          title: 'Soporte y resucitación',
+          cards: [
+            {
+              id: 'sepsis-abcde',
+              title: 'ABCDE y monitorización',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Actuar en paralelo: soporte, muestras si no retrasan, antibiótico, fluidos y foco.',
+              items: [
+                'Intervención: ABCDE, monitorización, vía venosa, oxígeno si hipoxemia y reevaluación seriada.',
+                'Dosis: oxígeno titulado a SatO2 según contexto; fluidos solo si hipoperfusión/shock o déficit clínico.',
+                'Vía: IV para fluidos/antibiótico si gravedad; monitorización continua si shock.',
+                'Evitar: retrasar antibiótico o control de foco por completar pruebas secundarias.',
+                'Reevaluar: TA/PAM, FC, FR, SatO2, mental, perfusión, diuresis, lactato y congestión.',
+              ],
+            },
+            {
+              id: 'sepsis-fluidos',
+              title: 'Fluidoterapia',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Cristaloide IV si hipoperfusión o shock, individualizando por respuesta y sobrecarga.',
+              items: [
+                'Intervención: cristaloide IV, preferentemente balanceado si disponible y no contraindicado.',
+                'Dosis: valorar 30 mL/kg en primeras 3 h si hipoperfusión inducida por sepsis o shock séptico.',
+                'Vía: IV; administrar en bolos/ritmo según gravedad, comorbilidad y reevaluación.',
+                'Evitar: automatizar por oliguria aislada o ignorar congestión, ERC, insuficiencia cardiaca o cirrosis.',
+                'Reevaluar: respuesta a cada bolo, lactato, diuresis, balance, crepitantes, edema y necesidad de vasopresor/UCI.',
+              ],
+              calculatorId: 'fluid-remaining',
+            },
+            {
+              id: 'sepsis-antibiotico',
+              title: 'Antibiótico precoz',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Pauta empírica según foco, gravedad, alergias y resistencias locales; no hay esquema único.',
+              items: [
+                'Intervención: antibiótico empírico precoz según foco probable y protocolo local.',
+                'Dosis: no se fija esquema universal; revisar foco, alergias, función renal/hepática y resistencias locales.',
+                'Vía: IV si shock, sepsis grave, mala tolerancia oral, foco profundo o necesidad de ingreso.',
+                'Evitar: retrasar por cultivos si la extracción no es inmediata.',
+                'Reevaluar: cultivos, foco, respuesta, toxicidad y desescalada cuando haya datos.',
+              ],
+            },
+            {
+              id: 'sepsis-vasopresor',
+              title: 'Vasopresor / UCI',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Si shock persiste, activar UCI y noradrenalina según protocolo local monitorizado.',
+              items: [
+                'Intervención: aviso precoz a UCI si hipotensión, lactato elevado persistente o mala perfusión.',
+                'Dosis: noradrenalina según protocolo local en entorno monitorizado; no se dosifica desde esta ficha.',
+                'Vía: preferente central; periférica temporal solo según protocolo y vigilancia local si no hay alternativa inmediata.',
+                'Evitar: retrasar vasopresor/UCI si shock persiste durante resucitación.',
+                'Reevaluar: PAM, perfusión, lactato, arritmias, extravasación si vía periférica y control de foco.',
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Ingreso monitorizado o UCI según shock, lactato, disfunción orgánica, soporte y respuesta.',
+      points: [
+        'Observación/ingreso si sepsis estable, precisa antibiótico IV, cultivos, fluidos, control de foco o vigilancia.',
+        'UCI si shock, vasopresor, lactato elevado persistente, insuficiencia respiratoria, deterioro mental o fracaso multiorgánico.',
+        'Reevaluar lactato si inicialmente elevado o si no mejora la perfusión.',
+        'Seguimiento de cultivos, foco, función renal/electrolitos, balance y desescalada antibiótica.',
+        'Alta solo si infección leve sin sepsis, estabilidad sostenida, foco controlado, tolerancia oral y seguimiento claro.',
+      ],
+      detailNodes: [
+        {
+          id: 'sepsis-revaluacion',
+          title: 'Reevaluación estructurada',
+          type: 'decision',
+          severity: 'warning',
+          items: [
+            'Revisar respuesta a fluidos y antibiótico, perfusión, lactato, diuresis y signos de sobrecarga.',
+            'Confirmar que existe plan de foco: drenaje, cirugía, retirada de dispositivo, urología o imagen según caso.',
+            'Desescalar antibiótico cuando haya microbiología y evolución compatible.',
+          ],
+        },
+      ],
+    },
+  ],
+});
+
 const buildFlow = (protocol) => {
   if (protocol.id === 'fibrilacion-auricular') {
     return buildFaDecisionPanelFlow(protocol);
@@ -4237,6 +4427,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'epoc-agudizacion') {
     return buildCopdExacerbationFlow(protocol);
+  }
+
+  if (protocol.id === 'sepsis') {
+    return buildSepsisFlow(protocol);
   }
 
   if (protocol.id === 'neumonia-comunidad') {

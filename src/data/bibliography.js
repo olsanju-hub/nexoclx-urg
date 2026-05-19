@@ -149,6 +149,16 @@ export const bibliographyCatalog = {
     title: 'Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021',
     shortTitle: 'SSC Sepsis 2021',
   },
+  'nice-cg174-fluidoterapia': {
+    id: 'nice-cg174-fluidoterapia',
+    title: 'NICE CG174: Intravenous fluid therapy in adults in hospital',
+    shortTitle: 'NICE CG174 Fluidoterapia IV',
+  },
+  'nice-ng253-sepsis': {
+    id: 'nice-ng253-sepsis',
+    title: 'NICE NG253: Suspected sepsis in people aged 16 or over: recognition, assessment and early management',
+    shortTitle: 'NICE NG253 Sepsis',
+  },
 };
 
 export const createBibliographyEntry = ({
