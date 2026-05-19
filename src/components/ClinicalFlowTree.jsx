@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertTriangle, ArrowLeft, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
 
 const severityLabels = {
@@ -533,9 +533,9 @@ const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen, onPr
 };
 
 const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, onProtocolOpen, onBack, backLabel = 'Protocolos', kindLabel = 'Protocolo' }) => {
-  const [activePanel, setActivePanel] = useState('sospecha');
   const [referencesOpen, setReferencesOpen] = useState(false);
   const panelSections = buildDecisionPanelSections(protocol);
+  const [activePanel, setActivePanel] = useState(panelSections[0]?.id ?? 'sospecha');
   const referencesSection =
     protocol.sections?.find((section) => section.type === 'references') ??
     (protocol.references?.length
@@ -551,6 +551,11 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
         }
       : null);
   const activeSection = panelSections.find((section) => section.id === activePanel) ?? panelSections[0];
+
+  useEffect(() => {
+    setActivePanel(panelSections[0]?.id ?? 'sospecha');
+    setReferencesOpen(false);
+  }, [protocol.id]);
 
   const selectPanel = (panelId) => {
     setReferencesOpen(false);
@@ -579,6 +584,13 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
         </div>
       </header>
 
+      {protocol.prompt ? (
+        <section className="clinical-sheet-prompt">
+          <h3>{protocol.prompt.title}</h3>
+          {protocol.prompt.summary ? <p>{protocol.prompt.summary}</p> : null}
+        </section>
+      ) : null}
+
       <div className="clinical-sheet-tabs" role="tablist" aria-label="Secciones del protocolo">
         {panelSections.map((section) => (
           <button
@@ -596,6 +608,33 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
 
       {activeSection ? (
         <DecisionPanelSection section={activeSection} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
+      ) : null}
+
+      {protocol.supportSections?.length ? (
+        <section className="clinical-sheet-support" aria-label="Apoyo clínico">
+          {protocol.supportSections.map((node) => (
+            <details key={node.id} className="clinical-sheet-support-item">
+              <summary>
+                <span>
+                  <strong>{node.title}</strong>
+                  {node.summary ? <small>{node.summary}</small> : null}
+                </span>
+                <span>Ver</span>
+              </summary>
+              <div className="clinical-sheet-support-body">
+                {node.items?.length ? (
+                  <ul className="clinical-sheet-list clinical-sheet-list-compact">
+                    {node.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <ClinicalSheetNode node={node} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
+                )}
+              </div>
+            </details>
+          ))}
+        </section>
       ) : null}
 
       {referencesSection ? (
