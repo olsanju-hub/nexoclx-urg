@@ -143,6 +143,11 @@ const procedureAction = (procedureId, label) => ({
   label,
 });
 
+const protocolAction = (protocolId, label) => ({
+  protocolId,
+  label,
+});
+
 const treatmentCalculatorNodes = (protocol, calculators) => {
   if (protocol.id === 'fibrilacion-auricular') {
     const calculatorMap = {
@@ -4194,6 +4199,178 @@ const buildCopdExacerbationFlow = (protocol) => {
   };
 };
 
+const buildAcuteHeartFailureFlow = (protocol) => {
+  const medicationGroups = asArray(protocol.medicationGroups);
+
+  return {
+    ...genericFlow(protocol),
+    layout: 'decision-panel',
+    panelSections: [
+      {
+        id: 'sospecha',
+        title: 'Sospecha',
+        summary: 'Disnea aguda con congestión, hipoxemia o bajo gasto; separar EAP hipertensivo de shock cardiogénico.',
+        points: [
+          'Disnea aguda, ortopnea/disnea paroxística nocturna, crepitantes, ingurgitación yugular o edemas.',
+          'SatO2 baja, hipertensión marcada o hipotensión con mala perfusión.',
+          'Buscar desencadenante: SCA, arritmia, infección, crisis hipertensiva, incumplimiento, anemia, TEP o insuficiencia renal.',
+          'Fenotipos útiles: congestión predominante, EAP hipertensivo, bajo gasto/shock e insuficiencia respiratoria.',
+        ],
+        detailNodes: [
+          {
+            id: 'ica-red-flags',
+            title: 'Datos de alarma',
+            type: 'alert',
+            severity: 'danger',
+            items: asArray(protocol.warnings),
+          },
+        ],
+      },
+      {
+        id: 'pruebas',
+        title: 'Pruebas',
+        summary: 'Confirmar congestión, detectar desencadenante y medir respiratorio, renal, electrolitos y perfusión.',
+        points: [
+          'Constantes, SatO2, monitorización y ECG 12 derivaciones.',
+          'Rx tórax si disponible y cambia conducta; ecografía pulmonar/cardiaca si se puede hacer sin retrasar medidas.',
+          'Analítica: hemograma, urea/creatinina, iones, glucemia y función hepática si gravedad.',
+          'Troponina si sospecha SCA o descompensación grave; BNP/NT-proBNP si duda diagnóstica.',
+          'Gasometría si hipoxemia, hipercapnia, acidosis, EPOC o gravedad; lactato si shock/hipoperfusión.',
+        ],
+        detailNodes: [
+          {
+            id: 'ica-resultados',
+            title: 'Resultados que cambian conducta',
+            type: 'step',
+            items: [
+              'ECG/troponina: si sugiere SCA, activar protocolo SCA y destino monitorizado.',
+              'Creatinina, potasio y sodio condicionan diurético, seguridad y seguimiento.',
+              'Hipercapnia/acidosis o trabajo respiratorio elevado apoyan VMNI y área monitorizada.',
+              'Lactato elevado o hipoperfusión persistente orientan a shock cardiogénico/UCI.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'decision',
+        title: 'Decisión',
+        summary: 'Clasificar fenotipo y decidir VMNI, diurético/nitratos, causa desencadenante y destino.',
+        points: [
+          'EAP hipertensivo: disnea intensa, congestión, PA alta; VMNI/CPAP y nitratos si TA lo permite.',
+          'ICA congestiva sin shock: diurético IV, control de diuresis y electrolitos.',
+          'Hipotensión/bajo gasto o shock cardiogénico: no nitratos; UCI/cardiología precoz.',
+          'Tratar desencadenante: SCA, FA rápida, HTA, infección, TEP, anemia o insuficiencia renal.',
+          'VMNI si hipoxemia, trabajo respiratorio o EAP sin contraindicación.',
+        ],
+        actions: [
+          procedureAction('vmni', 'Ver procedimiento VMNI'),
+          protocolAction('sindrome-coronario-agudo', 'Ver SCA'),
+          protocolAction('hta-urgencias', 'Ver HTA'),
+          procedureAction('fluidoterapia-iv', 'Ver Fluidoterapia IV'),
+        ],
+        detailNodes: [
+          {
+            id: 'ica-fluidoterapia-precaucion',
+            title: 'Fluidoterapia solo si toca',
+            type: 'alert',
+            severity: 'warning',
+            items: [
+              'No usar fluidos como rutina en congestión o EAP.',
+              'Valorar Fluidoterapia IV solo si sospecha hipovolemia, bajo gasto con déficit real o necesidad de reevaluar balance.',
+              'Si shock persiste, no retrasar UCI/cardiología por completar cálculos.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'tratamiento',
+        title: 'Tratamiento',
+        summary: 'Posición incorporada, oxígeno/VMNI si precisa, diurético si congestión, nitratos si EAP hipertensivo y TA suficiente.',
+        points: [
+          'Posición incorporada, monitorización, vía IV, oxígeno si hipoxemia y tratar desencadenante.',
+          'VMNI/CPAP si EAP con dificultad respiratoria, hipoxemia o trabajo respiratorio.',
+          'Furosemida IV si congestión/sobrecarga; controlar diuresis, TA, creatinina y potasio.',
+          'Nitroglicerina IV si EAP hipertensivo o congestión con TA suficiente; evitar si hipotensión/shock/PDE5.',
+          'Shock cardiogénico: UCI/cardiología precoz; vasoactivos solo en entorno monitorizado/protocolo local.',
+        ],
+        actions: [
+          procedureAction('vmni', 'Ver procedimiento VMNI'),
+          calculatorAction('simple-fluid-balance'),
+          calculatorAction('infusion-rate'),
+          calculatorAction('cockcroft-gault'),
+        ],
+        treatmentGroups: [
+          {
+            id: 'ica-medidas-iniciales',
+            title: 'Medidas iniciales',
+            cards: [
+              {
+                id: 'ica-posicion-oxigeno',
+                title: 'Soporte inicial',
+                type: 'treatment',
+                severity: 'warning',
+                summary: 'Actuar rápido sobre respiratorio, perfusión y desencadenante.',
+                items: [
+                  'Intervención: posición incorporada, monitorización, vía IV y oxígeno si hipoxemia.',
+                  'Dosis: oxígeno titulado a objetivo de SatO2 según contexto clínico.',
+                  'Vía: gafas, mascarilla o VMNI si trabajo respiratorio/hipoxemia.',
+                  'Evitar: oxígeno rutinario si no hay hipoxemia o retrasar VMNI en EAP franco.',
+                  'Reevaluar: SatO2, FR, trabajo respiratorio, TA, perfusión y necesidad de UCI.',
+                ],
+              },
+              {
+                id: 'ica-vmni',
+                title: 'VMNI / CPAP',
+                type: 'treatment',
+                severity: 'danger',
+                summary: 'Útil en EAP con hipoxemia o trabajo respiratorio si no hay contraindicación.',
+                items: [
+                  'Intervención: VMNI/CPAP en área monitorizada.',
+                  'Dosis: ajustar según procedimiento VMNI, tolerancia, fugas, SatO2 y gasometría si procede.',
+                  'Vía: interfaz no invasiva con vigilancia estrecha.',
+                  'Evitar: disminución marcada de conciencia, vómitos activos, shock no controlado o indicación de intubación inmediata.',
+                  'Reevaluar: disnea, FR, SatO2, TA, sincronía y gasometría si gravedad.',
+                ],
+                procedureId: 'vmni',
+              },
+            ],
+          },
+          ...medicationGroups.map((group) => ({
+            id: `grupo-${slugify(group.title)}`,
+            title: group.title,
+            cards: asArray(group.medicationIds).map(medicationNode),
+          })),
+        ],
+      },
+      {
+        id: 'destino',
+        title: 'Destino',
+        summary: 'Alta rara; observación, ingreso o UCI según respuesta, oxígeno/VMNI, renal, electrolitos y desencadenante.',
+        points: [
+          'Alta solo en casos muy seleccionados con resolución clara, estabilidad, bajo riesgo y seguimiento estrecho.',
+          'Observación si respuesta rápida pero necesita vigilancia de diuresis, TA, oxígeno o analítica.',
+          'Ingreso si requiere IV, oxígeno, VMNI, causa no resuelta, insuficiencia renal, alteraciones iónicas o comorbilidad.',
+          'UCI/cardiología si shock, hipoxemia persistente, VMNI prolongada, arritmia grave, SCA, lactato elevado, hipotensión o vasoactivos.',
+          'Seguimiento: peso, diuresis, creatinina, potasio y ajuste del tratamiento crónico.',
+        ],
+        detailNodes: [
+          {
+            id: 'ica-alta-segura',
+            title: 'Antes del alta',
+            type: 'decision',
+            severity: 'success',
+            items: [
+              'Confirmar estabilidad respiratoria y hemodinámica sin tratamiento IV activo.',
+              'Revisar desencadenante, tratamiento crónico, diurético, función renal y potasio.',
+              'Explicar alarma por disnea, ortopnea, ganancia de peso, síncope, dolor torácico o edemas progresivos.',
+            ],
+          },
+        ],
+      },
+    ],
+  };
+};
+
 const buildSepsisFlow = (protocol) => ({
   ...genericFlow(protocol),
   layout: 'decision-panel',
@@ -4391,6 +4568,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'sindrome-coronario-agudo') {
     return buildScaDecisionPanelFlow(protocol);
+  }
+
+  if (protocol.id === 'insuficiencia-cardiaca') {
+    return buildAcuteHeartFailureFlow(protocol);
   }
 
   if (protocol.id === 'hta-urgencias') {

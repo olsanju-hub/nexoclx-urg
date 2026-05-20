@@ -64,6 +64,15 @@ const escVentricularEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escHfEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-hf-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const ahaIschemicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -528,23 +537,29 @@ export const motivoConsultaModules = [
   },
   {
     id: 'insuficiencia-cardiaca',
-    title: 'Insuficiencia cardiaca',
-    shortTitle: 'ICC',
-    chapter: 'Cap. 19',
+    title: 'Insuficiencia cardiaca aguda / edema agudo de pulmón',
+    shortTitle: 'ICA / EAP',
+    chapter: 'Cap. 19 + ESC IC 2021',
     section: 'Cardiología',
     specialtyId: 'cardiologia',
     verifiedPage: 161,
     pdfPage: 186,
-    status: 'auditado',
-    implemented: false,
-    summary: 'Tema auditado. Protocolo operativo no activo.',
+    status: 'implementado',
+    implemented: true,
+    summary: 'Disnea, congestión, EAP hipertensivo, bajo gasto, VMNI, diurético, nitratos y destino monitorizado.',
     bibliography: [
       referenceEntry({
         id: 'icc-cap19',
         indexPage: 161,
         verifiedPage: 161,
         pdfPage: 186,
-        note: 'Capítulo base auditado para futura integración del protocolo de ICC.',
+        note: 'Capítulo base para insuficiencia cardiaca en urgencias.',
+      }),
+      escHfEntry({
+        id: 'icc-esc-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para fenotipos, diagnóstico y manejo inicial de insuficiencia cardiaca aguda.',
       }),
     ],
   },

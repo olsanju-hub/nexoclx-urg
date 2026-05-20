@@ -34,6 +34,16 @@ export const bibliographyCatalog = {
     title: 'Comentarios a la guía ESC 2022 sobre el tratamiento de pacientes con arritmias ventriculares y la prevención de la muerte cardiaca súbita',
     shortTitle: 'ESC Arritmias ventriculares 2022',
   },
+  'esc-hf-2021': {
+    id: 'esc-hf-2021',
+    title: 'Guía ESC 2021 para el diagnóstico y tratamiento de la insuficiencia cardiaca aguda y crónica',
+    shortTitle: 'ESC IC 2021',
+  },
+  'esc-hf-2023-update': {
+    id: 'esc-hf-2023-update',
+    title: 'Actualización focalizada ESC 2023 de la guía 2021 sobre insuficiencia cardiaca aguda y crónica',
+    shortTitle: 'ESC IC 2023 update',
+  },
   'aha-ictus-isquemico-2026': {
     id: 'aha-ictus-isquemico-2026',
     title: '2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke',

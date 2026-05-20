@@ -64,6 +64,15 @@ const escVentricularReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], n
     note,
   });
 
+const escHfReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-hf-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const ahaIschemicStrokeReferenceEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -1699,6 +1708,122 @@ export const medicationCatalog = {
       ),
     ],
   },
+  'furosemida-ica': {
+    id: 'furosemida-ica',
+    name: 'Furosemida',
+    protocolId: 'insuficiencia-cardiaca',
+    family: 'Diurético de asa',
+    indication:
+      'Congestión o edema agudo de pulmón en insuficiencia cardiaca aguda, con control de diuresis, tensión arterial, creatinina y potasio.',
+    contextUse: 'ICA congestiva o edema agudo de pulmón con sobrecarga clínica.',
+    contextDose: '40 mg IV iniciales; si precisa, repetir 20-40 mg IV a los 30-60 min según respuesta.',
+    contextRoute: 'Intravenosa lenta.',
+    contextFrequency: 'Bolo inicial y reevaluación; repetir solo si persiste congestión y lo permite la situación clínica.',
+    followUpPlan: 'Control de diuresis, peso, TA, creatinina, sodio y potasio; pasar a vía oral cuando esté estable.',
+    dose:
+      '40 mg IV iniciales en edema pulmonar; si es necesario, 20-40 mg IV adicionales a los 30-60 min. En otros edemas, 20-40 mg IV ajustados a respuesta.',
+    route: 'Intravenosa lenta.',
+    frequency: 'Bolos titulados; no administrar más rápido de 4 mg/min.',
+    duration: 'Uso agudo hasta descongestión y estabilidad; cambiar a oral tan pronto como sea posible.',
+    contraindications: [
+      'Hipovolemia, deshidratación o hipotensión no corregida.',
+      'Hipopotasemia o hiponatremia severa.',
+      'Oligoanuria por fallo renal que no responde a furosemida.',
+      'Precaución en anciano, ERC, riesgo de hipotensión y alteraciones electrolíticas.',
+    ],
+    renalAdjustment:
+      'No se define ajuste simple; en insuficiencia renal grave la velocidad de perfusión no debe superar 2,5 mg/min y la respuesta puede requerir monitorización estrecha.',
+    hepaticAdjustment:
+      'En enfermedad hepática o síndrome hepatorrenal, ajustar con cautela por riesgo de encefalopatía, electrolitos e hipovolemia.',
+    practicalNotes: [
+      'Corregir hipovolemia, hipotensión y alteraciones ácido-base/electrolíticas antes de intensificar si procede.',
+      'Monitorizar sodio, potasio y creatinina; vigilar ototoxicidad si dosis altas o administración rápida.',
+    ],
+    sourceScope:
+      'CIMA aporta dosis parenterales y seguridad; ESC 2021 respalda el enfoque de descongestión y fenotipos de ICA.',
+    sources: [
+      protocolSource(
+        'ESC IC 2021 · insuficiencia cardiaca aguda',
+        escHfReferenceEntry({
+          id: 'furosemida-ica-esc',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Referencia principal para fenotipos de insuficiencia cardiaca aguda y tratamiento de congestión.',
+        }),
+      ),
+      protocolSource(
+        'Murillo 7.ª ed. · insuficiencia cardiaca',
+        referenceEntry({
+          id: 'furosemida-ica-murillo',
+          verifiedPage: 161,
+          pdfPage: 186,
+          note: 'Apoyo práctico del capítulo de insuficiencia cardiaca.',
+        }),
+      ),
+      cimaSource(
+        'CIMA · Furosemida Fresenius Kabi 20 mg/2 ml solución inyectable y para perfusión',
+        'https://cima.aemps.es/cima/dochtml/ft/69097/FichaTecnica_69097.html',
+      ),
+    ],
+  },
+  'nitroglicerina-ica': {
+    id: 'nitroglicerina-ica',
+    name: 'Nitroglicerina',
+    protocolId: 'insuficiencia-cardiaca',
+    family: 'Vasodilatador',
+    indication:
+      'Edema agudo de pulmón hipertensivo o insuficiencia cardiaca aguda con presión arterial suficiente, especialmente si precisa reducción rápida de precarga/poscarga.',
+    contextUse: 'EAP hipertensivo o ICA con hipertensión y sin hipotensión.',
+    contextDose: 'Iniciar perfusión IV a 10-20 microg/min y titular según TA, disnea y congestión.',
+    contextRoute: 'Intravenosa en perfusión.',
+    contextFrequency: 'Perfusión continua titulada con monitorización.',
+    followUpPlan: 'Reevaluar TA, cefalea, mareo, perfusión, dolor torácico y necesidad de continuar.',
+    dose:
+      'Perfusión IV inicial 10-20 microg/min; titular de forma progresiva según respuesta clínica y tensional.',
+    route: 'Intravenosa en perfusión, previa dilución.',
+    frequency: 'Perfusión continua titulada.',
+    duration: 'Uso agudo monitorizado mientras persiste EAP hipertensivo, isquemia o congestión con TA suficiente.',
+    contraindications: [
+      'Hipotensión, hipovolemia no corregida o shock.',
+      'Uso reciente de inhibidores de PDE5.',
+      'Miocardiopatía obstructiva, estenosis aórtica/mitral significativa o hipertensión intracraneal.',
+      'No usar como rutina si no hay hipertensión, isquemia o EAP con TA suficiente.',
+    ],
+    renalAdjustment:
+      'Sin ajuste renal numérico específico; titular por presión arterial, perfusión y tolerancia.',
+    hepaticAdjustment:
+      'Sin ajuste hepático numérico específico; titular por respuesta y efectos adversos.',
+    practicalNotes: [
+      'Usar con monitorización estrecha y evitar descensos bruscos de presión arterial.',
+      'Si hipotensión o shock, suspender vasodilatador y escalar soporte/UCI.',
+    ],
+    sourceScope:
+      'ESC 2021 respalda considerar vasodilatadores en ICA precipitada por hipertensión; CIMA verifica presentación, indicaciones y contraindicaciones.',
+    sources: [
+      protocolSource(
+        'ESC IC 2021 · vasodilatadores en ICA',
+        escHfReferenceEntry({
+          id: 'nitroglicerina-ica-esc',
+          verifiedPages: [1],
+          pdfPages: [1],
+          note: 'Referencia principal para uso de vasodilatadores en insuficiencia cardiaca aguda hipertensiva.',
+        }),
+      ),
+      protocolSource(
+        'Murillo 7.ª ed. · insuficiencia cardiaca',
+        referenceEntry({
+          id: 'nitroglicerina-ica-murillo',
+          verifiedPage: 161,
+          pdfPage: 186,
+          note: 'Apoyo práctico del capítulo de insuficiencia cardiaca.',
+        }),
+      ),
+      cimaSource(
+        'CIMA · Solinitrina 1 mg/ml solución inyectable',
+        'https://cima.aemps.es/cima/dochtml/ft/55332/FichaTecnica_55332.html',
+      ),
+    ],
+  },
   'tenecteplasa-sca': {
     id: 'tenecteplasa-sca',
     name: 'Tenecteplasa',
@@ -3210,6 +3335,11 @@ export const medicationGroups = [
     id: 'sca-antiisquemico',
     title: 'SCA · analgesia y antiisquémico',
     items: ['nitroglicerina-sca', 'morfina-sca'],
+  },
+  {
+    id: 'ica-aguda',
+    title: 'Insuficiencia cardiaca aguda',
+    items: ['furosemida-ica', 'nitroglicerina-ica'],
   },
   {
     id: 'sca-antitrombotico',

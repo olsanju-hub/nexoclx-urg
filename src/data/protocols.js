@@ -64,6 +64,15 @@ const escVentricularEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escHfEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-hf-2021',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const ahaIschemicStrokeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -517,6 +526,61 @@ export const protocolCatalog = {
         verifiedPages: [221, 222, 223, 224, 225, 226],
         pdfPages: [246, 247, 248, 249, 250, 251],
         note: 'Tratamiento general, antiisquémico, antiagregación, anticoagulación y reperfusión.',
+      }),
+    ],
+  },
+  'insuficiencia-cardiaca': {
+    id: 'insuficiencia-cardiaca',
+    title: 'Insuficiencia cardiaca aguda / edema agudo de pulmón',
+    longTitle: 'Insuficiencia cardiaca aguda / edema agudo de pulmón',
+    chapter: 'Cap. 19 + ESC IC 2021',
+    section: 'Urgencias cardiovasculares',
+    specialtyId: 'cardiologia',
+    indexPage: 161,
+    verifiedPage: 161,
+    pdfPage: 186,
+    status: 'implementado',
+    summary:
+      'Disnea y congestión aguda: separar EAP hipertensivo, congestión sin shock y bajo gasto/shock cardiogénico.',
+    quickChecks: [
+      'Constantes, SatO2, trabajo respiratorio, perfusión y presión arterial desde el triaje.',
+      'ECG 12 derivaciones, monitorización y buscar SCA, arritmia, HTA, infección, TEP, anemia, insuficiencia renal o incumplimiento.',
+      'Rx tórax y ecografía pulmonar/cardiaca si disponibles y cambian conducta.',
+      'Analítica con hemograma, creatinina/urea, iones, glucemia; troponina, BNP/NT-proBNP, gasometría o lactato según contexto.',
+    ],
+    calculatorIds: ['simple-fluid-balance', 'infusion-rate', 'cockcroft-gault'],
+    medicationGroups: [
+      {
+        title: 'Tratamiento farmacológico',
+        medicationIds: ['furosemida-ica', 'nitroglicerina-ica'],
+      },
+    ],
+    warnings: [
+      'Hipotensión, mala perfusión, lactato elevado o alteración mental orientan a bajo gasto/shock cardiogénico.',
+      'EAP con hipoxemia o trabajo respiratorio requiere oxígeno, VMNI/CPAP precoz y destino monitorizado.',
+      'Dolor torácico, cambios ECG o troponina dinámica obligan a rama SCA.',
+      'No usar nitratos si hipotensión, shock, hipovolemia o PDE5 reciente.',
+    ],
+    bibliography: [
+      referenceEntry({
+        id: 'ica-murillo-cap19',
+        indexPage: 161,
+        verifiedPage: 161,
+        pdfPage: 186,
+        note: 'Capítulo base de insuficiencia cardiaca en urgencias.',
+      }),
+      escHfEntry({
+        id: 'ica-esc-hf-2021',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para diagnóstico, fenotipos y manejo inicial de la insuficiencia cardiaca aguda.',
+      }),
+      createBibliographyEntry({
+        id: 'ica-esc-hf-2023-update',
+        referenceId: 'esc-hf-2023-update',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Actualización focalizada ESC que mantiene el marco de la guía 2021.',
       }),
     ],
   },
