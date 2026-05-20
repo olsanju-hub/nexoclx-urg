@@ -458,10 +458,10 @@ const buildSpecialtyCollections = () =>
 const frequentProtocolIds = [
   'fibrilacion-auricular',
   'sindrome-coronario-agudo',
+  'insuficiencia-cardiaca',
+  'sepsis',
   'ictus-isquemico',
-  'neumonia-comunidad',
-  'hta-urgencias',
-  'dolor-urinario',
+  'anafilaxia',
 ];
 
 const protocolSearchAliases = {
@@ -489,12 +489,17 @@ const protocolSearchAliases = {
   'hta-urgencias': ['hta', 'hipertension', 'presion arterial'],
   bradicardias: ['bradicardia', 'bloqueo av'],
   'arritmias-ventriculares': ['tv', 'fv', 'torsades', 'taquicardia ventricular'],
-  'dolor-urinario': ['colico renal', 'urologia', 'litiasis', 'flanco'],
   'crisis-convulsiva-epilepsia': ['convulsion', 'convulsiones', 'epilepsia', 'estatus epileptico', 'status epilepticus', 'primera crisis'],
   anafilaxia: ['reaccion alergica', 'alergia grave', 'adrenalina', 'shock anafilactico', 'urticaria', 'angioedema', 'broncoespasmo'],
   'asma-exacerbacion': ['asma', 'crisis asmatica', 'exacerbacion asmatica', 'broncoespasmo', 'sibilancias', 'disnea', 'salbutamol', 'prednisona', 'ipratropio'],
   'epoc-agudizacion': ['epoc', 'agudizacion epoc', 'exacerbacion epoc', 'aepoc', 'disnea', 'broncoespasmo', 'hipercapnia', 'insuficiencia respiratoria', 'vni', 'antibiotico epoc'],
   sepsis: ['sepsis', 'shock septico', 'infeccion grave', 'lactato', 'hipotension', 'hipoperfusion', 'bacteriemia', 'antibiotico', 'fluidoterapia', 'vasopresores'],
+  'dolor-abdomen-quirurgico': ['dolor abdominal', 'abdomen agudo', 'apendicitis', 'peritonismo', 'obstruccion', 'cirugia general'],
+  'dolor-hepatobiliar-pancreatico': ['dolor abdominal', 'dolor epigastrico', 'hipocondrio derecho', 'colico biliar', 'colecistitis', 'colangitis', 'pancreatitis'],
+  'dolor-urinario': ['dolor abdominal', 'colico renal', 'urologia', 'litiasis', 'flanco', 'pielonefritis', 'retencion urinaria'],
+  'dolor-ginecologico': ['dolor abdominal', 'dolor pelvico', 'embarazo ectopico', 'torsion ovarica', 'ginecologia'],
+  'dolor-vascular': ['dolor abdominal', 'isquemia mesenterica', 'aneurisma', 'diseccion', 'vascular', 'dolor desproporcionado'],
+  'dolor-infeccioso-digestivo': ['dolor abdominal', 'gastroenteritis', 'colitis', 'diverticulitis', 'absceso', 'infeccioso digestivo'],
 };
 
 const getProtocolCalculatorCount = (moduleId) => implementedCalculators.filter((calculator) => calculator.moduleId === moduleId).length;
@@ -1647,11 +1652,17 @@ const HomeView = ({
           </section>
 
           <section className="compact-section compact-section-secondary">
-            <SectionTitle title="Frecuentes" />
+            <SectionTitle title="Procedimientos" note="Herramientas operativas para soporte y reevaluación." />
             <div className="compact-list">
               {procedureList.map((procedure) => (
                 <ProtocolCompactCard key={procedure.id} module={procedure} onClick={() => onProcedureOpen(procedure.id)} compact />
               ))}
+            </div>
+          </section>
+
+          <section className="compact-section compact-section-secondary">
+            <SectionTitle title="Protocolos frecuentes" />
+            <div className="compact-list">
               {frequentProtocols.map((module) => (
                 <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} compact />
               ))}
@@ -1753,7 +1764,7 @@ const ProceduresView = ({ onBack, onProcedureOpen, onCalculatorOpen }) => {
         </div>
       </section>
 
-      <DetailPanel title="Calculadoras VMNI" note="Acceso secundario; desde VMNI también aparecen en el punto de uso.">
+      <DetailPanel title="Calculadoras de procedimientos" note="Acceso secundario; desde cada procedimiento aparecen en el punto de uso.">
         <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
           {procedureCalculators.map((calculator) => (
             <ListActionRow
@@ -1815,7 +1826,7 @@ const CalculationsView = ({ onBack, onCalculatorOpen }) => (
           <ListActionRow
             key={calculator.id}
             title={calculator.title}
-            meta={`${calculator.block} · p. ${calculator.verifiedPage}`}
+            meta={calculator.verifiedPage ? `${calculator.block} · p. ${calculator.verifiedPage}` : calculator.block}
             onClick={() => onCalculatorOpen(calculator.id)}
           />
         ))}
