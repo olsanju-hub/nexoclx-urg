@@ -60,9 +60,9 @@ const pageClass = 'mx-auto max-w-[72rem] space-y-3 sm:space-y-5 xl:space-y-6';
 
 const primaryNavItems = [
   { key: 'home', label: 'Inicio', icon: LayoutDashboard },
-  { key: 'protocols', label: 'Protocolos', icon: ClipboardList },
-  { key: 'procedures', label: 'Procedimientos', icon: Wrench },
-  { key: 'calculations', label: 'Cálculos', icon: Calculator },
+  { key: 'protocols', label: 'Protocolos', mobileLabel: 'Protoc.', icon: ClipboardList },
+  { key: 'procedures', label: 'Procedimientos', mobileLabel: 'Proced.', icon: Wrench },
+  { key: 'calculations', label: 'Cálculos', mobileLabel: 'Cálc.', icon: Calculator },
 ];
 
 const initialCalculatorInputs = {
@@ -687,7 +687,7 @@ const PrimaryNavigation = ({ activeKey, onSelect, collapsed, onToggle }) => (
                 <span className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
                   <Icon className="h-[1.125rem] w-[1.125rem]" />
                 </span>
-                <span>{item.label}</span>
+                <span>{item.mobileLabel ?? item.label}</span>
               </button>
             );
           })}
@@ -1819,9 +1819,8 @@ const CalculationsView = ({ onBack, onCalculatorOpen }) => (
   <div className={pageClass}>
     <BackBar label="Inicio" onClick={onBack} />
 
-    <PageHero title="Cálculos" />
-
-    <DetailPanel title="Cálculos">
+    <section className="compact-section">
+      <SectionTitle title="Cálculos" />
       <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
         {implementedCalculators.map((calculator) => (
           <ListActionRow
@@ -1832,7 +1831,7 @@ const CalculationsView = ({ onBack, onCalculatorOpen }) => (
           />
         ))}
       </div>
-    </DetailPanel>
+    </section>
   </div>
 );
 
@@ -1843,15 +1842,17 @@ const CalculatorDetailView = ({ calculatorId, values, onChange, onBack }) => {
     <div className={pageClass}>
       <BackBar label="Cálculos" onClick={onBack} />
 
-      <PageHero
-        title={calculator.title}
-        note={calculator.summary}
-        aside={
-          <span className="text-sm text-[var(--text-muted)]">
-            {calculator.chapter} · p. {calculator.verifiedPage}
-          </span>
-        }
-      />
+      <section className="compact-section">
+        <SectionTitle
+          title={calculator.title}
+          note={calculator.summary}
+          action={
+            <span className="text-sm text-[var(--text-muted)]">
+              {calculator.chapter} · p. {calculator.verifiedPage}
+            </span>
+          }
+        />
+      </section>
 
       <CalculatorPanel calculatorId={calculatorId} values={values} onChange={onChange} />
       <BibliographyBlock entries={calculator.bibliography} />
