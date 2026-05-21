@@ -1,7 +1,7 @@
 {
-  "name": "NexoClx",
-  "short_name": "NexoClx",
-  "description": "Consulta clínica inicial basada en Medicina de urgencias y emergencias.",
+  "name": "NexoClx Urg",
+  "short_name": "NexoClx Urg",
+  "description": "Consulta clínica rápida para guardia y urgencias basada en Medicina de urgencias y emergencias.",
   "lang": "es",
   "start_url": "./",
   "scope": "./",

@@ -1,6 +1,6 @@
-# NexoClx
+# NexoClx Urg
 
-NexoClx es una app web estática orientada a protocolos clínicos rápidos en formato de organigrama interactivo, basada en bibliografía real de urgencias.  
+NexoClx Urg es una app web estática orientada a protocolos clínicos rápidos de guardia y urgencias, basada en bibliografía real de urgencias.  
 Su objetivo no es replicar un libro en pantalla, sino convertir capítulos auditados en flujos breves de decisión, conectando protocolo, cálculos, tratamiento y referencia bibliográfica textual verificable.
 
 URL pública principal en Vercel: `https://nexo-clx.vercel.app/`.
@@ -17,9 +17,9 @@ Debe mantenerse actualizado en cuatro capas:
 - relación entre protocolos, cálculos, tratamientos y bibliografía
 - bitácora acumulativa de cambios relevantes
 
-## Qué es NexoClx
+## Qué es NexoClx Urg
 
-NexoClx busca ofrecer una interfaz clínica breve, usable en móvil y basada en fuentes reales. La app parte de bibliografía auditada y avanza módulo por módulo.
+NexoClx Urg busca ofrecer una interfaz clínica breve para decisiones en urgencias, usable en móvil y basada en fuentes reales. La app parte de bibliografía auditada y avanza módulo por módulo.
 
 Principios actuales del proyecto:
 

@@ -575,13 +575,14 @@ const BrandLockup = ({ label }) => (
   <div className="flex min-w-0 items-center gap-3">
     <img
       src={brandMark}
-      alt="NexoClx"
+      alt="NexoClx Urg"
       className="h-10 w-10 rounded-[1rem] object-cover shadow-[0_18px_38px_-24px_rgba(78,58,20,0.34)] sm:h-11 sm:w-11 sm:rounded-[1.15rem]"
     />
     <div className="min-w-0">
       <div className="text-[0.98rem] font-semibold tracking-[-0.04em] text-[var(--text)] sm:text-[1rem]">
         <span>Nexo</span>
         <span className="text-[var(--accent-500)]">Clx</span>
+        <span className="ml-1 text-[var(--text-soft)]">Urg</span>
       </div>
       {label ? <p className="truncate pt-0.5 text-[0.72rem] font-medium text-[var(--text-muted)] sm:text-xs">{label}</p> : null}
     </div>
