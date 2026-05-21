@@ -17,30 +17,164 @@ Debe mantenerse actualizado en cuatro capas:
 - relación entre protocolos, cálculos, tratamientos y bibliografía
 - bitácora acumulativa de cambios relevantes
 
-## Qué es NexoClx Urg
+## Descripción actual de la app
 
-NexoClx Urg busca ofrecer una interfaz clínica breve para decisiones en urgencias, usable en móvil y basada en fuentes reales. La app parte de bibliografía auditada y avanza módulo por módulo.
+NexoClx Urg es una herramienta web de apoyo rápido para médicos de guardia y urgencias. Está pensada para abrirse en móvil durante la asistencia, localizar un problema clínico en pocos toques y resolver la pregunta práctica del momento: qué sospechar, qué pruebas pedir ahora, qué decisión tomar, qué tratamiento iniciar y cuál es el destino seguro del paciente.
+
+La app no funciona como un repositorio general de apuntes ni como una biblioteca de protocolos largos. Cada protocolo activo está convertido en una ficha clínica breve con cinco pestañas fijas:
+
+1. `Sospecha`
+2. `Pruebas`
+3. `Decisión`
+4. `Tratamiento`
+5. `Destino`
+
+Dentro de cada ficha, las pruebas, escalas, dosis, calculadoras, procedimientos y criterios de alta/ingreso aparecen en el punto donde cambian la conducta. El contenido ambulatorio solo se mantiene cuando forma parte de una decisión de urgencias: alta segura, tratamiento al alta, signos de alarma, revisión posterior o continuidad asistencial.
+
+La experiencia visual actual es mobile-first, compacta y ligera. La navegación principal queda en `Inicio`, `Protocolos`, `Procedimientos` y `Cálculos`; la sección `Medicamentos` no está visible como módulo independiente. Las fichas farmacológicas siguen existiendo como soporte interno para mostrar pautas auditadas dentro de los protocolos, con dosis, vía, frecuencia, duración, límites, contraindicaciones y fuentes cuando procede.
 
 Principios actuales del proyecto:
 
-- interfaz compacta y directa
-- contenido clínico solo cuando está verificado
-- bibliografía presente, pero no dominante
-- cálculos implementados solo cuando un módulo real los necesita
-- fichas farmacológicas con fuente explícita
-- navegación contextual entre protocolo, procedimiento, cálculo y tratamiento
+- decisión clínica rápida, no lectura larga
+- protocolos exclusivamente orientados a urgencias
+- interfaz compacta, con menos tarjetas y menos contenedores anidados
+- contenido clínico visible solo cuando está verificado
+- bibliografía textual y trazable, sin enlaces PDF públicos
+- cálculos implementados solo cuando un protocolo o procedimiento real los necesita
+- tratamientos integrados dentro del punto clínico donde se usan
+- navegación contextual entre protocolo, procedimiento, cálculo, tratamiento y fuente
+
+## Identidad, tono y estilo visual
+
+Esta sección define cómo debe sentirse y verse NexoClx Urg. Sirve como briefing para copiar el estilo de la app sin abrir el código.
+
+### Idea de producto
+
+NexoClx Urg no es una web corporativa, una biblioteca médica ni un dashboard de gestión. Es una app clínica de guardia: sobria, rápida, escaneable y pensada para tomar decisiones en urgencias. La interfaz debe transmitir calma, precisión y utilidad inmediata.
+
+La pregunta central de cada pantalla es:
+
+`¿Qué necesito decidir ahora en urgencias?`
+
+Por eso la app evita textos docentes largos, tarjetas decorativas, bloques de marketing, organigramas pesados y navegación profunda. Todo debe llevar rápido a una conducta clínica: prueba, cálculo, tratamiento, observación, ingreso, UCI, especialista, código o alta segura.
+
+### Personalidad visual
+
+- clínica, limpia y silenciosa
+- mobile-first
+- ligera, con pocas superficies
+- más parecida a una ficha de guardia que a un panel de control
+- sin aspecto de biblioteca, curso, dashboard o landing page
+- sin decoración innecesaria
+- con jerarquía clara entre información crítica, cálculo y destino
+
+### Paleta actual
+
+La paleta se mantiene clara y fría, con fondo gris-azulado muy suave, superficies blancas translúcidas y azul sanitario como acento principal.
+
+| Uso | Color aproximado | Variable actual |
+| --- | --- | --- |
+| Fondo base | `#f2f2f7` / degradado gris-azulado claro | `--bg` |
+| Superficie principal | blanco translúcido `rgba(255,255,255,0.62-0.90)` | `--surface-*` |
+| Línea fina | gris iOS suave `rgba(60,60,67,0.10-0.18)` | `--line` |
+| Texto principal | `#1c1c1e` | `--text` |
+| Texto secundario | `#3c3c43` | `--text-soft` |
+| Texto apagado | `#6c6c72` | `--text-muted` |
+| Acento | azul `#0a84ff` | `--accent-500` |
+| Éxito / alta segura | verde `#168a55` | `--success-500` |
+| Alerta / crítico | rojo `#d70015` | `--danger-500` |
+
+No introducir una paleta nueva. No virar la app a morado, crema, naranja, azul oscuro o dashboard oscuro. El azul se usa para navegación, pestaña activa, cálculos y acciones; el rojo solo para alarma real; el verde solo para destino seguro o respuesta favorable.
+
+### Tipografía
+
+- Fuente: `IBM Plex Sans`.
+- Títulos compactos, sin hero grande salvo casos muy puntuales.
+- Texto clínico en tamaños pequeños pero legibles.
+- Sin letter spacing negativo.
+- Los textos de botones y tabs deben caber en móvil sin partirse de forma rara.
+- Las secciones clínicas deben parecer una ficha de trabajo, no una página editorial.
+
+### Estructura visual
+
+La app usa una sola superficie principal cuando es posible. Las listas se separan con líneas finas en vez de tarjetas pesadas. Los contenedores grandes deben ser pocos y discretos.
+
+Reglas prácticas:
+
+- usar separadores finos antes que tarjetas
+- evitar tarjetas dentro de tarjetas
+- evitar sombras salvo en navegación móvil o superficies principales muy leves
+- radios moderados, no burbujas grandes en cada bloque
+- padding compacto
+- cabeceras pequeñas
+- listas escaneables
+- acciones clínicas cerca del punto donde cambian conducta
+- tabs de protocolo visibles sin scroll horizontal
+- menú móvil inferior claro y ocultable
+
+### Componentes principales
+
+| Componente | Estilo esperado | Uso |
+| --- | --- | --- |
+| Cabecera | fija, blanca translúcida, marca pequeña con icono y `NexoClx Urg` | orientación global |
+| Home | buscador prominente, chips de especialidad, listas ligeras | entrada rápida |
+| Lista de protocolos | filas con línea fina, título, especialidad/resumen y chevron | abrir ficha |
+| Ficha clínica | una superficie principal con cabecera compacta y cinco tabs | protocolo/procedimiento |
+| Tabs clínicas | `Sospecha`, `Pruebas`, `Decisión`, `Tratamiento`, `Destino` | navegación interna |
+| Pautas de tratamiento | bloques en línea, no tarjetas pesadas; dosis en campos claros | tratamiento accionable |
+| Botones de cálculo | pills azules discretos | abrir calculadora en contexto |
+| Bibliografía | acordeón secundario, no protagonista | trazabilidad |
+| Menú móvil | barra inferior translúcida, iconos, etiquetas cortas, botón ocultar | navegación principal |
+
+### Tono de texto clínico
+
+El texto debe sonar a guardia:
+
+- “Pedir ahora…”
+- “No retrasar…”
+- “Alta solo si…”
+- “Ingreso si…”
+- “UCI si…”
+- “Reevaluar…”
+- “Evitar si…”
+
+Evitar:
+
+- introducciones largas
+- epidemiología salvo que cambie conducta
+- lenguaje de consulta programada
+- seguimiento crónico como eje
+- prevención extensa
+- frases docentes que no ayudan en la decisión inmediata
+- protocolos nuevos sin fuente o sin dosis verificadas
+
+### Pantalla de protocolo ideal
+
+Cada protocolo debe poder leerse en móvil así:
+
+1. Cabecera: nombre del protocolo y especialidad.
+2. Tabs: `Sospecha`, `Pruebas`, `Decisión`, `Tratamiento`, `Destino`.
+3. Puntos cortos, máximo 4-5 visibles por pestaña.
+4. `Ver más` solo para detalle secundario.
+5. Calculadoras visibles donde cambian conducta.
+6. Tratamiento con dosis, vía, frecuencia, duración/máximo si aplica, evitar si y reevaluación.
+7. Destino con alta, observación, ingreso, UCI, especialista/código y alarmas.
+8. Bibliografía textual al final como acordeón.
+
+Si una pantalla parece una biblioteca, un dashboard o una ficha demasiado pesada, hay que reducir contenedores, repetir menos títulos y convertir tarjetas en filas o secciones con líneas.
 
 ## Estado actual
 
-- Home simplificada a: `buscador` + `especialidades`, sin bloques duplicados ni accesos rápidos redundantes.
-- Pantalla propia de `Protocolos` con organigramas clínicos para todos los protocolos implementados y acordeones por bloque clínico para evitar una lista plana interminable.
-- Protocolos reales operativos migrados a ficha clínica: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `insuficiencia cardiaca aguda / edema agudo de pulmón`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `crisis convulsiva / epilepsia en urgencias`, `sepsis / shock séptico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
+- Home simplificada a: `buscador` + `especialidades` + accesos breves a procedimientos y frecuentes, sin bloques de lectura largos.
+- Pantalla propia de `Protocolos` con búsqueda, chips de especialidad y listas ligeras por bloque clínico.
+- Vista de protocolo como ficha clínica compacta con `Sospecha`, `Pruebas`, `Decisión`, `Tratamiento` y `Destino`.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `insuficiencia cardiaca aguda / edema agudo de pulmón`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `crisis convulsiva / epilepsia en urgencias`, `anafilaxia`, `asma`, `EPOC`, `sepsis / shock séptico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
 - Sección `Procedimientos` activa con `VMNI` y `Fluidoterapia IV en urgencias`.
-- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado`, `BISAP`, calculadoras de VMNI y calculadoras de fluidoterapia IV/balance.
+- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado`, `BISAP`, dosis por peso de crisis/SCA/FA/ictus/heparina vascular/adrenalina, calculadoras de VMNI y calculadoras de fluidoterapia IV/balance.
 - La sección `Medicamentos` deja de ser sección principal visible. Los tratamientos deben vivir dentro de cada protocolo como pautas concretas y auditadas.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
 - Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC IC 2021/2023` como referencia de insuficiencia cardiaca aguda, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `Murillo 7.ª ed.`, `SEN Epilepsia 2023`, `NICE NG217` y `AES 2016` como fuentes del protocolo de crisis convulsiva/estatus, `NICE NG250 2025` como referencia principal de neumonía, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
-- Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`.
+- Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`. No está conectada como flujo clínico visible.
 - Despliegue público principal en Vercel: `https://nexo-clx.vercel.app/`.
 
 ## Estructura funcional de la app
@@ -49,21 +183,24 @@ Principios actuales del proyecto:
 
 | Sección | Estado | Función real hoy | Relación con el resto |
 | --- | --- | --- | --- |
-| Home | Activa | Punto de entrada mínimo con `buscador` y rejilla de `especialidades`. | Lleva a la especialidad o al resultado buscado sin pasos intermedios ni bloques redundantes. |
-| Protocolos | Activa | Índice clínico principal con organigrama interactivo para cada protocolo implementado. | Abre protocolo real, cálculo concreto o fuente principal desde la misma sección. |
-| Módulo FA | Activo | Organigrama con diagnóstico, tratamiento, calculadoras directas y destino. | Enlaza `CHA2DS2-VA`, `HAS-BLED` y `Cockcroft-Gault` desde el nodo correspondiente. |
+| Home | Activa | Punto de entrada mínimo con `buscador`, `especialidades`, procedimientos y frecuentes. | Lleva a la especialidad o al resultado buscado sin pasos intermedios ni bloques redundantes. |
+| Protocolos | Activa | Índice clínico principal con búsqueda, especialidades y listas ligeras. | Abre protocolo real, cálculo concreto o fuente principal desde la misma sección. |
+| Vista de protocolo | Activa | Ficha clínica en cinco pestañas: `Sospecha`, `Pruebas`, `Decisión`, `Tratamiento`, `Destino`. | Es la vista principal de actuación en urgencias. |
+| Módulo FA | Activo | Ficha clínica con estabilidad, frecuencia/ritmo, cardioversión, anticoagulación y destino. | Enlaza `CHA2DS2-VA`, `HAS-BLED` y `Cockcroft-Gault` desde el punto de decisión. |
 | Insuficiencia cardiaca aguda / EAP | Activo | Ficha clínica para disnea congestiva, EAP hipertensivo, bajo gasto/shock, VMNI, diurético, nitratos y destino. | Enlaza `VMNI`, `SCA`, `HTA`, `Fluidoterapia IV`, `Balance simple`, `Velocidad de perfusión` y `Cockcroft-Gault`. |
 | Módulo de bradicardias | Activo | Organigrama para repercusión, bradicardia sinusal / nodo, bloqueo AV y pacing. | El tratamiento farmacológico vive dentro del protocolo. |
 | Módulo de arritmias ventriculares | Activo | Organigrama para pulso, inestabilidad, TV monomorfa y torsades / TV polimórfica. | El tratamiento farmacológico vive dentro del protocolo. |
 | Módulos de ictus | Activos | `Ictus isquémico` e `ictus hemorrágico` con diagnóstico, tratamiento y destino. | Quedan agrupados en `Neurología` con bibliografía textual. |
 | Crisis convulsiva / epilepsia | Activo | Ficha clínica para crisis autolimitada, crisis en curso, primera crisis, crisis provocada y estatus epiléptico. | Queda en `Neurología`, con relación secundaria funcional con urgencias y tratamiento escalonado con CIMA. |
 | Anafilaxia | Activo | Ficha clínica para sospecha, pruebas mínimas, decisión de gravedad, adrenalina IM y destino. | Queda en `Urgencias` con calculadora directa de adrenalina IM por peso. |
+| Crisis asmática | Activo | Ficha clínica para gravedad, pruebas útiles, broncodilatadores, corticoide precoz, magnesio y destino. | Queda en `Respiratorio` y enlaza soporte/VMNI si cambia conducta. |
+| Agudización de EPOC | Activo | Ficha clínica para gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios, VNI y destino. | Queda en `Respiratorio` y enlaza `Cockcroft-Gault` y VMNI cuando procede. |
 | Sepsis / shock séptico | Activo | Ficha clínica para sospecha, pruebas, decisión, tratamiento inicial, fluidoterapia, foco y destino. | Enlaza `Fluidoterapia IV en urgencias`, `30 mL/kg sepsis`, `volumen pendiente` y `balance simple`. |
 | Procedimientos | Activa | Índice técnico operativo con `VMNI` y `Fluidoterapia IV en urgencias`. | Enlaza procedimientos desde protocolos cuando cambian conducta. |
 | VMNI | Activo | Procedimiento operativo para indicaciones, contraindicaciones, preparación, modos, ajustes, reevaluación y fracaso. | Incluye calculadoras propias de peso predicho, VT, PS, oxigenación y reevaluación. |
 | Fluidoterapia IV en urgencias | Activo | Procedimiento operativo para indicación, elección de líquido, cantidad/ritmo, reevaluación y precauciones. | Incluye cálculo de bolo por peso, 30 mL/kg sepsis, volumen pendiente, mantenimiento, balance y velocidad de perfusión. |
 | Dolor abdominal por escenarios | Activo | Protocolos de un vistazo para epigastrio, hipocondrio derecho, fosas iliacas, flanco, pelvis, peritonismo y sospecha vascular. | Cada cuadro queda en su especialidad principal: `Digestivo`, `Cirugía general`, `Urología`, `Ginecología` o `Vascular`. |
-| Cálculos | Activa | Agrupa cálculos implementados y muestra auditoría de pendientes. | Los cálculos activos también se abren desde el protocolo o procedimiento. |
+| Cálculos | Activa | Agrupa cálculos implementados en una lista compacta. | Los cálculos activos también se abren desde el protocolo o procedimiento. |
 | Medicamentos | No visible como sección principal | Los datos farmacológicos pueden seguir existiendo como soporte interno mientras se integran pautas auditadas dentro de cada protocolo. | No debe mostrarse como módulo independiente ni como navegación principal. |
 | Bibliografía | Activa | Da acceso a la obra base y a referencias estructuradas. | Cada módulo guarda sus referencias y páginas verificadas. |
 | Plantillas de imagen | En desarrollo | Solo existe la estructura inicial para `RX tórax sistemática`. | Quedará conectada a bibliografía específica cuando esa fuente esté en el repo. |
@@ -72,30 +209,30 @@ Principios actuales del proyecto:
 
 1. La `Home` funciona como entrada principal.
 2. Desde `Home` se entra directamente a una `especialidad` o a un resultado concreto del `buscador`.
-3. La pantalla `Especialidades` agrupa los módulos por bloque clínico y muestra recursos relacionados para que el crecimiento no se convierta en una lista plana.
-4. Al abrir un protocolo implementado, la vista se renderiza como organigrama clínico con nodos expandibles.
-5. Los módulos de `ictus` entran por `Neurología` y se resuelven como organigrama de manejo urgente, no como capítulo de estudio.
+3. La pantalla `Protocolos` agrupa los módulos por bloque clínico y permite filtrar por especialidad.
+4. Al abrir un protocolo implementado, la vista se renderiza como ficha clínica de urgencias con pestañas compactas.
+5. Los módulos de `ictus` entran por `Neurología` y se resuelven como ficha de manejo urgente, no como capítulo de estudio.
 6. Desde el protocolo se puede abrir un cálculo concreto o un procedimiento cuando cambia la conducta.
 7. Los tratamientos farmacológicos deben mostrarse dentro del protocolo, no como dependencia de una sección externa de medicamentos.
 8. Los mismos cálculos siguen existiendo en la sección general de `Cálculos`.
 9. `Procedimientos` agrupa técnicas operativas y no sustituye protocolos locales ni valoración de UCI/Neumología.
 10. Las fichas farmacológicas pueden mantenerse en datos internos si siguen siendo necesarias para no romper módulos existentes, pero no como sección principal visible.
-11. La bibliografía se mantiene accesible desde cabecera y dentro del protocolo como acceso secundario.
+11. La bibliografía se mantiene dentro del protocolo como acceso secundario, sin dominar la pantalla.
 
 ### Cómo se conectan los módulos
 
 - `Home` prioriza navegación, no lectura.
-- `Especialidades` es la puerta de entrada a módulos clínicos concretos.
-- `Módulo FA` ya no se resuelve como pantalla única; usa organigrama clínico con calculadoras directas.
+- `Protocolos` es la puerta de entrada a módulos clínicos concretos.
+- `Módulo FA` usa ficha clínica con calculadoras directas.
 - `Módulos de ictus` siguen la misma lógica: dato clave, clasificación, conducta, tratamiento y destino.
 - `Cálculos` solo se implementan cuando un protocolo real los necesita.
 - Los tratamientos se construyen dentro de cada protocolo a partir de pautas auditadas: fármaco, dosis, vía, frecuencia, duración, máximos, contraindicaciones y ajustes cuando proceda.
-- `Bibliografía` no vive como texto suelto al final: cada módulo guarda referencias estructuradas.
+- `Bibliografía` no vive como texto suelto dominante: cada módulo guarda referencias estructuradas y desplegables.
 - `Plantillas` siguen una lógica paralela: estructura, fuente base y estado de desarrollo.
 
 ### Criterio clínico global
 
-Todo protocolo debe funcionar como organigrama clínico de guardia, no como capítulo resumido.
+Todo protocolo debe funcionar como flujo clínico de guardia, no como capítulo resumido.
 
 Estructura fija:
 
@@ -214,19 +351,24 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Síndrome coronario agudo | Cap. 26 | 214 | Creado | Flujo real para ECG, hs-cTn, riesgo, reperfusión y antitrombosis, con bibliografía principal `ESC SCA 2023`. |
 | Bradicardias | Documento ESC 2021 | 1 | Creado | Guía interactiva de guardia para repercusión clínica, bradicardia sinusal / nodo, bloqueo AV y necesidad de estimulación. |
 | Arritmias ventriculares | Documento ESC 2022 | 1 | Creado | Guía interactiva de guardia para TV con pulso o sin pulso, TV monomorfa estable y torsades / TV polimórfica. |
+| Insuficiencia cardiaca aguda / EAP | Cap. 19 + ESC IC 2021/2023 | 161 | Creado | Ficha clínica para disnea congestiva, EAP hipertensivo, bajo gasto/shock, VMNI, diurético, nitratos y destino. |
+| Ictus isquémico | AHA/ASA 2026 + Cap. 64 | 442 | Creado | Ficha clínica para código ictus, TAC, ventana, trombólisis, trombectomía, PA, NIHSS y destino. |
+| Ictus hemorrágico | AHA/ASA 2022 + Cap. 64 | 442 | Creado | Ficha clínica para TAC, PA, reversión de anticoagulación, neurocirugía/UCI e ICH Score. |
+| Crisis convulsiva / epilepsia en urgencias | Cap. 63 + SEN/NICE/AES | 435 | Creado | Ficha clínica para crisis autolimitada, primera crisis, crisis provocada, estatus, tratamiento escalonado y destino. |
+| Anafilaxia | Cap. 190 + NICE/RCUK | 1059 | Creado | Ficha clínica para diagnóstico clínico, adrenalina IM, soporte, observación y alta segura. |
+| Crisis asmática | Cap. 40 + GINA/GEMA | 290 | Creado | Ficha clínica para gravedad, PEF/gasometría si procede, broncodilatadores, corticoide, magnesio y destino. |
+| Agudización de EPOC | Cap. 41 + GOLD/GesEPOC | 294 | Creado | Ficha clínica para gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios, VNI y destino. |
 | Neumonía adquirida en la comunidad | NICE NG250 2025 + Cap. 42 | 300 | Creado | Flujo real para sospecha, diagnóstico, CRB/CURB-65, destino, antibiótico inicial, revisión IV a 48 h y seguimiento. |
+| Sepsis / shock séptico | Cap. 107 + SSC 2021 | 640 | Creado | Ficha clínica para sospecha, lactato/cultivos, antibiótico precoz, fluidoterapia, foco, vasopresor/UCI y destino. |
 | Abdomen quirúrgico | Cap. 50 | 340 | Creado | Mini-protocolo de cirugía general para apendicitis, perforación, obstrucción, peritonitis y complicación. |
 | Hepatobiliar-pancreático | Cap. 50 | 340 | Creado | Mini-protocolo digestivo para cólico biliar, colecistitis, colangitis, hepatitis y pancreatitis. |
 | Dolor urinario | Cap. 50 | 340 | Creado | Mini-protocolo urológico para cólico renal, pielonefritis, ITU complicada, retención y prostatitis. |
 | Dolor ginecológico | Cap. 50 | 340 | Creado | Mini-protocolo ginecológico para ectópico, torsión, EPI, quiste complicado y gestación. |
 | Dolor vascular | Cap. 50 | 340 | Creado | Mini-protocolo vascular para isquemia mesentérica, aneurisma, disección y embolia visceral. |
 | Dolor infeccioso-digestivo | Cap. 50 | 340 | Creado | Mini-protocolo digestivo/infeccioso para gastroenteritis, colitis, diverticulitis y sepsis abdominal. |
-| Insuficiencia cardiaca | Cap. 19 | 161 | Solo indexado | Tema auditado para futura integración del protocolo de `ICC`. |
 | Taquicardia supraventricular | Guía ESC 2019 | 1 | Solo indexado | Referencia preparada para futuro módulo independiente de TSV. |
 | Shock | Cap. 18 | 154 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Dolor torácico agudo | Cap. 25 | 207 | Solo indexado | Tema auditado, sin protocolo operativo. |
-| Ictus | Cap. 64 | 442 | Solo indexado | Tema auditado, sin protocolo operativo. |
-| Sepsis | Cap. 107 | 640 | Solo indexado | Tema auditado, sin protocolo operativo. |
 | Coma | Cap. 62 | 428 | Solo indexado | Tema auditado, sin protocolo operativo. |
 
 ### Cálculos / escalas
@@ -392,16 +534,17 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 
 ### Pendiente funcional
 
-- Construir el siguiente protocolo real a partir de los temas ya auditados después de FA, HTA y SCA.
 - Hacer que la búsqueda evolucione de filtro simple a entrada clínica más útil.
-- Integrar tratamientos dentro de cada protocolo y retirar progresivamente dependencias visibles de fichas farmacológicas externas.
+- Seguir aligerando vistas si aparecen nuevas tarjetas o contenedores anidados.
 - Mantener la regla de no implementar cálculos fuera de contexto de módulo.
+- Mantener Medicamentos como soporte interno, sin reactivarlo como sección principal.
 
 ### Pendiente clínico
 
-- Desarrollar protocolos reales para `shock` o `ICC`.
+- Desarrollar protocolos reales para temas aún solo auditados, como `shock`, `dolor torácico agudo`, `coma` o `taquicardia supraventricular`.
 - Mantener en cada nuevo protocolo la misma conexión entre decisión clínica, cálculos, medicación y bibliografía.
 - Evitar siempre que la interfaz prometa una funcionalidad aún no implementada.
+- Mantener el foco exclusivo de urgencias: lo ambulatorio solo como alta, continuidad, revisión o signos de alarma.
 
 ### Pendiente bibliográfico
 
