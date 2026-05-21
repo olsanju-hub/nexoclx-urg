@@ -1112,7 +1112,7 @@ export const protocolCatalog = {
       'Adulto con sospecha de NAC; excluir nosocomial, pediátrica, ventilación mecánica o inmunosupresión compleja',
       'Primero descartar sepsis, insuficiencia respiratoria, shock, hipotensión, confusión o necesidad de soporte ventilatorio',
       'Confirmar clínica respiratoria, constantes, estado mental y radiografía/imagen si está en urgencias u hospital',
-      'CRB-65 si valoración inicial o ambulatoria; CURB-65 si está en hospital',
+      'CRB-65 si valoración inicial rápida; CURB-65 si está en hospital',
       'Elegir destino y antibiótico según gravedad, estabilidad, tolerancia oral y soporte domiciliario',
     ],
     quickSummary: [
@@ -1153,7 +1153,7 @@ export const protocolCatalog = {
       {
         id: 'gravedad',
         situation: '3. Gravedad',
-        action: 'Si estás en ámbito inicial o ambulatorio, usa CRB-65. Si estás en hospital, usa CURB-65.',
+        action: 'Si necesitas una valoración inicial rápida, usa CRB-65. Si está en hospital, usa CURB-65.',
         nuance: 'No decidas solo por la escala. Añade juicio clínico, comorbilidad, fragilidad, embarazo, hipoxemia, tolerancia oral y soporte domiciliario.',
       },
       {
@@ -1166,7 +1166,7 @@ export const protocolCatalog = {
     carePath: [
       {
         title: 'Bajo riesgo',
-        text: 'Si está estable, tolera vía oral, SatO2 aceptable y tiene apoyo, manejo ambulatorio con instrucciones claras.',
+        text: 'Si está estable, tolera vía oral, SatO2 aceptable y tiene apoyo, alta con tratamiento e instrucciones claras.',
       },
       {
         title: 'Riesgo intermedio',

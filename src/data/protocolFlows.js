@@ -3,11 +3,11 @@ import { getMedication } from './medications';
 import { protocolList } from './protocols';
 
 const PRIMARY_SECTION_TITLES = {
-  definition: 'Qué es',
-  orders: 'Qué pido',
-  findings: 'Qué espero encontrar',
+  definition: 'Sospecha',
+  orders: 'Pruebas',
+  findings: 'Decisión',
   treatment: 'Tratamiento',
-  followUp: 'Destino / seguimiento',
+  followUp: 'Destino',
 };
 
 const slugify = (value = '') =>
@@ -364,7 +364,7 @@ const cardiologyInterventionNodes = (protocol) => {
         items: [
           'Confirmar cifras, reposo y reevaluación.',
           'Evitar descensos bruscos o vía IV si no hay daño agudo de órgano.',
-          'Reevaluar PA y clínica antes de alta; ajustar seguimiento ambulatorio.',
+          'Reevaluar PA y clínica antes del alta; cerrar observación o control tras urgencias.',
         ],
       },
       {
@@ -480,8 +480,6 @@ const treatmentInitialItems = (protocol) => {
 const genericTreatmentSection = (protocol) => {
   const medicationGroups = asArray(protocol.medicationGroups);
   const calculators = asArray(protocol.calculatorIds);
-  const primaryCareGroup =
-    protocol.id === 'hta-urgencias' ? medicationGroups.find((group) => group.title === 'Urgencia hipertensiva') : null;
 
   return {
     id: 'tratamiento',
@@ -507,26 +505,6 @@ const genericTreatmentSection = (protocol) => {
           })),
         ],
       },
-      ...(primaryCareGroup
-        ? [
-            {
-              id: 'tratamiento-ap',
-              title: 'Tratamiento en Atención Primaria',
-              type: 'treatment',
-              summary: 'Solo si no hay daño agudo de órgano diana y el paciente permite manejo ambulatorio.',
-              children: [
-                ...asArray(primaryCareGroup.medicationIds).map(medicationNode),
-                {
-                  id: 'reevaluar-derivar',
-                  title: 'Reevaluar / derivar',
-                  type: 'decision',
-                  summary: 'Derivar si aparece daño de órgano diana, clínica de alarma, embarazo, mala respuesta o necesidad de vía IV.',
-                  severity: 'warning',
-                },
-              ],
-            },
-          ]
-        : []),
       ...(calculators.length ? treatmentCalculatorNodes(protocol, calculators) : []),
       ...(protocol.warnings?.length
         ? [
@@ -547,7 +525,7 @@ const genericFollowUpSection = (protocol) => ({
   id: 'seguimiento',
   title: PRIMARY_SECTION_TITLES.followUp,
   type: 'section',
-  summary: 'Destino, observación, ingreso o seguimiento según gravedad y respuesta.',
+  summary: 'Alta, observación, ingreso o unidad monitorizada según gravedad y respuesta.',
   children: [
     {
       id: 'destino',
@@ -643,10 +621,10 @@ const pneumoniaTreatmentSection = (protocol) => ({
       ],
     },
     {
-      id: 'tratamiento-ap',
-      title: 'Tratamiento en Atención Primaria',
+      id: 'tratamiento-al-alta',
+      title: 'Tratamiento al alta',
       type: 'treatment',
-      summary: 'Aplicar solo en bajo riesgo con estabilidad y tolerancia oral.',
+      summary: 'Aplicar solo en bajo riesgo con estabilidad, tolerancia oral y criterios de alta.',
       items: [
         brief(protocol.antibioticPlan[0]?.regimen, 190),
         'Reevaluar/derivar: si empeora, no mejora en 72 h, disnea, fiebre persistente, confusión, intolerancia oral o deterioro general.',
@@ -750,7 +728,7 @@ const buildPneumoniaFlow = (protocol) => ({
       title: 'Decisión',
       summary: 'CRB-65/CURB-65 ayudan a destino, siempre con juicio clínico.',
       points: [
-        'CRB-65 si valoración inicial o ambulatoria.',
+        'CRB-65 si valoración inicial rápida.',
         'CURB-65 si valoración hospitalaria.',
         'Bajo riesgo: domicilio solo si estable, tolera VO, SatO2 aceptable y apoyo.',
         'Alto riesgo o alarma: ingreso; UCI si fracaso respiratorio, shock, sepsis grave o soporte ventilatorio.',
@@ -1263,7 +1241,7 @@ const buildHepatobiliaryPancreaticFlow = (protocol) => ({
       title: 'Decisión',
       summary: 'Distinguir cólico resuelto de colecistitis/colangitis, pancreatitis grave o complicación.',
       points: [
-        'Cólico biliar resuelto, afebril, analítica sin alarma y tolera: alta con cirugía programada/seguimiento.',
+        'Cólico biliar resuelto, afebril, analítica sin alarma y tolera: alta con alarma y circuito quirúrgico diferido si procede.',
         'Fiebre, ictericia, colangitis, colecistitis, pancreatitis o dolor persistente: observación/ingreso.',
         'Pancreatitis grave: hipoxemia, shock, oliguria, lactato alto, hematocrito elevado, fallo orgánico o mala perfusión.',
         'En pancreatitis: BISAP ayuda a identificar alto riesgo y necesidad de vigilancia estrecha/UCI.',
@@ -1409,7 +1387,7 @@ const buildHepatobiliaryPancreaticFlow = (protocol) => ({
       title: 'Destino',
       summary: 'Alta solo en cólico biliar resuelto, estable y sin datos de infección u obstrucción.',
       points: [
-        'Alta: cólico biliar resuelto, afebril, sin ictericia, tolera vía oral y seguimiento/cirugía programada.',
+        'Alta: cólico biliar resuelto, afebril, sin ictericia, tolera vía oral y revisión diferida/cirugía programada si procede.',
         'Observación/ingreso: dolor persistente, vómitos, pancreatitis, colecistitis, colangitis o ictericia obstructiva.',
         'Digestivo/cirugía: colangitis, coledocolitiasis, colecistitis, absceso, complicación o necesidad de CPRE/procedimiento.',
         'UCI: shock, sepsis grave, hipoxemia, oliguria, acidosis/lactato elevado o fallo orgánico.',
@@ -1522,7 +1500,7 @@ const buildUrinaryAbdominalPainFlow = (protocol) => ({
       title: 'Decisión',
       summary: 'Alta solo si cólico no complicado, afebril, función renal segura y dolor controlado.',
       points: [
-        'Cólico no complicado: afebril, dolor controlado, tolera VO, función renal sin alarma y seguimiento.',
+        'Cólico no complicado: afebril, dolor controlado, tolera VO, función renal sin alarma y plan de alta claro.',
         'Ingreso/observación: dolor o vómitos persistentes, fiebre, monorreno, IR, embarazo, fragilidad o diagnóstico incierto.',
         'Urología urgente: obstrucción infectada, anuria/oliguria, monorreno obstruido, sepsis, fracaso renal o dolor intratable.',
         'Calcular Cockcroft-Gault si AINE, antibiótico, contraste o ingreso dependen de función renal.',
@@ -1732,7 +1710,7 @@ const buildUrinaryAbdominalPainFlow = (protocol) => ({
           items: [
             'Fiebre, escalofríos, dolor no controlado, vómitos persistentes o anuria/oliguria.',
             'Hematuria intensa, síncope, deterioro general o intolerancia a la medicación.',
-            'Reconsulta si no mejora o aparece clínica infecciosa tras alta por cólico.',
+            'Volver a urgencias si no mejora o aparece clínica infecciosa tras alta por cólico.',
           ],
         },
       ],
@@ -1810,7 +1788,7 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
       points: [
         'Test de embarazo obligatorio si posibilidad de gestación; β-HCG si positivo o duda diagnóstica.',
         'Hemograma, grupo/Rh y coagulación si sangrado, síncope, embarazo positivo, mal estado o cirugía probable.',
-        'PCR/VSG y microbiología ITS si sospecha EPI; cribado VIH, clamidia y gonorrea cuando proceda.',
+        'PCR/VSG y microbiología ITS si sospecha EPI; VIH, clamidia y gonorrea cuando cambien tratamiento o continuidad.',
         'Ecografía ginecológica/transvaginal si ectópico, torsión, quiste complicado, EPI complicada o diagnóstico incierto.',
       ],
       detailNodes: [
@@ -1829,11 +1807,11 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
     {
       id: 'decision',
       title: 'Decisión',
-      summary: 'Separar estable ambulatoria de ectópico/torsión/EPI complicada con ingreso.',
+      summary: 'Separar alta segura de ectópico/torsión/EPI complicada con ingreso.',
       points: [
         'Inestable o shock con sospecha de ectópico: reanimación y ginecología/quirófano urgente.',
         'Torsión probable: ginecología urgente aunque la ecografía no sea definitiva.',
-        'EPI ambulatoria solo si estadio leve, diagnóstico claro, tolera VO y sin criterios de ingreso.',
+        'EPI al alta solo si estadio leve, diagnóstico claro, tolera VO y sin criterios de ingreso.',
         'Ingreso si embarazo, vómitos, T >=39 °C, diagnóstico incierto, reacción peritoneal, absceso o falta de respuesta en 48-72 h.',
       ],
       detailNodes: [
@@ -1853,11 +1831,11 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
     {
       id: 'tratamiento',
       title: 'Tratamiento',
-      summary: 'Estabilizar primero; analgesia segura y antibiótico concreto solo si EPI leve ambulatoria.',
+      summary: 'Estabilizar primero; analgesia segura y antibiótico concreto solo si EPI leve al alta.',
       points: [
         'Ectópico inestable: decúbito, dos vías venosas, cristaloide según hemodinámica y ginecología/quirófano.',
         'Paracetamol 1 g IV cada 6 h o metamizol 2 g IV/IM si encaja embarazo y seguridad.',
-        'EPI leve ambulatoria: ceftriaxona 250 mg IM dosis única + doxiciclina 100 mg VO cada 12 h + metronidazol 500 mg VO cada 12 h 14 días.',
+        'EPI leve al alta: ceftriaxona 250 mg IM dosis única + doxiciclina 100 mg VO cada 12 h + metronidazol 500 mg VO cada 12 h 14 días.',
         'Si EPI complicada, embarazo, absceso, vómitos o mala evolución: ingreso y pauta parenteral por ginecología.',
       ],
       treatmentGroups: [
@@ -1897,15 +1875,15 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
           ],
         },
         {
-          id: 'epi-ambulatoria',
-          title: 'EPI leve ambulatoria',
+          id: 'epi-al-alta',
+          title: 'EPI leve al alta',
           cards: [
             {
               id: 'gine-ceftriaxona',
               title: 'Ceftriaxona',
               type: 'treatment',
               severity: 'warning',
-              summary: 'Pauta ambulatoria de EPI leve junto a doxiciclina y metronidazol.',
+              summary: 'Pauta de alta de EPI leve junto a doxiciclina y metronidazol.',
               sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/62639/FichaTecnica_62639.html',
               items: [
                 'Dosis: 250 mg.',
@@ -1921,7 +1899,7 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
               title: 'Doxiciclina',
               type: 'treatment',
               severity: 'warning',
-              summary: 'Pauta ambulatoria de EPI leve junto a ceftriaxona y metronidazol.',
+              summary: 'Pauta de alta de EPI leve junto a ceftriaxona y metronidazol.',
               sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/50404/FichaTecnica_50404.html',
               items: [
                 'Dosis: 100 mg.',
@@ -1937,7 +1915,7 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
               title: 'Metronidazol',
               type: 'treatment',
               severity: 'warning',
-              summary: 'Cobertura anaerobia en EPI ambulatoria leve.',
+              summary: 'Cobertura anaerobia en EPI leve tratable al alta.',
               sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/84614/FT_84614.html',
               items: [
                 'Dosis: 500 mg.',
@@ -1959,7 +1937,7 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
           severity: 'warning',
           items: [
             'Confirmar embarazo, alergias, función renal/hepática, sangrado, anticoagulación y gravedad antes de analgésicos o antibiótico.',
-            'No tratar ambulatoriamente EPI con embarazo, vómitos, absceso, reacción peritoneal, T >=39 °C o diagnóstico incierto.',
+            'No dar alta con EPI si embarazo, vómitos, absceso, reacción peritoneal, T >=39 °C o diagnóstico incierto.',
             'Avisar ginecología urgente si ectópico o torsión probable, incluso con exploración inicial poco expresiva.',
           ],
         },
@@ -1968,12 +1946,12 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
     {
       id: 'destino',
       title: 'Destino',
-      summary: 'Alta solo con embarazo urgente descartado, estabilidad y seguimiento claro.',
+      summary: 'Alta solo con embarazo urgente descartado, estabilidad y revisión clara.',
       points: [
         'Ginecología/quirófano: ectópico inestable, torsión probable, sangrado importante o abdomen agudo.',
         'Ingreso: EPI complicada, embarazo, absceso, vómitos, fiebre alta, mala evolución o diagnóstico incierto.',
         'Alta: dolor leve/controlado, estable, embarazo urgente descartado si procede y plan de revisión.',
-        'Revisión en 48-72 h si EPI ambulatoria; antes si empeora.',
+        'Revisión en 48-72 h si EPI tratada al alta; antes si empeora.',
       ],
       detailNodes: [
         {
@@ -2653,7 +2631,7 @@ const guardiaFlow = (protocol) => {
         id: 'seguimiento',
         title: PRIMARY_SECTION_TITLES.followUp,
         type: 'section',
-        summary: 'Destino y seguimiento según estabilidad, alarma y respuesta inicial.',
+        summary: 'Destino y revisión según estabilidad, alarma y respuesta inicial.',
         children: [
           {
             id: 'destino',
@@ -2665,7 +2643,7 @@ const guardiaFlow = (protocol) => {
           },
           {
             id: 'seguimiento',
-            title: 'Seguimiento',
+            title: 'Revisión tras urgencias',
             type: 'step',
             items: guardia.seguimiento,
           },
@@ -2928,7 +2906,7 @@ const buildScaDecisionPanelFlow = (protocol) => {
         detailNodes: [
           {
             id: 'destino-sca',
-            title: 'Reevaluación y seguimiento',
+            title: 'Reevaluación y alarma',
             type: 'decision',
             severity: 'success',
             items: [
@@ -3028,7 +3006,7 @@ const buildHtaDecisionPanelFlow = (protocol) => {
       {
         id: 'destino',
         title: 'Destino',
-        summary: 'Alta solo si no hay daño agudo, la PA desciende de forma segura y hay seguimiento cercano.',
+        summary: 'Alta solo si no hay daño agudo, la PA desciende de forma segura y queda control tras urgencias.',
         points: [
           'Alta: sin daño agudo, síntomas resueltos/banales, plan oral claro y control en 24-72 h.',
           'Observación: dudas diagnósticas, síntomas persistentes, necesidad de reevaluación o ajuste oral.',
@@ -4095,7 +4073,7 @@ const buildCopdExacerbationFlow = (protocol) => {
         title: 'Decisión',
         summary: 'Clasificar leve, moderada o grave; decidir antibiótico, VNI, ingreso o UCI.',
         points: [
-          'Leve: aumento de síntomas sin insuficiencia respiratoria ni datos de alarma; posible manejo ambulatorio si responde.',
+          'Leve: aumento de síntomas sin insuficiencia respiratoria ni datos de alarma; alta posible si responde.',
           'Moderada: precisa tratamiento en urgencias, broncodilatadores repetidos, corticoide o vigilancia.',
           'Grave: hipoxemia persistente, hipercapnia/acidosis, neumonía, comorbilidad, mala respuesta o fragilidad.',
           'Antibiótico si esputo purulento con aumento de disnea/volumen, neumonía, ventilación o gravedad.',
@@ -4189,7 +4167,7 @@ const buildCopdExacerbationFlow = (protocol) => {
             severity: 'success',
             items: [
               'Confirmar estabilidad respiratoria tras espaciar broncodilatadores y con oxígeno basal o objetivo individual.',
-              'Revisar inhaladores, tabaco, vacunas si procede y control precoz en atención primaria/neumología.',
+              'Revisar inhaladores y asegurar revisión precoz tras urgencias por continuidad asistencial/neumología.',
               'Volver por disnea progresiva, somnolencia, cianosis, fiebre persistente, esputo purulento creciente, dolor torácico o mala tolerancia oral.',
             ],
           },
@@ -4351,7 +4329,7 @@ const buildAcuteHeartFailureFlow = (protocol) => {
           'Observación si respuesta rápida pero necesita vigilancia de diuresis, TA, oxígeno o analítica.',
           'Ingreso si requiere IV, oxígeno, VMNI, causa no resuelta, insuficiencia renal, alteraciones iónicas o comorbilidad.',
           'UCI/cardiología si shock, hipoxemia persistente, VMNI prolongada, arritmia grave, SCA, lactato elevado, hipotensión o vasoactivos.',
-          'Seguimiento: peso, diuresis, creatinina, potasio y ajuste del tratamiento crónico.',
+          'Tras urgencias: peso, diuresis, creatinina, potasio y ajuste del tratamiento habitual.',
         ],
         detailNodes: [
           {
@@ -4361,7 +4339,7 @@ const buildAcuteHeartFailureFlow = (protocol) => {
             severity: 'success',
             items: [
               'Confirmar estabilidad respiratoria y hemodinámica sin tratamiento IV activo.',
-              'Revisar desencadenante, tratamiento crónico, diurético, función renal y potasio.',
+              'Revisar desencadenante, tratamiento habitual, diurético, función renal y potasio.',
               'Explicar alarma por disnea, ortopnea, ganancia de peso, síncope, dolor torácico o edemas progresivos.',
             ],
           },
@@ -4432,7 +4410,7 @@ const buildSepsisFlow = (protocol) => ({
         'Infección sin sepsis: estable, sin hipoperfusión ni disfunción; tratamiento según foco y vigilancia.',
         'Sepsis probable: infección con disfunción, lactato elevado, hipotensión, alteración mental, oliguria o mala perfusión.',
         'Shock séptico: hipotensión/hipoperfusión persistente; no retrasar UCI, vasopresor ni control de foco.',
-        'No usar qSOFA como único cribado; priorizar juicio clínico, lactato, constantes y disfunción orgánica.',
+        'No usar qSOFA como único filtro de gravedad; priorizar juicio clínico, lactato, constantes y disfunción orgánica.',
         'Control de foco urgente si hay foco drenable, obstrucción, isquemia, necrosis o dispositivo infectado.',
       ],
       actions: [procedureAction('fluidoterapia-iv', 'Ver Fluidoterapia IV en urgencias'), calculatorAction('sepsis-30mlkg')],

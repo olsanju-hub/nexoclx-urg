@@ -347,7 +347,7 @@ export const calculateCurb65 = ({ confusion, ureaOver7, respiratoryRate30, lowBl
         ? 'Riesgo alto. NICE recomienda considerar ingreso y derivación a críticos si procede.'
         : score === 2
           ? 'Riesgo intermedio. NICE propone decidir entre atención urgente en el día, unidad virtual, hospitalización a domicilio o ingreso.'
-          : 'Riesgo bajo. NICE permite alta con seguimiento y consejos de seguridad si no hay criterios clínicos de riesgo.',
+          : 'Riesgo bajo. NICE permite alta con alarma y revisión si no hay criterios clínicos de riesgo.',
     caution:
       'CURB-65 no sustituye la valoración de hipoxemia, sepsis, complicaciones pleurales, comorbilidad, fragilidad ni tolerancia oral.',
   };

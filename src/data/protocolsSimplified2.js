@@ -269,7 +269,7 @@ const ophthalmologyProtocols = {
       'Tonometría: PIO >30-40 mmHg',
       'Gonioscopia: visualiza ángulo',
       'Biomicroscopía: córnea edematosa, iris arqueado',
-      'Campimetría si crónico',
+      'Campimetría si déficit persistente y cambia conducta',
     ],
     expectedFindings: [
       'Dolor ojo severo, dolor cabeza, náuseas/vómitos',
@@ -521,7 +521,7 @@ const ophthalmologyProtocols = {
     title: 'Chalazión',
     category: 'Control',
     specialty: 'Oftalmología',
-    definition: 'Quiste meibomio no inflamatorio. Nódulo indoloro, crónico.',
+    definition: 'Nódulo palpebral indoloro no inflamatorio; en urgencias descartar infección o complicación.',
     diagnosticOrders: [
       'Inspección párpado',
     ],
@@ -651,12 +651,12 @@ const additionalProtocols = {
       'TC: engrosamiento pared, absceso o perforación si complicada',
     ],
     treatment: [
-      'No complicada, afebril y tolera VO: tratamiento oral y seguimiento en AP',
+      'No complicada, afebril y tolera VO: tratamiento oral al alta y revisión tras urgencias',
       'Complicada (absceso/perforación): ingreso, ayuno, líquidos IV y antibiótico IV de amplio espectro',
       'Drenaje guiado por imagen para abscesos seleccionados',
       'Cirugía si peritonitis generalizada o fracaso de tratamiento',
     ],
-    followUp: ['Control en consultas, colonoscopia electiva tras resolución según edad y riesgo'],
+    followUp: ['Alta con alarma; colonoscopia electiva tras resolución según edad y riesgo si procede'],
     redFlags: ['Perforación, absceso grande, sepsis, deterioro hemodinámico'],
     notes: 'Imagen (TC) guía conducta; evitar antibiótico rutinario en casos muy leves sin comorbilidad según guías.',
   }),
@@ -760,7 +760,7 @@ const additionalProtocols = {
       'Inestable o rotura: cirugía urgente (laparoscopia/laparotomía) y control hemodinámico',
       'Analgesia y soporte transfusional si necesario',
     ],
-    followUp: ['Control hCG seriado hasta negativización; consulta de Ginecología'],
+    followUp: ['Control hCG seriado hasta negativización y revisión por Ginecología'],
     redFlags: ['Shock, peritonitis, hemorragia activa, hCG muy elevada sugestiva de masa grande'],
     notes: 'Test embarazo obligatorio en toda mujer en edad fértil con dolor abdominal; avisar Ginecología precozmente.',
   }),
@@ -926,7 +926,7 @@ const gynecologyProtocols = {
     ],
     followUp: [
       'Pareja trazado y tratamiento',
-      'Educación prevención',
+      'Instrucciones de alarma al alta',
       'Seguimiento NAAT post-tratamiento',
     ],
     redFlags: ['Embarazo', 'PID', 'Conjuntivitis neonatal', 'Diseminada'],
@@ -967,7 +967,7 @@ const pediatricsProtocols = {
       'Alta cuando SatO2 >90% sin oxígeno',
     ],
     redFlags: ['SatO2 <90%', 'Apnea', 'Exhausto', 'Insuficiencia respiratoria', 'Prematuro'],
-    notes: 'Infección común <2 años. Mayoría manejable ambulatorio. VRS desencadenante.',
+    notes: 'En urgencias priorizar trabajo respiratorio, hidratación, oxígeno, ingreso o alta segura. VRS desencadenante frecuente.',
   }),
 
   'laringo-traqueitis': createProtocol({
@@ -1036,7 +1036,7 @@ const toxicologyProtocols = {
     followUp: [
       'UCI si coma o inestable',
       'Alta cuando alerta, tolera PO, nivel <100',
-      'Alcoholismo screening y rehabilitación',
+      'Alcohol: detectar abstinencia/intoxicación y derivar continuidad si procede',
     ],
     redFlags: ['Coma profundo', 'Respiración deprimida', 'Hipotermia severa', 'Hipoglucemia', 'Aspiración'],
     notes: 'Metabolismo 7-10g/h. Toxinas coingesta: metanol (ceguera), propilenglicol (hiperosmolaridad).',
@@ -1071,7 +1071,7 @@ const toxicologyProtocols = {
     followUp: [
       'UCI si intubado',
       'Observación mínimo 4h post-naloxona',
-      'Droga screening',
+      'Detectar sustancia implicada y riesgo agudo',
       'Consejería/programa sustitución',
     ],
     redFlags: ['Apnea', 'Bradicardia severa', 'Choque', 'Edema pulmonar', 'Convulsiones (mezcla)'],
@@ -1178,7 +1178,7 @@ const dermatologyProtocols = {
     ],
     followUp: [
       'Identificar/evitar disparador',
-      'Alergia consulta',
+      'Alergología tras alta si procede',
       'Cardiologo si hereditario',
     ],
     redFlags: ['Compromiso vía aérea', 'Angioedema hereditario', 'Recurrencia', 'Asociado anafilaxia'],

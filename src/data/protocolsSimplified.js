@@ -323,7 +323,7 @@ const respiratoryProtocols = {
       'Hidratación adecuada, analgesia y control de fiebre',
     ],
     followUp: [
-      'Alta con seguimiento AP 1-2 semanas',
+      'Alta con revisión tras urgencias en 1-2 semanas',
       'RX control 4-6 semanas si persistencia síntomas',
     ],
     redFlags: ['Sepsis', 'Insuficiencia respiratoria', 'Shock', 'Pleuresía purulenta'],
@@ -358,7 +358,7 @@ const respiratoryProtocols = {
     ],
     followUp: [
       'Ingreso si FEV1 <25%, PaCO2 >50, comorbilidad',
-      'Alta con control 1 semana en AP',
+      'Alta con control tras urgencias en 1 semana',
     ],
     redFlags: ['Insuficiencia respiratoria severa', 'Confusión mental', 'Cor pulmonale agudo'],
     notes: 'Causa muerte en EPOC. Desencadenantes: infección, contaminación, incumplimiento.',
@@ -390,7 +390,7 @@ const respiratoryProtocols = {
       'Intubación/tráqueo si agotamiento, hipercapnia progresiva o alteración de la conciencia',
     ],
     followUp: [
-      'Alta con control 1 semana en AP si leve-moderado',
+      'Alta con control tras urgencias en 1 semana si leve-moderado',
       'Ingreso si severo o mal cumplimiento',
     ],
     redFlags: ['Estatus asmático', 'Cianosis', 'Confusión', 'Silencio auscultatorio'],
@@ -555,7 +555,7 @@ const neurologyProtocols = {
     expectedFindings: [
       'Cefalea súbita intensísima (trueno)',
       'Fiebre + cefalea + rigidez nuca',
-      'Cambio patrón crónico',
+      'Cambio de patrón habitual',
       'Neurológico focalizador',
     ],
     treatment: [
@@ -613,7 +613,7 @@ const neurologyProtocols = {
     title: 'Epilepsia (seguimiento y ajustes)',
     category: 'Control',
     specialty: 'Neurología',
-    definition: 'Trastorno crónico predisposición crisis recurrentes, control farmacológico.',
+    definition: 'Paciente con predisposición a crisis recurrentes que acude por crisis, cambio de patrón o problema de tratamiento.',
     diagnosticOrders: [
       'Niveles farmacológicos cada 3-6 meses',
       'EEG anual',
@@ -718,7 +718,7 @@ const neurologyProtocols = {
     definition: 'Cefalea vascular episódica, unilateral, pulsátil, 4-72h, náuseas, fotofobia.',
     diagnosticOrders: [
       'Diagnóstico clínico en mayoría casos',
-      'TC/RM si patrón atípico o cambio crónico',
+      'TC/RM si patrón atípico o cambio respecto al basal',
       'Punción lumbar si HSA sospecha',
     ],
     expectedFindings: [
@@ -939,7 +939,7 @@ const digestiveProtocols = {
       'Cirugía si persiste >6 semanas',
     ],
     redFlags: ['Infección, absceso', 'Fístula', 'Incontinencia postoperatoria'],
-    notes: 'Causa dolor anogenital más frecuente. Hemorragia muy leve. Puede haber prurito anal crónico.',
+    notes: 'Causa frecuente de dolor anogenital. Hemorragia muy leve. Puede haber prurito anal persistente.',
   }),
 
   'hemorroides': createProtocol({
@@ -1207,7 +1207,7 @@ const nephrologyProtocols = {
     ],
     followUp: [
       'Monitorización ECG y recheck Ca cada 4-6h',
-      'Endocrinología si hipoparatiroidismo crónico',
+      'Endocrinología si hipoparatiroidismo conocido o necesidad de ajuste especializado',
       'Oral: Citrato de calcio 1-2g/6h',
     ],
     redFlags: ['Tetania', 'Convulsión', 'Arritmia', 'QT >500ms', 'Fibrilación'],
@@ -1381,7 +1381,7 @@ const nephrologyProtocols = {
       'Prevención recurrencia: hipercalciuria, hipocitraturia',
     ],
     redFlags: ['Obstrucción bilateral', 'Pielonefritis concomitante', 'Único riñón funcionante', 'Cálculo >6mm'],
-    notes: 'Prevalencia 1-10%. Recurrencia 50% en 5 años si no prevención. Compositions: 80% Ca oxalato, 10% ácido úrico.',
+    notes: 'En urgencias priorizar dolor, infección, obstrucción, función renal y criterios de alta/ingreso.',
   }),
 };
 

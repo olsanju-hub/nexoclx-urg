@@ -101,13 +101,13 @@ Estructura fija:
 
 1. Diagnóstico
 2. Tratamiento
-3. Seguimiento / destino
+3. Destino
 
 Reglas:
 
 - frases cortas y pasos accionables
 - escalas enlazadas directamente desde el nodo donde cambian conducta, no mediante "ir a Escalas"
-- tratamiento separado en `Tratamiento en Urgencias` y, cuando proceda, `Tratamiento en Atención Primaria`
+- tratamiento separado entre actuación en urgencias y, cuando proceda, tratamiento al alta
 - dosis, vía, frecuencia y duración solo si están auditadas
 - tratamientos con nombre del fármaco, dosis, vía y frecuencia, sin explicaciones innecesarias
 - los tratamientos deben ser concretos y escalonados; si falta un dato del paciente, la app debe pedirlo antes de adaptar la conducta
@@ -236,7 +236,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Aclaramiento de creatinina (Cockcroft-Gault) | Cap. 5 · Bioquímica sanguínea | 39 | Implementado | Se usa ya para revisar ajuste renal de anticoagulantes en FA. |
 | CHA2DS2-VA | Guía ESC 2024 · Fibrilación auricular | 32 | Implementado | Integrado dentro del protocolo FA y también accesible desde `Cálculos`. |
 | HAS-BLED | Guía ESC 2024 · Fibrilación auricular | 40 | Implementado | Integrado dentro del protocolo FA para vigilar riesgo hemorrágico y también accesible desde `Cálculos`. |
-| CRB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 9 | Implementado | Integrado para orientar riesgo y destino en atención inicial / ámbito ambulatorio. |
+| CRB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 9 | Implementado | Integrado para orientar riesgo y destino en la valoración inicial de urgencias. |
 | CURB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 11 | Implementado | Integrado para orientar riesgo y destino en ámbito hospitalario. |
 | Killip | ESC SCA 2023 · Síndrome coronario agudo | — | Implementado | Integrado en la decisión de gravedad/destino de SCA. |
 | NIHSS | AHA/ASA 2026 · Ictus isquémico | — | Implementado | Integrado en la decisión de código ictus, gravedad y comunicación clínica. |
