@@ -1,4 +1,4 @@
-import React, { startTransition, useDeferredValue, useEffect, useState } from 'react';
+import React, { Suspense, lazy, startTransition, useDeferredValue, useEffect, useState } from 'react';
 import {
   ArrowLeft,
   Calculator,
@@ -41,11 +41,11 @@ import {
   getCalculator,
   implementedCalculators,
 } from './data/calculators';
-import { ClinicalFlowTree } from './components/ClinicalFlowTree';
 import { getMotivoModule, groupModulesBySpecialty, motivoConsultaModules } from './data/modules';
-import { getProtocolFlow, protocolFlowCatalog } from './data/protocolFlows';
-import { getProcedureFlow, procedureList } from './data/procedures';
-import { getProtocol as getLegacyProtocol } from './data/protocols';
+import { procedureList } from './data/procedures';
+
+const ClinicalProtocolFlowView = lazy(() => import('./components/ClinicalProtocolFlowView'));
+const ProcedureFlowView = lazy(() => import('./components/ProcedureFlowView'));
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
 
@@ -391,11 +391,12 @@ const getPrimarySection = (view) => {
 const getPageLabel = (route) => {
   if (route.view === 'protocol') {
     const protocolId = route.protocolId ?? 'fibrilacion-auricular';
-    return getProtocolFlow(protocolId).title;
+    return getMotivoModule(protocolId).title;
   }
 
   if (route.view === 'procedure') {
-    return getProcedureFlow(route.procedureId ?? 'vmni').title;
+    const procedureId = route.procedureId ?? 'vmni';
+    return procedureList.find((procedure) => procedure.id === procedureId)?.title ?? 'Procedimiento';
   }
 
   if (route.view === 'calculator') {
@@ -420,11 +421,10 @@ const getPageLabel = (route) => {
 const uniqueByKey = (items, keyBuilder) => Array.from(new Map(items.map((item) => [keyBuilder(item), item])).values());
 const normalizeSearch = (value = '') => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const matchesSearch = (needle, ...parts) => parts.some((part) => normalizeSearch(part).includes(needle));
-const isOperativeProtocol = (module) => Boolean(module?.implemented && protocolFlowCatalog[module.id]);
+const isOperativeProtocol = (module) => Boolean(module?.implemented);
 
 const getModulePrimaryReferences = (moduleId) => {
-  const protocol = getLegacyProtocol(moduleId);
-  const entries = protocol?.bibliography ?? getMotivoModule(moduleId).bibliography ?? [];
+  const entries = getMotivoModule(moduleId).bibliography ?? [];
   return entries.slice(0, 1);
 };
 
@@ -856,6 +856,15 @@ const EmptySearchState = ({ query }) => (
     <p className="eyebrow eyebrow-muted">Sin coincidencias</p>
     <p className="mt-2 text-sm font-semibold text-[var(--text)]">{query}</p>
     <p className="mt-1 text-sm text-[var(--text-soft)]">Prueba con otra especialidad, protocolo, cálculo o fármaco.</p>
+  </div>
+);
+
+const RouteLoadingState = () => (
+  <div className={pageClass}>
+    <section className="compact-section">
+      <p className="eyebrow eyebrow-muted">Cargando</p>
+      <p className="mt-2 text-sm font-semibold text-[var(--text)]">Preparando ficha clínica.</p>
+    </section>
   </div>
 );
 
@@ -1781,40 +1790,6 @@ const ProceduresView = ({ onBack, onProcedureOpen, onCalculatorOpen }) => {
   );
 };
 
-const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen, onProcedureOpen, onProtocolOpen }) => {
-  const flow = getProtocolFlow(protocolId);
-
-  return (
-    <div className={pageClass}>
-      <ClinicalFlowTree
-        protocol={flow}
-        onCalculatorOpen={onCalculatorOpen}
-        onProcedureOpen={onProcedureOpen}
-        onProtocolOpen={onProtocolOpen}
-        onBack={onBack}
-        backLabel="Protocolos"
-      />
-    </div>
-  );
-};
-
-const ProcedureFlowView = ({ procedureId, onBack, onCalculatorOpen, onProtocolOpen }) => {
-  const flow = getProcedureFlow(procedureId);
-
-  return (
-    <div className={pageClass}>
-      <ClinicalFlowTree
-        protocol={flow}
-        onCalculatorOpen={onCalculatorOpen}
-        onProtocolOpen={onProtocolOpen}
-        onBack={onBack}
-        backLabel="Procedimientos"
-        kindLabel="Procedimiento"
-      />
-    </div>
-  );
-};
-
 const CalculationsView = ({ onBack, onCalculatorOpen }) => (
   <div className={pageClass}>
     <BackBar label="Inicio" onClick={onBack} />
@@ -1954,13 +1929,15 @@ const App = () => {
       };
 
       return (
-        <ClinicalProtocolFlowView
-          protocolId={protocolId}
-          onBack={handleBack}
-          onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
-          onProcedureOpen={(procedureId) => openProcedure(procedureId, protocolReturnTo)}
-          onProtocolOpen={(nextProtocolId) => openModule(nextProtocolId, protocolReturnTo)}
-        />
+        <Suspense fallback={<RouteLoadingState />}>
+          <ClinicalProtocolFlowView
+            protocolId={protocolId}
+            onBack={handleBack}
+            onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, protocolReturnTo)}
+            onProcedureOpen={(procedureId) => openProcedure(procedureId, protocolReturnTo)}
+            onProtocolOpen={(nextProtocolId) => openModule(nextProtocolId, protocolReturnTo)}
+          />
+        </Suspense>
       );
     }
 
@@ -1972,12 +1949,14 @@ const App = () => {
       };
 
       return (
-        <ProcedureFlowView
-          procedureId={procedureId}
-          onBack={handleBack}
-          onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, procedureReturnTo)}
-          onProtocolOpen={(protocolId) => openModule(protocolId, procedureReturnTo)}
-        />
+        <Suspense fallback={<RouteLoadingState />}>
+          <ProcedureFlowView
+            procedureId={procedureId}
+            onBack={handleBack}
+            onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, procedureReturnTo)}
+            onProtocolOpen={(protocolId) => openModule(protocolId, procedureReturnTo)}
+          />
+        </Suspense>
       );
     }
 
