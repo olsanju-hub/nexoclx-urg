@@ -168,12 +168,12 @@ Si una pantalla parece una biblioteca, un dashboard o una ficha demasiado pesada
 - Home simplificada a: `buscador` + `especialidades` + accesos breves a procedimientos y frecuentes, sin bloques de lectura largos.
 - Pantalla propia de `Protocolos` con búsqueda, chips de especialidad y listas ligeras por bloque clínico.
 - Vista de protocolo como ficha clínica compacta con `Sospecha`, `Pruebas`, `Decisión`, `Tratamiento` y `Destino`.
-- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `insuficiencia cardiaca aguda / edema agudo de pulmón`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `crisis convulsiva / epilepsia en urgencias`, `anafilaxia`, `asma`, `EPOC`, `sepsis / shock séptico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
+- Protocolos reales operativos: `fibrilación auricular`, `HTA en urgencias`, `síndrome coronario agudo`, `insuficiencia cardiaca aguda / edema agudo de pulmón`, `bradicardias`, `arritmias ventriculares`, `ictus isquémico`, `ictus hemorrágico`, `crisis convulsiva / epilepsia en urgencias`, `anafilaxia`, `asma`, `EPOC`, `tromboembolismo pulmonar / TEP`, `sepsis / shock séptico`, `neumonía adquirida en la comunidad` y módulos de dolor abdominal repartidos por especialidad.
 - Sección `Procedimientos` activa con `VMNI` y `Fluidoterapia IV en urgencias`.
-- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado`, `BISAP`, dosis por peso de crisis/SCA/FA/ictus/heparina vascular/adrenalina, calculadoras de VMNI y calculadoras de fluidoterapia IV/balance.
+- Cálculos activos: `CHA2DS2-VA`, `HAS-BLED`, `Cockcroft-Gault`, `CRB-65`, `CURB-65`, `Wells TEP`, `sPESI`, `Killip`, `NIHSS`, `ICH Score`, `Alvarado`, `BISAP`, dosis por peso de crisis/SCA/FA/ictus/heparina vascular/adrenalina, calculadoras de VMNI y calculadoras de fluidoterapia IV/balance.
 - La sección `Medicamentos` deja de ser sección principal visible. Los tratamientos deben vivir dentro de cada protocolo como pautas concretas y auditadas.
 - Icono unificado dentro y fuera de la app, con `manifest` web, `apple-touch-icon` y `service worker` para instalación PWA.
-- Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC IC 2021/2023` como referencia de insuficiencia cardiaca aguda, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `Murillo 7.ª ed.`, `SEN Epilepsia 2023`, `NICE NG217` y `AES 2016` como fuentes del protocolo de crisis convulsiva/estatus, `NICE NG250 2025` como referencia principal de neumonía, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
+- Bibliografía activa: `ESC FA 2024` como referencia principal de FA, `ESC HTA 2024` como referencia principal de HTA, `ESC SCA 2023` como referencia principal de IAM/SCA, `ESC IC 2021/2023` como referencia de insuficiencia cardiaca aguda, `ESC TSV 2019`, `ESC Bradicardias 2021` y `ESC Arritmias ventriculares 2022` como referencias principales indexadas de sus módulos, `AHA/ASA ictus isquémico` como referencia principal del módulo de ictus isquémico, `AHA/ASA ictus hemorrágico 2022` como referencia principal del módulo de ictus hemorrágico, `Murillo 7.ª ed.`, `SEN Epilepsia 2023`, `NICE NG217` y `AES 2016` como fuentes del protocolo de crisis convulsiva/estatus, `NICE NG250 2025` como referencia principal de neumonía, `ESC TEP 2019` y `NICE NG158` como fuentes del protocolo TEP, y `Murillo 7.ª ed.` como obra base general y apoyo práctico.
 - Plantilla de imagen inicial creada solo como estructura: `RX tórax sistemática`. No está conectada como flujo clínico visible.
 - Despliegue público principal en Vercel: `https://nexo-clx.vercel.app/`.
 
@@ -195,6 +195,7 @@ Si una pantalla parece una biblioteca, un dashboard o una ficha demasiado pesada
 | Anafilaxia | Activo | Ficha clínica para sospecha, pruebas mínimas, decisión de gravedad, adrenalina IM y destino. | Queda en `Urgencias` con calculadora directa de adrenalina IM por peso. |
 | Crisis asmática | Activo | Ficha clínica para gravedad, pruebas útiles, broncodilatadores, corticoide precoz, magnesio y destino. | Queda en `Respiratorio` y enlaza soporte/VMNI si cambia conducta. |
 | Agudización de EPOC | Activo | Ficha clínica para gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios, VNI y destino. | Queda en `Respiratorio` y enlaza `Cockcroft-Gault` y VMNI cuando procede. |
+| Tromboembolismo pulmonar / TEP | Activo | Ficha clínica para sospecha, pruebas, riesgo, anticoagulación, reperfusión y destino. | Queda en `Respiratorio` y enlaza `Wells TEP`, `sPESI`, `Cockcroft-Gault`, heparina por peso, `Fluidoterapia IV`, `VMNI` y `SCA` cuando procede. |
 | Sepsis / shock séptico | Activo | Ficha clínica para sospecha, pruebas, decisión, tratamiento inicial, fluidoterapia, foco y destino. | Enlaza `Fluidoterapia IV en urgencias`, `30 mL/kg sepsis`, `volumen pendiente` y `balance simple`. |
 | Procedimientos | Activa | Índice técnico operativo con `VMNI` y `Fluidoterapia IV en urgencias`. | Enlaza procedimientos desde protocolos cuando cambian conducta. |
 | VMNI | Activo | Procedimiento operativo para indicaciones, contraindicaciones, preparación, modos, ajustes, reevaluación y fracaso. | Incluye calculadoras propias de peso predicho, VT, PS, oxigenación y reevaluación. |
@@ -358,6 +359,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Anafilaxia | Cap. 190 + NICE/RCUK | 1059 | Creado | Ficha clínica para diagnóstico clínico, adrenalina IM, soporte, observación y alta segura. |
 | Crisis asmática | Cap. 40 + GINA/GEMA | 290 | Creado | Ficha clínica para gravedad, PEF/gasometría si procede, broncodilatadores, corticoide, magnesio y destino. |
 | Agudización de EPOC | Cap. 41 + GOLD/GesEPOC | 294 | Creado | Ficha clínica para gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios, VNI y destino. |
+| Tromboembolismo pulmonar / TEP | Cap. 39 + ESC TEP 2019 | 278 | Creado | Ficha clínica para sospecha, pruebas, Wells, sPESI, anticoagulación, reperfusión y destino. |
 | Neumonía adquirida en la comunidad | NICE NG250 2025 + Cap. 42 | 300 | Creado | Flujo real para sospecha, diagnóstico, CRB/CURB-65, destino, antibiótico inicial, revisión IV a 48 h y seguimiento. |
 | Sepsis / shock séptico | Cap. 107 + SSC 2021 | 640 | Creado | Ficha clínica para sospecha, lactato/cultivos, antibiótico precoz, fluidoterapia, foco, vasopresor/UCI y destino. |
 | Abdomen quirúrgico | Cap. 50 | 340 | Creado | Mini-protocolo de cirugía general para apendicitis, perforación, obstrucción, peritonitis y complicación. |
@@ -380,6 +382,8 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | HAS-BLED | Guía ESC 2024 · Fibrilación auricular | 40 | Implementado | Integrado dentro del protocolo FA para vigilar riesgo hemorrágico y también accesible desde `Cálculos`. |
 | CRB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 9 | Implementado | Integrado para orientar riesgo y destino en la valoración inicial de urgencias. |
 | CURB-65 | NICE NG250 2025 · Neumonía adquirida en la comunidad | 11 | Implementado | Integrado para orientar riesgo y destino en ámbito hospitalario. |
+| Wells TEP | ESC TEP 2019 / NICE NG158 · Tromboembolismo pulmonar | — | Implementado | Integrado para decidir dímero D frente a imagen directa en sospecha estable. |
+| sPESI | ESC TEP 2019 · Tromboembolismo pulmonar | — | Implementado | Integrado para apoyar destino en TEP confirmado estable. |
 | Killip | ESC SCA 2023 · Síndrome coronario agudo | — | Implementado | Integrado en la decisión de gravedad/destino de SCA. |
 | NIHSS | AHA/ASA 2026 · Ictus isquémico | — | Implementado | Integrado en la decisión de código ictus, gravedad y comunicación clínica. |
 | ICH Score | AHA/ASA 2022 · Ictus hemorrágico | — | Implementado | Integra Glasgow, volumen, localización, extensión intraventricular y edad para gravedad inicial. |
@@ -399,8 +403,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Escala de Cincinnati | Cap. 64 · Ictus | 446 | Pendiente | Detectada, no implementada. |
 | qSOFA / SOFA | Cap. 107 · Sepsis | 640 | Pendiente | Detectadas, no implementadas. |
 | Modelo de Wells para TVP | Cap. 36 · Enfermedad tromboembólica venosa | 261 | No aplicable por ahora | Queda fuera del alcance actual. |
-| Modelo de Wells para TEP | Cap. 39 · Tromboembolia pulmonar | 278 | No aplicable por ahora | Queda fuera del alcance actual. |
-| PESI / sPESI | Cap. 39 · Tromboembolia pulmonar | 281 | No aplicable por ahora | Queda fuera del alcance actual. |
+| PESI completo | Cap. 39 · Tromboembolia pulmonar | 281 | No aplicable por ahora | Se descarta por complejidad; sPESI cubre la decisión inicial de destino. |
 | Glasgow-Blatchford | Cap. 48 · Hemorragia digestiva alta | 329 | No aplicable por ahora | Queda fuera del alcance actual. |
 
 ### Fichas farmacológicas activas
@@ -454,6 +457,8 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | *Comentarios a la guía ESC 2021 sobre estimulación cardiaca y terapia de resincronización* | Activa · principal en bradicardias | Referencia textual del módulo de `Bradicardias`. |
 | *Comentarios a la guía ESC 2022 sobre arritmias ventriculares y prevención de muerte súbita* | Activa · principal en arritmias ventriculares | Referencia textual del módulo de `Arritmias ventriculares`. |
 | *NICE NG250: Neumonía: diagnóstico y manejo* | Activa · principal en neumonía | Referencia textual actualizada para diagnóstico, destino, antibiótico, reevaluación y seguimiento de NAC. |
+| *2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism* | Activa · principal en TEP | Referencia textual para probabilidad clínica, imagen, estratificación, anticoagulación, reperfusión y alta seleccionada. |
+| *NICE NG158: Venous thromboembolic diseases* | Activa · apoyo en ETV | Referencia textual de apoyo para diagnóstico inicial, dímero D, imagen y tratamiento anticoagulante. |
 | *Medicina de urgencias y emergencias. Guía diagnóstica y protocolos de actuación, 7.ª edición* | Activa · base práctica | Obra base textual auditada y usada por la app. |
 | *WSES Jerusalem guidelines 2020: diagnóstico y tratamiento de la apendicitis aguda* | Activa · corroboración quirúrgica | Referencia textual para abdomen quirúrgico. |
 | *WSES 2020: manejo de la diverticulitis colónica aguda en urgencias* | Activa · corroboración digestivo-infecciosa | Referencia textual para diverticulitis y dolor infeccioso-digestivo. |
@@ -501,6 +506,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | Sepsis | Cap. 107 | 640 | 640 | 665 | Auditado | Sin discrepancia. |
 | Ataque de asma | Cap. 40 | 290 | 290 | 315 | Implementado | Crisis asmática integrada como ficha clínica respiratoria. |
 | EPOC agudizada | Cap. 41 | 294 | 294 | 319 | Implementado | Agudización de EPOC integrada como ficha clínica respiratoria. |
+| Tromboembolismo pulmonar | Cap. 39 | 278 | 278 | 303 | Implementado | TEP integrado como ficha clínica respiratoria y de urgencias. |
 
 ## Bitácora del proyecto
 
@@ -529,6 +535,7 @@ La interfaz muestra referencias textuales verificables. No abre PDFs, no muestra
 | 2026-05-18 | Crisis asmática | Respiratorio / medicamentos | Se añadió Asma como protocolo independiente con gravedad, pruebas útiles, broncodilatadores, corticoide precoz, magnesio y destino. |
 | 2026-05-18 | Agudización de EPOC | Respiratorio / medicamentos | Se añadió EPOC como protocolo independiente con gasometría, oxígeno controlado, broncodilatadores, corticoide, antibiótico si criterios y VNI. |
 | 2026-05-18 | Procedimientos y VMNI | Procedimientos / cálculos | Se añadió la sección Procedimientos, el procedimiento VMNI, calculadoras técnicas y enlaces desde Asma/EPOC. |
+| 2026-05-21 | Tromboembolismo pulmonar / TEP | Respiratorio / Urgencias / cálculos | Se añadió TEP con Wells, sPESI, anticoagulación, reperfusión, destino y enlaces a CIMA/ESC/NICE. |
 
 ## Pendiente
 

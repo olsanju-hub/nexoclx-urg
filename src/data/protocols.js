@@ -181,6 +181,24 @@ const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escPeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-pe-2019',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const niceVteEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng158-vte',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const protocolCatalog = {
   'fibrilacion-auricular': {
     id: 'fibrilacion-auricular',
@@ -1094,6 +1112,53 @@ export const protocolCatalog = {
         verifiedPages: [1],
         pdfPages: [1],
         note: 'Guía española para diagnóstico y tratamiento del síndrome de agudización de EPOC.',
+      }),
+    ],
+  },
+  tep: {
+    id: 'tep',
+    title: 'Tromboembolismo pulmonar / TEP',
+    longTitle: 'Tromboembolismo pulmonar / TEP',
+    chapter: 'Cap. 39 + ESC TEP 2019',
+    section: 'Urgencias del aparato respiratorio',
+    indexPage: 278,
+    verifiedPage: 278,
+    pdfPage: 303,
+    status: 'implementado',
+    summary:
+      'Sospecha de TEP con decisión rápida entre dímero D, angio-TC, anticoagulación, reperfusión y destino.',
+    quickChecks: [
+      'Disnea brusca o inexplicada, dolor pleurítico, síncope/presíncope, taquicardia, hipoxemia, hemoptisis o signos de TVP.',
+      'Factores de riesgo: cirugía/inmovilización, cáncer, embarazo/puerperio, estrógenos, antecedente ETV, trombofilia o ingreso reciente.',
+      'Inestabilidad, shock, síncope, hipoxemia importante o dolor con mala perfusión obligan a manejar como TEP de alto riesgo hasta demostrar lo contrario.',
+      'Usar Wells TEP para probabilidad clínica si el paciente está estable; no usar dímero D para descartar en alta probabilidad.',
+      'Anticoagular si TEP probable/confirmado y no hay contraindicación; UFH si inestable, IR grave o posible reperfusión/procedimiento.',
+    ],
+    warnings: [
+      'No retrasar tratamiento de un TEP inestable por pruebas no disponibles.',
+      'No pedir dímero D para descartar TEP si la probabilidad clínica es alta.',
+      'Revisar sangrado activo, cirugía/ictus recientes, plaquetas y función renal antes de anticoagulación o trombólisis.',
+    ],
+    calculatorIds: ['wells-tep', 'spesi-tep', 'cockcroft-gault', 'vascular-heparin-dose'],
+    bibliography: [
+      referenceEntry({
+        id: 'tep-murillo-cap39',
+        indexPage: 278,
+        verifiedPage: 278,
+        pdfPage: 303,
+        note: 'Capítulo 39: clínica, pruebas, estratificación y tratamiento inicial del TEP.',
+      }),
+      escPeEntry({
+        id: 'tep-esc-2019',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Guía principal para sospecha, diagnóstico, riesgo, anticoagulación, trombólisis y alta precoz seleccionada.',
+      }),
+      niceVteEntry({
+        id: 'tep-nice-ng158',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Apoyo para estrategia diagnóstica inicial con probabilidad clínica, dímero D e imagen.',
       }),
     ],
   },

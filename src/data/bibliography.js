@@ -169,6 +169,16 @@ export const bibliographyCatalog = {
     title: 'NICE NG253: Suspected sepsis in people aged 16 or over: recognition, assessment and early management',
     shortTitle: 'NICE NG253 Sepsis',
   },
+  'esc-pe-2019': {
+    id: 'esc-pe-2019',
+    title: '2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism',
+    shortTitle: 'ESC TEP 2019',
+  },
+  'nice-ng158-vte': {
+    id: 'nice-ng158-vte',
+    title: 'NICE NG158: Venous thromboembolic diseases: diagnosis, management and thrombophilia testing',
+    shortTitle: 'NICE NG158 ETV',
+  },
 };
 
 export const createBibliographyEntry = ({

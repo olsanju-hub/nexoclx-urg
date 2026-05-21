@@ -55,6 +55,24 @@ const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escPeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-pe-2019',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const niceVteEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng158-vte',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 const wsesAppendicitisEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
   createBibliographyEntry({
     id,
@@ -350,6 +368,78 @@ export const calculateCurb65 = ({ confusion, ureaOver7, respiratoryRate30, lowBl
           : 'Riesgo bajo. NICE permite alta con alarma y revisión si no hay criterios clínicos de riesgo.',
     caution:
       'CURB-65 no sustituye la valoración de hipoxemia, sepsis, complicaciones pleurales, comorbilidad, fragilidad ni tolerancia oral.',
+  };
+};
+
+export const calculateWellsTep = ({
+  dvtSigns,
+  peMostLikely,
+  heartRateOver100,
+  immobilizationOrSurgery,
+  previousVte,
+  hemoptysis,
+  activeCancer,
+}) => {
+  const score =
+    (dvtSigns ? 3 : 0) +
+    (peMostLikely ? 3 : 0) +
+    (heartRateOver100 ? 1.5 : 0) +
+    (immobilizationOrSurgery ? 1.5 : 0) +
+    (previousVte ? 1.5 : 0) +
+    (hemoptysis ? 1 : 0) +
+    (activeCancer ? 1 : 0);
+
+  const probability =
+    score > 6 ? 'alta' : score >= 2 ? 'intermedia' : 'baja';
+  const simplified = score > 4 ? 'TEP probable' : 'TEP improbable';
+
+  return {
+    value: roundToOne(score),
+    unit: 'puntos',
+    interpretation:
+      score > 6
+        ? 'Probabilidad alta: no usar dímero D para descartar; angio-TC si estable y anticoagulación si no hay contraindicación.'
+        : score > 4
+          ? 'TEP probable: imagen directa si estable y anticoagulación si no hay contraindicación.'
+          : 'TEP improbable o probabilidad baja/intermedia: dímero D si paciente estable; angio-TC si positivo o persiste alta sospecha.',
+    fields: {
+      'Modelo 3 niveles': probability,
+      'Modelo 2 niveles': simplified,
+      Conducta: score > 4 ? 'Imagen directa / tratar si probable.' : 'Dímero D si estable y no alta probabilidad.',
+    },
+    caution: 'No aplica a TEP inestable: si hay shock/hipotensión, monitorizar, eco urgente y tratar sin esperar dímero D.',
+  };
+};
+
+export const calculateSpesiTep = ({
+  ageOver80,
+  cancer,
+  chronicCardiopulmonaryDisease,
+  heartRate110,
+  systolicBloodPressureUnder100,
+  oxygenSaturationUnder90,
+}) => {
+  const score = [
+    ageOver80,
+    cancer,
+    chronicCardiopulmonaryDisease,
+    heartRate110,
+    systolicBloodPressureUnder100,
+    oxygenSaturationUnder90,
+  ].filter(Boolean).length;
+
+  return {
+    value: score,
+    unit: 'puntos',
+    interpretation:
+      score === 0
+        ? 'Bajo riesgo por sPESI. Valorar alta/ambulatorio solo si TEP estable, sin hipoxemia, sin sangrado, tratamiento y seguimiento garantizados.'
+        : 'Mayor riesgo por sPESI. Valorar observación/ingreso y estratificación con VD, biomarcadores y contexto clínico.',
+    fields: {
+      Riesgo: score === 0 ? 'bajo' : 'no bajo',
+      Conducta: score === 0 ? 'Puede apoyar manejo ambulatorio seleccionado.' : 'No usar para alta directa.',
+    },
+    caution: 'sPESI no sustituye Hestia, soporte domiciliario, riesgo hemorrágico, función renal ni juicio clínico.',
   };
 };
 
@@ -1286,6 +1376,52 @@ export const calculatorCatalog = {
       }),
     ],
   },
+  'wells-tep': {
+    id: 'wells-tep',
+    title: 'Wells TEP',
+    shortTitle: 'Wells TEP',
+    moduleId: 'tep',
+    block: 'Tromboembolismo pulmonar',
+    chapter: 'ESC TEP 2019 + NICE NG158',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Probabilidad clínica pretest para decidir dímero D o imagen directa en sospecha estable de TEP.',
+    bibliography: [
+      escPeEntry({
+        id: 'wells-tep-esc',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'ESC recomienda valorar probabilidad clínica antes de dímero D o imagen en sospecha de TEP.',
+      }),
+      niceVteEntry({
+        id: 'wells-tep-nice',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'NICE usa puntuación de Wells para orientar dímero D o imagen en sospecha de TEP.',
+      }),
+    ],
+  },
+  'spesi-tep': {
+    id: 'spesi-tep',
+    title: 'sPESI',
+    shortTitle: 'sPESI',
+    moduleId: 'tep',
+    block: 'Tromboembolismo pulmonar',
+    chapter: 'ESC TEP 2019',
+    verifiedPage: 1,
+    pdfPage: 1,
+    status: 'implementado',
+    summary: 'Estratificación pronóstica simple para apoyar destino en TEP confirmado estable.',
+    bibliography: [
+      escPeEntry({
+        id: 'spesi-tep-esc',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'ESC integra sPESI/PESI en la estratificación de riesgo y selección de bajo riesgo.',
+      }),
+    ],
+  },
   killip: {
     id: 'killip',
     title: 'Killip',
@@ -1899,17 +2035,17 @@ export const calculationAudit = [
     chapter: 'Cap. 39 · Tromboembolia pulmonar',
     verifiedPage: 278,
     pdfPage: 303,
-    status: 'no aplicable por ahora',
-    note: 'Escala cuantificable detectada, fuera del alcance actual.',
+    status: 'implementado',
+    note: 'Integrado en TEP para decidir dímero D frente a imagen directa.',
   },
   {
-    id: 'pesi',
-    title: 'PESI / sPESI',
+    id: 'spesi-tep',
+    title: 'sPESI',
     chapter: 'Cap. 39 · Tromboembolia pulmonar',
     verifiedPage: 281,
     pdfPage: 306,
-    status: 'no aplicable por ahora',
-    note: 'Herramienta pronóstica de TEP detectada en el capítulo.',
+    status: 'implementado',
+    note: 'Integrado en TEP para apoyar bajo riesgo y destino; PESI completo se descarta por complejidad.',
   },
   {
     id: 'glasgow-blatchford',

@@ -30,6 +30,7 @@ import {
   calculateSepsisThirtyMlKg,
   calculateSeizureDose,
   calculateSimpleFluidBalance,
+  calculateSpesiTep,
   calculateStrokeThrombolysisDose,
   calculateVascularHeparinDose,
   calculateVmniPao2Fio2,
@@ -38,6 +39,7 @@ import {
   calculateVmniReassessment,
   calculateVmniSpo2Fio2,
   calculateVmniTidalVolume,
+  calculateWellsTep,
   getCalculator,
   implementedCalculators,
 } from './data/calculators';
@@ -103,6 +105,23 @@ const initialCalculatorInputs = {
     respiratoryRate30: false,
     lowBloodPressure: false,
     age65: false,
+  },
+  'wells-tep': {
+    dvtSigns: false,
+    peMostLikely: false,
+    heartRateOver100: false,
+    immobilizationOrSurgery: false,
+    previousVte: false,
+    hemoptysis: false,
+    activeCancer: false,
+  },
+  'spesi-tep': {
+    ageOver80: false,
+    cancer: false,
+    chronicCardiopulmonaryDisease: false,
+    heartRate110: false,
+    systolicBloodPressureUnder100: false,
+    oxygenSaturationUnder90: false,
   },
   killip: {
     classValue: '1',
@@ -265,6 +284,14 @@ const getCalculatorResult = (calculatorId, values) => {
 
   if (calculatorId === 'curb-65') {
     return calculateCurb65(values);
+  }
+
+  if (calculatorId === 'wells-tep') {
+    return calculateWellsTep(values);
+  }
+
+  if (calculatorId === 'spesi-tep') {
+    return calculateSpesiTep(values);
   }
 
   if (calculatorId === 'killip') {
@@ -493,6 +520,7 @@ const protocolSearchAliases = {
   anafilaxia: ['reaccion alergica', 'alergia grave', 'adrenalina', 'shock anafilactico', 'urticaria', 'angioedema', 'broncoespasmo'],
   'asma-exacerbacion': ['asma', 'crisis asmatica', 'exacerbacion asmatica', 'broncoespasmo', 'sibilancias', 'disnea', 'salbutamol', 'prednisona', 'ipratropio'],
   'epoc-agudizacion': ['epoc', 'agudizacion epoc', 'exacerbacion epoc', 'aepoc', 'disnea', 'broncoespasmo', 'hipercapnia', 'insuficiencia respiratoria', 'vni', 'antibiotico epoc'],
+  tep: ['tep', 'tromboembolismo pulmonar', 'embolia pulmonar', 'disnea', 'dolor pleuritico', 'hemoptisis', 'sincope', 'taquicardia', 'hipoxemia', 'dimero d', 'angio-tc', 'anticoagulacion', 'trombolisis'],
   sepsis: ['sepsis', 'shock septico', 'infeccion grave', 'lactato', 'hipotension', 'hipoperfusion', 'bacteriemia', 'antibiotico', 'fluidoterapia', 'vasopresores'],
   'dolor-abdomen-quirurgico': ['dolor abdominal', 'abdomen agudo', 'apendicitis', 'peritonismo', 'obstruccion', 'cirugia general'],
   'dolor-hepatobiliar-pancreatico': ['dolor abdominal', 'dolor epigastrico', 'hipocondrio derecho', 'colico biliar', 'colecistitis', 'colangitis', 'pancreatitis'],
@@ -1212,6 +1240,35 @@ const CalculatorPanel = ({ calculatorId, values, onChange, onOpenDetail, compact
               onChange={(value) => onChange('lowBloodPressure', value)}
             />
             <BooleanField checked={values.age65} label="Edad ≥ 65 años" onChange={(value) => onChange('age65', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'wells-tep' ? (
+        <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={values.dvtSigns} label="Signos clínicos de TVP (3)" onChange={(value) => onChange('dvtSigns', value)} />
+            <BooleanField checked={values.peMostLikely} label="TEP más probable que alternativa (3)" onChange={(value) => onChange('peMostLikely', value)} />
+            <BooleanField checked={values.heartRateOver100} label="FC > 100/min (1,5)" onChange={(value) => onChange('heartRateOver100', value)} />
+            <BooleanField checked={values.immobilizationOrSurgery} label="Inmovilización/cirugía reciente (1,5)" onChange={(value) => onChange('immobilizationOrSurgery', value)} />
+            <BooleanField checked={values.previousVte} label="TVP/TEP previo (1,5)" onChange={(value) => onChange('previousVte', value)} />
+            <BooleanField checked={values.hemoptysis} label="Hemoptisis (1)" onChange={(value) => onChange('hemoptysis', value)} />
+            <BooleanField checked={values.activeCancer} label="Cáncer activo (1)" onChange={(value) => onChange('activeCancer', value)} />
+          </div>
+          <CalculatorResult result={result} />
+        </div>
+      ) : null}
+
+      {calculatorId === 'spesi-tep' ? (
+        <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <BooleanField checked={values.ageOver80} label="Edad > 80 años" onChange={(value) => onChange('ageOver80', value)} />
+            <BooleanField checked={values.cancer} label="Cáncer" onChange={(value) => onChange('cancer', value)} />
+            <BooleanField checked={values.chronicCardiopulmonaryDisease} label="Enfermedad cardiopulmonar crónica" onChange={(value) => onChange('chronicCardiopulmonaryDisease', value)} />
+            <BooleanField checked={values.heartRate110} label="FC ≥ 110/min" onChange={(value) => onChange('heartRate110', value)} />
+            <BooleanField checked={values.systolicBloodPressureUnder100} label="PAS < 100 mmHg" onChange={(value) => onChange('systolicBloodPressureUnder100', value)} />
+            <BooleanField checked={values.oxygenSaturationUnder90} label="SatO2 < 90%" onChange={(value) => onChange('oxygenSaturationUnder90', value)} />
           </div>
           <CalculatorResult result={result} />
         </div>

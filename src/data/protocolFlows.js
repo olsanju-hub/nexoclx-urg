@@ -4177,6 +4177,261 @@ const buildCopdExacerbationFlow = (protocol) => {
   };
 };
 
+const buildPulmonaryEmbolismFlow = (protocol) => ({
+  ...genericFlow(protocol),
+  layout: 'decision-panel',
+  panelSections: [
+    {
+      id: 'sospecha',
+      title: 'Sospecha',
+      summary: 'Disnea, dolor pleurítico, síncope, hipoxemia o TVP: detectar rápido el TEP inestable.',
+      points: [
+        'Disnea brusca o inexplicada, dolor torácico pleurítico, síncope/presíncope, taquicardia o hipoxemia.',
+        'Hemoptisis, dolor pleurítico con roce, ansiedad súbita o deterioro respiratorio sin explicación alternativa clara.',
+        'Buscar signos de TVP: dolor, aumento de perímetro, edema unilateral o trayecto venoso doloroso.',
+        'Factores de riesgo: cirugía/inmovilización, cáncer, embarazo/puerperio, estrógenos, antecedente ETV, trombofilia o ingreso reciente.',
+        'Alarma: hipotensión, shock, síncope, hipoxemia importante o dolor torácico con mala perfusión.',
+      ],
+      detailNodes: [
+        {
+          id: 'tep-alto-riesgo-sospecha',
+          title: 'Banderas rojas',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'Hipotensión, shock, parada, síncope o deterioro respiratorio franco.',
+            'Hipoxemia importante, cianosis, trabajo respiratorio alto o necesidad de soporte.',
+            'Dolor torácico con inestabilidad: descartar SCA, disección, neumotórax y TEP alto riesgo en paralelo.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'pruebas',
+      title: 'Pruebas',
+      summary: 'Probabilidad clínica primero; dímero D solo si baja/intermedia y estable; angio-TC si alta o positivo.',
+      points: [
+        'Constantes, SatO2, monitorización si gravedad, ECG y vía IV si sospecha relevante.',
+        'Rx tórax como apoyo/diferencial; no descarta TEP.',
+        'Analítica: hemograma, bioquímica, función renal, iones y coagulación si anticoagulación/procedimiento.',
+        'Gasometría si hipoxemia, gravedad o duda ventilatoria; troponina y BNP/NT-proBNP si estratificación o VD.',
+        'Dímero D solo en probabilidad baja/intermedia y estable; angio-TC si probabilidad alta o dímero D positivo.',
+      ],
+      detailNodes: [
+        {
+          id: 'tep-pruebas-imagen',
+          title: 'Imagen y cama crítica',
+          type: 'step',
+          severity: 'warning',
+          items: [
+            'Angio-TC pulmonar si probabilidad alta o dímero D positivo; comprobar función renal antes de contraste si la situación lo permite.',
+            'Eco-doppler venoso si hay sospecha de TVP o no se puede realizar angio-TC.',
+            'Ecocardiografía urgente si shock/inestabilidad o sospecha de TEP de alto riesgo; no retrasa tratamiento si el paciente se deteriora.',
+          ],
+        },
+        {
+          id: 'tep-no-dimero-alta',
+          title: 'No usar mal el dímero D',
+          type: 'alert',
+          severity: 'danger',
+          items: [
+            'No pedir dímero D para descartar TEP con alta probabilidad clínica.',
+            'No esperar dímero D si el paciente está inestable o precisa reperfusión/soporte.',
+            'Un dímero D positivo no confirma TEP: obliga a imagen si cambia conducta.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'decision',
+      title: 'Decisión',
+      summary: 'Separar TEP alto riesgo de estable; usar Wells para diagnóstico y sPESI para destino si confirmado.',
+      points: [
+        'TEP inestable/alto riesgo: hipotensión, shock, parada o deterioro con disfunción VD probable; activar UCI y reperfusión.',
+        'TEP estable con riesgo intermedio: normotenso, pero VD/biomarcadores alterados o sPESI ≥1; observación/ingreso monitorizado.',
+        'TEP estable bajo riesgo: sPESI 0, sin hipoxemia ni sangrado y con tratamiento/seguimiento posible.',
+        'Sospecha baja/intermedia: Wells orienta dímero D; sospecha alta: imagen directa y anticoagulación si no contraindicación.',
+        'Embarazo/puerperio o alto riesgo de sangrado: consultar circuito específico y evitar automatismos.',
+      ],
+      actions: [
+        calculatorAction('wells-tep'),
+        calculatorAction('spesi-tep'),
+        calculatorAction('cockcroft-gault'),
+        protocolAction('sindrome-coronario-agudo', 'Ver SCA si dolor torácico diferencial'),
+      ],
+      detailNodes: [
+        {
+          id: 'tep-sangrado',
+          title: 'Antes de anticoagular o fibrinolisar',
+          type: 'decision',
+          severity: 'warning',
+          items: [
+            'Revisar sangrado activo, cirugía reciente, ictus reciente, plaquetas bajas, coagulopatía o punción no compresible.',
+            'Función renal condiciona HBPM/ACOD y contraste; usar Cockcroft-Gault si dudas.',
+            'Si contraindicación absoluta a anticoagulación, valorar filtro cava/circuito especializado según disponibilidad.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'tratamiento',
+      title: 'Tratamiento',
+      summary: 'Soporte inicial, anticoagulación si probable/confirmado y reperfusión si TEP alto riesgo.',
+      points: [
+        'ABCDE, oxígeno si hipoxemia, monitorización si gravedad, vía IV y analgesia si dolor.',
+        'Anticoagular si TEP probable/confirmado y no hay contraindicación; no esperar a imagen si alta/intermedia probabilidad y demora.',
+        'HBPM si estable y función renal compatible; UFH IV si inestable, IR grave o posible trombólisis/catéter/cirugía.',
+        'TEP alto riesgo con shock/hipotensión persistente: activar UCI y valorar trombólisis sistémica si no contraindicada.',
+        'Fluidoterapia solo con cautela si hipoperfusión; VMNI/soporte ventilatorio solo si insuficiencia respiratoria y vigilancia estrecha.',
+      ],
+      actions: [
+        calculatorAction('vascular-heparin-dose'),
+        calculatorAction('cockcroft-gault'),
+        procedureAction('fluidoterapia-iv', 'Ver Fluidoterapia IV con cautela'),
+        procedureAction('vmni', 'Ver VMNI si soporte respiratorio'),
+      ],
+      treatmentGroups: [
+        {
+          id: 'tep-soporte',
+          title: 'Medidas iniciales',
+          cards: [
+            {
+              id: 'tep-abcde',
+              title: 'ABCDE y soporte',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Prioridad en TEP inestable o hipoxémico.',
+              items: [
+                'Intervención: monitorización, vía IV, SatO2 continua si gravedad y analgesia si dolor.',
+                'Dosis: oxígeno titulado si hipoxemia; evitar hiperoxia innecesaria.',
+                'Vía: gafas, mascarilla o soporte ventilatorio según trabajo respiratorio.',
+                'Evitar: retrasar UCI/reperfusión por pruebas no disponibles en shock.',
+                'Reevaluar: TA, SatO2, FR, perfusión, dolor, lactato/gasometría y necesidad de vasopresor.',
+              ],
+            },
+            {
+              id: 'tep-fluidos',
+              title: 'Fluidoterapia con cautela',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'No es rutina: el exceso puede empeorar el ventrículo derecho.',
+              items: [
+                'Intervención: bolos pequeños solo si hipoperfusión y sospecha de bajo precarga real.',
+                'Dosis: reevaluar tras cada bolo; no perseguir 30 mL/kg como en sepsis.',
+                'Evitar: sobrecarga si VD dilatado, congestión o empeora oxigenación.',
+                'Reevaluar: TA, perfusión, SatO2, crepitantes, ecocardio si disponible y respuesta clínica.',
+              ],
+              procedureId: 'fluidoterapia-iv',
+            },
+          ],
+        },
+        {
+          id: 'tep-anticoagulacion',
+          title: 'Anticoagulación',
+          cards: [
+            {
+              id: 'tep-enoxaparina',
+              title: 'Enoxaparina',
+              type: 'treatment',
+              severity: 'info',
+              summary: 'HBPM de elección práctica si TEP estable y función renal compatible.',
+              medication: 'Anticoagulación TEP estable',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/82491/FT_82491.html',
+              items: [
+                'Fármaco/intervención: enoxaparina.',
+                'Dosis: 1 mg/kg SC cada 12 h; alternativa 1,5 mg/kg SC cada 24 h en pacientes no complicados y bajo riesgo de recurrencia.',
+                'Vía: subcutánea.',
+                'Ajuste renal: si ClCr 15-30 mL/min, usar intervalo reducido según ficha; no recomendada si ClCr <15 mL/min fuera de indicación especializada.',
+                'Evitar: sangrado activo, antecedente de HIT reciente, TEP que probablemente requiera trombólisis/cirugía o riesgo hemorrágico mayor.',
+                'Reevaluar: sangrado, plaquetas, función renal, peso real y transición a anticoagulación oral si procede.',
+              ],
+            },
+            {
+              id: 'tep-heparina-sodica',
+              title: 'Heparina sódica IV',
+              type: 'treatment',
+              severity: 'warning',
+              summary: 'Preferible si inestabilidad, IR grave o posible reperfusión/procedimiento.',
+              medication: 'Anticoagulación ajustable',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/58691/FT_58691.html',
+              calculatorId: 'vascular-heparin-dose',
+              items: [
+                'Fármaco/intervención: heparina sódica no fraccionada.',
+                'Dosis: bolo IV 80 UI/kg; en TEP grave puede aumentarse hasta 120 UI/kg según ficha/protocolo local.',
+                'Vía: IV bolo y perfusión ajustada a aPTT/anti-Xa según circuito local.',
+                'Frecuencia/perfusión: usar perfusión ajustable y controles de coagulación.',
+                'Evitar: sangrado activo, HIT o contraindicación de anticoagulación.',
+                'Reevaluar: aPTT/anti-Xa, plaquetas, sangrado, TA, perfusión y necesidad de reperfusión.',
+              ],
+            },
+          ],
+        },
+        {
+          id: 'tep-reperfusion',
+          title: 'TEP alto riesgo / reperfusión',
+          cards: [
+            {
+              id: 'tep-alteplasa',
+              title: 'Alteplasa',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Trombólisis sistémica para embolia pulmonar aguda masiva/alto riesgo si no contraindicada.',
+              medication: 'Fibrinólisis TEP alto riesgo',
+              sourceUrl: 'https://cima.aemps.es/cima/dochtml/ft/59494/FT_59494.html',
+              items: [
+                'Fármaco/intervención: alteplasa IV.',
+                'Dosis: si peso ≥65 kg, 10 mg bolo IV en 1-2 min y 90 mg en perfusión IV durante 2 h; máximo total 100 mg.',
+                'Dosis si <65 kg: 10 mg bolo IV y perfusión durante 2 h hasta máximo total 1,5 mg/kg.',
+                'Vía: intravenosa; reconstituida para uso inmediato.',
+                'Evitar: sangrado activo, ictus/cirugía reciente, lesión SNC, coagulopatía o contraindicación mayor de fibrinólisis.',
+                'Reevaluar: TA, SatO2, perfusión, sangrado y reinicio de heparina cuando aPTT sea seguro según ficha.',
+              ],
+            },
+            {
+              id: 'tep-cateter-cirugia',
+              title: 'Catéter / embolectomía',
+              type: 'treatment',
+              severity: 'danger',
+              summary: 'Alternativa si trombólisis contraindicada o fracaso, según disponibilidad.',
+              items: [
+                'Intervención: activar UCI/cardiología/neumología/radiología intervencionista o cirugía según circuito.',
+                'Indicación: TEP alto riesgo con contraindicación de trombólisis, fracaso o deterioro pese a tratamiento.',
+                'Evitar: retrasar soporte hemodinámico y traslado a centro útil si no existe recurso local.',
+                'Reevaluar: estabilidad, sangrado, VD, lactato y necesidad de soporte circulatorio.',
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'destino',
+      title: 'Destino',
+      summary: 'Alta solo si bajo riesgo y tratamiento organizado; UCI si shock, trombólisis o deterioro.',
+      points: [
+        'Alta/ambulatorio solo si bajo riesgo, estable, sin hipoxemia, sin sangrado, buen soporte y seguimiento claro.',
+        'Observación/ingreso si dolor, hipoxemia, comorbilidad, riesgo intermedio, duda diagnóstica, sangrado o mal soporte.',
+        'UCI si shock, hipotensión, vasopresor, trombólisis, hipoxemia grave, disfunción VD grave, deterioro o parada.',
+        'Seguimiento: anticoagulación organizada, control clínico, signos de alarma y estudio etiológico posterior si procede.',
+        'Volver por disnea o dolor progresivo, síncope, hemoptisis, sangrado, melena, cefalea brusca o empeoramiento general.',
+      ],
+      detailNodes: [
+        {
+          id: 'tep-alta-segura',
+          title: 'Alta segura',
+          type: 'decision',
+          severity: 'success',
+          items: [
+            'Confirmar estabilidad sostenida, SatO2 adecuada, sin disfunción grave de VD, sin sangrado y sin contraindicación al tratamiento.',
+            'Asegurar primera dosis, receta/plan de anticoagulación, educación sobre sangrado y revisión según circuito local.',
+            'No dar alta si embarazo/puerperio, cáncer inestable, mal soporte, hipoxemia, dolor no controlado o duda diagnóstica relevante.',
+          ],
+        },
+      ],
+    },
+  ],
+});
+
 const buildAcuteHeartFailureFlow = (protocol) => {
   const medicationGroups = asArray(protocol.medicationGroups);
 
@@ -4586,6 +4841,10 @@ const buildFlow = (protocol) => {
 
   if (protocol.id === 'epoc-agudizacion') {
     return buildCopdExacerbationFlow(protocol);
+  }
+
+  if (protocol.id === 'tep') {
+    return buildPulmonaryEmbolismFlow(protocol);
   }
 
   if (protocol.id === 'sepsis') {

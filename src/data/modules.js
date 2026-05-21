@@ -181,6 +181,24 @@ const niceNg250Entry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
     note,
   });
 
+const escPeEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'esc-pe-2019',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
+const niceVteEntry = ({ id, verifiedPages = [], pdfPages = [], note }) =>
+  createBibliographyEntry({
+    id,
+    referenceId: 'nice-ng158-vte',
+    verifiedPages,
+    pdfPages,
+    note,
+  });
+
 export const coreReference = bibliographyCatalog.murillo7;
 
 export const clinicalIndexAudit = [
@@ -370,6 +388,17 @@ export const clinicalIndexAudit = [
     pdfPage: 665,
     status: 'auditado',
     note: 'Sin discrepancia entre índice y arranque real.',
+  },
+  {
+    id: 'tep',
+    title: 'Tromboembolismo pulmonar',
+    chapter: 'Cap. 39',
+    section: 'Urgencias del aparato respiratorio',
+    indexPage: 278,
+    verifiedPage: 278,
+    pdfPage: 303,
+    status: 'implementado',
+    note: 'TEP integrado como ficha clínica respiratoria y de urgencias.',
   },
   {
     id: 'neumonia-comunidad',
@@ -866,6 +895,41 @@ export const motivoConsultaModules = [
     ],
   },
   {
+    id: 'tep',
+    title: 'Tromboembolismo pulmonar / TEP',
+    shortTitle: 'TEP',
+    chapter: 'Cap. 39 + ESC TEP 2019',
+    section: 'Respiratorio',
+    specialtyId: 'respiratorio',
+    relatedSpecialties: ['urgencias', 'cardiologia', 'interna'],
+    verifiedPage: 278,
+    pdfPage: 303,
+    status: 'implementado',
+    implemented: true,
+    summary: 'Sospecha, dímero D o angio-TC, riesgo, anticoagulación, reperfusión y destino del TEP.',
+    bibliography: [
+      referenceEntry({
+        id: 'tep-murillo-module',
+        indexPage: 278,
+        verifiedPage: 278,
+        pdfPage: 303,
+        note: 'Capítulo base de tromboembolia pulmonar en urgencias.',
+      }),
+      escPeEntry({
+        id: 'tep-esc-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Referencia principal para diagnóstico, estratificación de riesgo, anticoagulación y reperfusión.',
+      }),
+      niceVteEntry({
+        id: 'tep-nice-module',
+        verifiedPages: [1],
+        pdfPages: [1],
+        note: 'Apoyo para diagnóstico inicial, dímero D, imagen y anticoagulación en enfermedad tromboembólica venosa.',
+      }),
+    ],
+  },
+  {
     id: 'sepsis',
     title: 'Sepsis / shock séptico',
     shortTitle: 'Sepsis',
@@ -1144,6 +1208,20 @@ export const bibliographyBaseUsed = [
     shortTitle: bibliographyCatalog['nice-ng250-2025'].shortTitle,
     status: 'activa · principal en neumonía',
     note: 'Guía principal actualizada para neumonía: diagnóstico, lugar de cuidados, antibióticos, reevaluación y seguimiento.',
+  },
+  {
+    id: 'esc-pe-2019',
+    title: bibliographyCatalog['esc-pe-2019'].title,
+    shortTitle: bibliographyCatalog['esc-pe-2019'].shortTitle,
+    status: 'activa · principal en TEP',
+    note: 'Guía principal para diagnóstico, estratificación, anticoagulación y reperfusión del tromboembolismo pulmonar.',
+  },
+  {
+    id: 'nice-ng158-vte',
+    title: bibliographyCatalog['nice-ng158-vte'].title,
+    shortTitle: bibliographyCatalog['nice-ng158-vte'].shortTitle,
+    status: 'activa · apoyo en ETV',
+    note: 'Referencia de apoyo para diagnóstico y manejo de enfermedad tromboembólica venosa.',
   },
   {
     id: 'wses-appendicitis-2020',
