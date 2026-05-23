@@ -520,7 +520,7 @@ const protocolSearchAliases = {
   anafilaxia: ['reaccion alergica', 'alergia grave', 'adrenalina', 'shock anafilactico', 'urticaria', 'angioedema', 'broncoespasmo'],
   'asma-exacerbacion': ['asma', 'crisis asmatica', 'exacerbacion asmatica', 'broncoespasmo', 'sibilancias', 'disnea', 'salbutamol', 'prednisona', 'ipratropio'],
   'epoc-agudizacion': ['epoc', 'agudizacion epoc', 'exacerbacion epoc', 'aepoc', 'disnea', 'broncoespasmo', 'hipercapnia', 'insuficiencia respiratoria', 'vni', 'antibiotico epoc'],
-  tep: ['tep', 'tromboembolismo pulmonar', 'embolia pulmonar', 'disnea', 'dolor pleuritico', 'hemoptisis', 'sincope', 'taquicardia', 'hipoxemia', 'dimero d', 'angio-tc', 'anticoagulacion', 'trombolisis'],
+  tep: ['tep', 'tromboembolismo pulmonar', 'embolia pulmonar', 'disnea', 'dolor pleuritico', 'dolor pleurítico', 'hemoptisis', 'sincope', 'síncope', 'taquicardia', 'hipoxemia', 'dimero d', 'dímero d', 'dimero', 'dímero', 'angio-tc', 'anticoagulacion', 'anticoagulación', 'trombolisis', 'trombólisis'],
   sepsis: ['sepsis', 'shock septico', 'infeccion grave', 'lactato', 'hipotension', 'hipoperfusion', 'bacteriemia', 'antibiotico', 'fluidoterapia', 'vasopresores'],
   'dolor-abdomen-quirurgico': ['dolor abdominal', 'abdomen agudo', 'apendicitis', 'peritonismo', 'obstruccion', 'cirugia general'],
   'dolor-hepatobiliar-pancreatico': ['dolor abdominal', 'dolor epigastrico', 'hipocondrio derecho', 'colico biliar', 'colecistitis', 'colangitis', 'pancreatitis'],
