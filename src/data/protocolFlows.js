@@ -4,7 +4,7 @@ import { protocolList } from './protocols';
 
 const PRIMARY_SECTION_TITLES = {
   definition: 'Sospecha',
-  orders: 'Pruebas',
+  orders: 'Valoración',
   findings: 'Decisión',
   treatment: 'Tratamiento',
   followUp: 'Destino',
@@ -702,7 +702,7 @@ const buildPneumoniaFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Confirmar neumonía y pedir solo pruebas que cambian gravedad, destino o antibiótico.',
       points: [
         'Constantes completas: FR, SatO2, TA, FC, temperatura y estado mental.',
@@ -924,7 +924,7 @@ const buildSurgicalAbdomenFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Analítica dirigida e imagen solo si cambia cirugía, ingreso o diagnóstico diferencial.',
       points: [
         'Hemograma, bioquímica con creatinina/electrolitos, perfil hepático si procede y PCR/procalcitonina si sospecha infección.',
@@ -1215,7 +1215,7 @@ const buildHepatobiliaryPancreaticFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Confirmar patrón biliar/pancreático y detectar infección, obstrucción o gravedad.',
       points: [
         'Hemograma, glucosa, urea/creatinina, iones, PCR/procalcitonina si infección, y perfil hepático con bilirrubina directa.',
@@ -1474,7 +1474,7 @@ const buildUrinaryAbdominalPainFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Orina, función renal e imagen solo si cambia alta, antibiótico, contraste o derivación.',
       points: [
         'Tira/sedimento de orina; urocultivo si fiebre, ITU alta, complicada, embarazo, sepsis o antibiótico.',
@@ -1783,7 +1783,7 @@ const buildGynecologicAbdominalPainFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Test de embarazo, hemograma y ecografía si cambian cirugía, ingreso o antibiótico.',
       points: [
         'Test de embarazo obligatorio si posibilidad de gestación; β-HCG si positivo o duda diagnóstica.',
@@ -2035,7 +2035,7 @@ const buildVascularAbdominalPainFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Confirmar perfusión y pedir angio-TC sin retrasar soporte ni aviso especializado.',
       points: [
         'Monitorización, constantes, ECG si FA/riesgo cardiaco, dos vías venosas si inestable.',
@@ -2293,7 +2293,7 @@ const buildInfectiousDigestiveAbdominalPainFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Analítica y microbiología solo si cambian antibiótico, ingreso o aislamiento.',
       points: [
         'Constantes, hidratación, diuresis y exploración abdominal seriada si dolor localizado.',
@@ -2566,7 +2566,7 @@ const guardiaFlow = (protocol) => {
         children: [
           {
             id: 'pruebas',
-            title: 'Pruebas',
+            title: 'Valoración',
             type: 'step',
             items: guardia.pruebas,
           },
@@ -2715,7 +2715,7 @@ const buildFaDecisionPanelFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Confirmar ritmo y pedir solo datos que cambian frecuencia, cardioversión, anticoagulación o destino.',
         points: [
           'ECG 12 derivaciones y tira de ritmo mínimo 30 s; monitor si rápida, síntomas o tratamiento IV.',
@@ -2837,7 +2837,7 @@ const buildScaDecisionPanelFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'ECG inmediato, monitorización, troponina seriada si no hay SCACEST y analítica para anticoagular/reperfusión.',
         points: [
           'ECG 12 derivaciones en < 10 min; repetir si dolor persiste o el ECG inicial no es diagnóstico.',
@@ -2952,7 +2952,7 @@ const buildHtaDecisionPanelFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Pedir pruebas dirigidas a daño de órgano: corazón, cerebro, riñón, retina, aorta y embarazo.',
         points: [
           'ECG y Rx tórax si dolor torácico, disnea, insuficiencia cardíaca o sospecha cardiovascular.',
@@ -3064,7 +3064,7 @@ const buildBradyDecisionPanelFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'ECG y monitorización primero; analítica dirigida a causas reversibles que cambian tratamiento.',
         points: [
           'ECG 12 derivaciones y tira de ritmo; monitor, PA, SatO2 y accesos IV si síntomas o bloqueo alto.',
@@ -3176,7 +3176,7 @@ const buildVentricularDecisionPanelFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Monitor y ECG si no retrasa electricidad; analítica dirigida a isquemia, iones y causas reversibles.',
         points: [
           'Monitor/desfibrilador, PA, SatO2, accesos IV/IO y ECG 12 derivaciones si el paciente lo permite.',
@@ -3289,7 +3289,7 @@ const buildIschemicStrokeDecisionPanelFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'TAC sin contraste para descartar sangrado; angio-TC si sospecha gran vaso y no retrasa reperfusión.',
         points: [
           'Glucemia capilar, constantes, ECG/monitor y SatO2; dos accesos si candidato a reperfusión.',
@@ -3416,7 +3416,7 @@ const buildHemorrhagicStrokeDecisionPanelFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'TAC urgente, coagulación y datos para revertir anticoagulación y decidir neurocirugía/UCI.',
         points: [
           'TAC craneal sin contraste urgente; angio-TC si sospecha vascular, expansión, aneurisma o malformación.',
@@ -3543,7 +3543,7 @@ const buildSeizureEmergencyFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Glucemia y constantes primero; analítica, tóxicos, niveles y neuroimagen si cambian conducta.',
         points: [
           'Glucemia capilar inmediata, constantes, SatO2 y ECG si síncope/arrítmico, tóxicos, QT o comorbilidad lo sugieren.',
@@ -3720,7 +3720,7 @@ const buildAnaphylaxisFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Diagnóstico clínico: constantes y monitorización si gravedad; no retrasar adrenalina.',
         points: [
           'Diagnóstico clínico: no esperar analítica ni triptasa para tratar.',
@@ -3882,7 +3882,7 @@ const buildAsthmaExacerbationFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Constantes y SatO2 siempre; PEF si no retrasa tratamiento; gasometría e imagen solo si cambian conducta.',
         points: [
           'Constantes, SatO2, frecuencia respiratoria y cardiaca; PEF si disponible y no retrasa tratamiento.',
@@ -4046,7 +4046,7 @@ const buildCopdExacerbationFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Constantes, SatO2 y gasometría si gravedad; Rx/ECG/analítica para descartar complicaciones.',
         points: [
           'Constantes, SatO2, frecuencia respiratoria y trabajo respiratorio desde la llegada.',
@@ -4208,7 +4208,7 @@ const buildPulmonaryEmbolismFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Probabilidad clínica primero; dímero D solo si baja/intermedia y estable; angio-TC si alta o positivo.',
       points: [
         'Constantes, SatO2, monitorización si gravedad, ECG y vía IV si sospecha relevante.',
@@ -4511,7 +4511,7 @@ const buildAcuteHeartFailureFlow = (protocol) => {
       },
       {
         id: 'pruebas',
-        title: 'Pruebas',
+        title: 'Valoración',
         summary: 'Confirmar congestión, detectar desencadenante y medir respiratorio, renal, electrolitos y perfusión.',
         points: [
           'Constantes, SatO2, monitorización y ECG 12 derivaciones.',
@@ -4685,7 +4685,7 @@ const buildSepsisFlow = (protocol) => ({
     },
     {
       id: 'pruebas',
-      title: 'Pruebas',
+      title: 'Valoración',
       summary: 'Medir gravedad, buscar foco y tomar cultivos sin retrasar antibiótico urgente.',
       points: [
         'Constantes completas y monitorización si gravedad: TA/PAM, FC, FR, SatO2, temperatura y estado mental.',

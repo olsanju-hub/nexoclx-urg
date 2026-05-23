@@ -392,7 +392,7 @@ const PautaBlock = ({ card, onCalculatorOpen }) => {
 
 const PANEL_SECTION_MAP = [
   { sourceId: 'que-es', id: 'sospecha', title: 'Sospecha' },
-  { sourceId: 'que-pido', id: 'pruebas', title: 'Pruebas' },
+  { sourceId: 'que-pido', id: 'pruebas', title: 'Valoración' },
   { sourceId: 'que-espero', id: 'decision', title: 'Decisión' },
   { sourceId: 'tratamiento', id: 'tratamiento', title: 'Tratamiento' },
   { sourceId: 'seguimiento', id: 'destino', title: 'Destino' },
