@@ -433,13 +433,20 @@ export const calculateSpesiTep = ({
     unit: 'puntos',
     interpretation:
       score === 0
-        ? 'Bajo riesgo por sPESI. Valorar alta/ambulatorio solo si TEP estable, sin hipoxemia, sin sangrado, tratamiento y seguimiento garantizados.'
-        : 'Mayor riesgo por sPESI. Valorar observación/ingreso y estratificación con VD, biomarcadores y contexto clínico.',
+        ? 'Bajo riesgo por sPESI: puede apoyar alta precoz o manejo ambulatorio solo si el TEP confirmado está estable y no hay otros criterios de ingreso.'
+        : 'No bajo riesgo por sPESI: desde 1 punto no debe considerarse bajo riesgo; varios criterios no cambian la categoría, pero refuerzan vigilancia clínica.',
     fields: {
-      Riesgo: score === 0 ? 'bajo' : 'no bajo',
-      Conducta: score === 0 ? 'Puede apoyar manejo ambulatorio seleccionado.' : 'No usar para alta directa.',
+      Riesgo: score === 0 ? 'bajo por sPESI' : 'no bajo por sPESI',
+      Conducta:
+        score === 0
+          ? 'Puede apoyar alta precoz o manejo ambulatorio solo si estable, sin hipoxemia, sin sangrado, anticoagulación organizada, buen soporte y sin otros criterios clínicos de ingreso.'
+          : 'No usar para alta directa. Valorar observación/ingreso y completar estratificación con VD, biomarcadores, oxigenación, riesgo hemorrágico, comorbilidad y contexto clínico.',
+      Nota:
+        score === 0
+          ? 'No usar como único criterio de alta.'
+          : 'sPESI clasifica como no bajo riesgo desde 1 punto; varios criterios positivos aumentan la carga de riesgo pero mantienen la misma categoría general.',
     },
-    caution: 'sPESI no sustituye Hestia, soporte domiciliario, riesgo hemorrágico, función renal ni juicio clínico.',
+    caution: 'Usar solo en TEP confirmado estable. No aplica en shock/inestabilidad y no sustituye juicio clínico, soporte, sangrado ni función renal.',
   };
 };
 
@@ -1412,7 +1419,8 @@ export const calculatorCatalog = {
     verifiedPage: 1,
     pdfPage: 1,
     status: 'implementado',
-    summary: 'Estratificación pronóstica simple para apoyar destino en TEP confirmado estable.',
+    summary:
+      'Estratificación pronóstica simple para TEP confirmado estable: identifica bajo riesgo si es 0; ≥1 indica no bajo riesgo sin graduarlo con precisión.',
     bibliography: [
       escPeEntry({
         id: 'spesi-tep-esc',
