@@ -532,6 +532,70 @@ const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen, onPr
   );
 };
 
+const collectRelatedActions = (protocol, panelSections) => {
+  const actions = new Map();
+
+  const addAction = (action) => {
+    const key = action.calculatorId ?? action.procedureId ?? action.protocolId;
+    if (!key || actions.has(key)) return;
+    actions.set(key, action);
+  };
+
+  panelSections.forEach((section) => {
+    section.actions?.forEach(addAction);
+    collectCalculatorActions(section.detailNodes).forEach(addAction);
+    section.treatmentGroups?.forEach((group) => {
+      group.cards.forEach((card) => {
+        const calculatorId = card.calculatorId ?? card.calculatorAction?.calculatorId ?? card.dosingCalculator?.calculatorId;
+        if (calculatorId) addAction({ calculatorId, label: `Calcular dosis: ${card.title}` });
+      });
+    });
+  });
+
+  protocol.sections?.forEach((section) => {
+    collectCalculatorActions(section.children).forEach(addAction);
+  });
+
+  return [...actions.values()];
+};
+
+const RelatedTools = ({ actions, onCalculatorOpen, onProcedureOpen, onProtocolOpen }) => {
+  if (!actions.length) return null;
+
+  return (
+    <details className="clinical-sheet-tools">
+      <summary>
+        <span>
+          <strong>Herramientas relacionadas</strong>
+          <small>Calculadoras y escalas conectadas a este protocolo.</small>
+        </span>
+        <span>{actions.length}</span>
+      </summary>
+      <div className="clinical-sheet-tool-list">
+        {actions.map((action) => {
+          const key = action.calculatorId ?? action.procedureId ?? action.protocolId;
+          return (
+            <button
+              key={key}
+              type="button"
+              className="clinical-calc-button"
+              onClick={() =>
+                action.protocolId
+                  ? onProtocolOpen?.(action.protocolId)
+                  : action.procedureId
+                    ? onProcedureOpen?.(action.procedureId)
+                    : onCalculatorOpen?.(action.calculatorId)
+              }
+            >
+              {action.label}
+            </button>
+          );
+        })}
+      </div>
+    </details>
+  );
+};
+
 const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, onProtocolOpen, onBack, backLabel = 'Protocolos', kindLabel = 'Protocolo' }) => {
   const [referencesOpen, setReferencesOpen] = useState(false);
   const panelSections = buildDecisionPanelSections(protocol);
@@ -584,13 +648,6 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
         </div>
       </header>
 
-      {protocol.prompt ? (
-        <section className="clinical-sheet-prompt">
-          <h3>{protocol.prompt.title}</h3>
-          {protocol.prompt.summary ? <p>{protocol.prompt.summary}</p> : null}
-        </section>
-      ) : null}
-
       <div className="clinical-sheet-tabs" role="tablist" aria-label="Secciones del protocolo">
         {panelSections.map((section) => (
           <button
@@ -606,9 +663,23 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
         ))}
       </div>
 
+      {protocol.prompt ? (
+        <section className="clinical-sheet-prompt clinical-sheet-prompt-after-tabs">
+          <h3>{protocol.prompt.title}</h3>
+          {protocol.prompt.summary ? <p>{protocol.prompt.summary}</p> : null}
+        </section>
+      ) : null}
+
       {activeSection ? (
         <DecisionPanelSection section={activeSection} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
       ) : null}
+
+      <RelatedTools
+        actions={collectRelatedActions(protocol, panelSections)}
+        onCalculatorOpen={onCalculatorOpen}
+        onProcedureOpen={onProcedureOpen}
+        onProtocolOpen={onProtocolOpen}
+      />
 
       {protocol.supportSections?.length ? (
         <section className="clinical-sheet-support" aria-label="Apoyo clínico">
