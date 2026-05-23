@@ -16,6 +16,7 @@ const ClinicalProtocolFlowView = ({ protocolId, onBack, onCalculatorOpen, onProc
         onProtocolOpen={onProtocolOpen}
         onBack={onBack}
         backLabel="Protocolos"
+        kindLabel="Urgencias hospitalarias"
       />
     </div>
   );

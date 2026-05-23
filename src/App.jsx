@@ -50,6 +50,7 @@ const ClinicalProtocolFlowView = lazy(() => import('./components/ClinicalProtoco
 const ProcedureFlowView = lazy(() => import('./components/ProcedureFlowView'));
 
 const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
+const uiVersionLabel = 'NexoClx Urg · UI 061-style v1';
 
 const shellCardClass = 'shell-card';
 const panelClass = 'floating-panel';
@@ -612,6 +613,7 @@ const BrandLockup = ({ label }) => (
         <span className="text-[var(--accent-500)]">Clx</span>
         <span className="ml-1 text-[var(--text-soft)]">Urg</span>
       </div>
+      <span className="ui-version-badge">{uiVersionLabel}</span>
       {label ? <p className="truncate pt-0.5 text-[0.72rem] font-medium text-[var(--text-muted)] sm:text-xs">{label}</p> : null}
     </div>
   </div>
