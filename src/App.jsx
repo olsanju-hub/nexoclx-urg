@@ -50,7 +50,6 @@ const ClinicalProtocolFlowView = lazy(() => import('./components/ClinicalProtoco
 const ProcedureFlowView = lazy(() => import('./components/ProcedureFlowView'));
 
 const brandMark = `${import.meta.env.BASE_URL}assets/icons/app-icon-512.png`;
-const uiVersionLabel = 'NexoClx Urg · UI 061-style v1';
 
 const shellCardClass = 'shell-card';
 const panelClass = 'floating-panel';
@@ -483,15 +482,6 @@ const buildSpecialtyCollections = () =>
     };
   }).filter((group) => group.protocols.length > 0);
 
-const frequentProtocolIds = [
-  'fibrilacion-auricular',
-  'sindrome-coronario-agudo',
-  'insuficiencia-cardiaca',
-  'sepsis',
-  'ictus-isquemico',
-  'anafilaxia',
-];
-
 const protocolSearchAliases = {
   'fibrilacion-auricular': ['fa', 'arritmia', 'palpitaciones'],
   'sindrome-coronario-agudo': ['sca', 'infarto', 'dolor toracico', 'iam', 'scacest'],
@@ -613,7 +603,6 @@ const BrandLockup = ({ label }) => (
         <span className="text-[var(--accent-500)]">Clx</span>
         <span className="ml-1 text-[var(--text-soft)]">Urg</span>
       </div>
-      <span className="ui-version-badge">{uiVersionLabel}</span>
       {label ? <p className="truncate pt-0.5 text-[0.72rem] font-medium text-[var(--text-muted)] sm:text-xs">{label}</p> : null}
     </div>
   </div>
@@ -1673,9 +1662,6 @@ const HomeView = ({
   const procedureResults = filterProcedureItems(deferredSearchQuery).slice(0, 4);
   const calculatorResults = filterCalculatorItems(deferredSearchQuery).slice(0, 4);
   const hasSearchResults = protocolResults.length > 0 || procedureResults.length > 0 || calculatorResults.length > 0;
-  const frequentProtocols = frequentProtocolIds
-    .map((id) => simplifiedProtocols.find((module) => module.id === id))
-    .filter(Boolean);
 
   return (
     <div className={pageClass}>
@@ -1709,17 +1695,6 @@ const HomeView = ({
         </section>
       ) : (
         <>
-          <section className="compact-section">
-            <SectionTitle title="Especialidades" />
-            <div className="home-specialty-grid">
-              {specialtyCollections.map((group) => (
-                <button key={group.id} type="button" onClick={() => onSpecialtyOpen(group.id)} className="specialty-chip">
-                  {group.title}
-                </button>
-              ))}
-            </div>
-          </section>
-
           <section className="compact-section compact-section-secondary">
             <SectionTitle title="Procedimientos" note="Herramientas operativas para soporte y reevaluación." />
             <div className="compact-list">
@@ -1730,10 +1705,12 @@ const HomeView = ({
           </section>
 
           <section className="compact-section compact-section-secondary">
-            <SectionTitle title="Protocolos frecuentes" />
-            <div className="compact-list">
-              {frequentProtocols.map((module) => (
-                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} compact />
+            <SectionTitle title="Especialidades" />
+            <div className="home-specialty-grid home-specialty-grid-compact">
+              {specialtyCollections.map((group) => (
+                <button key={group.id} type="button" onClick={() => onSpecialtyOpen(group.id)} className="specialty-chip">
+                  {group.title}
+                </button>
               ))}
             </div>
           </section>

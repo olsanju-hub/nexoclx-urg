@@ -435,6 +435,17 @@
     gap: 0.55rem;
   }
 
+  .home-specialty-grid-compact {
+    gap: 0.42rem;
+  }
+
+  .home-specialty-grid-compact .specialty-chip {
+    min-height: 2rem;
+    padding: 0.42rem 0.64rem;
+    font-size: 0.76rem;
+    font-weight: 650;
+  }
+
   .specialty-chip-row::-webkit-scrollbar {
     display: none;
   }
