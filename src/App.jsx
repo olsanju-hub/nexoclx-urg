@@ -4,7 +4,6 @@ import {
   Calculator,
   ChevronRight,
   ClipboardList,
-  Minimize2,
   LayoutDashboard,
   Search,
   Wrench,
@@ -595,15 +594,15 @@ const BrandLockup = ({ label }) => (
     <img
       src={brandMark}
       alt="NexoClx Urg"
-      className="h-10 w-10 rounded-[1rem] object-cover shadow-[0_18px_38px_-24px_rgba(78,58,20,0.34)] sm:h-11 sm:w-11 sm:rounded-[1.15rem]"
+      className="h-7 w-7 rounded-[0.45rem] object-cover sm:h-8 sm:w-8"
     />
     <div className="min-w-0">
-      <div className="text-[0.98rem] font-semibold tracking-[-0.04em] text-[var(--text)] sm:text-[1rem]">
+      <div className="text-[0.96rem] font-semibold text-[var(--text)] sm:text-[1rem]">
         <span>Nexo</span>
         <span className="text-[var(--accent-500)]">Clx</span>
         <span className="ml-1 text-[var(--text-soft)]">Urg</span>
       </div>
-      {label ? <p className="truncate pt-0.5 text-[0.72rem] font-medium text-[var(--text-muted)] sm:text-xs">{label}</p> : null}
+      {label ? <p className="truncate pt-0.5 text-[0.7rem] font-medium text-[var(--text-muted)]">{label}</p> : null}
     </div>
   </div>
 );
@@ -650,12 +649,12 @@ const PageHero = ({ eyebrow, title, note, aside = null, children = null }) => (
 
 const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
   <header className={`fixed inset-x-0 top-0 z-40 border-b border-[color:var(--line)] bg-[rgba(255,255,255,0.82)] backdrop-blur-xl ${isScrolled ? 'shadow-[0_18px_38px_-34px_rgba(0,0,0,0.18)]' : ''}`}>
-    <div className="mx-auto flex h-[4.2rem] max-w-[82rem] items-center gap-3 px-3.5 sm:h-[4.6rem] sm:gap-4 sm:px-6 lg:px-8 xl:px-10">
+    <div className="mx-auto flex h-[3.35rem] max-w-[68rem] items-center gap-3 px-3 sm:h-[3.6rem] sm:gap-4 sm:px-4 lg:px-5">
       <button type="button" onClick={onHome} className="min-w-0 text-left">
         <BrandLockup label={pageLabel} />
       </button>
 
-      <nav className="ml-auto hidden items-center gap-1 rounded-full border border-[color:var(--line)] bg-[rgba(255,255,255,0.72)] p-1 shadow-[0_14px_30px_-26px_rgba(0,0,0,0.14)] lg:flex">
+      <nav className="ml-auto hidden items-center gap-1 lg:flex">
         {primaryNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeKey === item.key;
@@ -677,41 +676,29 @@ const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
   </header>
 );
 
-const PrimaryNavigation = ({ activeKey, onSelect, collapsed, onToggle }) => (
-  <nav className={`mobile-nav lg:hidden ${collapsed ? 'mobile-nav-collapsed' : ''}`}>
+const PrimaryNavigation = ({ activeKey, onSelect }) => (
+  <nav className="mobile-nav lg:hidden">
     <div className="mobile-nav-shell">
-      <button
-        type="button"
-        className="mobile-nav-toggle"
-        onClick={onToggle}
-        aria-label={collapsed ? 'Mostrar navegación' : 'Ocultar navegación'}
-        aria-expanded={!collapsed}
-      >
-        {collapsed ? <ChevronRight className="h-4 w-4" /> : <Minimize2 className="h-3.5 w-3.5" />}
-        <span className="mobile-nav-toggle-label">{collapsed ? 'Mostrar' : 'Ocultar'}</span>
-      </button>
-      {!collapsed ? (
-        <div className="mobile-nav-grid" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
-          {primaryNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeKey === item.key;
+      <div className="mobile-nav-grid" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
+        {primaryNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeKey === item.key;
 
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => onSelect(item.key)}
-                className={`mobile-nav-pill ${isActive ? 'mobile-nav-pill-active' : ''}`}
-              >
-                <span className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
-                  <Icon className="h-[1.125rem] w-[1.125rem]" />
-                </span>
-                <span>{item.mobileLabel ?? item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => onSelect(item.key)}
+              className={`mobile-nav-pill ${isActive ? 'mobile-nav-pill-active' : ''}`}
+            >
+              <span className={`mobile-nav-icon ${isActive ? 'mobile-nav-icon-active' : ''}`}>
+                <Icon className="h-[1.05rem] w-[1.05rem]" />
+              </span>
+              <span>{item.mobileLabel ?? item.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   </nav>
 );
@@ -1875,7 +1862,6 @@ const App = () => {
   const [route, setRoute] = useState({ view: 'home' });
   const [isScrolled, setIsScrolled] = useState(false);
   const [calculatorInputs, setCalculatorInputs] = useState(initialCalculatorInputs);
-  const [isMobileNavCollapsed, setIsMobileNavCollapsed] = useState(() => sessionStorage.getItem('nexoclx-mobile-nav-collapsed') === 'true');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1885,10 +1871,6 @@ const App = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    sessionStorage.setItem('nexoclx-mobile-nav-collapsed', String(isMobileNavCollapsed));
-  }, [isMobileNavCollapsed]);
 
   const navigate = (nextRoute) => {
     startTransition(() => {
@@ -2054,8 +2036,6 @@ const App = () => {
       <PrimaryNavigation
         activeKey={getPrimarySection(route.view)}
         onSelect={handlePrimaryNavigation}
-        collapsed={isMobileNavCollapsed}
-        onToggle={() => setIsMobileNavCollapsed((current) => !current)}
       />
       <AppHeader
         isScrolled={isScrolled}
@@ -2064,7 +2044,7 @@ const App = () => {
         onHome={() => navigate({ view: 'home' })}
         onSelect={handlePrimaryNavigation}
       />
-      <main className={`app-main ${isMobileNavCollapsed ? 'app-main-nav-collapsed' : ''}`}>
+      <main className="app-main">
         <div className="app-main-inner">{renderView()}</div>
       </main>
     </div>

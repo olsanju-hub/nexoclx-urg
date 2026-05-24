@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nexoclx-shell-v6';
+const CACHE_NAME = 'nexoclx-shell-v7';
 
 const getScopedUrl = (path) => new URL(path, self.registration.scope).toString();
 
@@ -46,19 +46,15 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      const networkFetch = fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const clonedResponse = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clonedResponse));
-          }
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
+          const clonedResponse = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clonedResponse));
+        }
 
-          return response;
-        })
-        .catch(() => cachedResponse);
-
-      return cachedResponse ?? networkFetch;
-    }),
+        return response;
+      })
+      .catch(() => caches.match(request)),
   );
 });

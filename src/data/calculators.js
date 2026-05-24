@@ -470,7 +470,7 @@ export const calculateKillip = ({ classValue }) => {
         : value === 2
           ? 'Insuficiencia cardíaca leve-moderada. Eleva riesgo y destino; monitorizar y tratar congestión.'
           : 'Sin insuficiencia cardíaca clínica por Killip. No elimina otros criterios de alto riesgo.',
-    caution: 'Killip complementa ECG, troponina, hemodinámica y criterios ESC; no sustituye el juicio clínico.',
+    caution: 'Killip complementa ECG, troponina, hemodinámica, criterios ESC y valoración clínica.',
   };
 };
 
