@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
+import { AlertTriangle, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
+import { ProtocolHeader } from './protocols/ProtocolHeader';
+import { ProtocolSection } from './protocols/ProtocolSection';
 
 const severityLabels = {
   info: 'Info',
@@ -464,7 +466,7 @@ const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen, onPr
   const hasDetails = Boolean(section.detailNodes?.length);
 
   return (
-    <section className="clinical-sheet-section" aria-labelledby={`clinical-sheet-${section.id}`}>
+    <ProtocolSection aria-labelledby={`clinical-sheet-${section.id}`}>
       <div className="clinical-sheet-section-head">
         <h3 id={`clinical-sheet-${section.id}`}>{section.title}</h3>
         {section.summary ? <p>{section.summary}</p> : null}
@@ -528,7 +530,7 @@ const DecisionPanelSection = ({ section, onCalculatorOpen, onProcedureOpen, onPr
           ) : null}
         </div>
       ) : null}
-    </section>
+    </ProtocolSection>
   );
 };
 
@@ -632,21 +634,7 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
 
   return (
     <div className="clinical-flow-tree decision-panel-tree clinical-sheet">
-      <header className="clinical-sheet-hero">
-        <div className="clinical-sheet-hero-top">
-          {onBack ? (
-            <button type="button" className="clinical-sheet-back-button" onClick={onBack}>
-              <ArrowLeft className="h-3.5 w-3.5" />
-              {backLabel}
-            </button>
-          ) : null}
-          <p className="clinical-sheet-kicker">{kindLabel}</p>
-        </div>
-        <div className="clinical-sheet-title-block">
-          <h2>{protocol.title}</h2>
-          <p>{protocol.specialty}</p>
-        </div>
-      </header>
+      <ProtocolHeader protocol={protocol} onBack={onBack} backLabel={backLabel} kindLabel={kindLabel} />
 
       <div className="clinical-sheet-tabs" role="tablist" aria-label="Secciones del protocolo">
         {panelSections.map((section) => (

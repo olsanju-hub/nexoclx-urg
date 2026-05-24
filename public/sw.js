@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nexoclx-shell-v5';
+const CACHE_NAME = 'nexoclx-shell-v6';
 
 const getScopedUrl = (path) => new URL(path, self.registration.scope).toString();
 
@@ -6,9 +6,9 @@ const APP_SHELL = [
   getScopedUrl('./'),
   getScopedUrl('./index.html'),
   getScopedUrl('./manifest.webmanifest'),
-  getScopedUrl('./branding/app-icon-192.png'),
-  getScopedUrl('./branding/app-icon-512.png'),
-  getScopedUrl('./branding/apple-touch-icon.png'),
+  getScopedUrl('./assets/icons/app-icon-192.png'),
+  getScopedUrl('./assets/icons/app-icon-512.png'),
+  getScopedUrl('./assets/icons/apple-touch-icon.png'),
 ];
 
 self.addEventListener('install', (event) => {

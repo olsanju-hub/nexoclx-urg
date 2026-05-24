@@ -5,6 +5,35 @@ Su objetivo no es replicar un libro en pantalla, sino convertir capítulos audit
 
 URL pública principal en Vercel: `https://nexo-clx.vercel.app/`.
 
+## Stack y estructura
+
+Stack actual: React, Vite y Tailwind. La app conserva su paleta azul clínica y usa la presentación de protocolos inspirada en NexoClx 061: ficha compacta, cabecera, metadatos, pestañas clínicas, acciones relacionadas y bibliografía.
+
+Estructura principal:
+
+```text
+public/
+  assets/
+  manifest.webmanifest
+  sw.js
+src/
+  App.jsx
+  main.jsx
+  components/
+    ClinicalFlowTree.jsx
+    ClinicalProtocolFlowView.jsx
+    ProcedureFlowView.jsx
+    ProtocolViewer.jsx
+    protocols/ProtocolHeader.jsx
+    protocols/ProtocolSection.jsx
+  data/
+  styles/index.css
+tailwind.config.js
+postcss.config.js
+```
+
+El contenido clínico, cálculos, medicamentos y bibliografía se mantienen en `src/data/` sin mezclar contexto con NexoClx 061 o NexoClx AP.
+
 ## README vivo
 
 Este `README` es el índice maestro del proyecto.  

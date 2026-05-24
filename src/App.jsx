@@ -49,7 +49,7 @@ import { procedureList } from './data/procedures';
 const ClinicalProtocolFlowView = lazy(() => import('./components/ClinicalProtocolFlowView'));
 const ProcedureFlowView = lazy(() => import('./components/ProcedureFlowView'));
 
-const brandMark = `${import.meta.env.BASE_URL}branding/app-icon-512.png`;
+const brandMark = `${import.meta.env.BASE_URL}assets/icons/app-icon-512.png`;
 const uiVersionLabel = 'NexoClx Urg · UI 061-style v1';
 
 const shellCardClass = 'shell-card';
