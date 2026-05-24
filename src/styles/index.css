@@ -1350,37 +1350,6 @@
     font-size: 0.82rem;
   }
 
-  .clinical-sheet-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.36rem;
-    margin: 0.58rem 0 0;
-  }
-
-  .clinical-sheet-meta-grid div {
-    min-width: 0;
-    border: 1px solid var(--line);
-    border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 0.72);
-    padding: 0.42rem 0.5rem;
-  }
-
-  .clinical-sheet-meta-grid dt {
-    color: var(--text-muted);
-    font-size: 0.64rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .clinical-sheet-meta-grid dd {
-    margin: 0.12rem 0 0;
-    color: var(--text-soft);
-    font-size: 0.76rem;
-    font-weight: 720;
-    line-height: 1.24;
-  }
-
   .clinical-sheet-prompt {
     border-bottom: 1px solid var(--line);
     background: rgba(245, 245, 247, 0.38);
@@ -2105,10 +2074,6 @@
 }
 
 @media (min-width: 640px) {
-  .clinical-sheet-meta-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
   .clinical-sheet-tabs {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
