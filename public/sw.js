@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nexoclx-shell-v7';
+const CACHE_NAME = 'nexoclx-shell-v8';
 
 const getScopedUrl = (path) => new URL(path, self.registration.scope).toString();
 

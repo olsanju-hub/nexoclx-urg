@@ -1644,6 +1644,7 @@ const HomeView = ({
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const specialtyCollections = buildSpecialtyCollections();
   const simplifiedProtocols = specialtyCollections.flatMap((group) => group.protocols);
+  const primaryProtocols = simplifiedProtocols.slice(0, 8);
   const hasSearchQuery = Boolean(normalizeSearch(deferredSearchQuery));
   const protocolResults = filterProtocolModules(simplifiedProtocols, deferredSearchQuery).slice(0, 8);
   const procedureResults = filterProcedureItems(deferredSearchQuery).slice(0, 4);
@@ -1656,7 +1657,7 @@ const HomeView = ({
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Buscar protocolo, síntoma o cálculo"
+          placeholder="Buscar protocolo o cálculo"
           prominent
         />
       </section>
@@ -1682,17 +1683,33 @@ const HomeView = ({
         </section>
       ) : (
         <>
+          <section className="compact-section">
+            <SectionTitle
+              title="Protocolos clínicos"
+              action={
+                <button type="button" className="ghost-button" onClick={() => onSpecialtyOpen('todos')}>
+                  Ver todos
+                </button>
+              }
+            />
+            <div className="compact-list">
+              {primaryProtocols.map((module) => (
+                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
+              ))}
+            </div>
+          </section>
+
           <section className="compact-section compact-section-secondary">
             <SectionTitle title="Procedimientos" note="Herramientas operativas para soporte y reevaluación." />
             <div className="compact-list">
-              {procedureList.map((procedure) => (
+              {procedureList.slice(0, 6).map((procedure) => (
                 <ProtocolCompactCard key={procedure.id} module={procedure} onClick={() => onProcedureOpen(procedure.id)} compact />
               ))}
             </div>
           </section>
 
           <section className="compact-section compact-section-secondary">
-            <SectionTitle title="Especialidades" />
+            <SectionTitle title="Especialidades" note="Acceso secundario por área clínica." />
             <div className="home-specialty-grid home-specialty-grid-compact">
               {specialtyCollections.map((group) => (
                 <button key={group.id} type="button" onClick={() => onSpecialtyOpen(group.id)} className="specialty-chip">
