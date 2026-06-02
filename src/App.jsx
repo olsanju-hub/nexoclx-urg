@@ -5,6 +5,7 @@ import {
   ChevronRight,
   ClipboardList,
   LayoutDashboard,
+  MoreHorizontal,
   Search,
   Wrench,
 } from 'lucide-react';
@@ -61,9 +62,9 @@ const pageClass = 'mx-auto max-w-[72rem] space-y-3 sm:space-y-5 xl:space-y-6';
 
 const primaryNavItems = [
   { key: 'home', label: 'Inicio', icon: LayoutDashboard },
-  { key: 'protocols', label: 'Protocolos', mobileLabel: 'Protoc.', icon: ClipboardList },
-  { key: 'procedures', label: 'Procedimientos', mobileLabel: 'Proced.', icon: Wrench },
-  { key: 'calculations', label: 'Cálculos', mobileLabel: 'Cálc.', icon: Calculator },
+  { key: 'protocols', label: 'Protocolos', icon: ClipboardList },
+  { key: 'calculations', label: 'Herramientas', icon: Calculator },
+  { key: 'more', label: 'Más', icon: MoreHorizontal },
 ];
 
 const initialCalculatorInputs = {
@@ -403,12 +404,12 @@ const getPrimarySection = (view) => {
     return 'protocols';
   }
 
-  if (view === 'procedure' || view === 'procedures') {
-    return 'procedures';
-  }
-
   if (view === 'calculator' || view === 'calculations') {
     return 'calculations';
+  }
+
+  if (view === 'procedure' || view === 'procedures' || view === 'sources' || view === 'more') {
+    return 'more';
   }
 
   return 'home';
@@ -434,11 +435,19 @@ const getPageLabel = (route) => {
   }
 
   if (route.view === 'calculations') {
-    return 'Cálculos';
+    return 'Herramientas';
   }
 
   if (route.view === 'procedures') {
     return 'Procedimientos';
+  }
+
+  if (route.view === 'sources') {
+    return 'Fuentes';
+  }
+
+  if (route.view === 'more') {
+    return 'Más';
   }
 
   return 'Inicio clínico';
@@ -588,6 +597,15 @@ const filterSpecialtyCollections = (groups, query) => {
     })
     .filter((group) => group.protocols.length > 0 || group.calculators.length > 0);
 };
+
+const getAllBibliographyEntries = () =>
+  uniqueByKey(
+    [
+      ...motivoConsultaModules.flatMap((module) => module.bibliography ?? []),
+      ...implementedCalculators.flatMap((calculator) => calculator.bibliography ?? []),
+    ],
+    (entry) => entry.internalId ?? entry.shortReference,
+  );
 
 const BrandLockup = ({ label }) => (
   <div className="flex min-w-0 items-center gap-3">
@@ -1878,6 +1896,35 @@ const CalculatorDetailView = ({ calculatorId, values, onChange, onBack }) => {
   );
 };
 
+const MoreView = ({ onBack, onProceduresOpen, onSourcesOpen }) => (
+  <div className={pageClass}>
+    <BackBar label="Inicio" onClick={onBack} />
+
+    <section className="compact-section">
+      <SectionTitle title="Más" note="Accesos secundarios y trazabilidad." />
+      <div className="compact-list">
+        <ListActionRow
+          title="Procedimientos"
+          meta="Herramientas operativas para soporte y reevaluación."
+          onClick={onProceduresOpen}
+        />
+        <ListActionRow
+          title="Fuentes"
+          meta="Referencias textuales verificadas y trazabilidad."
+          onClick={onSourcesOpen}
+        />
+      </div>
+    </section>
+  </div>
+);
+
+const SourcesView = ({ onBack }) => (
+  <div className={pageClass}>
+    <BackBar label="Más" onClick={onBack} />
+    <BibliographyBlock entries={getAllBibliographyEntries()} />
+  </div>
+);
+
 const App = () => {
   const [route, setRoute] = useState({ view: 'home' });
   const [isScrolled, setIsScrolled] = useState(false);
@@ -1945,15 +1992,15 @@ const App = () => {
       return;
     }
 
-    if (sectionKey === 'procedures') {
-      navigate({ view: 'procedures' });
+    if (sectionKey === 'calculations') {
+      openCalculations({ view: 'home' });
       return;
     }
 
-  if (sectionKey === 'calculations') {
-    openCalculations({ view: 'home' });
-    return;
-  }
+    if (sectionKey === 'more') {
+      navigate({ view: 'more' });
+      return;
+    }
 
     navigate({ view: 'home' });
   };
@@ -2028,6 +2075,20 @@ const App = () => {
           }
         />
       );
+    }
+
+    if (route.view === 'more') {
+      return (
+        <MoreView
+          onBack={() => navigate({ view: 'home' })}
+          onProceduresOpen={() => navigate({ view: 'procedures', returnTo: { view: 'more' } })}
+          onSourcesOpen={() => navigate({ view: 'sources', returnTo: { view: 'more' } })}
+        />
+      );
+    }
+
+    if (route.view === 'sources') {
+      return <SourcesView onBack={handleBack} />;
     }
 
     if (route.view === 'calculator') {

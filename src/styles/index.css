@@ -2506,3 +2506,22 @@
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
+
+@layer components {
+  .mobile-nav-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .mobile-nav-pill {
+    min-width: 0;
+    gap: 0.1rem;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-pill > span:last-child {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+    font-size: 0.68rem;
+  }
+}
