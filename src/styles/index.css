@@ -2085,3 +2085,183 @@
     font-size: 0.74rem;
   }
 }
+
+@layer base {
+  :root {
+    --motion-fast: 140ms;
+    --motion-base: 190ms;
+    --motion-panel: 220ms;
+    --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes clinical-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes clinical-panel {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes clinical-result {
+    0% {
+      border-color: rgba(0, 113, 227, 0.34);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+    }
+    100% {
+      border-color: rgba(0, 113, 227, 0.2);
+      box-shadow: 0 0 0 0 rgba(0, 113, 227, 0);
+    }
+  }
+
+  button,
+  a,
+  input,
+  select,
+  summary {
+    transition:
+      background-color var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-fast) var(--motion-ease),
+      color var(--motion-fast) var(--motion-ease),
+      opacity var(--motion-fast) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease);
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid rgba(0, 113, 227, 0.18);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .motion-route,
+  .home-search-panel,
+  .compact-section,
+  .floating-panel,
+  .clinical-flow-tree,
+  .flow-section,
+  .flow-node {
+    animation: clinical-enter var(--motion-base) var(--motion-ease) both;
+  }
+
+  .motion-result {
+    animation: clinical-result 520ms var(--motion-ease);
+  }
+
+  .flow-section-body,
+  .flow-node-body,
+  details > :not(summary) {
+    animation: clinical-panel var(--motion-panel) var(--motion-ease) both;
+  }
+
+  .floating-panel,
+  .compact-section,
+  .clinical-flow-tree,
+  .flow-section,
+  .flow-node,
+  .tonal-panel {
+    transition:
+      background-color var(--motion-base) var(--motion-ease),
+      border-color var(--motion-base) var(--motion-ease),
+      box-shadow var(--motion-base) var(--motion-ease),
+      opacity var(--motion-fast) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease);
+  }
+
+  .compact-section:hover,
+  .floating-panel:hover,
+  .clinical-flow-tree:hover,
+  .flow-section:hover,
+  .flow-node:hover,
+  .tonal-panel:hover {
+    border-color: rgba(0, 113, 227, 0.16);
+    box-shadow: 0 14px 32px -30px rgba(0, 0, 0, 0.16);
+  }
+
+  .soft-button:active,
+  .accent-button:active,
+  .ghost-button:active,
+  .nav-pill:active,
+  .mobile-nav-pill:active,
+  .section-chip:active,
+  .choice-button:active,
+  .protocol-compact-card:active,
+  .list-row:active,
+  .flow-jump-link:active,
+  .flow-section-header:active,
+  .flow-node-header:active,
+  .flow-node-action-button:active {
+    transform: translateY(1px) scale(0.99);
+  }
+
+  .specialty-chip:hover,
+  .section-chip:hover,
+  .choice-button:hover,
+  .flow-jump-link:hover {
+    border-color: rgba(0, 113, 227, 0.2);
+  }
+
+  .app-input:hover {
+    border-color: rgba(0, 113, 227, 0.2);
+  }
+
+  .mobile-nav-pill:hover,
+  .nav-pill:hover {
+    background: rgba(0, 113, 227, 0.05);
+  }
+}
+
+@media (hover: none) {
+  .compact-section:hover,
+  .floating-panel:hover,
+  .clinical-flow-tree:hover,
+  .flow-section:hover,
+  .flow-node:hover,
+  .tonal-panel:hover {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+
+  .motion-route,
+  .home-search-panel,
+  .compact-section,
+  .floating-panel,
+  .clinical-flow-tree,
+  .flow-section,
+  .flow-node,
+  .flow-section-body,
+  .flow-node-body,
+  details > :not(summary) {
+    transform: none !important;
+  }
+}

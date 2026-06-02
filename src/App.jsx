@@ -1062,7 +1062,10 @@ const nihssFields = [
 
 const CalculatorResult = ({ result }) =>
   result ? (
-    <div className="rounded-[1.15rem] border border-[rgba(0,113,227,0.20)] bg-[rgba(0,113,227,0.08)] px-4 py-3">
+    <div
+      key={`${result.value}-${result.unit}-${result.interpretation}`}
+      className="motion-result rounded-[1.15rem] border border-[rgba(0,113,227,0.20)] bg-[rgba(0,113,227,0.08)] px-4 py-3"
+    >
       <p className="text-2xl font-semibold tracking-[-0.04em] text-[var(--text)]">
         {result.value} <span className="text-sm font-medium text-[var(--text-muted)]">{result.unit}</span>
       </p>
@@ -2062,7 +2065,14 @@ const App = () => {
         onSelect={handlePrimaryNavigation}
       />
       <main className="app-main">
-        <div className="app-main-inner">{renderView()}</div>
+        <div className="app-main-inner">
+          <div
+            key={`${route.view}-${route.protocolId ?? ''}-${route.procedureId ?? ''}-${route.calculatorId ?? ''}-${route.focusSpecialtyId ?? ''}`}
+            className="motion-route"
+          >
+            {renderView()}
+          </div>
+        </div>
       </main>
     </div>
   );
