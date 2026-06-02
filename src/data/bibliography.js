@@ -91,8 +91,10 @@ export const bibliographyCatalog = {
   },
   'gold-epoc-2025': {
     id: 'gold-epoc-2025',
-    title: 'Global Initiative for Chronic Obstructive Lung Disease. Global Strategy for Diagnosis, Management, and Prevention of COPD, 2025',
-    shortTitle: 'GOLD 2025',
+    title: 'Global Initiative for Chronic Obstructive Lung Disease. Global Strategy for Prevention, Diagnosis and Management of COPD, 2026',
+    shortTitle: 'GOLD 2026',
+    year: 2026,
+    url: 'https://goldcopd.org/2026-gold-report-and-pocket-guide/',
   },
   'gesepoc-2021': {
     id: 'gesepoc-2021',

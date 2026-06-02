@@ -3020,7 +3020,7 @@ export const medicationCatalog = {
         }),
       ),
       protocolSource(
-        'GOLD 2025 · exacerbaciones de EPOC',
+        'GOLD 2026 · exacerbaciones de EPOC',
         goldCopdReferenceEntry({
           id: 'salbutamol-epoc-gold',
           verifiedPages: [1],
@@ -3106,7 +3106,7 @@ export const medicationCatalog = {
         }),
       ),
       protocolSource(
-        'GOLD 2025 · exacerbaciones de EPOC',
+        'GOLD 2026 · exacerbaciones de EPOC',
         goldCopdReferenceEntry({
           id: 'prednisona-epoc-gold',
           verifiedPages: [1],
