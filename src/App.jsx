@@ -665,37 +665,39 @@ const PageHero = ({ eyebrow, title, note, aside = null, children = null }) => (
   </section>
 );
 
-const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect }) => (
+const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect, showNav = true }) => (
   <header className={`fixed inset-x-0 top-0 z-40 border-b border-[color:var(--line)] bg-[rgba(255,255,255,0.82)] backdrop-blur-xl ${isScrolled ? 'shadow-[0_18px_38px_-34px_rgba(0,0,0,0.18)]' : ''}`}>
     <div className="mx-auto flex h-[3.35rem] max-w-[68rem] items-center gap-3 px-3 sm:h-[3.6rem] sm:gap-4 sm:px-4 lg:px-5">
       <button type="button" onClick={onHome} className="min-w-0 text-left">
         <BrandLockup label={pageLabel} />
       </button>
 
-      <nav className="ml-auto hidden items-center gap-1 lg:flex">
-        {primaryNavItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeKey === item.key;
+      {showNav ? (
+        <nav className="ml-auto hidden items-center gap-1 lg:flex">
+          {primaryNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeKey === item.key;
 
-          return (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => onSelect(item.key)}
-              className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => onSelect(item.key)}
+                className={`nav-pill ${isActive ? 'nav-pill-active' : ''}`}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      ) : null}
     </div>
   </header>
 );
 
 const PrimaryNavigation = ({ activeKey, onSelect }) => (
-  <nav className="mobile-nav lg:hidden">
+  <nav className="mobile-nav">
     <div className="mobile-nav-shell">
       <div className="mobile-nav-grid" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
         {primaryNavItems.map((item) => {
@@ -760,7 +762,7 @@ const ListActionRow = ({ title, meta, onClick, badge = null, disabled = false })
   </button>
 );
 
-const ProtocolCompactCard = ({ module, onClick, compact = false }) => {
+const ProtocolCompactCard = ({ module, onClick, compact = false, showCalculatorBadge = true }) => {
   const calculatorCount = module.calculatorCount ?? getProtocolCalculatorCount(module.id);
 
   return (
@@ -768,7 +770,7 @@ const ProtocolCompactCard = ({ module, onClick, compact = false }) => {
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <p className="truncate text-sm font-semibold text-[var(--text)]">{module.title}</p>
-          {!compact && calculatorCount ? <StatusBadge tone="active">{calculatorCount} cálculo{calculatorCount > 1 ? 's' : ''}</StatusBadge> : null}
+          {!compact && showCalculatorBadge && calculatorCount ? <StatusBadge tone="active">{calculatorCount} cálculo{calculatorCount > 1 ? 's' : ''}</StatusBadge> : null}
         </div>
         <p className="mt-1 text-[0.72rem] font-semibold text-[var(--text-muted)]">{module.section}</p>
         {!compact ? <p className="mt-1 line-clamp-1 text-xs leading-snug text-[var(--text-soft)]">{module.summary}</p> : null}
@@ -1655,92 +1657,44 @@ const DisclosureBlock = ({ title, summary, children, tone = 'neutral', defaultOp
   );
 };
 
-const HomeView = ({
-  onSpecialtyOpen,
-  onModuleOpen,
-  onCalculatorOpen,
-  onProcedureOpen,
-}) => {
+const HomeView = ({ onProtocolsOpen, onCalculationsOpen, onProceduresOpen, onSourcesOpen }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const deferredSearchQuery = useDeferredValue(searchQuery);
-  const specialtyCollections = buildSpecialtyCollections();
-  const simplifiedProtocols = specialtyCollections.flatMap((group) => group.protocols);
-  const primaryProtocols = simplifiedProtocols.slice(0, 8);
-  const hasSearchQuery = Boolean(normalizeSearch(deferredSearchQuery));
-  const protocolResults = filterProtocolModules(simplifiedProtocols, deferredSearchQuery).slice(0, 8);
-  const procedureResults = filterProcedureItems(deferredSearchQuery).slice(0, 4);
-  const calculatorResults = filterCalculatorItems(deferredSearchQuery).slice(0, 4);
-  const hasSearchResults = protocolResults.length > 0 || procedureResults.length > 0 || calculatorResults.length > 0;
+  const sections = [
+    { title: 'Protocolos', meta: 'Listado completo de protocolos hospitalarios.', onClick: onProtocolsOpen },
+    { title: 'Herramientas', meta: 'Cálculos y ayudas vinculadas a protocolos.', onClick: onCalculationsOpen },
+    { title: 'Procedimientos', meta: 'Técnicas operativas para soporte y reevaluación.', onClick: onProceduresOpen },
+    { title: 'Fuentes', meta: 'Referencias verificadas y trazabilidad.', onClick: onSourcesOpen },
+  ];
 
   return (
     <div className={pageClass}>
+      <section className="compact-section">
+        <SectionTitle
+          title="NexoClx Urg"
+          note="Urgencias hospitalarias."
+        />
+      </section>
+
       <section className="home-search-panel">
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Buscar protocolo o cálculo"
+          placeholder="Buscar protocolo, síntoma, cálculo..."
           prominent
         />
       </section>
 
-      {hasSearchQuery ? (
-        <section className="compact-section">
-          <SectionTitle title="Resultados" />
-          {hasSearchResults ? (
-            <div className="space-y-2">
-              {protocolResults.map((module) => (
-                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
-              ))}
-              {procedureResults.map((procedure) => (
-                <ProtocolCompactCard key={procedure.id} module={procedure} onClick={() => onProcedureOpen(procedure.id)} />
-              ))}
-              {calculatorResults.map((calculator) => (
-                <CalculatorCompactRow key={calculator.id} calculator={calculator} onClick={() => onCalculatorOpen(calculator.id)} />
-              ))}
-            </div>
-          ) : (
-            <EmptySearchState query={deferredSearchQuery} />
-          )}
-        </section>
-      ) : (
-        <>
-          <section className="compact-section">
-            <SectionTitle
-              title="Protocolos clínicos"
-              action={
-                <button type="button" className="ghost-button" onClick={() => onSpecialtyOpen('todos')}>
-                  Ver todos
-                </button>
-              }
-            />
-            <div className="compact-list">
-              {primaryProtocols.map((module) => (
-                <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
-              ))}
-            </div>
-          </section>
+      <section className="compact-section">
+        <div className="compact-list">
+          {sections.map((item) => (
+            <ListActionRow key={item.title} title={item.title} meta={item.meta} onClick={item.onClick} />
+          ))}
+        </div>
+      </section>
 
-          <section className="compact-section compact-section-secondary">
-            <SectionTitle title="Procedimientos" note="Herramientas operativas para soporte y reevaluación." />
-            <div className="compact-list">
-              {procedureList.slice(0, 6).map((procedure) => (
-                <ProtocolCompactCard key={procedure.id} module={procedure} onClick={() => onProcedureOpen(procedure.id)} compact />
-              ))}
-            </div>
-          </section>
-
-          <section className="compact-section compact-section-secondary">
-            <SectionTitle title="Especialidades" note="Acceso secundario por área clínica." />
-            <div className="home-specialty-grid home-specialty-grid-compact">
-              {specialtyCollections.map((group) => (
-                <button key={group.id} type="button" onClick={() => onSpecialtyOpen(group.id)} className="specialty-chip">
-                  {group.title}
-                </button>
-              ))}
-            </div>
-          </section>
-        </>
-      )}
+      <section className="compact-section compact-section-secondary">
+        <p className="text-sm leading-relaxed text-[var(--text-soft)]">Consulta por búsqueda o abre una sección disponible.</p>
+      </section>
     </div>
   );
 };
@@ -1750,12 +1704,11 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
   const [activeSpecialtyId, setActiveSpecialtyId] = useState(focusSpecialtyId ?? 'todos');
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const specialtyCollections = buildSpecialtyCollections();
-  const displayedCollections = specialtyCollections
-    .map((group) => ({
-      ...group,
-      protocols: filterProtocolModules(group.protocols, deferredSearchQuery, activeSpecialtyId),
-    }))
-    .filter((group) => group.protocols.length > 0);
+  const protocols = filterProtocolModules(
+    specialtyCollections.flatMap((group) => group.protocols),
+    deferredSearchQuery,
+    activeSpecialtyId,
+  );
 
   return (
     <div className={pageClass}>
@@ -1773,33 +1726,14 @@ const ProtocolsView = ({ onBack, onModuleOpen, onCalculatorOpen, focusSpecialtyI
         </div>
       </section>
 
-      {displayedCollections.length > 0 ? (
-        <div className="space-y-4">
-          {displayedCollections.map((group) => (
-            <section key={group.id} className="compact-section">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="eyebrow eyebrow-muted">{group.title}</p>
-                  <p className="mt-1 text-sm text-[var(--text-soft)]">{group.protocols.length} protocolos</p>
-                </div>
-                {activeSpecialtyId === 'todos' ? (
-                  <button
-                    type="button"
-                    onClick={() => setActiveSpecialtyId(group.id)}
-                    className="ghost-button"
-                  >
-                    Ver
-                  </button>
-                ) : null}
-              </div>
-              <div className="space-y-2">
-                {group.protocols.map((module) => (
-                  <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} />
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
+      {protocols.length > 0 ? (
+        <section className="compact-section">
+          <div className="compact-list">
+            {protocols.map((module) => (
+              <ProtocolCompactCard key={module.id} module={module} onClick={() => onModuleOpen(module.id)} showCalculatorBadge={false} />
+            ))}
+          </div>
+        </section>
       ) : (
         <EmptySearchState query={deferredSearchQuery} />
       )}
@@ -2104,28 +2038,34 @@ const App = () => {
 
     return (
       <HomeView
-        onSpecialtyOpen={openSpecialty}
-        onModuleOpen={(moduleId) => openModule(moduleId, { view: 'home' })}
-        onCalculatorOpen={(calculatorId) => openCalculator(calculatorId, { view: 'home' })}
-        onProcedureOpen={(procedureId) => openProcedure(procedureId, { view: 'home' })}
+        onProtocolsOpen={() => navigate({ view: 'protocols' })}
+        onCalculationsOpen={() => openCalculations({ view: 'home' })}
+        onProceduresOpen={() => navigate({ view: 'procedures', returnTo: { view: 'home' } })}
+        onSourcesOpen={() => navigate({ view: 'sources', returnTo: { view: 'home' } })}
       />
     );
   };
 
+  const showSectionNav = route.view !== 'home';
+  const activeSection = getPrimarySection(route.view);
+
   return (
     <div className="min-h-screen text-[var(--text)]">
-      <PrimaryNavigation
-        activeKey={getPrimarySection(route.view)}
-        onSelect={handlePrimaryNavigation}
-      />
+      {showSectionNav ? (
+        <PrimaryNavigation
+          activeKey={activeSection}
+          onSelect={handlePrimaryNavigation}
+        />
+      ) : null}
       <AppHeader
         isScrolled={isScrolled}
         pageLabel={getPageLabel(route)}
-        activeKey={getPrimarySection(route.view)}
+        activeKey={activeSection}
         onHome={() => navigate({ view: 'home' })}
         onSelect={handlePrimaryNavigation}
+        showNav={false}
       />
-      <main className="app-main">
+      <main className={`app-main${showSectionNav ? '' : ' app-main-home'}`}>
         <div className="app-main-inner">
           <div
             key={`${route.view}-${route.protocolId ?? ''}-${route.procedureId ?? ''}-${route.calculatorId ?? ''}-${route.focusSpecialtyId ?? ''}`}

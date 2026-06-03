@@ -2273,6 +2273,10 @@
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.15rem);
   }
 
+  .app-main-home {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.25rem);
+  }
+
   .app-main-inner {
     padding: 0 1rem 1rem;
   }
