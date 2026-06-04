@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, startTransition, useDeferredValue, useEffect, useState } from 'react';
 import {
   ArrowLeft,
+  BookOpen,
   Calculator,
   ChevronRight,
   ClipboardList,
@@ -697,7 +698,7 @@ const AppHeader = ({ isScrolled, pageLabel, activeKey, onHome, onSelect, showNav
 );
 
 const PrimaryNavigation = ({ activeKey, onSelect }) => (
-  <nav className="mobile-nav">
+  <nav className="mobile-nav lg:hidden">
     <div className="mobile-nav-shell">
       <div className="mobile-nav-grid" style={{ gridTemplateColumns: `repeat(${primaryNavItems.length}, minmax(0, 1fr))` }}>
         {primaryNavItems.map((item) => {
@@ -1660,19 +1661,16 @@ const DisclosureBlock = ({ title, summary, children, tone = 'neutral', defaultOp
 const HomeView = ({ onProtocolsOpen, onCalculationsOpen, onProceduresOpen, onSourcesOpen }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const sections = [
-    { title: 'Protocolos', meta: 'Listado completo de protocolos hospitalarios.', onClick: onProtocolsOpen },
-    { title: 'Herramientas', meta: 'Cálculos y ayudas vinculadas a protocolos.', onClick: onCalculationsOpen },
-    { title: 'Procedimientos', meta: 'Técnicas operativas para soporte y reevaluación.', onClick: onProceduresOpen },
-    { title: 'Fuentes', meta: 'Referencias verificadas y trazabilidad.', onClick: onSourcesOpen },
+    { title: 'Protocolos', meta: 'Listado completo de protocolos hospitalarios.', icon: ClipboardList, onClick: onProtocolsOpen },
+    { title: 'Herramientas', meta: 'Cálculos y ayudas vinculadas a protocolos.', icon: Calculator, onClick: onCalculationsOpen },
+    { title: 'Procedimientos', meta: 'Técnicas operativas para soporte y reevaluación.', icon: Wrench, onClick: onProceduresOpen },
+    { title: 'Fuentes', meta: 'Referencias verificadas y trazabilidad.', icon: BookOpen, onClick: onSourcesOpen },
   ];
 
   return (
     <div className={pageClass}>
-      <section className="compact-section">
-        <SectionTitle
-          title="NexoClx Urg"
-          note="Urgencias hospitalarias."
-        />
+      <section className="home-intro-line">
+        <p>Urgencias hospitalarias.</p>
       </section>
 
       <section className="home-search-panel">
@@ -1684,16 +1682,19 @@ const HomeView = ({ onProtocolsOpen, onCalculationsOpen, onProceduresOpen, onSou
         />
       </section>
 
-      <section className="compact-section">
-        <div className="compact-list">
+      <section className="home-section-map" aria-label="Secciones disponibles">
           {sections.map((item) => (
-            <ListActionRow key={item.title} title={item.title} meta={item.meta} onClick={item.onClick} />
+            <button key={item.title} type="button" onClick={item.onClick} className="home-section-link">
+              <span className="home-section-icon" aria-hidden="true">
+                <item.icon className="h-4 w-4" />
+              </span>
+              <span className="min-w-0">
+                <strong>{item.title}</strong>
+                <small>{item.meta}</small>
+              </span>
+              <ChevronRight className="home-section-chevron h-4 w-4" aria-hidden="true" />
+            </button>
           ))}
-        </div>
-      </section>
-
-      <section className="compact-section compact-section-secondary">
-        <p className="text-sm leading-relaxed text-[var(--text-soft)]">Consulta por búsqueda o abre una sección disponible.</p>
       </section>
     </div>
   );
@@ -2063,7 +2064,7 @@ const App = () => {
         activeKey={activeSection}
         onHome={() => navigate({ view: 'home' })}
         onSelect={handlePrimaryNavigation}
-        showNav={false}
+        showNav={showSectionNav}
       />
       <main className={`app-main${showSectionNav ? '' : ' app-main-home'}`}>
         <div className="app-main-inner">
