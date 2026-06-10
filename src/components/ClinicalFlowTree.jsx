@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, Calculator, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
 import { ProtocolHeader } from './protocols/ProtocolHeader';
 import { ProtocolSection } from './protocols/ProtocolSection';
@@ -368,7 +368,7 @@ const PautaBlock = ({ card, onCalculatorOpen }) => {
   const detailItems = card.items?.length ? card.items : card.summary ? [card.summary] : [];
   const calculatorId = card.calculatorId ?? card.calculatorAction?.calculatorId ?? card.dosingCalculator?.calculatorId;
   const title = card.sourceUrl ? (
-    <a href={card.sourceUrl} target="_blank" rel="noreferrer" className="clinical-sheet-link">
+    <a href={card.sourceUrl} className="clinical-sheet-link">
       {card.title}
     </a>
   ) : (
@@ -601,7 +601,6 @@ const RelatedTools = ({ actions, onCalculatorOpen, onProcedureOpen, onProtocolOp
 const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, onProtocolOpen, onBack, backLabel = 'Protocolos', kindLabel = 'Protocolo' }) => {
   const [referencesOpen, setReferencesOpen] = useState(false);
   const panelSections = buildDecisionPanelSections(protocol);
-  const [activePanel, setActivePanel] = useState(panelSections[0]?.id ?? 'sospecha');
   const referencesSection =
     protocol.sections?.find((section) => section.type === 'references') ??
     (protocol.references?.length
@@ -616,18 +615,6 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
           ],
         }
       : null);
-  const activeSection = panelSections.find((section) => section.id === activePanel) ?? panelSections[0];
-
-  useEffect(() => {
-    setActivePanel(panelSections[0]?.id ?? 'sospecha');
-    setReferencesOpen(false);
-  }, [protocol.id]);
-
-  const selectPanel = (panelId) => {
-    setReferencesOpen(false);
-    setActivePanel(panelId);
-  };
-
   const toggleReferences = () => {
     setReferencesOpen((current) => !current);
   };
@@ -636,20 +623,17 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
     <div className="clinical-flow-tree decision-panel-tree clinical-sheet">
       <ProtocolHeader protocol={protocol} onBack={onBack} backLabel={backLabel} kindLabel={kindLabel} />
 
-      <div className="clinical-sheet-tabs" role="tablist" aria-label="Secciones del protocolo">
+      <nav className="clinical-sheet-tabs" aria-label="Secciones del protocolo">
         {panelSections.map((section) => (
-          <button
+          <a
             key={section.id}
-            type="button"
-            role="tab"
-            aria-selected={activePanel === section.id}
-            className={`clinical-sheet-tab ${activePanel === section.id ? 'clinical-sheet-tab-active' : ''}`}
-            onClick={() => selectPanel(section.id)}
+            href={`#clinical-sheet-${section.id}`}
+            className="clinical-sheet-tab"
           >
             {section.title}
-          </button>
+          </a>
         ))}
-      </div>
+      </nav>
 
       {protocol.prompt ? (
         <section className="clinical-sheet-prompt clinical-sheet-prompt-after-tabs">
@@ -658,9 +642,17 @@ const DecisionPanelProtocol = ({ protocol, onCalculatorOpen, onProcedureOpen, on
         </section>
       ) : null}
 
-      {activeSection ? (
-        <DecisionPanelSection section={activeSection} onCalculatorOpen={onCalculatorOpen} onProcedureOpen={onProcedureOpen} onProtocolOpen={onProtocolOpen} />
-      ) : null}
+      <div className="clinical-sheet-section-stack">
+        {panelSections.map((section) => (
+          <DecisionPanelSection
+            key={section.id}
+            section={section}
+            onCalculatorOpen={onCalculatorOpen}
+            onProcedureOpen={onProcedureOpen}
+            onProtocolOpen={onProtocolOpen}
+          />
+        ))}
+      </div>
 
       <RelatedTools
         actions={collectRelatedActions(protocol, panelSections)}

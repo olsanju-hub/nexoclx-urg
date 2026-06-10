@@ -53,8 +53,8 @@ const ProcedureFlowView = lazy(() => import('./components/ProcedureFlowView'));
 const brandMark = `${import.meta.env.BASE_URL}assets/icons/app-icon-512.png`;
 
 const shellCardClass = 'shell-card';
-const panelClass = 'floating-panel';
-const mutedPanelClass = 'tonal-panel';
+const panelClass = 'minimal-panel';
+const mutedPanelClass = 'minimal-muted-panel';
 const subtleButtonClass = 'soft-button';
 const ghostButtonClass = 'ghost-button';
 const inputClass = 'app-input';
@@ -774,7 +774,7 @@ const ProtocolCompactCard = ({ module, onClick, compact = false, showCalculatorB
           {!compact && showCalculatorBadge && calculatorCount ? <StatusBadge tone="active">{calculatorCount} cálculo{calculatorCount > 1 ? 's' : ''}</StatusBadge> : null}
         </div>
         <p className="mt-1 text-[0.72rem] font-semibold text-[var(--text-muted)]">{module.section}</p>
-        {!compact ? <p className="mt-1 line-clamp-1 text-xs leading-snug text-[var(--text-soft)]">{module.summary}</p> : null}
+        {!compact && module.section ? <p className="mt-1 text-xs leading-snug text-[var(--text-soft)]">{module.section}</p> : null}
       </div>
       <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-hover:translate-x-0.5" />
     </button>
@@ -906,18 +906,17 @@ const SpecialtyAccordionList = ({
     {groups.map((group) => (
       <details
         key={group.id}
-        className="group overflow-hidden rounded-[1.35rem] border border-[color:var(--line)] bg-[rgba(255,255,255,0.92)] shadow-[0_18px_40px_-34px_rgba(0,0,0,0.16)]"
+        className="group overflow-hidden rounded-lg border border-[color:var(--line)] bg-white"
         {...(forceOpen || group.id === preferredOpenId || (!preferredOpenId && group.id === 'cardiologia') ? { open: true } : {})}
       >
         <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4 sm:px-5 sm:py-4.5 [&::-webkit-details-marker]:hidden">
           <div className="min-w-0">
             <p className="text-[1.02rem] font-semibold tracking-[-0.03em] text-[var(--text)]">{group.title}</p>
-            {group.note ? <p className="mt-1 max-w-2xl text-sm text-[var(--text-soft)]">{group.note}</p> : null}
           </div>
           <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-open:rotate-90" />
         </summary>
 
-        <div className="border-t border-[color:var(--line)] bg-[rgba(252,249,244,0.5)] px-4 py-4 sm:px-5">
+        <div className="border-t border-[color:var(--line)] bg-white px-4 py-4 sm:px-5">
           <div className="space-y-4">
             {group.protocols.length > 0 ? (
               <SpecialtySectionRows title="Protocolos">
@@ -1661,23 +1660,19 @@ const DisclosureBlock = ({ title, summary, children, tone = 'neutral', defaultOp
 const HomeView = ({ onProtocolsOpen, onCalculationsOpen, onProceduresOpen, onSourcesOpen }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const sections = [
-    { title: 'Protocolos', meta: 'Listado completo de protocolos hospitalarios.', icon: ClipboardList, onClick: onProtocolsOpen },
-    { title: 'Herramientas', meta: 'Cálculos y ayudas vinculadas a protocolos.', icon: Calculator, onClick: onCalculationsOpen },
-    { title: 'Procedimientos', meta: 'Técnicas operativas para soporte y reevaluación.', icon: Wrench, onClick: onProceduresOpen },
-    { title: 'Fuentes', meta: 'Referencias verificadas y trazabilidad.', icon: BookOpen, onClick: onSourcesOpen },
+    { title: 'Protocolos', icon: ClipboardList, onClick: onProtocolsOpen },
+    { title: 'Herramientas', icon: Calculator, onClick: onCalculationsOpen },
+    { title: 'Procedimientos', icon: Wrench, onClick: onProceduresOpen },
+    { title: 'Fuentes', icon: BookOpen, onClick: onSourcesOpen },
   ];
 
   return (
     <div className={pageClass}>
-      <section className="home-intro-line">
-        <p>Urgencias hospitalarias.</p>
-      </section>
-
       <section className="home-search-panel">
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Buscar protocolo, síntoma, cálculo..."
+          placeholder="ictus, sepsis, dolor, cálculo..."
           prominent
         />
       </section>
@@ -1690,7 +1685,6 @@ const HomeView = ({ onProtocolsOpen, onCalculationsOpen, onProceduresOpen, onSou
               </span>
               <span className="min-w-0">
                 <strong>{item.title}</strong>
-                <small>{item.meta}</small>
               </span>
               <ChevronRight className="home-section-chevron h-4 w-4" aria-hidden="true" />
             </button>
@@ -1754,7 +1748,7 @@ const ProceduresView = ({ onBack, onProcedureOpen, onCalculatorOpen }) => {
       <BackBar label="Inicio" onClick={onBack} />
 
       <section className="compact-section">
-        <SectionTitle title="Procedimientos" note="Técnicas operativas para guardia." />
+        <SectionTitle title="Procedimientos" />
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
@@ -1770,7 +1764,7 @@ const ProceduresView = ({ onBack, onProcedureOpen, onCalculatorOpen }) => {
         </div>
       </section>
 
-      <DetailPanel title="Calculadoras de procedimientos" note="Acceso secundario; desde cada procedimiento aparecen en el punto de uso.">
+      <DetailPanel title="Calculadoras de procedimientos">
         <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
           {procedureCalculators.map((calculator) => (
             <ListActionRow
@@ -1836,16 +1830,16 @@ const MoreView = ({ onBack, onProceduresOpen, onSourcesOpen }) => (
     <BackBar label="Inicio" onClick={onBack} />
 
     <section className="compact-section">
-      <SectionTitle title="Más" note="Accesos secundarios y trazabilidad." />
+      <SectionTitle title="Más" />
       <div className="compact-list">
         <ListActionRow
           title="Procedimientos"
-          meta="Herramientas operativas para soporte y reevaluación."
+          meta="Soporte, reevaluación y procedimientos de guardia."
           onClick={onProceduresOpen}
         />
         <ListActionRow
           title="Fuentes"
-          meta="Referencias textuales verificadas y trazabilidad."
+          meta="Referencias verificadas y trazabilidad."
           onClick={onSourcesOpen}
         />
       </div>

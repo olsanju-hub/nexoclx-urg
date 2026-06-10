@@ -1384,6 +1384,9 @@
   }
 
   .clinical-sheet-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 2rem;
     flex: 1 1 calc(33.333% - 0.24rem);
     border: 1px solid transparent;
@@ -1397,6 +1400,7 @@
     overflow-wrap: normal;
     white-space: nowrap;
     word-break: keep-all;
+    text-decoration: none;
   }
 
   .clinical-sheet-tab-active {
@@ -1408,6 +1412,14 @@
 
   .clinical-sheet-section {
     padding: 0.7rem 0.72rem 0.82rem;
+  }
+
+  .clinical-sheet-section-stack {
+    display: grid;
+  }
+
+  .clinical-sheet-section-stack > * + * {
+    border-top: 1px solid var(--line);
   }
 
   .clinical-sheet-section-head {
@@ -2354,11 +2366,11 @@
     grid-template-columns: 2rem minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.72rem;
-    min-height: 4.2rem;
+    min-height: 3.25rem;
     border: 0;
     border-bottom: 1px solid var(--line);
     background: transparent;
-    padding: 0.82rem 0.92rem;
+    padding: 0.68rem 0.82rem;
     text-align: left;
     color: var(--text);
     transition:
@@ -2396,7 +2408,7 @@
   }
 
   .home-section-link small {
-    display: block;
+    display: none;
     margin-top: 0.18rem;
     color: var(--text-muted);
     font-size: 0.78rem;
@@ -2563,6 +2575,57 @@
 
   .flow-node {
     border-left-width: 2px;
+  }
+}
+
+/* Minimal clinical pass: same blue identity, less visible chrome. */
+@layer components {
+  .minimal-panel,
+  .minimal-muted-panel,
+  .compact-section,
+  .home-search-panel,
+  .clinical-flow-tree,
+  .clinical-sheet {
+    border: 1px solid var(--line);
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .minimal-muted-panel {
+    background: var(--surface-2);
+  }
+
+  .home-section-icon,
+  .icon-well {
+    border-radius: 0.45rem;
+  }
+
+  .protocol-compact-card {
+    min-height: 3.35rem;
+    border-radius: 0.5rem;
+    box-shadow: none;
+  }
+
+  .protocol-compact-card p {
+    letter-spacing: 0;
+  }
+
+  .specialty-chip-row {
+    gap: 0.35rem;
+  }
+
+  .specialty-chip {
+    min-height: 2rem;
+    border-radius: 999px;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.76rem;
+  }
+
+  .eyebrow {
+    letter-spacing: 0;
+    text-transform: none;
   }
 }
 
