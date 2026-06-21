@@ -1,0 +1,18 @@
+:root {
+  --app-name: "NexoClx Urg";
+  --clinical-context: "Urgencias hospitalarias";
+  --color-bg: #f2f2f7;
+  --color-bg-soft: #eff0f5;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #fbfdfc;
+  --color-text: #1c1c1e;
+  --color-text-soft: #3c3c43;
+  --color-muted: #6c6c72;
+  --color-line: #d9d9e2;
+  --color-line-strong: #c8c8d2;
+  --color-accent: #0a84ff;
+  --color-accent-strong: #0048bf;
+  --color-accent-soft: #e7f2ff;
+  --color-success: #168a55;
+  --color-danger: #d70015;
+}
