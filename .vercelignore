@@ -1,6 +1,0 @@
-.local-biblio/
-docs/*.pdf
-node_modules/
-dist/
-coverage/
-*.log

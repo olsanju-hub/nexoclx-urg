@@ -1,0 +1,16 @@
+{
+  "name": "NexoClx Urg",
+  "context": "Urgencias hospitalarias",
+  "colors": {
+    "bg": "#f2f2f7",
+    "bgSoft": "#eff0f5",
+    "surface": "#ffffff",
+    "text": "#1c1c1e",
+    "textSoft": "#3c3c43",
+    "muted": "#6c6c72",
+    "accent": "#0a84ff",
+    "accentStrong": "#0048bf",
+    "success": "#168a55",
+    "danger": "#d70015"
+  }
+}
