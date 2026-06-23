@@ -15,7 +15,7 @@ import { routes } from '../app/routes.js';
 export const appConfig = {
   name: 'NexoClx Urg',
   context: 'Urgencias hospitalarias',
-  icon: '/icons/app-icon-192.png',
+  icon: `${import.meta.env.BASE_URL}icons/app-icon-192.png`,
   accent: '#0a84ff',
   homeVariant: 'standard',
 };
