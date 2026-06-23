@@ -5,13 +5,13 @@ export function Calculations() {
   return (
     <div className="screen">
       <div className="section-heading">
-        <h1>Calculos</h1>
-        <p>Calculadoras preparadas sin formulas activas.</p>
+        <h1>Cálculos</h1>
+        <p>Módulo no operativo. Pendiente de contenido clínico validado.</p>
       </div>
-      <ContentBlock title="Formula pendiente">
-        <p>No se ejecuta ningun calculo clinico hasta disponer de formula, fuente, version y revision.</p>
+      <ContentBlock title="Estado del módulo">
+        <p>Módulo no operativo. Pendiente de contenido clínico validado.</p>
       </ContentBlock>
-      <EmptyClinicalState text="Esta seccion es estructural y no operativa." />
+      <EmptyClinicalState text="Contenido pendiente de validación bibliográfica." />
     </div>
   );
 }

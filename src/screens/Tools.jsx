@@ -6,15 +6,15 @@ export function Tools({ app }) {
     <div className="screen">
       <div className="section-heading">
         <h1>Herramientas</h1>
-        <p>Area preparada para calculos y ayudas de {app.context.toLowerCase()}.</p>
+        <p>Módulo no operativo. Pendiente de contenido clínico validado.</p>
       </div>
-      <ContentBlock title="Calculadoras">
-        <p>No hay formulas activas. Cada herramienta requerira formula, fuente, version y revision antes de estar disponible.</p>
+      <ContentBlock title="Estado del módulo">
+        <p>Módulo no operativo. Pendiente de contenido clínico validado.</p>
       </ContentBlock>
-      <ContentBlock title="Ayudas de decision">
-        <p>Sin criterios operativos. Este espacio solo define la estructura visual.</p>
+      <ContentBlock title="Validación pendiente">
+        <p>Contenido pendiente de validación bibliográfica.</p>
       </ContentBlock>
-      <EmptyClinicalState text="Las herramientas no realizan calculos clinicos en esta version." />
+      <EmptyClinicalState text="Módulo no operativo. Pendiente de contenido clínico validado." />
     </div>
   );
 }

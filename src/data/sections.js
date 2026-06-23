@@ -17,47 +17,48 @@ export const appConfig = {
   context: 'Urgencias hospitalarias',
   icon: '/icons/app-icon-192.png',
   accent: '#0a84ff',
+  homeVariant: 'standard',
 };
 
 export const primarySections = [
   {
     id: routes.protocols,
     title: 'Protocolos',
-    description: 'Gravedad, observacion y alta.',
+    description: 'Módulo no operativo.',
     icon: FileText,
   },
   {
     id: routes.tools,
     title: 'Herramientas',
-    description: 'Ayudas urgentes pendientes.',
+    description: 'Módulo no operativo.',
     icon: Calculator,
   },
   {
     id: routes.procedures,
     title: 'Procedimientos',
-    description: 'Tecnicas pendientes.',
+    description: 'Módulo no operativo.',
     icon: Stethoscope,
   },
   {
     id: routes.sources,
     title: 'Fuentes',
-    description: 'Fuentes pendientes.',
+    description: 'Pendiente de bibliografía validada.',
     icon: BookOpen,
   },
 ];
 
 export const secondarySections = [
-  { id: routes.protocols, title: 'Protocolos', description: 'Listado estructural no operativo.', icon: FolderOpen },
-  { id: routes.tools, title: 'Herramientas', description: 'Sin formulas clinicas activas.', icon: Wrench },
-  { id: routes.procedures, title: 'Procedimientos', description: 'Sin pasos clinicos activos.', icon: Stethoscope },
-  { id: routes.sources, title: 'Fuentes', description: 'Pendiente de fuentes.', icon: Library },
+  { id: routes.protocols, title: 'Protocolos', description: 'Módulo no operativo.', icon: FolderOpen },
+  { id: routes.tools, title: 'Herramientas', description: 'Módulo no operativo.', icon: Wrench },
+  { id: routes.procedures, title: 'Procedimientos', description: 'Módulo no operativo.', icon: Stethoscope },
+  { id: routes.sources, title: 'Fuentes', description: 'Pendiente de bibliografía validada.', icon: Library },
 ];
 
 export const bottomNavItems = [
   { id: routes.home, label: 'Inicio', icon: HeartPulse },
   { id: routes.protocols, label: 'Protocolos', icon: FileText },
   { id: routes.tools, label: 'Herramientas', icon: Calculator },
-  { id: routes.more, label: 'Mas', icon: MoreHorizontal },
+  { id: routes.more, label: 'Más', icon: MoreHorizontal },
 ];
 
 export const desktopNavItems = [

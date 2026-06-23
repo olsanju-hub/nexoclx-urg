@@ -6,11 +6,11 @@ export function Bibliography() {
   return (
     <div className="screen">
       <div className="section-heading">
-        <h1>Bibliografia</h1>
-        <p>Fuentes pendientes de incorporacion.</p>
+        <h1>Bibliografía</h1>
+        <p>Pendiente de bibliografía validada.</p>
       </div>
       <SourceList sources={placeholderSources} />
-      <EmptyClinicalState text="No se muestra contenido clinico sin fuente verificable." />
+      <EmptyClinicalState text="Pendiente de bibliografía validada." />
     </div>
   );
 }

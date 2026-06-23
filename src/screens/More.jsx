@@ -5,10 +5,10 @@ export function More({ sections, onNavigate }) {
   return (
     <div className="screen">
       <div className="section-heading">
-        <h1>Mas</h1>
+        <h1>Más</h1>
         <p>Accesos secundarios de la app.</p>
       </div>
-      <CompactList label="Mas accesos">
+      <CompactList label="Más accesos">
         {sections.map((section) => (
           <ListRow
             key={section.id}

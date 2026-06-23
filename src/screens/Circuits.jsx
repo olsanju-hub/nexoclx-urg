@@ -7,17 +7,17 @@ export function Circuits({ onOpen }) {
     <div className="screen">
       <div className="section-heading">
         <h1>Circuitos</h1>
-        <p>Rutas asistenciales pendientes.</p>
+        <p>Módulo no operativo. Pendiente de contenido clínico validado.</p>
       </div>
       <CompactList label="Listado de circuitos">
         <ListRow
-          title="Circuito pendiente de validacion"
-          description="Sin activacion, criterios ni coordinacion operativa."
+          title="Módulo pendiente"
+          description="Módulo no operativo. Pendiente de contenido clínico validado."
           meta="No operativo"
           onClick={onOpen}
         />
       </CompactList>
-      <EmptyClinicalState text="Requiere fuente y revision." />
+      <EmptyClinicalState text="Módulo no operativo. Pendiente de contenido clínico validado." />
     </div>
   );
 }

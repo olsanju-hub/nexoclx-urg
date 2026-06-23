@@ -20,13 +20,13 @@ const routeTitles = {
   [routes.protocols]: 'Protocolos',
   [routes.protocolDetail]: 'Protocolo',
   [routes.tools]: 'Herramientas',
-  [routes.bibliography]: 'Bibliografia',
+  [routes.bibliography]: 'Bibliografía',
   [routes.procedures]: 'Procedimientos',
   [routes.circuits]: 'Circuitos',
   [routes.circuitDetail]: 'Circuito',
-  [routes.calculations]: 'Calculos',
+  [routes.calculations]: 'Cálculos',
   [routes.sources]: 'Fuentes',
-  [routes.more]: 'Mas',
+  [routes.more]: 'Más',
 };
 
 export default function App() {

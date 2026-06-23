@@ -12,12 +12,12 @@ export function Home({ app, sections, onNavigate }) {
     <div className="screen home-screen">
       <section className="home-intro">
         <div className="home-title">
-          <h1>Mapa clinico</h1>
+          <h1>Mapa clínico</h1>
           <p>{app.context}</p>
         </div>
         <SearchBox value={query} onChange={setQuery} placeholder="Buscar seccion o recurso" />
       </section>
-      <HomeMap sections={visibleSections} onNavigate={onNavigate} />
+      <HomeMap sections={visibleSections} variant={app.homeVariant} onNavigate={onNavigate} />
     </div>
   );
 }

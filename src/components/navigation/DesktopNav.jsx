@@ -1,6 +1,6 @@
 export function DesktopNav({ items, activeRoute, onNavigate }) {
   return (
-    <nav className="desktop-nav" aria-label="Navegacion principal">
+    <nav className="desktop-nav" aria-label="Navegación principal">
       {items.map((item) => (
         <button
           key={item.id}

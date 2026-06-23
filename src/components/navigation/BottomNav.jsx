@@ -1,6 +1,6 @@
 export function BottomNav({ items, activeRoute, onNavigate }) {
   return (
-    <nav className="bottom-nav" aria-label="Navegacion inferior">
+    <nav className="bottom-nav" aria-label="Navegación inferior">
       {items.map((item) => {
         const Icon = item.icon;
         const active = activeRoute === item.id;

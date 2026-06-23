@@ -6,22 +6,36 @@ import { EmptyClinicalState } from '../components/feedback/EmptyClinicalState.js
 
 export function Protocols({ protocols, onOpen }) {
   const [query, setQuery] = useState('');
-  const filtered = useMemo(
-    () => protocols.filter((item) => `${item.title} ${item.description}`.toLowerCase().includes(query.toLowerCase())),
-    [protocols, query],
-  );
+  const [filter, setFilter] = useState('all');
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.toLowerCase();
+    return protocols.filter((item) => {
+      const matchesQuery = `${item.title} ${item.description}`.toLowerCase().includes(normalizedQuery);
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'pending' && item.status === 'Pendiente') ||
+        (filter === 'sources' && item.title.toLowerCase().includes('bibliografía'));
+      return matchesQuery && matchesFilter;
+    });
+  }, [filter, protocols, query]);
 
   return (
     <div className="screen">
       <div className="section-heading">
         <h1>Protocolos</h1>
-        <p>Listado estructural preparado para contenido validado.</p>
+        <p>Contenido pendiente de validación bibliográfica.</p>
       </div>
       <SearchBox value={query} onChange={setQuery} placeholder="Buscar protocolo" />
       <div className="filter-strip" aria-label="Filtros">
-        <button className="filter-chip is-active" type="button">Todos</button>
-        <button className="filter-chip" type="button">Pendientes</button>
-        <button className="filter-chip" type="button">Fuentes</button>
+        <button className={filter === 'all' ? 'filter-chip is-active' : 'filter-chip'} type="button" onClick={() => setFilter('all')}>
+          Todos
+        </button>
+        <button className={filter === 'pending' ? 'filter-chip is-active' : 'filter-chip'} type="button" onClick={() => setFilter('pending')}>
+          Pendientes
+        </button>
+        <button className={filter === 'sources' ? 'filter-chip is-active' : 'filter-chip'} type="button" onClick={() => setFilter('sources')}>
+          Fuentes
+        </button>
       </div>
       <CompactList label="Listado de protocolos">
         {filtered.map((protocol) => (
@@ -34,7 +48,7 @@ export function Protocols({ protocols, onOpen }) {
           />
         ))}
       </CompactList>
-      <EmptyClinicalState text="No hay decisiones clinicas activas hasta incorporar bibliografia y revision." />
+      <EmptyClinicalState text="Módulo no operativo. Pendiente de contenido clínico validado." />
     </div>
   );
 }
