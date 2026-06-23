@@ -24,34 +24,34 @@ export const primarySections = [
   {
     id: routes.protocols,
     title: 'Protocolos',
-    description: 'Módulo no operativo.',
+    description: 'Guías clínicas para atención urgente.',
     icon: FileText,
   },
   {
     id: routes.tools,
     title: 'Herramientas',
-    description: 'Módulo no operativo.',
+    description: 'Apoyo para priorización y pruebas urgentes.',
     icon: Calculator,
   },
   {
     id: routes.procedures,
     title: 'Procedimientos',
-    description: 'Módulo no operativo.',
+    description: 'Técnicas y flujos asistenciales.',
     icon: Stethoscope,
   },
   {
     id: routes.sources,
     title: 'Fuentes',
-    description: 'Pendiente de bibliografía validada.',
+    description: 'Guías y documentos consultados.',
     icon: BookOpen,
   },
 ];
 
 export const secondarySections = [
-  { id: routes.protocols, title: 'Protocolos', description: 'Módulo no operativo.', icon: FolderOpen },
-  { id: routes.tools, title: 'Herramientas', description: 'Módulo no operativo.', icon: Wrench },
-  { id: routes.procedures, title: 'Procedimientos', description: 'Módulo no operativo.', icon: Stethoscope },
-  { id: routes.sources, title: 'Fuentes', description: 'Pendiente de bibliografía validada.', icon: Library },
+  { id: routes.protocols, title: 'Protocolos', description: 'Guías clínicas para atención urgente.', icon: FolderOpen },
+  { id: routes.tools, title: 'Herramientas', description: 'Apoyo para priorización y pruebas urgentes.', icon: Wrench },
+  { id: routes.procedures, title: 'Procedimientos', description: 'Técnicas y flujos asistenciales.', icon: Stethoscope },
+  { id: routes.sources, title: 'Fuentes', description: 'Guías y documentos consultados.', icon: Library },
 ];
 
 export const bottomNavItems = [

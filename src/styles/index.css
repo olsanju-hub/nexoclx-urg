@@ -479,10 +479,6 @@ h2 {
     0 1px 0 rgba(255, 255, 255, 0.84) inset;
 }
 
-.protocol-step-card:nth-child(n + 5) {
-  margin-top: calc(4.2rem + env(safe-area-inset-bottom));
-}
-
 .protocol-step-index {
   display: grid;
   width: 2.35rem;
@@ -511,6 +507,24 @@ h2 {
   color: var(--color-muted);
   font-size: 0.93rem;
   line-height: var(--line-height-copy);
+}
+
+.clinical-bullets {
+  display: grid;
+  gap: 0.48rem;
+  margin: 0.76rem 0 0;
+  padding-left: 1.05rem;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: var(--line-height-copy);
+}
+
+.clinical-bullets li::marker {
+  color: var(--color-accent);
+}
+
+.content-block .clinical-bullets {
+  margin-top: 0;
 }
 
 .empty-state {
