@@ -51,7 +51,7 @@ button {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-3);
-  width: min(1120px, 100%);
+  width: min(1220px, 100%);
   margin: 0 auto;
   padding: 0.68rem var(--space-4);
 }
@@ -118,7 +118,7 @@ button {
 
 .app-main {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1220px;
   margin: 0 auto;
   padding: 1.65rem var(--space-4) calc(6.8rem + env(safe-area-inset-bottom));
   overflow-x: hidden;
@@ -258,6 +258,18 @@ h2 {
   min-height: 6.25rem;
 }
 
+.section-card::after {
+  content: '';
+  position: absolute;
+  right: -2.5rem;
+  bottom: -2.75rem;
+  width: 6.4rem;
+  height: 6.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-accent) 9%, transparent);
+  pointer-events: none;
+}
+
 .list-row::before {
   content: '';
   position: absolute;
@@ -359,6 +371,8 @@ h2 {
   align-self: center;
   color: var(--color-accent);
   opacity: 0.72;
+  position: relative;
+  z-index: 1;
 }
 
 .list-row-side {
@@ -463,6 +477,10 @@ h2 {
   box-shadow:
     0 18px 42px -34px rgba(23, 33, 36, 0.5),
     0 1px 0 rgba(255, 255, 255, 0.84) inset;
+}
+
+.protocol-step-card:nth-child(n + 5) {
+  margin-top: calc(4.2rem + env(safe-area-inset-bottom));
 }
 
 .protocol-step-index {
@@ -601,27 +619,44 @@ h2 {
   }
 
   .app-main {
-    padding: 2.35rem var(--space-6) var(--space-8);
+    padding: 2.6rem var(--space-6) 3.25rem;
   }
 
   .screen {
-    max-width: 820px;
+    max-width: 900px;
   }
 
   .home-screen {
-    max-width: 1020px;
+    max-width: 1140px;
+    gap: 1.7rem;
+  }
+
+  .home-intro {
+    grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 0.75fr);
+    align-items: end;
+    gap: var(--space-6);
+  }
+
+  .home-title h1 {
+    font-size: clamp(2.35rem, 4.6vw, 3.35rem);
+  }
+
+  .home-title p {
+    font-size: 1.08rem;
   }
 
   .home-map {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-4);
+    gap: 1.15rem;
   }
 
   .section-card {
     display: grid;
-    min-height: 10.2rem;
+    min-height: 12.2rem;
     grid-template-columns: minmax(0, 1fr);
     align-content: space-between;
+    padding: 1.18rem;
+    border-radius: 1.5rem;
   }
 
   .section-chevron {
@@ -638,16 +673,42 @@ h2 {
     display: inline;
   }
 
+  .compact-list {
+    gap: 0.85rem;
+  }
+
+  .list-row {
+    min-height: 5.15rem;
+    padding: 1.05rem 1.12rem 1.05rem 1.25rem;
+    border-radius: 1.25rem;
+  }
+
+  .content-block,
+  .source-list,
+  .empty-state {
+    padding: 1.18rem 1.25rem;
+  }
+
   .protocol-detail {
-    max-width: 860px;
+    max-width: 980px;
   }
 
   .protocol-flow {
-    gap: var(--space-3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
   }
 
   .protocol-step-card {
+    min-height: 8.4rem;
+    border-radius: 1.45rem;
+    padding: 1.12rem;
+    margin-top: 0;
     transition: background var(--motion-fast), border-color var(--motion-fast), box-shadow var(--motion-fast);
+  }
+
+  .protocol-step-card:first-child {
+    grid-column: span 2;
+    min-height: 7.4rem;
   }
 
   .protocol-step-card:hover {

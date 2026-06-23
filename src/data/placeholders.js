@@ -8,9 +8,10 @@ export const placeholderProtocols = [
   },
   {
     id: 'pendiente-validacion',
-    title: 'Contenido pendiente de validación bibliográfica',
+    title: 'Protocolo pendiente de validación',
     description: 'Contenido pendiente de validación bibliográfica.',
     status: 'No operativo',
+    detailVariant: 'structured-pending',
   },
   {
     id: 'fuentes-pendientes',
@@ -65,7 +66,35 @@ export const crisisHypertensionSections = [
   },
   {
     step: '05',
-    title: 'Tratamiento según escenario',
+    title: 'Conducta según escenario',
     body: 'Módulo no operativo. Pendiente de contenido clínico validado.',
+  },
+];
+
+export const genericProtocolSections = [
+  {
+    step: '01',
+    title: 'Bloque de valoración inicial',
+    body: 'Módulo no operativo. Pendiente de contenido clínico validado.',
+  },
+  {
+    step: '02',
+    title: 'Criterio pendiente de validar',
+    body: 'Contenido pendiente de validación bibliográfica.',
+  },
+  {
+    step: '03',
+    title: 'Conducta pendiente de contenido validado',
+    body: 'Módulo no operativo. Pendiente de contenido clínico validado.',
+  },
+  {
+    step: '04',
+    title: 'Herramienta relacionada pendiente',
+    body: 'Módulo no operativo. Pendiente de contenido clínico validado.',
+  },
+  {
+    step: '05',
+    title: 'Fuente pendiente',
+    body: 'Pendiente de bibliografía validada.',
   },
 ];
