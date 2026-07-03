@@ -83,6 +83,26 @@ export function ProtocolDetail({ protocol, onBack }) {
         </ul>
       </ContentBlock>
 
+      {protocol.treatment?.length > 0 && (
+        <ContentBlock title="Tratamiento">
+          <div className="treatment-grid">
+            {protocol.treatment.map((item) => (
+              <article className="treatment-card" key={item.title}>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+                {item.items?.length > 0 && (
+                  <ul className="clinical-bullets">
+                    {item.items.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            ))}
+          </div>
+        </ContentBlock>
+      )}
+
       <SourceList sources={protocol.sources} />
     </div>
   );

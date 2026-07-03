@@ -7,6 +7,18 @@ export const placeholderSources = [
   'ACC/AHA. 2022 Guideline for the Diagnosis and Management of Aortic Disease. https://www.ahajournals.org/doi/10.1161/CIR.0000000000001106',
 ];
 
+export const hypertensionSources = [
+  'ESC. 2024 Guidelines for the management of elevated blood pressure and hypertension. https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/elevated-blood-pressure-and-hypertension/',
+  'European Society of Hypertension. 2023 ESH Guidelines for the management of arterial hypertension. Journal of Hypertension. https://journals.lww.com/jhypertension/fulltext/2023/12000/2023_esh_guidelines_for_the_management_of_arterial.2.aspx',
+  'NICE. Hypertension in adults: diagnosis and management, NG136. https://www.nice.org.uk/guidance/ng136/chapter/recommendations',
+  'NICE. Hypertension in adults: diagnosis and management, visual summary. https://www.nice.org.uk/guidance/ng136/resources/visual-summary-pdf-6899919517',
+  'BNF/NICE. Amlodipine. https://bnf.nice.org.uk/drugs/amlodipine/',
+  'BNF/NICE. Ramipril. https://bnf.nice.org.uk/drugs/ramipril/',
+  'BNF/NICE. Losartan potassium. https://bnf.nice.org.uk/drugs/losartan-potassium/',
+  'BNF/NICE. Indapamide. https://bnf.nice.org.uk/drugs/indapamide/',
+  'Peacock WF, et al. Treatment of hypertensive emergencies. Ann Transl Med. 2017. https://pmc.ncbi.nlm.nih.gov/articles/PMC5440310/',
+];
+
 export const placeholderProtocols = [
   {
     id: 'dolor-toracico',
@@ -97,5 +109,101 @@ export const placeholderProtocols = [
       copyPrefix: 'Dolor torácico Urg',
     },
     sources: placeholderSources,
+  },
+  {
+    id: 'hta',
+    title: 'HTA',
+    description: 'Diferenciación de daño agudo, conducta urgente y destino hospitalario.',
+    status: 'Guía clínica',
+    sections: [
+      {
+        step: '01',
+        title: 'Confirmar gravedad real',
+        body: 'Repite la presión arterial con técnica correcta y clasifica al paciente por daño agudo, no solo por la cifra.',
+        items: [
+          'Valora ABCDE, dolor torácico, disnea, focalidad neurológica, confusión, alteración visual, oliguria, embarazo o dolor dorsal brusco.',
+          'Comprueba fármacos, suspensión reciente de tratamiento, tóxicos, dolor, ansiedad, retención urinaria y causas reversibles.',
+          'Usa monitorización y área de mayor vigilancia si hay síntomas, signos de daño de órgano o necesidad de tratamiento intravenoso.',
+        ],
+      },
+      {
+        step: '02',
+        title: 'Semáforo de conducta',
+        body: 'La emergencia hipertensiva exige daño agudo de órgano diana y tratamiento monitorizado; la HTA sin daño agudo no requiere descenso brusco.',
+        items: [
+          'Emergencia: encefalopatía, ictus candidato a vía específica, SCA, edema agudo de pulmón, disección aórtica, insuficiencia renal aguda o eclampsia.',
+          'HTA grave sin daño agudo: observar, reevaluar, reiniciar o ajustar tratamiento oral y planificar seguimiento.',
+          'Evita reducciones rápidas no indicadas si no hay daño agudo documentado.',
+        ],
+      },
+      {
+        step: '03',
+        title: 'Pruebas dirigidas',
+        body: 'Solicita pruebas según síntomas y sospecha de órgano afectado.',
+        items: [
+          'ECG, troponina y radiografía/imagen si hay dolor torácico, disnea, sospecha de SCA o edema pulmonar.',
+          'Analítica con función renal, electrolitos y orina cuando condiciona daño renal, tratamiento o ingreso.',
+          'Neuroimagen o circuito ictus si hay focalidad, alteración neurológica o criterio temporal aplicable.',
+        ],
+      },
+      {
+        step: '04',
+        title: 'Tratamiento y destino',
+        body: 'El tratamiento depende del escenario: ajuste oral y seguimiento si no hay daño agudo; intravenoso titulado e ingreso si hay emergencia.',
+        items: [
+          'Emergencia hipertensiva: monitorización, vía intravenosa titulable, objetivos definidos por el proceso y valoración de UCI/interconsulta.',
+          'HTA grave sin daño agudo: evitar descenso brusco; ajustar tratamiento oral y confirmar seguimiento estrecho.',
+          'Alta solo si no hay daño agudo, hay estabilidad clínica, plan terapéutico y seguimiento documentado.',
+        ],
+      },
+    ],
+    tools: [
+      'Selector de daño agudo de órgano diana.',
+      'Semáforo: emergencia hipertensiva, HTA grave sin daño agudo o seguimiento ambulatorio.',
+      'Resumen copiable para evolución, interconsulta o ingreso.',
+    ],
+    treatment: [
+      {
+        title: 'Sin daño agudo',
+        body: 'La conducta es reevaluación, tratamiento oral y seguimiento; no descenso rápido intravenoso.',
+        items: [
+          'Reiniciar o intensificar tratamiento oral según perfil: amlodipino 5 mg cada 24 h hasta 10 mg; ramipril 1,25-2,5 mg cada 24 h hasta 10 mg; losartán 50 mg cada 24 h hasta 100 mg; indapamida 2,5 mg cada 24 h o MR 1,5 mg.',
+          'Comprobar función renal y potasio cuando se indiquen IECA, ARA-II, diuréticos o antagonistas mineralocorticoides.',
+        ],
+      },
+      {
+        title: 'Emergencia hipertensiva',
+        body: 'Requiere monitorización, tratamiento titulado y objetivo dependiente del órgano afectado.',
+        items: [
+          'Labetalol intravenoso: bolo inicial 0,3-1 mg/kg con máximo inicial 20 mg, seguido de perfusión 0,4-1 mg/kg/h según respuesta y vigilancia.',
+          'Priorizar tratamiento específico si predomina SCA, edema agudo de pulmón, disección aórtica, ictus, insuficiencia renal aguda o eclampsia.',
+          'Ingreso o unidad monitorizada si hay daño agudo, perfusión intravenosa, deterioro clínico o necesidad de interconsulta urgente.',
+        ],
+      },
+      {
+        title: 'Alta y seguimiento',
+        body: 'Solo si la evaluación descarta daño agudo y queda un plan seguro.',
+        items: [
+          'Documentar cifras, repetición de medida, ausencia de daño agudo, cambios terapéuticos y seguimiento.',
+          'Entregar señales de reconsulta urgente: dolor torácico, disnea, focalidad neurológica, confusión, síncope o empeoramiento.',
+        ],
+      },
+    ],
+    interactive: {
+      title: 'Decisión rápida HTA Urg',
+      intro: 'Marca los datos presentes.',
+      checks: [
+        'Dolor torácico, disnea, edema pulmonar, focalidad neurológica, confusión, alteración visual, oliguria o dolor dorsal brusco.',
+        'ECG, biomarcadores, función renal, neuroimagen o clínica sugieren daño agudo de órgano diana.',
+        'Necesidad de tratamiento intravenoso titulado o monitorización continua.',
+        'HTA grave sin daño agudo pero sin seguimiento fiable o con mala tolerancia clínica.',
+      ],
+      positiveTitle: 'Escalar a emergencia, observación o ingreso',
+      positiveBody: 'Si hay daño agudo, monitoriza, trata según órgano afectado e ingresa o interconsulta. Si no hay daño agudo pero el plan no es seguro, observa y ajusta.',
+      negativeTitle: 'Ajuste oral y alta segura',
+      negativeBody: 'Con estabilidad y sin daño agudo, evita descenso brusco, ajusta tratamiento oral y documenta seguimiento y signos de alarma.',
+      copyPrefix: 'HTA Urg',
+    },
+    sources: hypertensionSources,
   },
 ];

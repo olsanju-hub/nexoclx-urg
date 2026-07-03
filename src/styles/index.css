@@ -877,6 +877,30 @@ h2 {
   border-color: color-mix(in srgb, var(--color-accent) 44%, var(--color-line));
 }
 
+.treatment-grid {
+  display: grid;
+  gap: 0.82rem;
+}
+
+.treatment-card {
+  border: 1px solid color-mix(in srgb, var(--color-accent) 16%, var(--color-line));
+  border-radius: 1.15rem;
+  background: color-mix(in srgb, var(--color-surface) 94%, var(--color-accent-soft) 6%);
+  padding: 0.92rem;
+}
+
+.treatment-card h3 {
+  margin-bottom: 0.26rem;
+  font-size: 0.96rem;
+}
+
+.treatment-card p {
+  margin-bottom: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: var(--line-height-copy);
+}
+
 .empty-state {
   display: flex;
   align-items: flex-start;

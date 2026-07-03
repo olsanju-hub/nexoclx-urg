@@ -1,0 +1,68 @@
+{
+  "fecha": "2026-07-03",
+  "app": "NexoClx Urg",
+  "rama": "main",
+  "commit_inicial": "8c3af75",
+  "commit_final": null,
+  "tema_creado": "HTA",
+  "archivos_modificados": [
+    "src/data/placeholders.js",
+    "src/screens/ProtocolDetail.jsx",
+    "src/styles/index.css",
+    "reports/hta-report.json"
+  ],
+  "fuentes_usadas": [
+    "ESC 2024 Guidelines for the management of elevated blood pressure and hypertension",
+    "European Society of Hypertension 2023 Guidelines for the management of arterial hypertension",
+    "NICE NG136 Hypertension in adults: diagnosis and management",
+    "NICE NG136 visual summary",
+    "BNF/NICE: amlodipine, ramipril, losartan potassium, indapamide",
+    "Peacock WF et al. Treatment of hypertensive emergencies. Ann Transl Med. 2017"
+  ],
+  "fuente_por_bloque_clinico": {
+    "diferenciacion_emergencia_sin_dano_agudo": ["ESC 2024", "ESH 2023", "NICE NG136"],
+    "pruebas_dirigidas_por_organo": ["ESC 2024", "ESH 2023"],
+    "tratamiento_oral_sin_dano_agudo": ["NICE NG136", "BNF/NICE"],
+    "tratamiento_intravenoso_emergencia": ["Peacock WF et al. 2017"],
+    "alta_observacion_ingreso": ["ESC 2024", "ESH 2023", "NICE NG136"]
+  },
+  "fuente_por_tratamiento_dosis": {
+    "amlodipino_5_10_mg_24h": "BNF/NICE amlodipine",
+    "ramipril_1_25_2_5_mg_hasta_10_mg_24h": "BNF/NICE ramipril",
+    "losartan_50_100_mg_24h": "BNF/NICE losartan potassium",
+    "indapamida_2_5_mg_o_MR_1_5_mg_24h": "BNF/NICE indapamide",
+    "labetalol_IV_0_3_1_mg_kg_max_20_mg_y_perf_0_4_1_mg_kg_h": "Peacock WF et al. 2017"
+  },
+  "dosis_anadidas": [
+    "amlodipino 5 mg cada 24 h hasta 10 mg",
+    "ramipril 1,25-2,5 mg cada 24 h hasta 10 mg",
+    "losartan 50 mg cada 24 h hasta 100 mg",
+    "indapamida 2,5 mg cada 24 h o MR 1,5 mg",
+    "labetalol intravenoso bolo 0,3-1 mg/kg maximo inicial 20 mg y perfusion 0,4-1 mg/kg/h"
+  ],
+  "escalones_terapeuticos_anadidos": [
+    "Sin dano agudo: ajuste oral y seguimiento, sin descenso brusco",
+    "Emergencia hipertensiva: monitorizacion y tratamiento intravenoso titulado",
+    "Alta segura: estabilidad, ausencia de dano agudo y seguimiento documentado"
+  ],
+  "tratamientos_coadyuvantes_anadidos": [
+    "reevaluacion de causas reversibles",
+    "seguimiento estrecho tras alta",
+    "signos de reconsulta urgente"
+  ],
+  "contenido_omitido_por_falta_de_fuente": [
+    "Dosis de otros intravenosos no trazadas en fuente seleccionada",
+    "Objetivos especificos por subescenario que dependan de protocolo local"
+  ],
+  "calculadoras_nuevas": false,
+  "formulas_modificadas": false,
+  "build": "pass",
+  "errores_consola": [],
+  "overflow_horizontal": false,
+  "colores_base_modificados": false,
+  "navegacion_global_modificada": false,
+  "vercel_tocado": false,
+  "riesgos_pendientes": [
+    "Revisar objetivos de descenso por organo afectado con direccion clinica antes de granular mas"
+  ]
+}
