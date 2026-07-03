@@ -13,7 +13,7 @@ export function Calculations() {
     <div className="screen">
       <div className="section-heading">
         <h1>Selector de destino</h1>
-        <p>Apoyo no matemático vinculado al protocolo Dolor torácico.</p>
+        <p>Elige el escenario.</p>
       </div>
       <ContentBlock title="Dolor torácico">
         <div className="segmented-control" aria-label="Destino">

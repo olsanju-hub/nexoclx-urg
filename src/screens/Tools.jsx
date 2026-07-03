@@ -26,7 +26,7 @@ export function Tools() {
     <div className="screen">
       <div className="section-heading">
         <h1>Herramientas</h1>
-        <p>Apoyo rápido vinculado al protocolo Dolor torácico.</p>
+        <p>Pruebas y destino.</p>
       </div>
       <ContentBlock title="Checklist de pruebas y destino">
         <div className="checklist-grid">

@@ -6,7 +6,7 @@ export function Bibliography() {
     <div className="screen">
       <div className="section-heading">
         <h1>Bibliografía</h1>
-        <p>Fuentes utilizadas para el protocolo Dolor torácico.</p>
+        <p>Verificación bibliográfica.</p>
       </div>
       <SourceList sources={placeholderSources} />
     </div>

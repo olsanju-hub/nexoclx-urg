@@ -15,7 +15,7 @@ export function Home({ app, sections, onNavigate }) {
           <h1>Mapa clínico</h1>
           <p>{app.context}</p>
         </div>
-        <SearchBox value={query} onChange={setQuery} placeholder="Buscar seccion o recurso" />
+        <SearchBox value={query} onChange={setQuery} placeholder="Buscar sección o recurso" />
       </section>
       <HomeMap sections={visibleSections} variant={app.homeVariant} onNavigate={onNavigate} />
     </div>

@@ -6,7 +6,7 @@ export function Sources() {
     <div className="screen">
       <div className="section-heading">
         <h1>Fuentes</h1>
-        <p>Fuentes utilizadas para el protocolo Dolor torácico.</p>
+        <p>Verificación bibliográfica.</p>
       </div>
       <SourceList sources={placeholderSources} />
     </div>

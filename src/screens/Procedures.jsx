@@ -11,7 +11,7 @@ export function Procedures() {
     <div className="screen">
       <div className="section-heading">
         <h1>Procedimientos</h1>
-        <p>Procedimientos vinculados a los protocolos disponibles.</p>
+        <p>Pasos clave.</p>
       </div>
       <ContentBlock title="Dolor torácico">
         <div className="checklist-grid">

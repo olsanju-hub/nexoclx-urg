@@ -6,7 +6,7 @@ export function More({ sections, onNavigate }) {
     <div className="screen">
       <div className="section-heading">
         <h1>Más</h1>
-        <p>Accesos secundarios de la app.</p>
+        <p>Secciones.</p>
       </div>
       <CompactList label="Más accesos">
         {sections.map((section) => (

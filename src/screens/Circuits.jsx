@@ -6,7 +6,7 @@ export function Circuits({ onOpen }) {
     <div className="screen">
       <div className="section-heading">
         <h1>Circuitos</h1>
-        <p>Flujos asistenciales vinculados a los protocolos disponibles.</p>
+        <p>Secuencia asistencial.</p>
       </div>
       <CompactList label="Listado de circuitos">
         <ListRow

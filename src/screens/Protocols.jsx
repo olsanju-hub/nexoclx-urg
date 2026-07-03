@@ -17,7 +17,7 @@ export function Protocols({ protocols, onOpen }) {
     <div className="screen">
       <div className="section-heading">
         <h1>Protocolos</h1>
-        <p>Protocolos clínicos disponibles para urgencias hospitalarias.</p>
+        <p>Consulta rápida.</p>
       </div>
       <SearchBox value={query} onChange={setQuery} placeholder="Buscar protocolo" />
       <CompactList label="Listado de protocolos">

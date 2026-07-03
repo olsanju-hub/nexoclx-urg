@@ -30,7 +30,7 @@ export const primarySections = [
   {
     id: routes.tools,
     title: 'Herramientas',
-    description: 'Apoyo para priorización y pruebas urgentes.',
+    description: 'Priorización y pruebas urgentes.',
     icon: Calculator,
   },
   {
@@ -49,7 +49,7 @@ export const primarySections = [
 
 export const secondarySections = [
   { id: routes.protocols, title: 'Protocolos', description: 'Guías clínicas para atención urgente.', icon: FolderOpen },
-  { id: routes.tools, title: 'Herramientas', description: 'Apoyo para priorización y pruebas urgentes.', icon: Wrench },
+  { id: routes.tools, title: 'Herramientas', description: 'Priorización y pruebas urgentes.', icon: Wrench },
   { id: routes.procedures, title: 'Procedimientos', description: 'Técnicas y flujos asistenciales.', icon: Stethoscope },
   { id: routes.sources, title: 'Fuentes', description: 'Guías y documentos consultados.', icon: Library },
 ];

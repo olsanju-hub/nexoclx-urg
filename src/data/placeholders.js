@@ -82,7 +82,7 @@ export const placeholderProtocols = [
     ],
     interactive: {
       title: 'Decisión rápida en urgencias',
-      intro: 'Marca los datos presentes para priorizar ubicación, pruebas y destino asistencial.',
+      intro: 'Marca los datos presentes.',
       checks: [
         'Compromiso vital, shock, insuficiencia respiratoria, síncope, arritmia o dolor persistente.',
         'ECG compatible con SCA con elevación del ST o equivalente según protocolo del centro.',
