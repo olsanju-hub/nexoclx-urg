@@ -3,6 +3,122 @@ import { DetailHeader } from '../components/detail/DetailHeader.jsx';
 import { ContentBlock } from '../components/detail/ContentBlock.jsx';
 import { SourceList } from '../components/detail/SourceList.jsx';
 
+const getDefaultValues = (fields = []) => fields.reduce((values, field) => ({
+  ...values,
+  [field.id]: field.type === 'checkbox' ? false : '',
+}), {});
+
+const conditionIsMet = (condition, values) => {
+  if (typeof condition === 'string') {
+    return Boolean(values[condition]);
+  }
+  if (condition.gte !== undefined) {
+    const value = Number(values[condition.id]);
+    return values[condition.id] !== '' && !Number.isNaN(value) && value >= condition.gte;
+  }
+  if (condition.lte !== undefined) {
+    const value = Number(values[condition.id]);
+    return values[condition.id] !== '' && !Number.isNaN(value) && value <= condition.lte;
+  }
+  if (condition.equals !== undefined) {
+    return values[condition.id] === condition.equals;
+  }
+  return false;
+};
+
+const outcomeMatches = (outcome, values) => {
+  if (outcome.any?.some((condition) => conditionIsMet(condition, values))) return true;
+  if (outcome.all?.length > 0 && outcome.all.every((condition) => conditionIsMet(condition, values))) return true;
+  return false;
+};
+
+function ClinicalToolPanel({ protocol }) {
+  const [values, setValues] = useState(() => getDefaultValues(protocol.assessment.fields));
+  const [copied, setCopied] = useState(false);
+  const outcome = useMemo(
+    () => protocol.assessment.outcomes.find((item) => outcomeMatches(item, values)) ?? protocol.assessment.defaultOutcome,
+    [protocol.assessment, values],
+  );
+  const summary = useMemo(() => {
+    const findings = protocol.assessment.fields
+      .map((field) => {
+        const value = values[field.id];
+        if (field.type === 'checkbox') return value ? `- ${field.label}` : null;
+        if (value === '') return null;
+        const option = field.options?.find((item) => item.value === value);
+        return `- ${field.label}: ${option?.label ?? value}${field.unit ? ` ${field.unit}` : ''}`;
+      })
+      .filter(Boolean)
+      .join('\n') || '- Sin datos introducidos.';
+    return `${protocol.assessment.copyPrefix}\n${findings}\nSalida: ${outcome.title}. ${outcome.body}`;
+  }, [outcome.body, outcome.title, protocol.assessment, values]);
+
+  const updateValue = (field, value) => {
+    setValues((current) => ({ ...current, [field.id]: value }));
+    setCopied(false);
+  };
+
+  const copySummary = async () => {
+    await navigator.clipboard.writeText(summary);
+    setCopied(true);
+  };
+
+  return (
+    <section className="decision-panel" aria-label={protocol.assessment.title}>
+      <div className="decision-header">
+        <div>
+          <h2>{protocol.assessment.title}</h2>
+          <p>{protocol.assessment.intro}</p>
+        </div>
+        <span className={outcome.tone === 'alert' ? 'status-pill is-alert' : 'status-pill'}>{outcome.status}</span>
+      </div>
+      <div className="tool-fields">
+        {protocol.assessment.fields.map((field) => (
+          <label className={field.type === 'checkbox' && values[field.id] ? 'tool-field is-checked' : 'tool-field'} key={field.id}>
+            <span>{field.label}</span>
+            {field.type === 'number' && (
+              <span className="tool-input-wrap">
+                <input
+                  inputMode="numeric"
+                  min={field.min}
+                  max={field.max}
+                  type="number"
+                  value={values[field.id]}
+                  onChange={(event) => updateValue(field, event.target.value)}
+                />
+                {field.unit && <small>{field.unit}</small>}
+              </span>
+            )}
+            {field.type === 'select' && (
+              <select value={values[field.id]} onChange={(event) => updateValue(field, event.target.value)}>
+                <option value="">Seleccionar</option>
+                {field.options.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            )}
+            {field.type === 'checkbox' && (
+              <input type="checkbox" checked={values[field.id]} onChange={(event) => updateValue(field, event.target.checked)} />
+            )}
+          </label>
+        ))}
+      </div>
+      <div className="decision-result">
+        <h3>{outcome.title}</h3>
+        <p>{outcome.body}</p>
+        {outcome.actions?.length > 0 && (
+          <ul className="clinical-bullets">
+            {outcome.actions.map((action) => (
+              <li key={action}>{action}</li>
+            ))}
+          </ul>
+        )}
+        <button className="copy-button" type="button" onClick={copySummary}>{copied ? 'Resumen copiado' : 'Copiar resumen'}</button>
+      </div>
+    </section>
+  );
+}
+
 function DecisionPanel({ protocol }) {
   const [selected, setSelected] = useState([]);
   const [copied, setCopied] = useState(false);
@@ -54,7 +170,7 @@ export function ProtocolDetail({ protocol, onBack }) {
   return (
     <div className="screen detail-screen protocol-detail">
       <DetailHeader title={protocol.title} subtitle={protocol.description} onBack={onBack} />
-      {protocol.interactive && <DecisionPanel protocol={protocol} />}
+      {protocol.assessment ? <ClinicalToolPanel protocol={protocol} /> : protocol.interactive && <DecisionPanel protocol={protocol} />}
 
       <section className="protocol-flow" aria-label="Estructura del protocolo">
         {protocol.sections.map((section) => (

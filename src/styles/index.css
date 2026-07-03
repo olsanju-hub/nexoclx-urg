@@ -829,6 +829,63 @@ h2 {
   accent-color: var(--color-accent);
 }
 
+.tool-fields {
+  display: grid;
+  gap: 0.62rem;
+}
+
+.tool-field {
+  display: grid;
+  gap: 0.48rem;
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-surface) 90%, #fff);
+  padding: 0.78rem 0.85rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  font-weight: 720;
+  line-height: var(--line-height-copy);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.tool-field.is-checked {
+  border-color: color-mix(in srgb, var(--color-accent) 38%, var(--color-line));
+  background: color-mix(in srgb, var(--color-accent-soft) 62%, #fff);
+  color: var(--color-text);
+}
+
+.tool-field input,
+.tool-field select {
+  width: 100%;
+  min-height: 2.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-line) 88%, transparent);
+  border-radius: 0.82rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.58rem 0.68rem;
+}
+
+.tool-field input[type="checkbox"] {
+  width: 1.2rem;
+  min-height: 1.2rem;
+  accent-color: var(--color-accent);
+}
+
+.tool-input-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.48rem;
+  align-items: center;
+}
+
+.tool-input-wrap small {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
 .clinical-check.is-checked {
   border-color: color-mix(in srgb, var(--color-accent) 38%, var(--color-line));
   background: color-mix(in srgb, var(--color-accent-soft) 62%, #fff);
