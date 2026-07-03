@@ -80,6 +80,22 @@ export const placeholderProtocols = [
       'Estratificación estructurada de riesgo integrada en el circuito hospitalario.',
       'Interconsulta temprana según ECG, biomarcadores, estabilidad y diagnóstico diferencial.',
     ],
+    interactive: {
+      title: 'Decisión rápida en urgencias',
+      intro: 'Marca los datos presentes para priorizar ubicación, pruebas y destino asistencial.',
+      checks: [
+        'Compromiso vital, shock, insuficiencia respiratoria, síncope, arritmia o dolor persistente.',
+        'ECG compatible con SCA con elevación del ST o equivalente según protocolo del centro.',
+        'Troponina positiva, en evolución o vía seriada aún no completada.',
+        'Sospecha dominante de TEP, síndrome aórtico agudo, neumotórax o miopericarditis.',
+        'Necesidad de observación, imagen urgente, ingreso o interconsulta específica.',
+      ],
+      positiveTitle: 'Monitorizar, observar o ingresar según escenario',
+      positiveBody: 'Con cualquier dato marcado, prioriza área monitorizada, ECG/troponina seriados, interconsulta o circuito específico según sospecha.',
+      negativeTitle: 'Completar vía de bajo riesgo antes del alta',
+      negativeBody: 'Solo plantear alta tras evaluación completa, bajo riesgo documentado, diagnóstico alternativo razonable y plan de seguimiento.',
+      copyPrefix: 'Dolor torácico Urg',
+    },
     sources: placeholderSources,
   },
 ];
