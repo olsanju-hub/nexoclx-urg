@@ -32,12 +32,25 @@ const outcomeMatches = (outcome, values) => {
   return false;
 };
 
+const getMissingFields = (fields, values) => fields.filter((field) => field.required && values[field.id] === '');
+
 function ClinicalToolPanel({ protocol }) {
   const [values, setValues] = useState(() => getDefaultValues(protocol.assessment.fields));
   const [copied, setCopied] = useState(false);
+  const missingFields = useMemo(() => getMissingFields(protocol.assessment.fields, values), [protocol.assessment.fields, values]);
   const outcome = useMemo(
-    () => protocol.assessment.outcomes.find((item) => outcomeMatches(item, values)) ?? protocol.assessment.defaultOutcome,
-    [protocol.assessment, values],
+    () => {
+      if (missingFields.length > 0) {
+        return protocol.assessment.incompleteOutcome ?? {
+          status: 'Completar',
+          title: 'Introduce los datos mínimos',
+          body: 'La herramienta necesita los campos obligatorios para devolver una conducta.',
+          actions: missingFields.map((field) => `Completar: ${field.label}`),
+        };
+      }
+      return protocol.assessment.outcomes.find((item) => outcomeMatches(item, values)) ?? protocol.assessment.defaultOutcome;
+    },
+    [missingFields, protocol.assessment, values],
   );
   const summary = useMemo(() => {
     const findings = protocol.assessment.fields

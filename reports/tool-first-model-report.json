@@ -1,0 +1,53 @@
+{
+  "fecha": "2026-07-04",
+  "app": "NexoClx Urg",
+  "readme_creado_actualizado": true,
+  "temas_revisados": ["Dolor torácico", "HTA"],
+  "decision_pertinencia": {
+    "Dolor torácico": "Pertinente en Urg como triaje, ECG, troponina/vía seriada, observación, ingreso, alta e interconsulta.",
+    "HTA": "Pertinente en Urg como HTA grave, urgencia/emergencia hipertensiva, pruebas urgentes, tratamiento y destino."
+  },
+  "dolor_toracico_corregido_AP": false,
+  "dolor_toracico_corregido_Urg": true,
+  "dolor_toracico_corregido_061": false,
+  "hta_corregida_AP": false,
+  "hta_corregida_Urg": true,
+  "hta_corregida_061": false,
+  "justificacion_no_mantenido": [],
+  "archivos_modificados": ["README.md", "src/data/placeholders.js", "src/screens/ProtocolDetail.jsx", "reports/tool-first-model-report.json"],
+  "fuentes_usadas": [
+    "ACC/AHA/ACEP/NAEMSP/SCAI 2025 ACS Guideline",
+    "ESC 2023 ACS Guideline",
+    "ACC/AHA/ASE/CHEST/SAEM/SCCT/SCMR 2021 Chest Pain Guideline",
+    "NICE CG95 chest pain",
+    "ESC 2024 elevated blood pressure and hypertension",
+    "ESH 2023 arterial hypertension",
+    "NICE NG136 hypertension",
+    "BNF/NICE antihypertensive monographs",
+    "Peacock WF et al. Treatment of hypertensive emergencies. Ann Transl Med. 2017"
+  ],
+  "fuente_por_bloque_clinico": {
+    "dolor_toracico_Urg": ["2025 ACC/AHA ACS", "ESC 2023 ACS", "2021 AHA/ACC chest pain", "NICE CG95"],
+    "hta_Urg": ["ESC 2024", "ESH 2023", "NICE NG136", "Peacock WF et al. 2017"]
+  },
+  "fuente_por_tratamiento_dosis": {
+    "HTA sin daño agudo": ["BNF/NICE amlodipine", "BNF/NICE ramipril", "BNF/NICE losartan", "BNF/NICE indapamide"],
+    "emergencia hipertensiva": ["Peacock WF et al. 2017"]
+  },
+  "dosis_anadidas": ["amlodipino", "ramipril", "losartan", "indapamida", "labetalol IV"],
+  "escalones_terapeuticos_anadidos": ["sin daño agudo: ajuste oral", "emergencia: intravenoso titulado e ingreso/interconsulta"],
+  "tratamientos_coadyuvantes_anadidos": ["reevaluacion de causas reversibles", "seguimiento estrecho", "signos de alarma"],
+  "calculos_implementados": [],
+  "calculos_omitidos": ["HEART/TIMI/GRACE/Wells/PERC/Geneva: no se muestran ni se usan como herramienta activa en esta fase"],
+  "contenido_omitido_por_falta_de_fuente": ["Objetivos de descenso por subescenario dependientes de protocolo local"],
+  "calculadoras_nuevas": false,
+  "formulas_modificadas": false,
+  "build": "pass",
+  "errores_consola": [],
+  "overflow_horizontal": false,
+  "colores_base_modificados": false,
+  "navegacion_global_modificada": false,
+  "estetica_modificada": false,
+  "vercel_tocado": false,
+  "riesgos_pendientes": ["Revisión médica si se desea añadir escalas completas de dolor torácico."]
+}

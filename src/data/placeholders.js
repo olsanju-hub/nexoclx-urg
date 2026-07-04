@@ -69,11 +69,11 @@ export const placeholderProtocols = [
       {
         step: '05',
         title: 'Observación, ingreso o alta',
-        body: 'La disposición requiere una vía clínica estructurada que combine síntomas, ECG, biomarcadores, riesgo y diagnóstico alternativo.',
+        body: 'La disposición requiere una vía clínica estructurada que combine síntomas, ECG, biomarcadores, estabilidad y diagnóstico alternativo.',
         items: [
           'Ingreso o unidad monitorizada si hay inestabilidad, isquemia, biomarcadores positivos, causa grave o necesidad de tratamiento hospitalario.',
           'Observación si el episodio requiere ECG/troponina seriada o pruebas complementarias antes de decidir destino.',
-          'Alta solo con bajo riesgo documentado, evaluación completa, diagnóstico alternativo razonable y plan de seguimiento.',
+          'Alta solo con estabilidad documentada, evaluación completa, diagnóstico alternativo razonable y plan de seguimiento.',
         ],
       },
       {
@@ -89,7 +89,7 @@ export const placeholderProtocols = [
     ],
     tools: [
       'ECG seriado y vía local de troponina de alta sensibilidad.',
-      'Estratificación estructurada de riesgo integrada en el circuito hospitalario.',
+      'Destino estructurado según estabilidad, ECG, troponina y sospecha diferencial.',
       'Interconsulta temprana según ECG, biomarcadores, estabilidad y diagnóstico diferencial.',
     ],
     interactive: {
@@ -104,8 +104,8 @@ export const placeholderProtocols = [
       ],
       positiveTitle: 'Monitorizar, observar o ingresar según escenario',
       positiveBody: 'Con cualquier dato marcado, prioriza área monitorizada, ECG/troponina seriados, interconsulta o circuito específico según sospecha.',
-      negativeTitle: 'Completar vía de bajo riesgo antes del alta',
-      negativeBody: 'Solo plantear alta tras evaluación completa, bajo riesgo documentado, diagnóstico alternativo razonable y plan de seguimiento.',
+      negativeTitle: 'Completar vía clínica antes del alta',
+      negativeBody: 'Solo plantear alta tras evaluación completa, estabilidad documentada, diagnóstico alternativo razonable y plan de seguimiento.',
       copyPrefix: 'Dolor torácico Urg',
     },
     assessment: {
@@ -119,6 +119,7 @@ export const placeholderProtocols = [
           id: 'ecg',
           type: 'select',
           label: 'ECG inicial',
+          required: true,
           options: [
             { value: 'normal', label: 'Sin cambios agudos' },
             { value: 'ischemic', label: 'Cambios isquémicos o arritmia relevante' },
@@ -129,6 +130,7 @@ export const placeholderProtocols = [
           id: 'troponin',
           type: 'select',
           label: 'Troponina / vía seriada',
+          required: true,
           options: [
             { value: 'not-done', label: 'No realizada' },
             { value: 'negative-complete', label: 'Vía seriada negativa completa' },
@@ -165,12 +167,22 @@ export const placeholderProtocols = [
           ],
         },
       ],
+      incompleteOutcome: {
+        status: 'Datos',
+        title: 'Completa ECG y troponina/vía seriada',
+        body: 'La disposición en urgencias no debe proponerse sin ECG y estado de la vía de troponina cuando aplica.',
+        actions: [
+          'Registrar ECG inicial.',
+          'Indicar si troponina está no realizada, pendiente, positiva o vía seriada negativa completa.',
+          'Marcar dolor activo, inestabilidad o diferencial grave si existen.',
+        ],
+      },
       defaultOutcome: {
-        status: 'Bajo riesgo',
+        status: 'Alta',
         title: 'Alta solo tras vía completa y diagnóstico razonable',
         body: 'Sin datos marcados, el alta exige evaluación completa, vía seriada negativa si procede y seguimiento.',
         actions: [
-          'Documentar bajo riesgo y diagnóstico alternativo razonable.',
+          'Documentar estabilidad y diagnóstico alternativo razonable.',
           'Entregar señales de reconsulta.',
           'Planificar seguimiento según circuito local.',
         ],
@@ -277,12 +289,13 @@ export const placeholderProtocols = [
       intro: 'Introduce cifras, daño orgánico y seguridad del plan para orientar conducta.',
       copyPrefix: 'HTA Urg',
       fields: [
-        { id: 'sbp', type: 'number', label: 'Presión sistólica', min: 70, max: 300, unit: 'mmHg' },
-        { id: 'dbp', type: 'number', label: 'Presión diastólica', min: 40, max: 180, unit: 'mmHg' },
+        { id: 'sbp', type: 'number', label: 'Presión sistólica', min: 70, max: 300, unit: 'mmHg', required: true },
+        { id: 'dbp', type: 'number', label: 'Presión diastólica', min: 40, max: 180, unit: 'mmHg', required: true },
         {
           id: 'organDamage',
           type: 'select',
           label: 'Daño agudo de órgano diana',
+          required: true,
           options: [
             { value: 'none', label: 'No objetivado' },
             { value: 'suspected', label: 'Sospechado' },
@@ -319,6 +332,16 @@ export const placeholderProtocols = [
           ],
         },
       ],
+      incompleteOutcome: {
+        status: 'Datos',
+        title: 'Completa cifras y daño orgánico',
+        body: 'La herramienta diferencia HTA sin daño agudo, urgencia y emergencia a partir de TA y daño de órgano.',
+        actions: [
+          'Introducir presión sistólica y diastólica.',
+          'Seleccionar daño agudo: no objetivado, sospechado o confirmado.',
+          'Marcar síntomas torácicos, neurológicos, renales o inseguridad del alta si existen.',
+        ],
+      },
       defaultOutcome: {
         status: 'Oral',
         title: 'Ajuste oral y seguimiento',
