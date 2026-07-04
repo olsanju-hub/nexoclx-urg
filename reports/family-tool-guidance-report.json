@@ -14,7 +14,7 @@
     "HTA: ya orientada a assessment de dano organico, tratamiento inicial y destino"
   ],
   "temas_omitidos_por_falta_de_pertinencia": [],
-  "archivos_modificados": ["README.md", "reports/family-tool-guidance-report.json"],
+  "archivos_modificados": ["README.md", ".github/workflows/pages.yml", "reports/family-tool-guidance-report.json"],
   "fuentes_usadas": [],
   "fuente_por_bloque_clinico": {},
   "fuente_por_tratamiento_dosis": {},
@@ -33,6 +33,7 @@
   "navegacion_global_modificada": false,
   "estetica_modificada": false,
   "vercel_tocado": false,
+  "nota_despliegue": "Actualizada la accion actions/deploy-pages de v4 a v5 tras fallo externo del paso deploy de GitHub Pages; no se modifico codigo de la app.",
   "riesgos_pendientes": [
     "Mantener revision clinica si se anaden dosis urgentes, escalas o criterios de alta."
   ]
