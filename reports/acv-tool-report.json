@@ -24,16 +24,14 @@
     "trombectomia_gran_vaso": ["AHA/ASA 2026", "NICE NG128"],
     "AIT_y_destino": ["NICE NG128", "Estrategia en Ictus SNS 2024"]
   },
-  "tratamiento_dosis_anadidas": [
-    "Alteplasa intravenosa en adultos seleccionados: 0,9 mg/kg, maximo 90 mg, 10% bolo inicial y resto en 60 min."
-  ],
+  "tratamiento_dosis_anadidas": [],
   "calculos_implementados": [],
   "calculos_omitidos": [
     "NIHSS no implementada en esta fase; no se muestra como calculadora."
   ],
   "contenido_omitido_por_falta_de_fuente": [
     "Criterios locales completos de inclusion/exclusion de trombolisis dependientes del circuito hospitalario.",
-    "Tenecteplasa y dosis no incorporadas para evitar recomendacion incompleta sin protocolo local."
+    "Dosis de trombolisis no incorporadas como pauta visible para evitar recomendacion incompleta sin criterios de elegibilidad, peso y protocolo local."
   ],
   "calculadoras_nuevas": false,
   "formulas_modificadas": false,

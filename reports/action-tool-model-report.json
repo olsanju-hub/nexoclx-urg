@@ -1,0 +1,49 @@
+{
+  "fecha": "2026-07-04",
+  "app": "NexoClx Urg",
+  "README_actualizado": true,
+  "herramientas_temas_revisados": ["Dolor toracico", "HTA", "ACV"],
+  "decision_pertinencia": {
+    "Dolor toracico": "aplica como gravedad, ECG/troponina seriada, observacion, ingreso, alta o interconsulta",
+    "HTA": "aplica como dano agudo de organo diana, observacion, emergencia, tratamiento monitorizado y destino",
+    "ACV": "aplica como codigo ictus, imagen urgente, reperfusion por equipo de ictus y destino"
+  },
+  "herramientas_corregidas": [
+    "Detalle de protocolo centrado en panel de conducta y resumen copiable",
+    "Retirados pasos narrativos visibles del flujo de herramienta",
+    "Retirado bloque visible de fuentes dentro del detalle de herramienta",
+    "Retirado bloque visible de herramientas relacionadas dentro del detalle",
+    "Retirada dosis mg/kg visible de labetalol sin calculadora/peso"
+  ],
+  "herramientas_no_modificadas_y_motivo": [],
+  "herramientas_retiradas_ocultadas_y_motivo": [],
+  "fuentes_usadas_internamente": [
+    "ACC/AHA ACS and chest pain guidance",
+    "ESC ACS, pulmonary embolism and hypertension guidance",
+    "NICE chest pain and hypertension guidance",
+    "AHA/ASA/NICE/Ministerio de Sanidad stroke sources"
+  ],
+  "bibliografia_visible_anadida": false,
+  "item_bibliografia_visible_eliminado": true,
+  "calculos_implementados": [],
+  "calculos_omitidos": [
+    "NIHSS no implementada; no se muestra como calculadora",
+    "Dosis mg/kg de labetalol omitida de la vista al no existir campo de peso ni calculadora"
+  ],
+  "tratamientos_dosis_escaladas_anadidas": [],
+  "archivos_modificados": [
+    "README.md",
+    "src/screens/ProtocolDetail.jsx",
+    "src/data/placeholders.js",
+    "reports/action-tool-model-report.json"
+  ],
+  "build": "pass",
+  "errores_consola": [],
+  "overflow_horizontal": false,
+  "estetica_modificada": false,
+  "navegacion_modificada": false,
+  "vercel_tocado": false,
+  "riesgos_pendientes": [
+    "Si se reintroduce tratamiento IV por peso, implementar calculadora con peso y fuente/local protocol."
+  ]
+}

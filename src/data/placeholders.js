@@ -258,7 +258,7 @@ export const placeholderProtocols = [
         title: 'Emergencia hipertensiva',
         body: 'Requiere monitorización, tratamiento titulado y objetivo dependiente del órgano afectado.',
         items: [
-          'Labetalol intravenoso: bolo inicial 0,3-1 mg/kg con máximo inicial 20 mg, seguido de perfusión 0,4-1 mg/kg/h según respuesta y vigilancia.',
+          'Tratamiento intravenoso titulado solo en área monitorizada y según protocolo del centro/equipo responsable.',
           'Priorizar tratamiento específico si predomina SCA, edema agudo de pulmón, disección aórtica, ictus, insuficiencia renal aguda o eclampsia.',
           'Ingreso o unidad monitorizada si hay daño agudo, perfusión intravenosa, deterioro clínico o necesidad de interconsulta urgente.',
         ],
@@ -375,7 +375,7 @@ export const placeholderProtocols = [
         title: 'Tratamiento tiempo-dependiente',
         body: 'La indicación definitiva de trombólisis o trombectomía exige imagen, criterios de elegibilidad y equipo de ictus.',
         items: [
-          'Alteplasa intravenosa en adultos seleccionados: 0,9 mg/kg, máximo 90 mg, 10% en bolo inicial y resto en 60 minutos.',
+          'Trombólisis intravenosa solo tras imagen, criterios de elegibilidad y validación por equipo de ictus.',
           'Trombectomía mecánica debe valorarse en oclusión de gran vaso y ventana aplicable según imagen y criterios del equipo.',
           'Mantener monitorización, control de complicaciones y destino a unidad de ictus o área monitorizada según gravedad.',
         ],
@@ -456,7 +456,7 @@ export const placeholderProtocols = [
           body: 'Déficit discapacitante y ventana precoz obligan a activar equipo de ictus y decidir reperfusión tras descartar hemorragia.',
           actions: [
             'Priorizar TC/angio-TC según circuito.',
-            'Si procede alteplasa: 0,9 mg/kg, máximo 90 mg; 10% bolo inicial y resto en 60 min.',
+            'Si procede trombólisis, aplicar pauta y verificación del circuito hospitalario vigente.',
             'Documentar hora de inicio, glucemia, anticoagulación, presión arterial y criterios revisados.',
           ],
         },

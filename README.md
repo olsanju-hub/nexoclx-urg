@@ -4,6 +4,12 @@ NexoClx Urg es una app independiente de la familia NexoClx para Urgencias hospit
 
 La familia NexoClx está formada por AP, Urg, 061 y Ped. No se deben fusionar apps ni crear un selector común.
 
+## Modelo de conducta
+
+Cada tema debe responder: "estoy ante esta patología en este paciente, ¿qué hago ahora?". La secuencia de trabajo es patología -> datos urgentes -> gravedad/riesgo -> pruebas -> tratamiento inicial -> dosis -> reevaluación -> observación/ingreso/alta/interconsulta -> fuentes documentadas internamente.
+
+La interfaz debe priorizar conducta y destino. No debe mostrar capítulos, pasos de lectura ni bibliografía como parte del flujo clínico.
+
 ## Identidad
 
 - Contexto: Urgencias hospitalarias.
@@ -43,9 +49,10 @@ Cada tema debe ser una herramienta:
 - resultado de gravedad o escenario;
 - pruebas urgentes iniciales;
 - tratamiento y dosis si proceden;
+- reevaluación y criterios de mala respuesta;
 - observación, ingreso, alta o interconsulta;
 - resumen copiable;
-- fuentes al final.
+- fuentes documentadas en reportes o README, no como bloque visible de la herramienta.
 
 Si un bloque solo se lee, convertirlo en checklist, panel de decisión, cálculo real o detalle secundario.
 
@@ -59,13 +66,15 @@ No mencionar HEART, TIMI, GRACE, Wells, PERC, Geneva u otras escalas si no se ca
 
 No crear botones falsos ni calculadoras incompletas.
 
-## Fuentes
+## Fuentes internas
 
 Fuentes aceptables: guías de sociedades científicas, organismos oficiales, consensos publicados, documentos oficiales referenciados y fuentes internas ya trazables.
 
 Fuentes preferentes: ESC/ESH, AHA/ACC, NICE, SEC, SEMES, AHA/ERC, CHEST y documentos nacionales o autonómicos publicados.
 
 No usar blogs, webs comerciales, apuntes, contenido generado por IA, presentaciones sin respaldo, protocolos locales no publicados ni textos sin trazabilidad.
+
+Las fuentes sostienen la herramienta por detrás. No añadir "Fuentes" o "Bibliografía" como card, paso o bloque visible dentro de cada herramienta clínica.
 
 ## Destino
 
@@ -89,6 +98,7 @@ No rediseñar. Mantener patrón visual family-discovery-aesthetic, tipografía, 
 - No mostrar textos internos, pendientes, mocks ni placeholders.
 - No mostrar contenido clínico sin fuente.
 - No mencionar cálculos si no se calculan.
+- No mostrar bibliografía como ítem del flujo de la herramienta.
 - No tocar Vercel.
 
 ## Validación antes de commit/push
