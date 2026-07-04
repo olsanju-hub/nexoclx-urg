@@ -19,6 +19,13 @@ export const hypertensionSources = [
   'Peacock WF, et al. Treatment of hypertensive emergencies. Ann Transl Med. 2017. https://pmc.ncbi.nlm.nih.gov/articles/PMC5440310/',
 ];
 
+export const strokeSources = [
+  'AHA/ASA. 2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke. https://www.ahajournals.org/doi/10.1161/STR.0000000000000513',
+  'NICE. Stroke and transient ischaemic attack in over 16s: diagnosis and initial management, NG128. https://www.nice.org.uk/guidance/ng128',
+  'Ministerio de Sanidad. Estrategia en Ictus del Sistema Nacional de Salud. Actualización 2024. https://www.sanidad.gob.es/areas/calidadAsistencial/estrategias/ictus/docs/Estrategia_en_Ictus_del_SNS._Actualizacion_2024_accesible.pdf',
+  'AHA/ASA. 2019 Update to the 2018 Guidelines for the Early Management of Acute Ischemic Stroke. https://www.stroke.org/-/media/Stroke-Files/Ischemic-Stroke-Professional-Materials/AIS-Toolkit/Guidelines-for-Mangaging-Patients-with-AIS-2019-Update-to-2018-Guidelines.pdf',
+];
+
 export const placeholderProtocols = [
   {
     id: 'dolor-toracico',
@@ -169,13 +176,9 @@ export const placeholderProtocols = [
       ],
       incompleteOutcome: {
         status: 'Datos',
-        title: 'Completa ECG y troponina/vía seriada',
-        body: 'La disposición en urgencias no debe proponerse sin ECG y estado de la vía de troponina cuando aplica.',
-        actions: [
-          'Registrar ECG inicial.',
-          'Indicar si troponina está no realizada, pendiente, positiva o vía seriada negativa completa.',
-          'Marcar dolor activo, inestabilidad o diferencial grave si existen.',
-        ],
+        title: 'Faltan datos obligatorios',
+        body: 'Completa los campos marcados para orientar observación, ingreso, alta o interconsulta.',
+        actions: [],
       },
       defaultOutcome: {
         status: 'Alta',
@@ -334,13 +337,9 @@ export const placeholderProtocols = [
       ],
       incompleteOutcome: {
         status: 'Datos',
-        title: 'Completa cifras y daño orgánico',
-        body: 'La herramienta diferencia HTA sin daño agudo, urgencia y emergencia a partir de TA y daño de órgano.',
-        actions: [
-          'Introducir presión sistólica y diastólica.',
-          'Seleccionar daño agudo: no objetivado, sospechado o confirmado.',
-          'Marcar síntomas torácicos, neurológicos, renales o inseguridad del alta si existen.',
-        ],
+        title: 'Faltan datos obligatorios',
+        body: 'Completa los campos marcados para orientar gravedad y destino.',
+        actions: [],
       },
       defaultOutcome: {
         status: 'Oral',
@@ -354,5 +353,143 @@ export const placeholderProtocols = [
       },
     },
     sources: hypertensionSources,
+  },
+  {
+    id: 'acv',
+    title: 'ACV',
+    description: 'Código ictus hospitalario, imagen urgente, reperfusión e ingreso/interconsulta.',
+    status: 'Herramienta clínica',
+    sections: [
+      {
+        step: '01',
+        title: 'Entrada a código ictus',
+        body: 'Confirmar hora de inicio o última vez visto bien, déficit actual, glucemia, constantes, anticoagulación y situación basal.',
+        items: [
+          'La neuroimagen urgente diferencia isquemia de hemorragia y condiciona reperfusión o manejo neurocrítico.',
+          'No administrar antiagregación o anticoagulación antes de descartar hemorragia intracraneal.',
+          'Activar equipo/código ictus si hay déficit discapacitante, ventana temporal o sospecha de gran vaso.',
+        ],
+      },
+      {
+        step: '02',
+        title: 'Tratamiento tiempo-dependiente',
+        body: 'La indicación definitiva de trombólisis o trombectomía exige imagen, criterios de elegibilidad y equipo de ictus.',
+        items: [
+          'Alteplasa intravenosa en adultos seleccionados: 0,9 mg/kg, máximo 90 mg, 10% en bolo inicial y resto en 60 minutos.',
+          'Trombectomía mecánica debe valorarse en oclusión de gran vaso y ventana aplicable según imagen y criterios del equipo.',
+          'Mantener monitorización, control de complicaciones y destino a unidad de ictus o área monitorizada según gravedad.',
+        ],
+      },
+    ],
+    tools: [
+      'Selector de ventana, déficit y sospecha de gran vaso.',
+      'Panel de imagen/reperfusión/interconsulta.',
+      'Resumen copiable para código ictus e ingreso.',
+    ],
+    assessment: {
+      title: 'Herramienta ACV en urgencias',
+      intro: 'Orienta código ictus, imagen urgente y destino hospitalario.',
+      copyPrefix: 'ACV Urg',
+      fields: [
+        {
+          id: 'onset',
+          type: 'select',
+          label: 'Inicio o última vez visto bien',
+          required: true,
+          options: [
+            { value: 'under-4-5', label: 'Menos de 4,5 h' },
+            { value: 'under-24', label: '4,5-24 h' },
+            { value: 'over-24', label: 'Más de 24 h' },
+            { value: 'unknown', label: 'Desconocido' },
+            { value: 'resolved', label: 'Síntomas resueltos' },
+          ],
+        },
+        {
+          id: 'imaging',
+          type: 'select',
+          label: 'Imagen cerebral',
+          required: true,
+          options: [
+            { value: 'not-done', label: 'No realizada' },
+            { value: 'no-bleed', label: 'Sin hemorragia' },
+            { value: 'bleed', label: 'Hemorragia intracraneal' },
+            { value: 'lvo', label: 'Oclusión de gran vaso' },
+          ],
+        },
+        { id: 'disablingDeficit', type: 'checkbox', label: 'Déficit neurológico discapacitante actual' },
+        { id: 'lowConsciousness', type: 'checkbox', label: 'Disminución de conciencia, crisis, cefalea súbita intensa o vómitos' },
+        { id: 'lvoClinical', type: 'checkbox', label: 'Sospecha clínica de gran vaso: afasia, desviación mirada, hemiparesia intensa o negligencia' },
+        { id: 'anticoagulated', type: 'checkbox', label: 'Anticoagulación o trastorno hemorrágico conocido' },
+        { id: 'glucoseChecked', type: 'checkbox', label: 'Glucemia revisada' },
+        { id: 'strokeTeam', type: 'checkbox', label: 'Equipo/código ictus activado' },
+      ],
+      outcomes: [
+        {
+          any: [{ id: 'imaging', equals: 'bleed' }, 'lowConsciousness'],
+          status: 'Crítico',
+          tone: 'alert',
+          title: 'Neurocrítico / hemorragia o deterioro',
+          body: 'La prioridad es manejo neurocrítico, control de complicaciones, neuroimagen completa e interconsulta urgente.',
+          actions: [
+            'Activar neurología/neurocirugía o circuito neurocrítico según disponibilidad.',
+            'Evitar antiagregación, anticoagulación o trombólisis.',
+            'Ingreso en área monitorizada o unidad específica según gravedad.',
+          ],
+        },
+        {
+          any: [{ id: 'imaging', equals: 'lvo' }, 'lvoClinical'],
+          status: 'Gran vaso',
+          tone: 'alert',
+          title: 'Valorar trombectomía/código ictus avanzado',
+          body: 'La sospecha o confirmación de gran vaso requiere coordinación inmediata con equipo de ictus y centro útil.',
+          actions: [
+            'Confirmar angio-TC o imagen vascular si no está realizada.',
+            'Coordinar trombectomía si cumple criterios de imagen y ventana.',
+            'No retrasar trombólisis intravenosa si está indicada y no contraindicada.',
+          ],
+        },
+        {
+          any: [{ id: 'onset', equals: 'under-4-5' }, 'disablingDeficit'],
+          status: 'Reperfusión',
+          tone: 'alert',
+          title: 'Código ictus: valorar trombólisis tras imagen',
+          body: 'Déficit discapacitante y ventana precoz obligan a activar equipo de ictus y decidir reperfusión tras descartar hemorragia.',
+          actions: [
+            'Priorizar TC/angio-TC según circuito.',
+            'Si procede alteplasa: 0,9 mg/kg, máximo 90 mg; 10% bolo inicial y resto en 60 min.',
+            'Documentar hora de inicio, glucemia, anticoagulación, presión arterial y criterios revisados.',
+          ],
+        },
+        {
+          any: [{ id: 'onset', equals: 'resolved' }],
+          status: 'AIT',
+          tone: 'alert',
+          title: 'Posible AIT: evaluación urgente',
+          body: 'La resolución de síntomas no equivale a alta directa; requiere estudio etiológico y prevención precoz según circuito.',
+          actions: [
+            'Confirmar ausencia de déficit actual y revisar diagnóstico diferencial.',
+            'Completar imagen/estudio vascular según circuito.',
+            'Alta solo si existe plan seguro, tratamiento indicado y seguimiento urgente documentado.',
+          ],
+        },
+      ],
+      incompleteOutcome: {
+        status: 'Datos',
+        title: 'Faltan datos obligatorios',
+        body: 'Completa inicio e imagen para orientar código ictus y destino.',
+        actions: [],
+      },
+      defaultOutcome: {
+        status: 'Observar',
+        title: 'Completar evaluación neurológica',
+        body: 'Sin criterio de activación registrado, mantener evaluación dirigida y descartar imitadores sin demorar imagen si persiste sospecha.',
+        actions: [
+          'Revisar glucemia, constantes, medicación y exploración neurológica seriada.',
+          'Solicitar imagen urgente si hay déficit focal, duda diagnóstica o riesgo vascular.',
+          'Interconsulta si la orientación no permite alta segura.',
+        ],
+      },
+    },
+    sources: strokeSources,
   },
 ];

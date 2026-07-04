@@ -42,10 +42,10 @@ function ClinicalToolPanel({ protocol }) {
     () => {
       if (missingFields.length > 0) {
         return protocol.assessment.incompleteOutcome ?? {
-          status: 'Completar',
-          title: 'Introduce los datos mínimos',
-          body: 'La herramienta necesita los campos obligatorios para devolver una conducta.',
-          actions: missingFields.map((field) => `Completar: ${field.label}`),
+          status: 'Datos',
+          title: 'Faltan datos obligatorios',
+          body: 'Completa los campos marcados para obtener una salida clínica.',
+          actions: [],
         };
       }
       return protocol.assessment.outcomes.find((item) => outcomeMatches(item, values)) ?? protocol.assessment.defaultOutcome;
