@@ -1,0 +1,39 @@
+{
+  "fecha": "2026-07-04",
+  "app": "NexoClx Urg",
+  "README_creado_actualizado": true,
+  "familia": ["NexoClx AP", "NexoClx Urg", "NexoClx 061", "NexoClx Ped"],
+  "temas_revisados": ["Dolor toracico", "HTA"],
+  "decision_pertinencia": {
+    "Dolor toracico": "aplica en Urg como gravedad, pruebas urgentes, tratamiento inicial, observacion, ingreso, alta o interconsulta",
+    "HTA": "aplica en Urg como diferenciacion de HTA sin dano agudo, urgencia/emergencia hipertensiva, pruebas, tratamiento y destino"
+  },
+  "temas_corregidos": [],
+  "temas_no_modificados_y_motivo": [
+    "Dolor toracico: ya orientado a assessment y salida de gravedad/destino",
+    "HTA: ya orientada a assessment de dano organico, tratamiento inicial y destino"
+  ],
+  "temas_omitidos_por_falta_de_pertinencia": [],
+  "archivos_modificados": ["README.md", "reports/family-tool-guidance-report.json"],
+  "fuentes_usadas": [],
+  "fuente_por_bloque_clinico": {},
+  "fuente_por_tratamiento_dosis": {},
+  "dosis_anadidas": [],
+  "escalones_terapeuticos_anadidos": [],
+  "tratamientos_coadyuvantes_anadidos": [],
+  "calculos_implementados": [],
+  "calculos_omitidos": [],
+  "contenido_omitido_por_falta_de_fuente": [],
+  "calculadoras_nuevas": false,
+  "formulas_modificadas": false,
+  "build": "pass",
+  "errores_consola": [],
+  "overflow_horizontal": false,
+  "colores_base_modificados": false,
+  "navegacion_global_modificada": false,
+  "estetica_modificada": false,
+  "vercel_tocado": false,
+  "riesgos_pendientes": [
+    "Mantener revision clinica si se anaden dosis urgentes, escalas o criterios de alta."
+  ]
+}
