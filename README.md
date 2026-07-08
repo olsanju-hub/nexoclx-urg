@@ -10,6 +10,8 @@ Cada tema debe responder: "estoy ante esta patología en este paciente, ¿qué h
 
 La interfaz debe priorizar conducta y destino. No debe mostrar capítulos, pasos de lectura ni bibliografía como parte del flujo clínico.
 
+El patrón técnico base es `src/lib/clinicalToolEngine.js` + `ClinicalActionTool`: cada tema debe expresarse como `assessment.fields`, `assessment.calculations`, `assessment.interpretations` y `assessment.outcomes`.
+
 ## Identidad
 
 - Contexto: Urgencias hospitalarias.

@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-07-04",
+  "fecha": "2026-07-09",
   "app": "NexoClx Urg",
   "README_actualizado": true,
   "herramientas_temas_revisados": ["Dolor toracico", "HTA", "ACV"],
@@ -9,12 +9,15 @@
     "ACV": "aplica como codigo ictus, imagen urgente, reperfusion por equipo de ictus y destino"
   },
   "herramientas_corregidas": [
+    "Creado motor src/lib/clinicalToolEngine.js para fields, calculations, interpretations y outcomes",
+    "Creado componente ClinicalActionTool reutilizable",
     "Detalle de protocolo centrado en panel de conducta y resumen copiable",
     "Retirados pasos narrativos visibles del flujo de herramienta",
     "Retirado bloque visible de fuentes dentro del detalle de herramienta",
     "Retirado bloque visible de herramientas relacionadas dentro del detalle",
     "Retirada dosis mg/kg visible de labetalol sin calculadora/peso"
   ],
+  "herramientas_convertidas_a_assessment": ["Dolor toracico", "HTA", "ACV"],
   "herramientas_no_modificadas_y_motivo": [],
   "herramientas_retiradas_ocultadas_y_motivo": [],
   "fuentes_usadas_internamente": [
@@ -33,6 +36,8 @@
   "tratamientos_dosis_escaladas_anadidas": [],
   "archivos_modificados": [
     "README.md",
+    "src/lib/clinicalToolEngine.js",
+    "src/components/detail/ClinicalActionTool.jsx",
     "src/screens/ProtocolDetail.jsx",
     "src/data/placeholders.js",
     "reports/action-tool-model-report.json"
