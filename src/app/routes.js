@@ -4,6 +4,7 @@ export const routes = {
   protocolDetail: 'protocol-detail',
   htaUrgProtocol: 'hta-urgencias',
   tools: 'tools',
+  htaUrgSupportTool: 'hta-urg-tool',
   procedures: 'procedures',
   circuits: 'circuits',
   circuitDetail: 'circuit-detail',

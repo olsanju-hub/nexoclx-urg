@@ -230,6 +230,37 @@ h2 {
   gap: var(--space-3);
 }
 
+.tool-group-stack {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.tool-pathology-group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.tool-pathology-heading {
+  display: grid;
+  gap: 0.2rem;
+  padding-inline: 0.15rem;
+}
+
+.tool-pathology-heading h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  letter-spacing: 0;
+}
+
+.tool-pathology-heading p {
+  margin: 0;
+  max-width: 42rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: var(--line-height-copy);
+}
+
 .section-card,
 .list-row {
   display: grid;
@@ -629,6 +660,38 @@ h2 {
   font-weight: 860;
 }
 
+.urg-hta-panel-tabs {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--color-line) 86%, transparent);
+  border-radius: 1.1rem;
+  background: color-mix(in srgb, var(--color-surface) 92%, #fff);
+  padding: 0.38rem;
+  scrollbar-width: none;
+}
+
+.urg-hta-panel-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.urg-hta-panel-tabs button {
+  flex: 0 0 auto;
+  min-height: 2.6rem;
+  border: 0;
+  border-radius: 0.85rem;
+  background: transparent;
+  color: var(--color-muted);
+  padding: 0 0.82rem;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.urg-hta-panel-tabs button.is-active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
 .urg-hta-grid {
   display: grid;
   gap: var(--space-4);
@@ -717,6 +780,22 @@ h2 {
   accent-color: var(--color-accent);
 }
 
+.urg-hta-primary-action {
+  min-height: 3rem;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--color-accent);
+  color: white;
+  padding: 0 1rem;
+  font-size: 0.94rem;
+  font-weight: 840;
+}
+
+.urg-hta-primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .urg-hta-result {
   border-color: color-mix(in srgb, var(--color-accent) 22%, var(--color-line));
   background: linear-gradient(180deg, color-mix(in srgb, var(--color-accent-soft) 45%, white), var(--color-surface));
@@ -803,6 +882,37 @@ h2 {
   gap: 0.75rem;
 }
 
+.urg-hta-tool-link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.6rem;
+}
+
+.urg-hta-tool-link-grid button {
+  display: flex;
+  min-height: 3.4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 18%, var(--color-line));
+  border-radius: 0.95rem;
+  background: color-mix(in srgb, var(--color-surface) 88%, var(--color-accent-soft));
+  color: var(--color-text);
+  padding: 0.72rem 0.82rem;
+  text-align: left;
+}
+
+.urg-hta-tool-link-grid span {
+  font-size: 0.9rem;
+  font-weight: 820;
+}
+
+.urg-hta-tool-link-grid small {
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
 .urg-hta-mini-grid article,
 .urg-hta-source-list article {
   display: grid;
@@ -851,6 +961,21 @@ h2 {
   color: var(--color-accent);
   font-size: 0.86rem;
   font-weight: 800;
+}
+
+.urg-hta-record-list {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.urg-hta-record {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.58rem;
+  border: 1px solid color-mix(in srgb, var(--color-line) 86%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-surface) 92%, #fff);
+  padding: 0.72rem;
 }
 
 .urg-hta-modal-backdrop {

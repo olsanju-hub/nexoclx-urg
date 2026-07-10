@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { DetailHeader } from '../components/detail/DetailHeader.jsx';
+import { htaUrgSupportTools } from '../data/htaUrgSupportTools.js';
 import { htaUrgSources, ivTreatments, oralTreatments } from '../data/htaUrgProtocol.js';
 
 const initialValues = {
@@ -306,8 +307,9 @@ function TimerPanel() {
   );
 }
 
-export function HtaUrgProtocol({ onBack }) {
+export function HtaUrgProtocol({ onBack, onOpenTool }) {
   const [values, setValues] = useState(initialValues);
+  const [activePanel, setActivePanel] = useState('triage');
   const [showBibliography, setShowBibliography] = useState(false);
   const recommendation = useMemo(() => buildRecommendation(values), [values]);
   const update = (key, value) => setValues((current) => ({ ...current, [key]: value }));
@@ -319,85 +321,105 @@ export function HtaUrgProtocol({ onBack }) {
         <button className="urg-hta-bibliography-button" type="button" onClick={() => setShowBibliography(true)} aria-label="Abrir bibliografía">B</button>
       </div>
 
-      <section className="urg-hta-grid">
-        <div className="urg-hta-card">
-          <h2>Triage</h2>
-          <div className="urg-hta-two-col">
-            <Field label="PAS"><input inputMode="numeric" type="number" value={values.sbp} onChange={(event) => update('sbp', event.target.value)} placeholder="mmHg" /></Field>
-            <Field label="PAD"><input inputMode="numeric" type="number" value={values.dbp} onChange={(event) => update('dbp', event.target.value)} placeholder="mmHg" /></Field>
-          </div>
-          <Field label="Situación clínica">
-            <select value={values.presentation} onChange={(event) => update('presentation', event.target.value)}>
-              {Object.entries(presentations).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-          </Field>
-          <Field label="Tratamiento actual">
-            <select value={values.treatment} onChange={(event) => update('treatment', event.target.value)}>
-              {Object.entries(treatments).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-          </Field>
-          <div className="urg-hta-check-grid">
-            {[
-              ['knownHta', 'HTA conocida'],
-              ['poorAdherence', 'Adherencia dudosa'],
-              ['recentWithdrawal', 'Retirada reciente'],
-              ['stimulants', 'Tóxicos/simpaticomiméticos'],
-              ['ckd', 'ERC'],
-              ['cvd', 'ECV previa'],
-              ['frailty', 'Fragilidad/anciano'],
-            ].map(([id, label]) => (
-              <label key={id}><input type="checkbox" checked={values[id]} onChange={(event) => update(id, event.target.checked)} />{label}</label>
-            ))}
-          </div>
-        </div>
+      <nav className="urg-hta-panel-tabs" aria-label="Ventanas HTA">
+        {[
+          ['triage', 'Triage'],
+          ['tests', 'Pruebas'],
+          ['treatment', 'Tratamiento'],
+          ['destination', 'Revaloración'],
+          ['tools', 'Herramientas'],
+        ].map(([id, label]) => (
+          <button className={activePanel === id ? 'is-active' : ''} type="button" key={id} onClick={() => setActivePanel(id)}>{label}</button>
+        ))}
+      </nav>
 
-        <div className={`urg-hta-result is-${recommendation.tone}`}>
-          <span>{recommendation.title}</span>
-          <ResultRow label="Clasificación" value={recommendation.classification} />
-          <ResultRow label="Sospecha principal" value={recommendation.suspicion} />
-          <ResultRow label="Daño orgánico" value={recommendation.damage} />
-          <ResultRow label="Gravedad" value={recommendation.severity} />
-          <ResultRow label="Pruebas urgentes" value={recommendation.tests} />
-          <ResultRow label="Qué hacer ahora" value={recommendation.now} />
-          <ResultRow label="Tratamiento recomendado" value={recommendation.treatment} />
-          <ResultRow label="Dosis / pauta" value={recommendation.dose} />
-          <ResultRow label="Revaloración" value={recommendation.reassessment} />
-          <ResultRow label="Objetivo de descenso" value={recommendation.target} />
-          <ResultRow label="Evitar" value={recommendation.avoid} />
-          <ResultRow label="Destino" value={recommendation.destination} />
-          <ResultRow label="Fuente" value={recommendation.source} />
-        </div>
-      </section>
+      {activePanel === 'triage' && (
+        <>
+          <section className="urg-hta-grid">
+            <div className="urg-hta-card">
+              <h2>Triage</h2>
+              <div className="urg-hta-two-col">
+                <Field label="PAS"><input inputMode="numeric" type="number" value={values.sbp} onChange={(event) => update('sbp', event.target.value)} placeholder="mmHg" /></Field>
+                <Field label="PAD"><input inputMode="numeric" type="number" value={values.dbp} onChange={(event) => update('dbp', event.target.value)} placeholder="mmHg" /></Field>
+              </div>
+              <Field label="Situación clínica">
+                <select value={values.presentation} onChange={(event) => update('presentation', event.target.value)}>
+                  {Object.entries(presentations).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </Field>
+              <Field label="Tratamiento actual">
+                <select value={values.treatment} onChange={(event) => update('treatment', event.target.value)}>
+                  {Object.entries(treatments).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </Field>
+              <div className="urg-hta-check-grid">
+                {[
+                  ['knownHta', 'HTA conocida'],
+                  ['poorAdherence', 'Adherencia dudosa'],
+                  ['recentWithdrawal', 'Retirada reciente'],
+                  ['stimulants', 'Tóxicos/simpaticomiméticos'],
+                  ['ckd', 'ERC'],
+                  ['cvd', 'ECV previa'],
+                  ['frailty', 'Fragilidad/anciano'],
+                ].map(([id, label]) => (
+                  <label key={id}><input type="checkbox" checked={values[id]} onChange={(event) => update(id, event.target.checked)} />{label}</label>
+                ))}
+              </div>
+            </div>
 
-      <section className="urg-hta-card">
-        <h2>Daño agudo de órgano diana</h2>
-        <div className="urg-hta-check-grid">
-          {[
-            ['neuroDamage', 'Neurológico'],
-            ['coronaryDamage', 'Coronario'],
-            ['heartFailureDamage', 'IC / edema pulmonar'],
-            ['dissectionDamage', 'Disección aórtica'],
-            ['renalDamage', 'Renal'],
-            ['retinaDamage', 'Retinopatía grave'],
-            ['pregnancyDamage', 'Preeclampsia/eclampsia'],
-          ].map(([id, label]) => (
-            <label key={id}><input type="checkbox" checked={values[id]} onChange={(event) => update(id, event.target.checked)} />{label}</label>
-          ))}
-        </div>
-      </section>
+            <div className={`urg-hta-result is-${recommendation.tone}`}>
+              <span>{recommendation.title}</span>
+              <ResultRow label="Clasificación" value={recommendation.classification} />
+              <ResultRow label="Sospecha principal" value={recommendation.suspicion} />
+              <ResultRow label="Daño orgánico" value={recommendation.damage} />
+              <ResultRow label="Gravedad" value={recommendation.severity} />
+              <ResultRow label="Pruebas urgentes" value={recommendation.tests} />
+              <ResultRow label="Qué hacer ahora" value={recommendation.now} />
+              <ResultRow label="Tratamiento recomendado" value={recommendation.treatment} />
+              <ResultRow label="Dosis / pauta" value={recommendation.dose} />
+              <ResultRow label="Revaloración" value={recommendation.reassessment} />
+              <ResultRow label="Objetivo de descenso" value={recommendation.target} />
+              <ResultRow label="Evitar" value={recommendation.avoid} />
+              <ResultRow label="Destino" value={recommendation.destination} />
+              <ResultRow label="Fuente" value={recommendation.source} />
+            </div>
+          </section>
 
-      <section className="urg-hta-accordion" aria-label="Protocolo HTA urgencias">
-        <details open>
-          <summary>Pruebas</summary>
+          <section className="urg-hta-card">
+            <h2>Daño agudo de órgano diana</h2>
+            <div className="urg-hta-check-grid">
+              {[
+                ['neuroDamage', 'Neurológico'],
+                ['coronaryDamage', 'Coronario'],
+                ['heartFailureDamage', 'IC / edema pulmonar'],
+                ['dissectionDamage', 'Disección aórtica'],
+                ['renalDamage', 'Renal'],
+                ['retinaDamage', 'Retinopatía grave'],
+                ['pregnancyDamage', 'Preeclampsia/eclampsia'],
+              ].map(([id, label]) => (
+                <label key={id}><input type="checkbox" checked={values[id]} onChange={(event) => update(id, event.target.checked)} />{label}</label>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+
+      {activePanel === 'tests' && (
+        <section className="urg-hta-card">
+          <h2>Pruebas urgentes</h2>
           <div className="urg-hta-mini-grid">
             <article><span>Base</span><p>PA repetida, ECG, creatinina/eGFR, iones.</p></article>
             <article><span>Dolor torácico/SCA</span><p>ECG inmediato, troponina si procede, Rx tórax según clínica.</p></article>
             <article><span>Neurológico</span><p>Neuroimagen/ruta ictus; no bajar PA de forma indiscriminada.</p></article>
             <article><span>Disección</span><p>AngioTC e interconsulta urgente si sospecha compatible.</p></article>
           </div>
-        </details>
-        <details>
-          <summary>Tratamiento IV</summary>
+        </section>
+      )}
+
+      {activePanel === 'treatment' && (
+        <section className="urg-hta-grid">
+          <div className="urg-hta-card">
+            <h2>Tratamiento IV</h2>
           <div className="urg-hta-mini-grid">
             {ivTreatments.map((item) => (
               <article key={item.id}>
@@ -408,9 +430,9 @@ export function HtaUrgProtocol({ onBack }) {
               </article>
             ))}
           </div>
-        </details>
-        <details>
-          <summary>Tratamiento VO</summary>
+          </div>
+          <div className="urg-hta-card">
+            <h2>Tratamiento VO</h2>
           <div className="urg-hta-mini-grid">
             {oralTreatments.map((item) => (
               <article key={item.id}>
@@ -421,19 +443,38 @@ export function HtaUrgProtocol({ onBack }) {
               </article>
             ))}
           </div>
-        </details>
-        <details>
-          <summary>Revaloración / destino</summary>
+          </div>
+        </section>
+      )}
+
+      {activePanel === 'destination' && (
+        <>
+          <section className="urg-hta-card">
+            <h2>Revaloración / destino</h2>
           <div className="urg-hta-mini-grid">
             <article><span>Alta</span><p>Sin daño agudo, buen estado, reevaluación favorable, plan y seguimiento.</p></article>
             <article><span>Observación</span><p>Síntomas leves, dudas diagnósticas o respuesta pendiente.</p></article>
             <article><span>Ingreso</span><p>Daño orgánico, descompensación, comorbilidad o necesidad de tratamiento IV.</p></article>
             <article><span>UCI/interconsulta</span><p>Perfusión IV/titulación estrecha, disección, EAP grave, encefalopatía o SCA grave.</p></article>
           </div>
-        </details>
-      </section>
+          </section>
+          <TimerPanel />
+        </>
+      )}
 
-      <TimerPanel />
+      {activePanel === 'tools' && (
+        <section className="urg-hta-card">
+          <h2>Herramientas auxiliares</h2>
+          <div className="urg-hta-tool-link-grid">
+            {htaUrgSupportTools.map((tool) => (
+              <button type="button" key={tool.id} onClick={() => onOpenTool?.(tool.id)}>
+                <span>{tool.title}</span>
+                <small>{tool.status}</small>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {showBibliography && <BibliographyModal onClose={() => setShowBibliography(false)} />}
     </div>

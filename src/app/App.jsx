@@ -8,6 +8,7 @@ import { Protocols } from '../screens/Protocols.jsx';
 import { ProtocolDetail } from '../screens/ProtocolDetail.jsx';
 import { HtaUrgProtocol } from '../screens/HtaUrgProtocol.jsx';
 import { Tools } from '../screens/Tools.jsx';
+import { HtaUrgSupportTool } from '../screens/HtaUrgSupportTool.jsx';
 import { More } from '../screens/More.jsx';
 import { Procedures } from '../screens/Procedures.jsx';
 import { Circuits } from '../screens/Circuits.jsx';
@@ -20,6 +21,7 @@ const routeTitles = {
   [routes.protocolDetail]: 'Protocolo',
   [routes.htaUrgProtocol]: 'HTA en Urgencias',
   [routes.tools]: 'Herramientas',
+  [routes.htaUrgSupportTool]: 'Herramienta HTA',
   [routes.procedures]: 'Procedimientos',
   [routes.circuits]: 'Circuitos',
   [routes.circuitDetail]: 'Circuito',
@@ -72,8 +74,9 @@ export default function App() {
       {route === routes.home && <Home app={appConfig} sections={primarySections} onNavigate={navigate} />}
       {route === routes.protocols && <Protocols protocols={placeholderProtocols} onOpen={openProtocol} />}
       {route === routes.protocolDetail && <ProtocolDetail protocol={currentProtocol} onBack={() => navigate(routes.protocols)} />}
-      {route === routes.htaUrgProtocol && <HtaUrgProtocol onBack={() => navigate(routes.protocols)} />}
-      {route === routes.tools && <Tools app={appConfig} />}
+      {route === routes.htaUrgProtocol && <HtaUrgProtocol onBack={() => navigate(routes.protocols)} onOpenTool={(id) => navigate(routes.htaUrgSupportTool, id)} />}
+      {route === routes.tools && <Tools onOpen={(id) => navigate(routes.htaUrgSupportTool, id)} />}
+      {route === routes.htaUrgSupportTool && <HtaUrgSupportTool toolId={selectedId} onBack={() => navigate(routes.tools)} onOpenProtocol={() => navigate(routes.htaUrgProtocol, 'hta-urgencias')} />}
       {route === routes.procedures && <Procedures />}
       {route === routes.circuits && <Circuits onOpen={() => navigate(routes.circuitDetail)} />}
       {route === routes.circuitDetail && <CircuitDetail onBack={() => navigate(routes.circuits)} />}
