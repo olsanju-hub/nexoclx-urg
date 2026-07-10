@@ -6,6 +6,7 @@ import { AppShell } from '../components/shell/AppShell.jsx';
 import { Home } from '../screens/Home.jsx';
 import { Protocols } from '../screens/Protocols.jsx';
 import { ProtocolDetail } from '../screens/ProtocolDetail.jsx';
+import { HtaUrgProtocol } from '../screens/HtaUrgProtocol.jsx';
 import { Tools } from '../screens/Tools.jsx';
 import { More } from '../screens/More.jsx';
 import { Procedures } from '../screens/Procedures.jsx';
@@ -17,6 +18,7 @@ const routeTitles = {
   [routes.home]: 'Inicio',
   [routes.protocols]: 'Protocolos',
   [routes.protocolDetail]: 'Protocolo',
+  [routes.htaUrgProtocol]: 'HTA en Urgencias',
   [routes.tools]: 'Herramientas',
   [routes.procedures]: 'Procedimientos',
   [routes.circuits]: 'Circuitos',
@@ -50,7 +52,13 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  const openProtocol = (id) => navigate(routes.protocolDetail, id);
+  const openProtocol = (id) => {
+    if (id === 'hta-urgencias') {
+      navigate(routes.htaUrgProtocol, id);
+      return;
+    }
+    navigate(routes.protocolDetail, id);
+  };
 
   return (
     <AppShell
@@ -64,6 +72,7 @@ export default function App() {
       {route === routes.home && <Home app={appConfig} sections={primarySections} onNavigate={navigate} />}
       {route === routes.protocols && <Protocols protocols={placeholderProtocols} onOpen={openProtocol} />}
       {route === routes.protocolDetail && <ProtocolDetail protocol={currentProtocol} onBack={() => navigate(routes.protocols)} />}
+      {route === routes.htaUrgProtocol && <HtaUrgProtocol onBack={() => navigate(routes.protocols)} />}
       {route === routes.tools && <Tools app={appConfig} />}
       {route === routes.procedures && <Procedures />}
       {route === routes.circuits && <Circuits onOpen={() => navigate(routes.circuitDetail)} />}
