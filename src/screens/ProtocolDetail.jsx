@@ -1,22 +1,24 @@
 import { ClinicalActionTool } from '../components/detail/ClinicalActionTool.jsx';
 import { DetailHeader } from '../components/detail/DetailHeader.jsx';
+import { EmptyClinicalState } from '../components/feedback/EmptyClinicalState.jsx';
 
 export function ProtocolDetail({ protocol, onBack }) {
+  if (!protocol) {
+    return (
+      <div className="screen detail-screen protocol-detail">
+        <DetailHeader title="Protocolo" subtitle="Sin protocolo cargado" onBack={onBack} />
+        <EmptyClinicalState text="No hay protocolo cargado." />
+      </div>
+    );
+  }
+
   return (
     <div className="screen detail-screen protocol-detail">
       <DetailHeader title={protocol.title} subtitle={protocol.description} onBack={onBack} />
       {protocol.assessment ? (
         <ClinicalActionTool protocol={protocol} />
       ) : (
-        <section className="decision-panel">
-          <div className="decision-header">
-            <div>
-              <h2>Herramienta pendiente de estructurar</h2>
-              <p>Este tema debe convertirse al modelo de conducta clínica antes de considerarse final.</p>
-            </div>
-            <span className="status-pill is-alert">Revisar</span>
-          </div>
-        </section>
+        <EmptyClinicalState text="No hay herramienta cargada para este protocolo." />
       )}
     </div>
   );

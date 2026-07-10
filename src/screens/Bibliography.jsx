@@ -1,14 +1,13 @@
-import { SourceList } from '../components/detail/SourceList.jsx';
-import { placeholderSources } from '../data/placeholders.js';
+import { EmptyClinicalState } from '../components/feedback/EmptyClinicalState.jsx';
 
 export function Bibliography() {
   return (
     <div className="screen">
       <div className="section-heading">
         <h1>Bibliografía</h1>
-        <p>Verificación bibliográfica.</p>
+        <p>Base preparada para futuras fuentes.</p>
       </div>
-      <SourceList sources={placeholderSources} />
+      <EmptyClinicalState text="No hay fuentes cargadas." />
     </div>
   );
 }

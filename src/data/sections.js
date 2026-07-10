@@ -24,34 +24,34 @@ export const primarySections = [
   {
     id: routes.protocols,
     title: 'Protocolos',
-    description: 'Guías clínicas para atención urgente.',
+    description: 'Estructura preparada para futuros protocolos.',
     icon: FileText,
   },
   {
     id: routes.tools,
     title: 'Herramientas',
-    description: 'Priorización y pruebas urgentes.',
+    description: 'Estructura preparada para futuras herramientas.',
     icon: Calculator,
   },
   {
     id: routes.procedures,
     title: 'Procedimientos',
-    description: 'Técnicas y flujos asistenciales.',
+    description: 'Estructura preparada para futuros procedimientos.',
     icon: Stethoscope,
   },
   {
     id: routes.sources,
     title: 'Fuentes',
-    description: 'Guías y documentos consultados.',
+    description: 'Estructura preparada para futuras fuentes.',
     icon: BookOpen,
   },
 ];
 
 export const secondarySections = [
-  { id: routes.protocols, title: 'Protocolos', description: 'Guías clínicas para atención urgente.', icon: FolderOpen },
-  { id: routes.tools, title: 'Herramientas', description: 'Priorización y pruebas urgentes.', icon: Wrench },
-  { id: routes.procedures, title: 'Procedimientos', description: 'Técnicas y flujos asistenciales.', icon: Stethoscope },
-  { id: routes.sources, title: 'Fuentes', description: 'Guías y documentos consultados.', icon: Library },
+  { id: routes.protocols, title: 'Protocolos', description: 'Estructura preparada para futuros protocolos.', icon: FolderOpen },
+  { id: routes.tools, title: 'Herramientas', description: 'Estructura preparada para futuras herramientas.', icon: Wrench },
+  { id: routes.procedures, title: 'Procedimientos', description: 'Estructura preparada para futuros procedimientos.', icon: Stethoscope },
+  { id: routes.sources, title: 'Fuentes', description: 'Estructura preparada para futuras fuentes.', icon: Library },
 ];
 
 export const bottomNavItems = [
