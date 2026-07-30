@@ -1,8 +1,9 @@
 import { CompactList } from '../components/lists/CompactList.jsx';
 import { ListRow } from '../components/lists/ListRow.jsx';
+import { decisionProtocols } from '../data/decisionProtocols.js';
 import { htaUrgToolGroups } from '../data/htaUrgSupportTools.js';
 
-export function Tools({ onOpen }) {
+export function Tools({ onOpen, onOpenProtocol }) {
   return (
     <div className="screen">
       <div className="section-heading">
@@ -29,6 +30,23 @@ export function Tools({ onOpen }) {
             </CompactList>
           </section>
         ))}
+        <section className="tool-pathology-group" aria-labelledby="tool-group-decision">
+          <div className="tool-pathology-heading">
+            <h2 id="tool-group-decision">Decision clinica transversal</h2>
+            <p>Herramientas validadas para gravedad, activacion y destino.</p>
+          </div>
+          <CompactList label="Herramientas transversales">
+            {decisionProtocols.map((tool) => (
+              <ListRow
+                key={tool.id}
+                title={tool.title}
+                description={tool.description}
+                meta={tool.status}
+                onClick={() => onOpenProtocol(tool.id)}
+              />
+            ))}
+          </CompactList>
+        </section>
       </div>
     </div>
   );

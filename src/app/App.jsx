@@ -75,7 +75,7 @@ export default function App() {
       {route === routes.protocols && <Protocols protocols={placeholderProtocols} onOpen={openProtocol} />}
       {route === routes.protocolDetail && <ProtocolDetail protocol={currentProtocol} onBack={() => navigate(routes.protocols)} />}
       {route === routes.htaUrgProtocol && <HtaUrgProtocol onBack={() => navigate(routes.protocols)} onOpenTool={(id) => navigate(routes.htaUrgSupportTool, id)} />}
-      {route === routes.tools && <Tools onOpen={(id) => navigate(routes.htaUrgSupportTool, id)} />}
+      {route === routes.tools && <Tools onOpen={(id) => navigate(routes.htaUrgSupportTool, id)} onOpenProtocol={openProtocol} />}
       {route === routes.htaUrgSupportTool && <HtaUrgSupportTool toolId={selectedId} onBack={() => navigate(routes.tools)} onOpenProtocol={() => navigate(routes.htaUrgProtocol, 'hta-urgencias')} />}
       {route === routes.procedures && <Procedures />}
       {route === routes.circuits && <Circuits onOpen={() => navigate(routes.circuitDetail)} />}

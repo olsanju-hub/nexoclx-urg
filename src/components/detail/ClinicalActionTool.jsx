@@ -148,6 +148,20 @@ export function ClinicalActionTool({ protocol }) {
           {copied ? 'Resumen copiado' : 'Copiar resumen'}
         </button>
       </div>
+
+      {protocol.sources?.length > 0 && (
+        <div className="decision-result">
+          <h3>Fuentes</h3>
+          <ul className="clinical-bullets">
+            {protocol.sources.map((source) => (
+              <li key={source.url}>
+                <a href={source.url} target="_blank" rel="noreferrer">{source.label}</a>
+                {source.supports ? `: ${source.supports}` : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
