@@ -150,8 +150,8 @@ export function ClinicalActionTool({ protocol }) {
       </div>
 
       {protocol.sources?.length > 0 && (
-        <div className="decision-result">
-          <h3>Fuentes</h3>
+        <details className="decision-result">
+          <summary>Fuentes</summary>
           <ul className="clinical-bullets">
             {protocol.sources.map((source) => (
               <li key={source.url}>
@@ -160,7 +160,7 @@ export function ClinicalActionTool({ protocol }) {
               </li>
             ))}
           </ul>
-        </div>
+        </details>
       )}
     </section>
   );
