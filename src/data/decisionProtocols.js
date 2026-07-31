@@ -211,6 +211,8 @@ const hyperkalemiaUrgProtocol = {
     title: 'Asistente de hiperpotasemia en Urgencias',
     intro: 'Integra potasio, ECG, estabilidad, muestra, glucemia y funcion renal para llegar a una conducta.',
     copyPrefix: 'Valoracion Urg hiperpotasemia',
+    contextLabel: 'NexoClx Urg',
+    operationalTrace: true,
     fields: [
       { id: 'potassium', label: 'Potasio vigente', type: 'number', unit: 'mmol/L', min: 2, max: 10 },
       { id: 'sampleQuality', label: 'Calidad de muestra', type: 'select', required: true, options: [
@@ -273,6 +275,45 @@ const hyperkalemiaUrgProtocol = {
       {
         status: 'Critico',
         tone: 'alert',
+        title: 'Tratamiento inmediato con glucemia pendiente',
+        body: 'Hay criterio de hiperpotasemia critica, pero falta glucemia basal para recomendar insulina-glucosa completa.',
+        all: [
+          { source: 'computed', id: 'Regla de riesgo', equals: 'HK-RSK-003: hiperpotasemia critica' },
+          { id: 'glucoseAvailable', equals: false },
+        ],
+        actions: [
+          'ABCDE, monitor ECG continuo, via IV y repetir/confirmar potasio sin retrasar estabilizacion si ECG o clinica son de riesgo.',
+          'Confirmar calcio IV si ECG de riesgo/inestabilidad: gluconato calcico 10% 30 mL IV con monitorizacion; considerar alternativa local si via central.',
+          'Obtener glucemia basal antes de insulina-glucosa y mantener vigilancia posterior de hipoglucemia.',
+          'Reevaluar ECG, glucemia y potasio; si persiste ECG de riesgo, hiperpotasemia refractaria, anuria o dialisis, activar criticos/nefrologia.',
+        ],
+        recommendations: [
+          {
+            id: 'urg-calcium',
+            rule: 'HK-TX-001',
+            label: 'Administrar calcio IV',
+            detail: 'Estabilizacion de membrana con monitorizacion cuando hay ECG de riesgo o inestabilidad.',
+            critical: true,
+          },
+          {
+            id: 'urg-get-glucose',
+            rule: 'HK-SAFE-001',
+            label: 'Obtener glucemia basal',
+            detail: 'Bloqueo de seguridad antes de insulina-glucosa.',
+            critical: true,
+          },
+          {
+            id: 'urg-urgent-consult',
+            rule: 'HK-ESC-001',
+            label: 'Interconsulta urgente',
+            detail: 'Avisar a criticos/nefrologia si hay refractariedad, anuria, dialisis o ECG persistente.',
+            critical: true,
+          },
+        ],
+      },
+      {
+        status: 'Critico',
+        tone: 'alert',
         title: 'Tratamiento inmediato y monitorizacion',
         body: 'Hay criterio de hiperpotasemia critica por potasio, ECG o inestabilidad.',
         when: { source: 'computed', id: 'Regla de riesgo', equals: 'HK-RSK-003: hiperpotasemia critica' },
@@ -281,6 +322,29 @@ const hyperkalemiaUrgProtocol = {
           'Confirmar calcio IV si ECG de riesgo/inestabilidad: gluconato calcico 10% 30 mL IV con monitorizacion; considerar alternativa local si via central.',
           'Desplazar potasio si procede: insulina regular 10 UI IV con glucosa segun glucemia, y salbutamol nebulizado 10-20 mg si no contraindicado.',
           'Reevaluar ECG, glucemia y potasio; si persiste ECG de riesgo, hiperpotasemia refractaria, anuria o dialisis, activar criticos/nefrologia.',
+        ],
+        recommendations: [
+          {
+            id: 'urg-calcium',
+            rule: 'HK-TX-001',
+            label: 'Administrar calcio IV',
+            detail: 'Estabilizacion de membrana con monitorizacion cuando hay ECG de riesgo o inestabilidad.',
+            critical: true,
+          },
+          {
+            id: 'urg-insulin-glucose',
+            rule: 'HK-TX-002',
+            label: 'Administrar insulina-glucosa',
+            detail: 'Desplazamiento intracelular con glucemia basal confirmada y vigilancia posterior.',
+            critical: true,
+          },
+          {
+            id: 'urg-urgent-consult',
+            rule: 'HK-ESC-001',
+            label: 'Interconsulta urgente',
+            detail: 'Avisar a criticos/nefrologia si hay refractariedad, anuria, dialisis o ECG persistente.',
+            critical: true,
+          },
         ],
       },
       {
@@ -291,6 +355,14 @@ const hyperkalemiaUrgProtocol = {
         actions: [
           'Repetir potasio con muestra no hemolizada y revisar ECG.',
           'Reabrir el asistente con el dato actualizado; si aparece ECG de riesgo, pasar a rama critica.',
+        ],
+        recommendations: [
+          {
+            id: 'urg-repeat-sample',
+            rule: 'HK-DX-002',
+            label: 'Repetir potasio y ECG',
+            detail: 'Confirmar el dato antes de cerrar la rama si no hay criterios criticos.',
+          },
         ],
       },
       {
@@ -306,6 +378,22 @@ const hyperkalemiaUrgProtocol = {
           'Valorar tratamiento reductor y consulta a nefrologia segun funcion renal, diuresis y respuesta.',
           'Decidir observacion o ingreso segun tendencia, causa reversible, ECG y capacidad de reevaluacion segura.',
         ],
+        recommendations: [
+          {
+            id: 'urg-observation',
+            rule: 'HK-DST-001',
+            label: 'Observacion monitorizada',
+            detail: 'Mantener vigilancia y reevaluacion de potasio/ECG antes de destino definitivo.',
+            critical: true,
+          },
+          {
+            id: 'urg-admission',
+            rule: 'HK-DST-002',
+            label: 'Ingreso',
+            detail: 'Ingresar si persiste riesgo, causa no corregida, deterioro renal o seguimiento no seguro.',
+            critical: true,
+          },
+        ],
       },
       {
         status: 'Reevaluar',
@@ -318,6 +406,21 @@ const hyperkalemiaUrgProtocol = {
         actions: [
           'Revisar farmacos, aportes, funcion renal y equilibrio acido-base.',
           'Repetir potasio segun riesgo y no alta si hay ECG anormal, inestabilidad, deterioro renal o falta de seguimiento fiable.',
+        ],
+        recommendations: [
+          {
+            id: 'urg-reevaluate',
+            rule: 'HK-RV-001',
+            label: 'Reevaluar antes de alta',
+            detail: 'Repetir potasio/ECG segun riesgo y bloquear alta si reaparece gravedad.',
+          },
+          {
+            id: 'urg-discharge',
+            rule: 'HK-DST-003',
+            label: 'Alta con plan seguro',
+            detail: 'Solo si no hay inestabilidad, ECG de riesgo, potasio severo ni seguimiento incierto.',
+            critical: true,
+          },
         ],
       },
     ],

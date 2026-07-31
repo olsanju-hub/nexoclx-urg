@@ -66,9 +66,105 @@ function ComputedValue({ name, value }) {
   return <li>{name}: {typeof value === 'object' && value.label ? value.label : String(value)}</li>;
 }
 
+const formatDateTime = (date) => new Intl.DateTimeFormat('es-ES', {
+  dateStyle: 'short',
+  timeStyle: 'short',
+}).format(date);
+
+function OperationalTrace({ recommendations = [], contextLabel, decisions, executedActions, responses, onDecision, onModify, onExecute, onResponse }) {
+  if (!recommendations.length && !executedActions.length) return null;
+
+  return (
+    <div className="decision-result trace-panel">
+      {recommendations.length > 0 && (
+        <>
+          <h3>Recomendación</h3>
+          <div className="trace-stack">
+            {recommendations.map((recommendation) => {
+              const decision = decisions[recommendation.id];
+              const hasDecision = decision?.status === 'accepted' || decision?.status === 'modified';
+              const isRejected = decision?.status === 'rejected';
+              return (
+                <article className="trace-item" key={recommendation.id}>
+                  <div className="trace-item-header">
+                    <div>
+                      <h4>{recommendation.label}</h4>
+                      <p>{recommendation.detail}</p>
+                    </div>
+                    {recommendation.critical && <span className="status-pill is-alert">Crítica</span>}
+                  </div>
+                  {recommendation.rule && <small className="trace-rule">Regla: {recommendation.rule}</small>}
+                  <p className="trace-decision">Confirmar decisión profesional</p>
+                  <div className="trace-actions" aria-label={`Confirmar decisión para ${recommendation.label}`}>
+                    <button type="button" onClick={() => onDecision(recommendation, 'accepted')}>Aceptar</button>
+                    <button type="button" onClick={() => onDecision(recommendation, 'modified')}>Modificar</button>
+                    <button type="button" onClick={() => onDecision(recommendation, 'rejected')}>Rechazar</button>
+                  </div>
+                  {decision?.status === 'modified' && (
+                    <label className="trace-note">
+                      <span>Modificación profesional</span>
+                      <textarea
+                        value={decision.note ?? ''}
+                        onChange={(event) => onModify(recommendation.id, event.target.value)}
+                        placeholder="Describe la conducta modificada"
+                      />
+                    </label>
+                  )}
+                  {decision && (
+                    <p className="trace-decision">
+                      Confirmar decisión: {decision.status === 'accepted' ? 'aceptada' : decision.status === 'modified' ? 'modificada' : 'rechazada'}
+                    </p>
+                  )}
+                  {isRejected && (
+                    <p className="trace-warning">La recomendación rechazada no cierra el caso. Reevalúa o selecciona otra conducta segura.</p>
+                  )}
+                  {hasDecision && recommendation.executable !== false && (
+                    <button className="copy-button trace-execute" type="button" onClick={() => onExecute(recommendation, decision)}>
+                      Confirmar como realizada
+                    </button>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {executedActions.length > 0 && (
+        <div className="trace-executed">
+          <h3>Acción realizada</h3>
+          {executedActions.map((action) => {
+            const response = responses[action.id] ?? 'pending';
+            return (
+              <article className="trace-item" key={action.id}>
+                <h4>{action.action}</h4>
+                <p>{action.decision === 'modified' && action.note ? action.note : action.detail}</p>
+                <ul className="clinical-bullets">
+                  <li>Fecha y hora: {action.executedAt}</li>
+                  <li>Contexto asistencial: {contextLabel}</li>
+                  <li>Estado: completado</li>
+                  <li>Respuesta: {response === 'pending' ? 'pendiente' : response === 'success' ? 'registrada favorable' : 'fracaso o escalada necesaria'}</li>
+                </ul>
+                <div className="trace-actions">
+                  <button type="button" onClick={() => onResponse(action.id, 'success')}>Registrar respuesta</button>
+                  <button type="button" onClick={() => onResponse(action.id, 'failure')}>Fracaso / escalar</button>
+                  <button type="button" onClick={() => onResponse(action.id, 'pending')}>Volver a reevaluación</button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ClinicalActionTool({ protocol }) {
   const [values, setValues] = useState(() => getDefaultValues(protocol.assessment.fields));
   const [copied, setCopied] = useState(false);
+  const [decisions, setDecisions] = useState({});
+  const [executedActions, setExecutedActions] = useState([]);
+  const [responses, setResponses] = useState({});
   const output = useMemo(() => getClinicalOutput(protocol.assessment, values), [protocol.assessment, values]);
   const summary = useMemo(
     () => formatClinicalSummary({ protocol, values, computed: output.computed, outcome: output.outcome }),
@@ -85,9 +181,50 @@ export function ClinicalActionTool({ protocol }) {
     setCopied(true);
   };
 
+  const handleDecision = (recommendation, status) => {
+    setDecisions((current) => ({
+      ...current,
+      [recommendation.id]: {
+        ...current[recommendation.id],
+        status,
+        note: status === 'modified' ? current[recommendation.id]?.note ?? '' : '',
+      },
+    }));
+  };
+
+  const handleModify = (id, note) => {
+    setDecisions((current) => ({
+      ...current,
+      [id]: { ...current[id], status: 'modified', note },
+    }));
+  };
+
+  const handleExecute = (recommendation, decision) => {
+    const alreadyExecuted = executedActions.some((action) => action.recommendationId === recommendation.id);
+    if (alreadyExecuted) return;
+    setExecutedActions((current) => [
+      ...current,
+      {
+        id: `${recommendation.id}-${Date.now()}`,
+        recommendationId: recommendation.id,
+        action: recommendation.label,
+        detail: recommendation.detail,
+        decision: decision.status,
+        note: decision.note,
+        executedAt: formatDateTime(new Date()),
+      },
+    ]);
+  };
+
+  const handleResponse = (id, status) => {
+    setResponses((current) => ({ ...current, [id]: status }));
+  };
+
   const computedEntries = Object.entries(output.computed ?? {}).filter(([, value]) => (
     value !== null && value !== undefined && value !== ''
   ));
+  const usesOperationalTrace = Boolean(protocol.assessment.operationalTrace);
+  const recommendations = output.outcome?.recommendations ?? [];
 
   return (
     <section className="decision-panel" aria-label={protocol.assessment.title}>
@@ -112,7 +249,7 @@ export function ClinicalActionTool({ protocol }) {
 
       {computedEntries.length > 0 && (
         <div className="decision-result">
-          <h3>Cálculos integrados</h3>
+          <h3>{usesOperationalTrace ? 'Hecho calculado' : 'Cálculos integrados'}</h3>
           <ul className="clinical-bullets">
             {computedEntries.map(([name, value]) => <ComputedValue key={name} name={name} value={value} />)}
           </ul>
@@ -137,7 +274,8 @@ export function ClinicalActionTool({ protocol }) {
       )}
 
       <div className="decision-result">
-        <h3>{output.outcome?.title}</h3>
+        <h3>{usesOperationalTrace ? 'Resultado' : output.outcome?.title}</h3>
+        {usesOperationalTrace && <h4>{output.outcome?.title}</h4>}
         <p>{output.outcome?.body}</p>
         {output.outcome?.actions?.length > 0 && (
           <ul className="clinical-bullets">
@@ -148,6 +286,20 @@ export function ClinicalActionTool({ protocol }) {
           {copied ? 'Resumen copiado' : 'Copiar resumen'}
         </button>
       </div>
+
+      {usesOperationalTrace && (
+        <OperationalTrace
+          recommendations={recommendations}
+          contextLabel={protocol.assessment.contextLabel ?? 'NexoClx'}
+          decisions={decisions}
+          executedActions={executedActions}
+          responses={responses}
+          onDecision={handleDecision}
+          onModify={handleModify}
+          onExecute={handleExecute}
+          onResponse={handleResponse}
+        />
+      )}
 
       {protocol.sources?.length > 0 && (
         <details className="decision-result">
