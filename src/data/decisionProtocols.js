@@ -173,7 +173,172 @@ const dataQuality = (values) => {
   return '';
 };
 
+const hyperkalemiaRisk = (values) => {
+  const k = toNumber(values.potassium);
+  if (values.unstable || values.ecgStatus === 'risk' || (k !== null && k >= 6.5)) return 'HK-RSK-003: hiperpotasemia critica';
+  if (values.sampleQuality === 'hemolyzed' && k !== null && k < 6.5) return 'HK-DX-002: muestra no valida, confirmar potasio';
+  if (k === null) return 'HK-DX-001: falta potasio vigente';
+  if (k >= 6) return 'HK-RSK-002: hiperpotasemia alta';
+  if (k > 5.5) return 'HK-RSK-001: hiperpotasemia moderada';
+  if (k > 5) return 'HK-RSK-000: hiperpotasemia leve';
+  return 'HK-DX-000: sin hiperpotasemia con el dato introducido';
+};
+
+const hyperkalemiaRenalFlag = (values) => {
+  if (values.renalStatus === 'dialysis') return 'HK-ESC-002: dialisis/anuria o nefrologia urgente';
+  if (values.renalStatus === 'ckd') return 'HK-ESC-001: ERC/FRA u oligoanuria';
+  if (values.renalStatus === 'unknown') return 'HK-DX-003: funcion renal no disponible';
+  return '';
+};
+
+const hyperkalemiaGlucoseFlag = (values) => {
+  const critical = hyperkalemiaRisk(values) === 'HK-RSK-003: hiperpotasemia critica';
+  if (critical && !values.glucoseAvailable) return 'HK-SAFE-001: falta glucemia antes de insulina';
+  return '';
+};
+
+const hyperkalemiaMedicationFlag = (values) => {
+  if (!Array.isArray(values.riskMedication) || values.riskMedication.length === 0) return '';
+  return `HK-DX-004: revisar farmacos (${values.riskMedication.length})`;
+};
+
+const hyperkalemiaUrgProtocol = {
+  id: 'hiperpotasemia-gold-standard',
+  title: 'Hiperpotasemia Gold Standard',
+  description: 'Asistente Urg para confirmar gravedad, tratar, reevaluar y decidir observacion o ingreso.',
+  status: 'Interactivo',
+  assessment: {
+    title: 'Asistente de hiperpotasemia en Urgencias',
+    intro: 'Integra potasio, ECG, estabilidad, muestra, glucemia y funcion renal para llegar a una conducta.',
+    copyPrefix: 'Valoracion Urg hiperpotasemia',
+    fields: [
+      { id: 'potassium', label: 'Potasio vigente', type: 'number', unit: 'mmol/L', min: 2, max: 10 },
+      { id: 'sampleQuality', label: 'Calidad de muestra', type: 'select', required: true, options: [
+        { value: 'valid', label: 'Muestra valida' },
+        { value: 'hemolyzed', label: 'Hemolisis o extraccion dudosa' },
+        { value: 'unknown', label: 'Calidad desconocida' },
+      ] },
+      { id: 'ecgStatus', label: 'ECG actual', type: 'select', required: true, options: [
+        { value: 'normal', label: 'Sin cambios sugestivos' },
+        { value: 'risk', label: 'Cambios compatibles o arritmia' },
+        { value: 'unavailable', label: 'Pendiente/no disponible aun' },
+      ] },
+      { id: 'unstable', label: 'Inestabilidad, sincope, arritmia o debilidad marcada', type: 'checkbox' },
+      { id: 'glucoseAvailable', label: 'Glucemia disponible antes de insulina', type: 'checkbox' },
+      { id: 'renalStatus', label: 'Funcion renal/contexto', type: 'select', required: true, options: [
+        { value: 'known-normal', label: 'Sin ERC/FRA conocida' },
+        { value: 'ckd', label: 'ERC, FRA, oligoanuria o rabdomiolisis' },
+        { value: 'dialysis', label: 'Dialisis, anuria o nefrologia urgente' },
+        { value: 'unknown', label: 'No disponible' },
+      ] },
+      { id: 'riskMedication', label: 'Farmacos o aportes que elevan K', type: 'multi', options: [
+        { value: 'raas', label: 'IECA/ARA-II/ARNI/aliskiren' },
+        { value: 'mra', label: 'Espironolactona/eplerenona' },
+        { value: 'nsaid', label: 'AINE' },
+        { value: 'supplements', label: 'Potasio o sal potasica' },
+        { value: 'other', label: 'Heparina, trimetoprim u otro' },
+      ] },
+      { id: 'digitalisRisk', label: 'Sospecha de intoxicacion digitalica o hipercalcemia', type: 'checkbox' },
+    ],
+    calculations: [
+      { id: 'Regla de riesgo', type: 'custom', fn: hyperkalemiaRisk },
+      { id: 'Regla renal', type: 'custom', fn: hyperkalemiaRenalFlag },
+      { id: 'Regla glucemia', type: 'custom', fn: hyperkalemiaGlucoseFlag },
+      { id: 'Regla farmacos', type: 'custom', fn: hyperkalemiaMedicationFlag },
+    ],
+    interpretations: [
+      {
+        id: 'hk-glucose',
+        when: { source: 'computed', id: 'Regla glucemia', notEquals: '' },
+        title: 'Bloqueo de seguridad para insulina',
+        body: 'La insulina-glucosa exige glucemia basal y vigilancia de hipoglucemia.',
+        actions: ['Obtener glucemia inmediata; no registrar insulina como conducta ejecutada sin confirmacion profesional.'],
+      },
+      {
+        id: 'hk-renal',
+        when: { source: 'computed', id: 'Regla renal', notEquals: '' },
+        title: 'Riesgo renal o depuracion limitada',
+        body: 'La eliminacion de potasio puede requerir nefrologia/dialisis o ingreso monitorizado.',
+        actions: ['Actualizar creatinina, diuresis, equilibrio acido-base y causa precipitante.'],
+      },
+      {
+        id: 'hk-digitalis',
+        when: 'digitalisRisk',
+        title: 'Confirmacion profesional obligatoria antes de calcio',
+        body: 'La sospecha de intoxicacion digitalica o hipercalcemia modifica la seguridad del calcio IV.',
+        actions: ['Escalar a medico responsable/toxicologia antes de administrar calcio salvo arritmia inestable.'],
+      },
+    ],
+    outcomes: [
+      {
+        status: 'Critico',
+        tone: 'alert',
+        title: 'Tratamiento inmediato y monitorizacion',
+        body: 'Hay criterio de hiperpotasemia critica por potasio, ECG o inestabilidad.',
+        when: { source: 'computed', id: 'Regla de riesgo', equals: 'HK-RSK-003: hiperpotasemia critica' },
+        actions: [
+          'ABCDE, monitor ECG continuo, via IV y repetir/confirmar potasio sin retrasar estabilizacion si ECG o clinica son de riesgo.',
+          'Confirmar calcio IV si ECG de riesgo/inestabilidad: gluconato calcico 10% 30 mL IV con monitorizacion; considerar alternativa local si via central.',
+          'Desplazar potasio si procede: insulina regular 10 UI IV con glucosa segun glucemia, y salbutamol nebulizado 10-20 mg si no contraindicado.',
+          'Reevaluar ECG, glucemia y potasio; si persiste ECG de riesgo, hiperpotasemia refractaria, anuria o dialisis, activar criticos/nefrologia.',
+        ],
+      },
+      {
+        status: 'Confirmar',
+        title: 'Repetir muestra y ECG',
+        body: 'La muestra puede explicar el valor y no hay criterios actuales de emergencia.',
+        when: { source: 'computed', id: 'Regla de riesgo', equals: 'HK-DX-002: muestra no valida, confirmar potasio' },
+        actions: [
+          'Repetir potasio con muestra no hemolizada y revisar ECG.',
+          'Reabrir el asistente con el dato actualizado; si aparece ECG de riesgo, pasar a rama critica.',
+        ],
+      },
+      {
+        status: 'Observacion/ingreso',
+        title: 'Manejo urgente con vigilancia',
+        body: 'El nivel de potasio o el contexto renal requiere tratamiento etiologico, tendencia y destino hospitalario.',
+        any: [
+          { source: 'computed', id: 'Regla de riesgo', equals: 'HK-RSK-002: hiperpotasemia alta' },
+          { source: 'computed', id: 'Regla renal', equals: 'HK-ESC-002: dialisis/anuria o nefrologia urgente' },
+        ],
+        actions: [
+          'Monitorizar, suspender aportes/farmacos contribuyentes y buscar causa precipitante.',
+          'Valorar tratamiento reductor y consulta a nefrologia segun funcion renal, diuresis y respuesta.',
+          'Decidir observacion o ingreso segun tendencia, causa reversible, ECG y capacidad de reevaluacion segura.',
+        ],
+      },
+      {
+        status: 'Reevaluar',
+        title: 'Corregir causa y controlar tendencia',
+        body: 'No hay criterios criticos, pero precisa plan de seguimiento y seguridad.',
+        any: [
+          { source: 'computed', id: 'Regla de riesgo', equals: 'HK-RSK-001: hiperpotasemia moderada' },
+          { source: 'computed', id: 'Regla de riesgo', equals: 'HK-RSK-000: hiperpotasemia leve' },
+        ],
+        actions: [
+          'Revisar farmacos, aportes, funcion renal y equilibrio acido-base.',
+          'Repetir potasio segun riesgo y no alta si hay ECG anormal, inestabilidad, deterioro renal o falta de seguimiento fiable.',
+        ],
+      },
+    ],
+    defaultOutcome: {
+      status: 'Dato insuficiente',
+      title: 'Obtener potasio vigente o ECG',
+      body: 'Sin potasio actual no puede clasificarse gravedad salvo que exista ECG de riesgo o inestabilidad.',
+      actions: [
+        'Actualizar dato dinamico y ECG si la sospecha es clinicamente relevante.',
+        'Si hay inestabilidad, actuar como emergencia aunque falte confirmacion analitica.',
+      ],
+    },
+  },
+  sources: [
+    { label: 'UK Kidney Association. Clinical Practice Guideline: Management of Hyperkalaemia in Adults. 2023.', url: 'https://www.ukkidney.org/sites/default/files/FINAL%20VERSION%20-%20UKKA%20CLINICAL%20PRACTICE%20GUIDELINE%20-%20MANAGEMENT%20OF%20HYPERKALAEMIA%20IN%20ADULTS%20-%20191223_0.pdf', supports: 'Clasificacion, tratamiento y reevaluacion adulta.' },
+    { label: 'Resuscitation Council UK. Emergency treatment of hyperkalaemia algorithm.', url: 'https://www.resus.org.uk/library/additional-guidance/guidance-hyperkalaemia', supports: 'Secuencia de actuacion urgente.' },
+  ],
+};
+
 export const decisionProtocols = [
+  hyperkalemiaUrgProtocol,
   {
     id: 'sepsis-shock',
     title: 'Sepsis y shock septico',
