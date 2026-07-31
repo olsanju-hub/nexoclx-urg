@@ -6,8 +6,8 @@ Documento interno de desarrollo de NexoClx Urg. No sustituye al README principal
 
 - Fase actual: Fase 2 - Ingenieria de contenidos clinicos.
 - Fase 1 - Arquitectura: cerrada y congelada.
-- Gold Standard: Hiperpotasemia, en preparacion.
-- Version del Gold Standard: pendiente de Documento A/B/C.
+- Gold Standard: Hiperpotasemia, Documento A en borrador funcional.
+- Version del Gold Standard: v0.1 funcional; Documentos B/C pendientes.
 - Estado de validacion: no validado.
 - Proximos hitos:
   1. Documento A - Especificacion Funcional de Hiperpotasemia.
@@ -117,7 +117,7 @@ Un asistente debe demostrar:
 
 | Asistente | Estado | Version | Fase | Validacion | Observaciones |
 |---|---|---|---|---|---|
-| Hiperpotasemia Gold Standard | En especificacion | Pendiente | Fase 2 | No validado | Primer piloto; debe generar Documento A, B y C. |
+| Hiperpotasemia Gold Standard | Documento A redactado | v0.1 funcional | Fase 2 | No validado | Documentos B y C pendientes; no implementado. |
 
 ## Registro de decisiones
 
@@ -127,3 +127,4 @@ Un asistente debe demostrar:
 | 2026-07-31 | Fase 2 activada con Hiperpotasemia como Gold Standard. | Piloto suficientemente delimitado y capaz de tensionar contexto, motores, flujos, microherramientas, capacidades y seguridad. |
 | 2026-07-31 | Modelo A/B/C obligatorio. | Separar arquitectura estable, conocimiento clinico versionable y capacidades operativas. |
 | 2026-07-31 | Regla de aceptacion de asistentes fijada. | Ningun asistente puede desarrollarse fuera del Gold Standard. |
+| 2026-07-31 | Documento A de Hiperpotasemia redactado como especificacion funcional estable. | Validar el flujo funcional sin acoplar umbrales, dosis ni tratamientos al documento estable. |
