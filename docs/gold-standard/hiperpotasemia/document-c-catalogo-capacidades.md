@@ -80,7 +80,7 @@ Cambiar una capacidad no debe modificar Documento A ni Documento B. Solo debe mo
 
 ### AP
 
-| Capacidad | Estado por defecto | Conducta si falta |
+| Capacidad | Estado por defecto | Respuesta operativa si falta |
 |---|---|---|
 | `CAP-CTX-001` | disponible | No iniciar asistente sin contexto minimo |
 | `CAP-VIG-001` | disponible | Pedir confirmacion manual |
@@ -114,7 +114,7 @@ Cambiar una capacidad no debe modificar Documento A ni Documento B. Solo debe mo
 
 ### Urg
 
-| Capacidad | Estado por defecto | Conducta si falta |
+| Capacidad | Estado por defecto | Respuesta operativa si falta |
 |---|---|---|
 | `CAP-CTX-001` | disponible | Crear contexto minimo |
 | `CAP-VIG-001` | disponible | Actualizar dato |
@@ -148,7 +148,7 @@ Cambiar una capacidad no debe modificar Documento A ni Documento B. Solo debe mo
 
 ### 061
 
-| Capacidad | Estado por defecto | Conducta si falta |
+| Capacidad | Estado por defecto | Respuesta operativa si falta |
 |---|---|---|
 | `CAP-CTX-001` | disponible | Crear contexto prehospitalario minimo |
 | `CAP-VIG-001` | disponible | Registrar hora/origen del dato |
@@ -182,7 +182,7 @@ Cambiar una capacidad no debe modificar Documento A ni Documento B. Solo debe mo
 
 ### Ped
 
-| Capacidad | Estado por defecto | Conducta si falta |
+| Capacidad | Estado por defecto | Respuesta operativa si falta |
 |---|---|---|
 | `CAP-CTX-001` | disponible | Crear contexto pediatrico minimo |
 | `CAP-VIG-001` | disponible | Actualizar dato dinamico |
@@ -214,9 +214,9 @@ Cambiar una capacidad no debe modificar Documento A ni Documento B. Solo debe mo
 | `CAP-SEG-001` | disponible | Doble comprobacion medicacion pediatrica |
 | `CAP-ALT-001` | disponible | Alta con familia instruida si cumple criterios |
 
-## 6. Reglas de derivacion por falta de capacidad
+## 6. Respuestas operativas por falta de capacidad
 
-| Capacidad faltante | Conducta alternativa |
+| Capacidad faltante | Respuesta operativa alternativa |
 |---|---|
 | ECG no disponible y sospecha moderada/severa | Derivar a Urg o trasladar segun contexto |
 | Monitorizacion no disponible y ECG/riesgo alto | Escalar zona, activar traslado o prealerta |

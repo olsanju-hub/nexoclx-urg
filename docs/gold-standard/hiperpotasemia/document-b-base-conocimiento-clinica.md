@@ -181,43 +181,102 @@ Las recomendaciones se generan a partir de reglas y capacidades. La administraci
 | `HK-DST-001` | K normal y estable, asintomatico, ECG normal, causa identificada/tratada, seguimiento asegurado | Puede considerarse alta/seguimiento segun contexto | `SRC-RCH-2024-PED`, `SRC-UKKA-2023` |
 | `HK-DST-002` | AP con K moderada/severa, ECG no disponible o dato no confirmable con seguridad | Derivacion urgente a Urg o activacion 061 segun gravedad | Derivado de fuentes y capacidades AP |
 
-## 12. Matriz de dependencias
+## 12. Matriz de trazabilidad y dependencias
 
-| Regla | Motores | Flujos | Microherramientas | Capacidades | Fuentes |
-|---|---|---|---|---|---|
-| `HK-DX-001` | Analitica | - | - | Analitica disponible | `SRC-UKKA-2023` |
-| `HK-DX-004` | Analitica | Reevaluacion | Repetir muestra | Analitica disponible | `SRC-RCH-2024-PED`, `SRC-UKKA-2023` |
-| `HK-RSK-003` | Analitica, ECG | Monitorizacion | ECG | ECG, monitor | `SRC-RCUK-2025-ADULT` |
-| `HK-ECG-003` | ECG | Monitorizacion | Interpretacion ECG | ECG vigente | `SRC-RCH-2024-PED` |
-| `HK-TX-001` | Dosis/farmaco | Monitorizacion, confirmacion | Dosis IV | Via IV, monitor, calcio | `SRC-RCUK-2025-ADULT` |
-| `HK-TX-002` | Dosis, glucemia | Monitorizacion, confirmacion | Glucemia, dosis | Via IV, glucemia, insulina/glucosa | `SRC-RCUK-2025-ADULT` |
-| `HK-TX-006` | Funcion renal | Interconsulta/traslado | eGFR | Nefrologia/dialisis o traslado | `SRC-UKKA-2023`, `SRC-RCUK-2025-ADULT` |
-| `HK-PED-TX-003` | Peso/dosis pediatrica | Monitorizacion, confirmacion | Dosis pediatrica | Peso, via IV/IO, monitor, calcio | `SRC-RCH-2024-PED` |
-| `HK-PED-TX-007` | Pediatrico base | Traslado/interconsulta | - | UCIP/pediatria/traslado | `SRC-RCH-2024-PED` |
-| `HK-061-002` | Funcion renal, pediatrico si aplica | Traslado/prealerta | - | SVA, hospital util | `SRC-RCUK-2025-ADULT`, `SRC-RCH-2024-PED` |
+Cada regla debe poder rastrearse a motor, flujo, microherramienta, capacidad, fuente y casos de prueba. Las capacidades concretas se resuelven en Documento C.
+
+| Regla | Motor | Flujo | Microherramienta | Capacidad | Fuente | Pruebas |
+|---|---|---|---|---|---|---|
+| `HK-DX-001` | Analitica | Validar contexto | - | `CAP-LAB-001` | `SRC-UKKA-2023` | CT-01, CT-02, CT-03 |
+| `HK-DX-002` | Analitica, pediatrico base | Validar contexto | - | `CAP-LAB-001`, `CAP-PED-002` | `SRC-RCH-2024-PED` | CT-11, CT-12 |
+| `HK-DX-003` | Analitica, pediatrico base | Validar contexto | - | `CAP-LAB-001`, `CAP-PED-002` | `SRC-RCH-2024-PED` | CT-13 |
+| `HK-DX-004` | Analitica | Reevaluacion | Repetir muestra | `CAP-LAB-002` | `SRC-RCH-2024-PED`, `SRC-UKKA-2023` | CT-05 |
+| `HK-DX-005` | ECG, contexto clinico | ABCDE si procede | Interpretacion ECG | `CAP-ECG-001`, `CAP-ECG-002` | `SRC-RCUK-2025-ADULT`, `SRC-RCH-2024-PED` | CT-04, CT-16 |
+| `HK-RSK-001` | Analitica | Alta segura/seguimiento | - | `CAP-LAB-001`, `CAP-ALT-001` | `SRC-UKKA-2023` | CT-01 |
+| `HK-RSK-002` | Analitica, ECG | Monitorizacion | Interpretacion ECG | `CAP-LAB-001`, `CAP-ECG-001` | `SRC-UKKA-2023`, `SRC-RCUK-2025-ADULT` | CT-02, CT-09 |
+| `HK-RSK-003` | Analitica, ECG | Monitorizacion | Interpretacion ECG | `CAP-LAB-001`, `CAP-ECG-001`, `CAP-ECG-002` | `SRC-UKKA-2023`, `SRC-RCUK-2025-ADULT` | CT-03, CT-10 |
+| `HK-RSK-004` | ECG, constantes/contexto | ABCDE, monitorizacion | Interpretacion ECG | `CAP-ECG-001`, `CAP-ECG-002` | `SRC-RCUK-2025-ADULT` | CT-03, CT-04, CT-16 |
+| `HK-PED-001` | Analitica, pediatrico base | Monitorizacion si procede | - | `CAP-LAB-001`, `CAP-PED-001` | `SRC-RCH-2024-PED` | CT-11 |
+| `HK-PED-002` | Analitica, pediatrico base | Monitorizacion | - | `CAP-LAB-001`, `CAP-PED-001`, `CAP-ECG-002` | `SRC-RCH-2024-PED` | CT-11 |
+| `HK-PED-003` | Analitica, pediatrico base | Monitorizacion, escalada | - | `CAP-LAB-001`, `CAP-PED-001`, `CAP-PED-002` | `SRC-RCH-2024-PED` | CT-12, CT-13 |
+| `HK-PED-004` | ECG, pediatrico base | ABCDE, monitorizacion | Interpretacion ECG | `CAP-ECG-001`, `CAP-ECG-002`, `CAP-PED-001` | `SRC-RCH-2024-PED` | CT-12, CT-16 |
+| `HK-ECG-001` | ECG | Monitorizacion | Interpretacion ECG | `CAP-ECG-001` | `SRC-RCH-2024-PED`, `SRC-RCUK-2025-ADULT` | CT-03, CT-04 |
+| `HK-ECG-002` | ECG | Monitorizacion | Interpretacion ECG | `CAP-ECG-001` | `SRC-RCH-2024-PED` | CT-03, CT-16 |
+| `HK-ECG-003` | ECG | Monitorizacion | Interpretacion ECG | `CAP-ECG-001`, `CAP-ECG-002` | `SRC-RCH-2024-PED`, `SRC-RCUK-2025-ADULT` | CT-03, CT-16 |
+| `HK-ECG-004` | ECG, hemodinamico/contexto | ABCDE, PCR/peri-parada | Interpretacion ECG | `CAP-ECG-001`, `CAP-ECG-002` | `SRC-RCH-2024-PED`, `SRC-RCUK-2025-ADULT` | CT-04, CT-16 |
+| `HK-ECG-005` | ECG | Monitorizacion/reevaluacion | Interpretacion ECG | `CAP-ECG-001` | `SRC-RCH-2024-PED` | CT-01, CT-02 |
+| `HK-SAFE-001` | Glucemia, dosis | Seguridad medicacion | Glucemia | `CAP-GLU-001`, `CAP-CONF-001` | `SRC-RCUK-2025-ADULT`, `SRC-RCH-2024-PED` | CT-06, CT-14 |
+| `HK-SAFE-002` | Peso/dosis pediatrica | Seguridad medicacion | Dosis pediatrica | `CAP-PED-001`, `CAP-CONF-001` | `SRC-RCH-2024-PED` | CT-12 |
+| `HK-SAFE-003` | Farmacologia, tratamiento habitual | Confirmacion profesional | Checklist medicacion relacionada | `CAP-CONF-001`, `CAP-SEG-001` | `SRC-RCH-2024-PED`, `SRC-RCUK-2025-ADULT` | CT-07 |
+| `HK-SAFE-004` | Farmacologia | Seguridad medicacion | Compatibilidad via | `CAP-IV-001`, `CAP-SEG-001` | `SRC-RCH-2024-PED`, `SRC-RCUK-2025-ADULT` | CT-03, CT-18 |
+| `HK-SAFE-005` | Trazabilidad | Confirmacion profesional | - | `CAP-CONF-001` | Contrato funcional NexoClx | CT-03, CT-10, CT-12 |
+| `HK-SAFE-006` | Vigencia contexto | Validar contexto | - | `CAP-VIG-001` | Contrato funcional NexoClx | CT-05, CT-09 |
+| `HK-TX-001` | Farmacologia/dosis | Monitorizacion, confirmacion | Dosis IV | `CAP-IV-001`, `CAP-ECG-002`, `CAP-MED-001` | `SRC-RCUK-2025-ADULT`, `SRC-UKKA-2023` | CT-03, CT-04 |
+| `HK-TX-002` | Farmacologia/dosis, glucemia | Monitorizacion, confirmacion | Glucemia, dosis IV | `CAP-IV-001`, `CAP-GLU-001`, `CAP-MED-001` | `SRC-RCUK-2025-ADULT`, `SRC-UKKA-2023` | CT-02, CT-03, CT-06, CT-14 |
+| `HK-TX-003` | Farmacologia | Monitorizacion | Nebulizacion | `CAP-MED-002` | `SRC-RCUK-2025-ADULT`, `SRC-UKKA-2023` | CT-02, CT-03 |
+| `HK-TX-004` | Farmacologia | Tratamiento/eliminacion | Selector farmaco | `CAP-MED-003` | `SRC-RCUK-2025-ADULT`, `SRC-UKKA-2023` | CT-02, CT-03 |
+| `HK-TX-005` | Gasometria, farmacologia | Monitorizacion, confirmacion | Gasometria/acido-base | `CAP-IV-001`, `CAP-LAB-001`, `CAP-SEG-001` | `SRC-RCUK-2025-ADULT`, `SRC-RCH-2024-PED` | CT-18 |
+| `HK-TX-006` | Funcion renal | Interconsulta/traslado | eGFR | `CAP-REN-002`, `CAP-REN-003` | `SRC-RCUK-2025-ADULT`, `SRC-UKKA-2023` | CT-08 |
+| `HK-TX-007` | Medicacion habitual | Seguridad medicacion | Checklist medicacion relacionada | `CAP-CONF-001` | `SRC-RCH-2024-PED`, `SRC-UKKA-2023` | CT-01, CT-17 |
+| `HK-TX-001A` | Dosis/farmaco | Confirmacion profesional | Dosis IV | `CAP-IV-001`, `CAP-MED-001` | `SRC-RCUK-2025-ADULT` | CT-03 |
+| `HK-TX-001B` | Dosis/farmaco | Confirmacion profesional | Dosis IV | `CAP-IV-001`, `CAP-MED-001` | `SRC-RCUK-2025-ADULT` | CT-03 |
+| `HK-TX-002A` | Dosis/farmaco, glucemia | Confirmacion, monitorizacion | Dosis IV, glucemia | `CAP-IV-001`, `CAP-GLU-001`, `CAP-MED-001` | `SRC-RCUK-2025-ADULT` | CT-06, CT-14 |
+| `HK-TX-002B` | Glucemia, perfusiones | Monitorizacion | Glucemia, perfusion | `CAP-GLU-001`, `CAP-INF-001` | `SRC-RCUK-2025-ADULT` | CT-14 |
+| `HK-TX-003A` | Dosis/farmaco | Monitorizacion | Nebulizacion | `CAP-MED-002` | `SRC-RCUK-2025-ADULT` | CT-02, CT-03 |
+| `HK-TX-004A` | Farmacologia | Eliminacion | Selector farmaco | `CAP-MED-003` | `SRC-RCUK-2025-ADULT` | CT-02 |
+| `HK-TX-005A` | Gasometria, dosis/farmaco | PCR/peri-parada, seguridad | Dosis IV | `CAP-IV-001`, `CAP-SEG-001` | `SRC-RCUK-2025-ADULT` | CT-18 |
+| `HK-PED-TX-001` | Pediatrico base | Monitorizacion | - | `CAP-PED-001`, `CAP-ECG-002`, `CAP-IV-001` | `SRC-RCH-2024-PED` | CT-11, CT-12 |
+| `HK-PED-TX-002` | Pediatrico base, analitica | Monitorizacion | Repetir muestra | `CAP-LAB-001`, `CAP-LAB-002`, `CAP-ECG-002` | `SRC-RCH-2024-PED` | CT-12 |
+| `HK-PED-TX-003` | Peso/dosis pediatrica | Monitorizacion, confirmacion | Dosis pediatrica | `CAP-PED-001`, `CAP-IV-001`/`CAP-IO-001`, `CAP-MED-001` | `SRC-RCH-2024-PED` | CT-12 |
+| `HK-PED-TX-004` | Peso/dosis pediatrica, glucemia | Monitorizacion, confirmacion | Dosis pediatrica, glucemia | `CAP-PED-001`, `CAP-GLU-001`, `CAP-IV-001` | `SRC-RCH-2024-PED` | CT-11, CT-12, CT-14 |
+| `HK-PED-TX-005` | Peso/dosis pediatrica | Monitorizacion | Nebulizacion | `CAP-PED-001`, `CAP-MED-002` | `SRC-RCH-2024-PED` | CT-11, CT-12 |
+| `HK-PED-TX-006` | Gasometria, peso/dosis pediatrica | Monitorizacion, seguridad | Gasometria/acido-base | `CAP-PED-001`, `CAP-IV-001`, `CAP-SEG-001` | `SRC-RCH-2024-PED` | CT-18 |
+| `HK-PED-TX-007` | Pediatrico base | Traslado/interconsulta | - | `CAP-PED-002`, `CAP-PED-003`, `CAP-TRS-001` | `SRC-RCH-2024-PED` | CT-12, CT-13 |
+| `HK-PED-TX-003A` | Peso/dosis pediatrica | Confirmacion profesional | Dosis pediatrica | `CAP-PED-001`, `CAP-MED-001` | `SRC-RCH-2024-PED` | CT-12 |
+| `HK-PED-TX-003B` | Peso/dosis pediatrica | Confirmacion profesional | Dosis pediatrica | `CAP-PED-001`, `CAP-MED-001` | `SRC-RCH-2024-PED` | CT-12 |
+| `HK-PED-TX-004A` | Peso/dosis pediatrica | Confirmacion profesional | Dosis pediatrica | `CAP-PED-001`, `CAP-IV-001` | `SRC-RCH-2024-PED` | CT-12, CT-14 |
+| `HK-PED-TX-004B` | Peso/dosis pediatrica, glucemia | Confirmacion profesional | Dosis pediatrica, glucemia | `CAP-PED-001`, `CAP-GLU-001`, `CAP-IV-001` | `SRC-RCH-2024-PED` | CT-12, CT-14 |
+| `HK-PED-TX-005A` | Peso/dosis pediatrica | Monitorizacion | Nebulizacion | `CAP-PED-001`, `CAP-MED-002` | `SRC-RCH-2024-PED` | CT-11, CT-12 |
+| `HK-PED-TX-006A` | Peso/dosis pediatrica, gasometria | Confirmacion profesional | Dosis pediatrica, gasometria | `CAP-PED-001`, `CAP-IV-001`, `CAP-LAB-001` | `SRC-RCH-2024-PED` | CT-18 |
+| `HK-RV-001` | ECG | Reevaluacion | Interpretacion ECG | `CAP-ECG-001`, `CAP-ECG-002` | `SRC-RCH-2024-PED`, `SRC-RCUK-2025-ADULT` | CT-03, CT-16 |
+| `HK-RV-002` | Glucemia | Reevaluacion, monitorizacion | Glucemia | `CAP-GLU-001` | `SRC-RCH-2024-PED`, `SRC-RCUK-2025-ADULT`, `SRC-UKKA-2023` | CT-06, CT-14 |
+| `HK-RV-003` | Analitica | Reevaluacion | Repetir muestra | `CAP-LAB-001`, `CAP-LAB-002` | `SRC-UKKA-2023`, `SRC-RCH-2024-PED` | CT-02, CT-03, CT-15 |
+| `HK-RV-004` | Pediatrico base, ECG | Reevaluacion, monitorizacion | - | `CAP-PED-002`, `CAP-ECG-002` | `SRC-RCH-2024-PED` | CT-11, CT-12 |
+| `HK-RV-005` | Analitica, contexto | Reevaluacion/alta segura | Repetir muestra | `CAP-LAB-002`, `CAP-ALT-001` | `SRC-UKKA-2023` | CT-15, CT-20 |
+| `HK-ESC-001` | ECG/contexto | PCR/peri-parada | - | `CAP-ECG-002`, `CAP-CONF-001` | `SRC-RCUK-2025-ADULT` | CT-04 |
+| `HK-ESC-002` | Funcion renal | Interconsulta/traslado | eGFR | `CAP-REN-002`, `CAP-REN-003`, `CAP-UCI-001` | `SRC-RCUK-2025-ADULT`, `SRC-UKKA-2023` | CT-08 |
+| `HK-ESC-003` | Pediatrico base | Interconsulta/traslado | - | `CAP-PED-002`, `CAP-PED-003`, `CAP-HOSP-002` | `SRC-RCH-2024-PED` | CT-12, CT-13 |
+| `HK-061-001` | ECG, contexto 061 | Traslado/prealerta | Interpretacion ECG | `CAP-TRS-001`, `CAP-COM-001`, `CAP-HOSP-001`/`CAP-HOSP-002` | Fuentes adultas/ped y contrato 061 | CT-10 |
+| `HK-061-002` | Funcion renal, pediatrico si aplica | Traslado/prealerta | eGFR | `CAP-TRS-002`, `CAP-HOSP-001`/`CAP-HOSP-002` | `SRC-RCUK-2025-ADULT`, `SRC-RCH-2024-PED` | CT-10, CT-13 |
+| `HK-DST-001` | Analitica, ECG, contexto | Alta segura | Checklist alta segura | `CAP-ALT-001`, `CAP-LAB-002` | `SRC-RCH-2024-PED`, `SRC-UKKA-2023` | CT-01, CT-20 |
+| `HK-DST-002` | Contexto AP, capacidades | Derivacion/traslado | - | `CAP-ECG-001`, `CAP-TRS-001`, `CAP-TRS-002` | Fuentes y capacidades AP | CT-09 |
 
 ## 13. Validacion clinica requerida antes de implementar
 
 Casos obligatorios:
 
-1. Adulto K leve, estable, ECG normal.
-2. Adulto K moderada, ECG normal, ERC.
-3. Adulto K severa con ECG de riesgo.
-4. ECG de riesgo con K pendiente.
-5. Muestra hemolizada discordante.
-6. Glucemia no disponible antes de tratamiento con insulina.
-7. Sospecha de toxicidad digitalica.
-8. Anuria o dialisis probable.
-9. AP sin ECG disponible.
-10. 061 con K severa conocida.
-11. Nino con K moderada.
-12. Nino severo sin peso vigente.
-13. Neonato con K elevado segun umbral neonatal.
-14. Hipoglucemia tras tratamiento.
-15. Rebote de potasio tras descenso.
-16. Cambio de rama por nuevo ECG.
-17. Embarazo.
-18. Acidosis metabolica relevante.
+| ID | Escenario |
+|---|---|
+| CT-01 | Adulto K leve, estable, ECG normal |
+| CT-02 | Adulto K moderada, ECG normal, ERC |
+| CT-03 | Adulto K severa con ECG de riesgo |
+| CT-04 | ECG de riesgo con K pendiente |
+| CT-05 | Muestra hemolizada discordante |
+| CT-06 | Glucemia no disponible antes de tratamiento con insulina |
+| CT-07 | Sospecha de toxicidad digitalica |
+| CT-08 | Anuria o dialisis probable |
+| CT-09 | AP sin ECG disponible |
+| CT-10 | 061 con K severa conocida |
+| CT-11 | Nino con K moderada |
+| CT-12 | Nino severo sin peso vigente |
+| CT-13 | Neonato con K elevado segun umbral neonatal |
+| CT-14 | Hipoglucemia tras tratamiento |
+| CT-15 | Rebote de potasio tras descenso |
+| CT-16 | Cambio de rama por nuevo ECG |
+| CT-17 | Embarazo |
+| CT-18 | Acidosis metabolica relevante |
+| CT-19 | Intoxicacion o contexto alternativo que pasa a otro asistente |
+| CT-20 | Alta o seguimiento tras normalizacion y causa controlada |
 
 Criterios de seguridad:
 

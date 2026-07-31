@@ -156,14 +156,36 @@ El asistente debe implementarse como maquina de estados funcional.
 
 ### Reglas de transicion
 
-Cada transicion debe declarar:
+Cada transicion debe declarar evento, condicion, bloqueo, accion generada y siguiente estado.
 
-- evento que la dispara;
-- condicion;
-- bloqueo si existe;
-- accion generada;
-- dato o regla que actualiza el contexto;
-- necesidad de confirmacion profesional si procede.
+| Desde | Evento | Condicion | Bloqueo | Accion funcional | Siguiente estado |
+|---|---|---|---|---|---|
+| INICIO | Entrada recibida | Existe ruta de entrada valida | Falta contexto minimo | Crear o recuperar contexto | VALIDAR_CONTEXTO |
+| VALIDAR_CONTEXTO | Contexto revisado | Datos heredados vigentes suficientes para primera decision | - | Marcar datos como reutilizados | EVALUAR_RIESGO |
+| VALIDAR_CONTEXTO | Contexto incompleto | Falta dato imprescindible o dato no vigente | Dato obligatorio no disponible | Listar dato requerido y razon | DATOS_INSUFICIENTES |
+| DATOS_INSUFICIENTES | Dato puede obtenerse en el contexto | Capacidad declarada disponible o variable | Capacidad desconocida | Solicitar obtencion o confirmacion | OBTENER_DATO |
+| DATOS_INSUFICIENTES | Dato no puede obtenerse en el contexto | Capacidad no disponible | No se puede cerrar decision | Generar conducta alternativa por falta de dato | CONDUCTA_FINAL |
+| OBTENER_DATO | Dato introducido o actualizado | Dato con origen, hora, ambito y vigencia | Dato contradictorio o dudoso | Actualizar contexto | VALIDAR_CONTEXTO |
+| EVALUAR_RIESGO | Riesgo funcional critico detectado | Regla de riesgo aplicable segun Documento B | Requiere flujo critico | Abrir flujo reutilizable correspondiente | FLUJO_CRITICO |
+| EVALUAR_RIESGO | Riesgo no critico o estabilizado | Existen datos suficientes para reglas | - | Pasar a procesamiento de reglas | INTERPRETAR |
+| EVALUAR_RIESGO | Riesgo no evaluable | Faltan datos para la regla de riesgo | Dato critico ausente | Solicitar dato o generar alternativa | DATOS_INSUFICIENTES |
+| FLUJO_CRITICO | Flujo completado | Paciente continua en asistente | - | Incorporar resultados al contexto | INTERPRETAR |
+| FLUJO_CRITICO | Flujo desplaza problema principal | Otro asistente/flujo pasa a ser prioritario | Confirmacion si cambia diagnostico principal | Registrar derivacion de flujo | CONDUCTA_FINAL |
+| INTERPRETAR | Reglas evaluadas | Hechos calculados disponibles | - | Separar hechos, incertidumbre y contradicciones | RECOMENDAR |
+| INTERPRETAR | Regla no evaluable | Falta dato, motor o capacidad | Regla bloqueada | Registrar bloqueo trazable | DATOS_INSUFICIENTES |
+| RECOMENDAR | Recomendacion generada | Capacidades suficientes segun Documento C | Accion critica pendiente | Mostrar recomendacion como no ejecutada | CONFIRMAR_DECISION |
+| RECOMENDAR | Recomendacion no ejecutable | Falta capacidad requerida | Capacidad no disponible | Ofrecer alternativa operativa | ESCALAR |
+| RECOMENDAR | No requiere accion critica | Conducta puede proponerse sin confirmacion de ejecucion | - | Preparar conducta final | CONDUCTA_FINAL |
+| CONFIRMAR_DECISION | Profesional acepta | Accion critica confirmada | - | Registrar decision profesional | EJECUTAR_CONDUCTA |
+| CONFIRMAR_DECISION | Profesional modifica o rechaza | Motivo documentado | - | Registrar decision y recalcular si procede | RECOMENDAR |
+| EJECUTAR_CONDUCTA | Conducta registrada | Requiere control posterior | - | Programar reevaluacion | REEVALUAR |
+| EJECUTAR_CONDUCTA | Conducta registrada | No requiere control temporal dentro del asistente | - | Preparar cierre o retorno | CONDUCTA_FINAL |
+| REEVALUAR | Nuevo dato disponible | Cambia riesgo, respuesta o incertidumbre | - | Actualizar contexto y recalcular | INTERPRETAR |
+| REEVALUAR | Fracaso o deterioro | Reglas de escalada aplicables | - | Generar escalada | ESCALAR |
+| REEVALUAR | Respuesta suficiente | Cumple criterio de destino | - | Emitir conducta final | CONDUCTA_FINAL |
+| ESCALAR | Recurso o destino definido | Capacidad alternativa disponible | Confirmacion si traslado/ingreso/activacion | Registrar recomendacion de escalada | CONDUCTA_FINAL |
+| CONDUCTA_FINAL | Cierre solicitado | Conducta valida emitida | Accion critica sin confirmar | Cerrar episodio o mantener pendiente | FINALIZADO |
+| CONDUCTA_FINAL | Asistente llamado desde otro flujo | Existe punto de retorno | - | Devolver resultado estructurado | VOLVER_ORIGEN |
 
 No se permiten transiciones circulares sin cambio de estado, dato o decision.
 

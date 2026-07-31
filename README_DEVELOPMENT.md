@@ -8,13 +8,14 @@ Documento interno de desarrollo de NexoClx Urg. No sustituye al README principal
 - Fase 1 - Arquitectura: cerrada y congelada.
 - Gold Standard: Hiperpotasemia, Documentos A/B/C en borrador.
 - Version del Gold Standard: v0.1 funcional/clinico/operativo.
-- Estado de validacion: pendiente de auditoria del piloto.
+- Estado de validacion: auditoria preimplementacion iniciada; casos y escenarios de independencia pendientes.
 - Proximos hitos:
   1. Documento A - Especificacion Funcional de Hiperpotasemia.
   2. Documento B - Base de Conocimiento Clinica.
-  3. Validacion del piloto frente al contrato funcional.
+  3. Validacion formal de casos CT-*.
   4. Validacion de independencia A/B/C.
-  5. Declaracion de Gold Standard v1.0 si supera la validacion.
+  5. Implementacion si supera auditoria.
+  6. Declaracion de Gold Standard v1.0 si supera la validacion.
 
 ## Filosofia de NexoClx
 
@@ -117,7 +118,7 @@ Un asistente debe demostrar:
 
 | Asistente | Estado | Version | Fase | Validacion | Observaciones |
 |---|---|---|---|---|---|
-| Hiperpotasemia Gold Standard | Documentos A/B/C redactados | v0.1 funcional/clinico/operativo | Fase 2 | Pendiente | No implementado; siguiente hito: auditoria y validacion del piloto. |
+| Hiperpotasemia Gold Standard | Documentos A/B/C auditados preimplementacion | v0.1 funcional/clinico/operativo | Fase 2 | Pendiente CT-* | No implementado; siguiente hito: validacion formal de casos e independencia A/B/C. |
 
 ## Registro de decisiones
 
@@ -130,3 +131,4 @@ Un asistente debe demostrar:
 | 2026-07-31 | Documento A de Hiperpotasemia redactado como especificacion funcional estable. | Validar el flujo funcional sin acoplar umbrales, dosis ni tratamientos al documento estable. |
 | 2026-07-31 | Documento B de Hiperpotasemia redactado como base clinica versionable. | Separar reglas, umbrales, dosis, recomendaciones y fuentes del Documento A estable. |
 | 2026-07-31 | Documento C de Hiperpotasemia redactado como catalogo de capacidades. | Condicionar conductas a capacidades reales sin modificar flujo funcional ni reglas clinicas. |
+| 2026-07-31 | Auditoria preimplementacion de Hiperpotasemia iniciada y documentada. | Verificar independencia A/B/C, trazabilidad de reglas, modelo de estados y separacion de capacidades antes de programar. |
