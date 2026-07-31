@@ -6,14 +6,14 @@ Documento interno de desarrollo de NexoClx Urg. No sustituye al README principal
 
 - Fase actual: Fase 2 - Ingenieria de contenidos clinicos.
 - Fase 1 - Arquitectura: cerrada y congelada.
-- Gold Standard: Hiperpotasemia, Documentos A y B en borrador.
-- Version del Gold Standard: v0.1 funcional/clinico; Documento C pendiente.
-- Estado de validacion: no validado.
+- Gold Standard: Hiperpotasemia, Documentos A/B/C en borrador.
+- Version del Gold Standard: v0.1 funcional/clinico/operativo.
+- Estado de validacion: pendiente de auditoria del piloto.
 - Proximos hitos:
   1. Documento A - Especificacion Funcional de Hiperpotasemia.
   2. Documento B - Base de Conocimiento Clinica.
-  3. Documento C - Catalogo de Capacidades.
-  4. Validacion del piloto frente al contrato funcional.
+  3. Validacion del piloto frente al contrato funcional.
+  4. Validacion de independencia A/B/C.
   5. Declaracion de Gold Standard v1.0 si supera la validacion.
 
 ## Filosofia de NexoClx
@@ -117,7 +117,7 @@ Un asistente debe demostrar:
 
 | Asistente | Estado | Version | Fase | Validacion | Observaciones |
 |---|---|---|---|---|---|
-| Hiperpotasemia Gold Standard | Documentos A y B redactados | v0.1 funcional/clinico | Fase 2 | No validado | Documento C pendiente; no implementado. |
+| Hiperpotasemia Gold Standard | Documentos A/B/C redactados | v0.1 funcional/clinico/operativo | Fase 2 | Pendiente | No implementado; siguiente hito: auditoria y validacion del piloto. |
 
 ## Registro de decisiones
 
@@ -129,3 +129,4 @@ Un asistente debe demostrar:
 | 2026-07-31 | Regla de aceptacion de asistentes fijada. | Ningun asistente puede desarrollarse fuera del Gold Standard. |
 | 2026-07-31 | Documento A de Hiperpotasemia redactado como especificacion funcional estable. | Validar el flujo funcional sin acoplar umbrales, dosis ni tratamientos al documento estable. |
 | 2026-07-31 | Documento B de Hiperpotasemia redactado como base clinica versionable. | Separar reglas, umbrales, dosis, recomendaciones y fuentes del Documento A estable. |
+| 2026-07-31 | Documento C de Hiperpotasemia redactado como catalogo de capacidades. | Condicionar conductas a capacidades reales sin modificar flujo funcional ni reglas clinicas. |
