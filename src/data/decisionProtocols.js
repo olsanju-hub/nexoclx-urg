@@ -294,6 +294,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Administrar calcio IV',
             detail: 'Estabilizacion de membrana con monitorizacion cuando hay ECG de riesgo o inestabilidad.',
             critical: true,
+            reevaluationKind: 'calcium',
           },
           {
             id: 'urg-get-glucose',
@@ -301,6 +302,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Obtener glucemia basal',
             detail: 'Bloqueo de seguridad antes de insulina-glucosa.',
             critical: true,
+            reevaluationKind: 'observation',
           },
           {
             id: 'urg-urgent-consult',
@@ -308,6 +310,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Interconsulta urgente',
             detail: 'Avisar a criticos/nefrologia si hay refractariedad, anuria, dialisis o ECG persistente.',
             critical: true,
+            reevaluationKind: 'transfer',
           },
         ],
       },
@@ -330,6 +333,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Administrar calcio IV',
             detail: 'Estabilizacion de membrana con monitorizacion cuando hay ECG de riesgo o inestabilidad.',
             critical: true,
+            reevaluationKind: 'calcium',
           },
           {
             id: 'urg-insulin-glucose',
@@ -337,6 +341,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Administrar insulina-glucosa',
             detail: 'Desplazamiento intracelular con glucemia basal confirmada y vigilancia posterior.',
             critical: true,
+            reevaluationKind: 'insulin',
           },
           {
             id: 'urg-urgent-consult',
@@ -344,6 +349,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Interconsulta urgente',
             detail: 'Avisar a criticos/nefrologia si hay refractariedad, anuria, dialisis o ECG persistente.',
             critical: true,
+            reevaluationKind: 'transfer',
           },
         ],
       },
@@ -362,6 +368,7 @@ const hyperkalemiaUrgProtocol = {
             rule: 'HK-DX-002',
             label: 'Repetir potasio y ECG',
             detail: 'Confirmar el dato antes de cerrar la rama si no hay criterios criticos.',
+            reevaluationKind: 'observation',
           },
         ],
       },
@@ -385,6 +392,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Observacion monitorizada',
             detail: 'Mantener vigilancia y reevaluacion de potasio/ECG antes de destino definitivo.',
             critical: true,
+            reevaluationKind: 'observation',
           },
           {
             id: 'urg-admission',
@@ -392,6 +400,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Ingreso',
             detail: 'Ingresar si persiste riesgo, causa no corregida, deterioro renal o seguimiento no seguro.',
             critical: true,
+            reevaluationKind: 'observation',
           },
         ],
       },
@@ -413,6 +422,7 @@ const hyperkalemiaUrgProtocol = {
             rule: 'HK-RV-001',
             label: 'Reevaluar antes de alta',
             detail: 'Repetir potasio/ECG segun riesgo y bloquear alta si reaparece gravedad.',
+            reevaluationKind: 'observation',
           },
           {
             id: 'urg-discharge',
@@ -420,6 +430,7 @@ const hyperkalemiaUrgProtocol = {
             label: 'Alta con plan seguro',
             detail: 'Solo si no hay inestabilidad, ECG de riesgo, potasio severo ni seguimiento incierto.',
             critical: true,
+            reevaluationKind: 'observation',
           },
         ],
       },

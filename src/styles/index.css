@@ -1479,6 +1479,10 @@ h2 {
   padding: 0.9rem;
 }
 
+.trace-item.is-primary {
+  border-color: color-mix(in srgb, var(--color-accent) 34%, var(--color-line));
+}
+
 .trace-item-header {
   display: flex;
   align-items: flex-start;
@@ -1524,6 +1528,12 @@ h2 {
   font-weight: 800;
 }
 
+.trace-actions button:disabled,
+.trace-execute:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .trace-note {
   display: grid;
   gap: 0.4rem;
@@ -1541,6 +1551,36 @@ h2 {
   color: var(--color-text);
   padding: 0.75rem;
   font: inherit;
+}
+
+.trace-note input,
+.trace-note select {
+  width: 100%;
+  min-height: 2.55rem;
+  border: 1px solid var(--color-line);
+  border-radius: 0.85rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0 0.72rem;
+  font: inherit;
+}
+
+.trace-field-grid,
+.trace-reevaluation {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.trace-next-step {
+  border-left: 3px solid color-mix(in srgb, var(--color-accent) 38%, var(--color-line));
+  padding-left: 0.72rem;
+}
+
+.trace-next-step strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--color-text);
+  font-size: 0.9rem;
 }
 
 .trace-execute {
