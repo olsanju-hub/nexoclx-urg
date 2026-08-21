@@ -1,0 +1,41 @@
+{
+  "date": "2026-08-22",
+  "environment": {
+    "localPreview": "http://127.0.0.1:4177/nexoclx-urg/",
+    "mobileViewport": "390x844",
+    "desktopViewport": "1440x1000"
+  },
+  "screensReviewed": [
+    "home",
+    "protocol-detail-sepsis",
+    "protocol-detail-dolor-toracico",
+    "tools",
+    "procedures",
+    "circuits",
+    "sources"
+  ],
+  "mobile": {
+    "folder": "visual-review-final/mobile/",
+    "scrollWidthCheck": {
+      "innerWidth": 390,
+      "documentScrollWidth": 390,
+      "bodyScrollWidth": 390
+    },
+    "result": "Sin scroll horizontal en viewport movil real. Home, detalle de sepsis y fuentes revisados visualmente."
+  },
+  "desktop": {
+    "folder": "visual-review-final/desktop/",
+    "result": "Home y fuentes revisados visualmente en escritorio; navegacion superior y layout responsive correctos."
+  },
+  "issuesFound": [
+    {
+      "issue": "Capturas iniciales con Chrome CLI recortaban a 390 px mientras el viewport interno era 500 px.",
+      "fix": "Repetida captura movil mediante CDP con Emulation.setDeviceMetricsOverride a 390 px."
+    },
+    {
+      "issue": "Titulo largo y placeholder del buscador con riesgo de recorte visual en movil.",
+      "fix": "Wrapping explicito de encabezados, tamano movil estable y placeholder de Home acortado."
+    }
+  ],
+  "status": "Apto para revision final y publicacion."
+}

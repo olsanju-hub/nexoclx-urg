@@ -1,66 +1,69 @@
 import { useEffect, useMemo, useState } from 'react';
 import { appConfig, primarySections, secondarySections } from '../data/sections.js';
-import { placeholderProtocols } from '../data/placeholders.js';
+import { allClinicalItems, clinicalProtocols } from '../data/urgClinicalData.js';
 import { routes } from './routes.js';
 import { AppShell } from '../components/shell/AppShell.jsx';
 import { Home } from '../screens/Home.jsx';
 import { Protocols } from '../screens/Protocols.jsx';
 import { ProtocolDetail } from '../screens/ProtocolDetail.jsx';
-import { HtaUrgProtocol } from '../screens/HtaUrgProtocol.jsx';
 import { Tools } from '../screens/Tools.jsx';
-import { HtaUrgSupportTool } from '../screens/HtaUrgSupportTool.jsx';
 import { More } from '../screens/More.jsx';
 import { Procedures } from '../screens/Procedures.jsx';
 import { Circuits } from '../screens/Circuits.jsx';
 import { CircuitDetail } from '../screens/CircuitDetail.jsx';
 import { Calculations } from '../screens/Calculations.jsx';
+import { Sources } from '../screens/Sources.jsx';
 
 const routeTitles = {
   [routes.home]: 'Inicio',
   [routes.protocols]: 'Protocolos',
   [routes.protocolDetail]: 'Protocolo',
-  [routes.htaUrgProtocol]: 'HTA en Urgencias',
   [routes.tools]: 'Herramientas',
-  [routes.htaUrgSupportTool]: 'Herramienta HTA',
   [routes.procedures]: 'Procedimientos',
   [routes.circuits]: 'Circuitos',
   [routes.circuitDetail]: 'Circuito',
   [routes.calculations]: 'Cálculos',
+  [routes.sources]: 'Fuentes',
   [routes.more]: 'Más',
 };
 
-export default function App() {
-  const [route, setRoute] = useState(() => window.location.hash.replace('#/', '') || routes.home);
-  const [selectedId, setSelectedId] = useState(null);
+const parseHashState = () => {
+  const rawHash = window.location.hash.replace(/^#\/?/, '');
+  const [hashRoute, hashId] = rawHash.split('/');
+  return {
+    route: hashRoute || routes.home,
+    selectedId: hashId || null,
+  };
+};
 
-  const currentProtocol = useMemo(
-    () => placeholderProtocols.find((item) => item.id === selectedId) ?? placeholderProtocols[0],
+export default function App() {
+  const initialHashState = parseHashState();
+  const [route, setRoute] = useState(initialHashState.route);
+  const [selectedId, setSelectedId] = useState(initialHashState.selectedId);
+
+  const currentItem = useMemo(
+    () => allClinicalItems.find((item) => item.id === selectedId) ?? null,
     [selectedId],
   );
 
   const navigate = (nextRoute, id = null) => {
     setRoute(nextRoute);
     setSelectedId(id);
-    window.history.replaceState(null, '', `#/${nextRoute}`);
+    window.history.replaceState(null, '', `#/${nextRoute}${id ? `/${id}` : ''}`);
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   useEffect(() => {
     const onHashChange = () => {
-      setRoute(window.location.hash.replace('#/', '') || routes.home);
-      setSelectedId(null);
+      const nextHashState = parseHashState();
+      setRoute(nextHashState.route);
+      setSelectedId(nextHashState.selectedId);
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  const openProtocol = (id) => {
-    if (id === 'hta-urgencias') {
-      navigate(routes.htaUrgProtocol, id);
-      return;
-    }
-    navigate(routes.protocolDetail, id);
-  };
+  const openItem = (id) => navigate(routes.protocolDetail, id);
 
   return (
     <AppShell
@@ -71,16 +74,15 @@ export default function App() {
       secondarySections={secondarySections}
       onNavigate={navigate}
     >
-      {route === routes.home && <Home app={appConfig} sections={primarySections} onNavigate={navigate} />}
-      {route === routes.protocols && <Protocols protocols={placeholderProtocols} onOpen={openProtocol} />}
-      {route === routes.protocolDetail && <ProtocolDetail protocol={currentProtocol} onBack={() => navigate(routes.protocols)} />}
-      {route === routes.htaUrgProtocol && <HtaUrgProtocol onBack={() => navigate(routes.protocols)} onOpenTool={(id) => navigate(routes.htaUrgSupportTool, id)} />}
-      {route === routes.tools && <Tools onOpen={(id) => navigate(routes.htaUrgSupportTool, id)} onOpenProtocol={openProtocol} />}
-      {route === routes.htaUrgSupportTool && <HtaUrgSupportTool toolId={selectedId} onBack={() => navigate(routes.tools)} onOpenProtocol={() => navigate(routes.htaUrgProtocol, 'hta-urgencias')} />}
-      {route === routes.procedures && <Procedures />}
-      {route === routes.circuits && <Circuits onOpen={() => navigate(routes.circuitDetail)} />}
-      {route === routes.circuitDetail && <CircuitDetail onBack={() => navigate(routes.circuits)} />}
-      {route === routes.calculations && <Calculations />}
+      {route === routes.home && <Home app={appConfig} sections={primarySections} onNavigate={navigate} onOpen={openItem} />}
+      {route === routes.protocols && <Protocols protocols={clinicalProtocols} onOpen={openItem} />}
+      {route === routes.protocolDetail && <ProtocolDetail item={currentItem} onBack={() => navigate(routes.protocols)} onOpen={openItem} />}
+      {route === routes.tools && <Tools onOpen={openItem} />}
+      {route === routes.procedures && <Procedures onOpen={openItem} />}
+      {route === routes.circuits && <Circuits onOpen={openItem} />}
+      {route === routes.circuitDetail && <CircuitDetail item={currentItem} onBack={() => navigate(routes.circuits)} />}
+      {route === routes.calculations && <Calculations onOpen={openItem} />}
+      {route === routes.sources && <Sources />}
       {route === routes.more && <More sections={secondarySections} onNavigate={navigate} />}
     </AppShell>
   );

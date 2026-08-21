@@ -7,6 +7,7 @@
 
 html {
   min-width: 320px;
+  overflow-x: hidden;
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
@@ -16,6 +17,11 @@ html {
 
 body {
   margin: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  max-width: 100%;
   overflow-x: hidden;
 }
 
@@ -142,7 +148,15 @@ button {
 .section-heading,
 .detail-header {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   gap: 0.86rem;
+}
+
+.section-heading > *,
+.detail-header > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 h1,
@@ -153,10 +167,12 @@ p {
 
 h1 {
   margin-bottom: 0;
-  font-size: clamp(1.72rem, 8vw, 2.64rem);
+  font-size: 2.32rem;
   font-weight: 820;
   line-height: 1.06;
   letter-spacing: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 h2 {
@@ -249,7 +265,7 @@ h2 {
 .tool-pathology-heading h2 {
   margin: 0;
   color: var(--color-text);
-  font-size: clamp(1rem, 2vw, 1.18rem);
+  font-size: 1.08rem;
   letter-spacing: 0;
 }
 
@@ -575,6 +591,80 @@ h2 {
   font-weight: 740;
 }
 
+.quick-section,
+.search-results,
+.search-result-group {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.section-heading.compact {
+  gap: 0.28rem;
+}
+
+.section-heading.compact h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.quick-grid,
+.linked-chip-grid,
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.quick-grid button,
+.linked-chip-grid button,
+.tag-row span {
+  min-height: 2.42rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 24%, var(--color-line));
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-accent);
+  padding: 0.56rem 0.78rem;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 780;
+}
+
+.tag-row span {
+  min-height: auto;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+.search-result-group h2 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.clinical-section h3 {
+  margin-bottom: 0.28rem;
+}
+
+.is-destination {
+  border-color: color-mix(in srgb, var(--color-accent) 34%, var(--color-line));
+  background: color-mix(in srgb, var(--color-accent-soft) 48%, white);
+}
+
+.destination-grid {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.destination-grid article {
+  min-width: 0;
+}
+
+.destination-grid strong {
+  color: var(--color-text);
+  font-size: 0.82rem;
+}
+
 .bottom-nav {
   position: fixed;
   right: var(--space-3);
@@ -591,6 +681,16 @@ h2 {
   box-shadow:
     0 16px 36px -26px rgba(23, 33, 36, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.62) inset;
+}
+
+@media (max-width: 560px) {
+  h1 {
+    font-size: 1.9rem;
+  }
+
+  .search-box input {
+    font-size: 0.9rem;
+  }
 }
 
 .bottom-nav-item {
@@ -937,7 +1037,7 @@ h2 {
   display: block;
   margin-top: 0.6rem;
   color: var(--color-text);
-  font-size: clamp(2.6rem, 15vw, 4.4rem);
+  font-size: 3rem;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -1071,7 +1171,7 @@ h2 {
   }
 
   .home-title h1 {
-    font-size: clamp(2.35rem, 4.6vw, 3.35rem);
+    font-size: 3.16rem;
   }
 
   .home-title p {
@@ -1736,7 +1836,7 @@ h2 {
   }
 
   .home-title h1 {
-    font-size: clamp(2.35rem, 4.6vw, 3.35rem);
+    font-size: 3.16rem;
   }
 
   .home-title p {

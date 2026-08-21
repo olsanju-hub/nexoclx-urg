@@ -15,7 +15,7 @@ export function Protocols({ protocols, onOpen }) {
     <div className="screen">
       <div className="section-heading">
         <h1>Protocolos</h1>
-        <p>Base preparada para futuros protocolos.</p>
+        <p>Modulos por motivo de consulta, sindrome, gravedad y destino.</p>
       </div>
       <SearchBox value={query} onChange={setQuery} placeholder="Buscar protocolo" />
       {protocols.length === 0 ? (
@@ -28,7 +28,7 @@ export function Protocols({ protocols, onOpen }) {
                 key={protocol.id}
                 title={protocol.title}
                 description={protocol.description}
-                meta={protocol.status}
+                meta={`${protocol.priority} · ${protocol.areas?.join('/')}`}
                 onClick={() => onOpen(protocol.id)}
               />
             ))}
