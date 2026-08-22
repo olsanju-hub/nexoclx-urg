@@ -23,7 +23,7 @@ export const primarySections = [
   {
     id: routes.protocols,
     title: 'Protocolos',
-    description: '54 protocolos por motivo, sindrome, gravedad y destino.',
+    description: '52 protocolos adultos por motivo, sindrome, gravedad y destino.',
     icon: FileText,
   },
   {

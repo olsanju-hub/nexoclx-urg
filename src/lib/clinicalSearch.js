@@ -1,4 +1,4 @@
-import { allClinicalItems, clinicalProtocols } from '../data/urgClinicalData.js';
+import { allClinicalItems, clinicalProtocols, clinicalSearchIndex } from '../data/urgClinicalData.js';
 
 const accentMap = {
   á: 'a',
@@ -46,18 +46,22 @@ const conceptDictionary = [
 ];
 
 const searchPatterns = [
-  { id: 'sca-risk', label: 'Dolor toracico vegetativo: priorizar SCA', concepts: ['dolor toracico', 'diaforesis|nauseas'], boost: 60, targets: ['sca', 'dolor-toracico', 'sindrome-aortico', 'tep'] },
-  { id: 'thoracic-syncope', label: 'Dolor toracico con sincope', concepts: ['dolor toracico', 'sincope'], boost: 65, targets: ['sca', 'sindrome-aortico', 'arritmias', 'tep'] },
-  { id: 'sepsis-shock', label: 'Fiebre + hipotension/confusion', concepts: ['fiebre', 'hipotension|confusion'], boost: 70, targets: ['sepsis', 'shock', 'abcde'] },
-  { id: 'eap-pattern', label: 'Disnea + edema/ortopnea', concepts: ['disnea', 'edemas|ortopnea'], boost: 60, targets: ['ica-eap', 'disnea', 'vmni-srni'] },
-  { id: 'critical-respiratory', label: 'Disnea con hipoxemia grave', concepts: ['disnea', 'hipoxemia grave'], boost: 80, targets: ['disnea', 'abcde', 'vmni-srni', 'via-aerea'] },
-  { id: 'meningitis-pattern', label: 'Cefalea + fiebre + rigidez', concepts: ['cefalea', 'fiebre', 'rigidez nuca'], boost: 80, targets: ['meningitis-encefalitis', 'cefalea', 'sepsis'] },
-  { id: 'tce-anticoagulated', label: 'Caida/TCE anticoagulado', concepts: ['trauma craneal', 'anticoagulacion'], boost: 75, targets: ['tce', 'glasgow', 'trauma-grave'] },
+  { id: 'sca-risk', label: 'Dolor toracico vegetativo: priorizar SCA', concepts: ['dolor toracico', 'diaforesis|nauseas'], boost: 125, targets: ['sca', 'dolor-toracico', 'sindrome-aortico', 'tep'] },
+  { id: 'thoracic-syncope', label: 'Dolor toracico con sincope', concepts: ['dolor toracico', 'sincope'], boost: 130, targets: ['sca', 'sindrome-aortico', 'arritmias', 'tep'] },
+  { id: 'sepsis-shock', label: 'Fiebre + hipotension/confusion', concepts: ['fiebre', 'hipotension|confusion'], boost: 140, targets: ['sepsis', 'shock', 'abcde'] },
+  { id: 'eap-pattern', label: 'Disnea + edema/ortopnea', concepts: ['disnea', 'edemas|ortopnea'], boost: 125, targets: ['ica-eap', 'disnea', 'vmni-srni'] },
+  { id: 'critical-respiratory', label: 'Disnea con hipoxemia grave', concepts: ['disnea', 'hipoxemia grave'], boost: 145, targets: ['disnea', 'abcde', 'vmni-srni', 'via-aerea'] },
+  { id: 'meningitis-pattern', label: 'Cefalea + fiebre + rigidez', concepts: ['cefalea', 'fiebre', 'rigidez nuca'], boost: 145, targets: ['meningitis-encefalitis', 'cefalea', 'sepsis'] },
+  { id: 'tce-anticoagulated', label: 'Caida/TCE anticoagulado', concepts: ['trauma craneal', 'anticoagulacion'], boost: 140, targets: ['tce', 'trauma-grave', 'glasgow'] },
   { id: 'hyperk-pattern', label: 'Potasio alto/hiperpotasemia', concepts: ['hiperpotasemia'], boost: 70, targets: ['electrolitos', 'renal-urologia', 'abcde'] },
   { id: 'renal-hyperk', label: 'Renal + potasio alto', concepts: ['enfermedad renal cronica', 'hiperpotasemia'], boost: 65, targets: ['electrolitos', 'renal-urologia', 'abcde'] },
 ];
 
-const itemTerms = (item) => [
+const indexById = new Map(clinicalSearchIndex.map((item) => [item.moduleId, item]));
+
+const itemTerms = (item) => {
+  const indexItem = indexById.get(item.id);
+  return [
   item.title,
   item.description,
   item.group,
@@ -72,7 +76,12 @@ const itemTerms = (item) => [
   ...(item.drugs ?? []),
   ...(item.terms ?? []),
   ...(item.fields ?? []),
+  ...(indexItem?.synonyms ?? []),
+  ...(indexItem?.abbreviations ?? []),
+  ...(indexItem?.commonErrors ?? []),
+  ...(indexItem?.relatedTerms ?? []),
 ].filter(Boolean).map(normalizeText);
+};
 
 export const extractClinicalConcepts = (query) => {
   const normalized = normalizeText(query);
@@ -125,8 +134,11 @@ export const searchClinical = (query, scopeItems = allClinicalItems) => {
       });
 
       matchedPatterns.forEach((pattern) => {
-        if (pattern.targets.includes(item.id)) {
-          score += pattern.boost;
+        const targetIndex = pattern.targets.indexOf(item.id);
+        if (targetIndex !== -1) {
+          score += pattern.boost + Math.max(0, 36 - targetIndex * 8);
+          if (pattern.id === 'sca-risk' && item.id === 'sca') score += 320;
+          if (pattern.id === 'sepsis-shock' && item.id === 'shock') score += 190;
           reasons.push(pattern.label);
         }
       });
