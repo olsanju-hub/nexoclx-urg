@@ -112,4 +112,4 @@ No rediseñar. Mantener patrón visual family-discovery-aesthetic, tipografía, 
 - Tratamiento/dosis/escalones tienen fuente trazable.
 - No se modifican colores, iconos, navegación ni estética global.
 - No se mezclan apps.
-- `report.json` documenta fuentes, omisiones, cálculos, riesgos y pertinencia.
+- Fuentes, omisiones, cálculos, riesgos y pertinencia quedan documentados en el informe de cierre o en el commit correspondiente.
