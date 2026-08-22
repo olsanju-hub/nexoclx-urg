@@ -757,6 +757,33 @@ h2 {
   gap: 0.75rem;
 }
 
+.reference-search {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.reference-search span {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.reference-search input {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  padding: 0.85rem 0.95rem;
+}
+
+.reference-search input:focus {
+  border-color: var(--color-accent);
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
 .reference-link {
   display: grid;
   width: 100%;

@@ -1,5 +1,7 @@
+import { useMemo, useState } from 'react';
 import { BookOpen } from 'lucide-react';
-import { murilloBook, murilloIndex, getMurilloEntriesForItem } from '../data/murilloBook.js';
+import { murilloIndex, getMurilloEntriesForItem } from '../data/murilloBook.js';
+import { normalizeText } from '../lib/clinicalSearch.js';
 
 const openResource = (entry) => {
   if (!entry.resourceAvailable || !entry.resource) return;
@@ -7,9 +9,19 @@ const openResource = (entry) => {
 };
 
 export function MurilloBook({ item }) {
+  const [query, setQuery] = useState('');
   const linkedEntries = item ? getMurilloEntriesForItem(item.id) : [];
-  const mappedModules = new Set(murilloIndex.flatMap((entry) => entry.moduleIds)).size;
-  const entriesBySection = murilloIndex.reduce((sections, entry) => {
+  const visibleEntries = useMemo(() => {
+    const normalizedQuery = normalizeText(query);
+    if (!normalizedQuery) return murilloIndex;
+    return murilloIndex.filter((entry) => [
+      entry.section,
+      entry.chapter,
+      entry.title,
+      entry.bookPage,
+    ].some((value) => normalizeText(String(value)).includes(normalizedQuery)));
+  }, [query]);
+  const entriesBySection = visibleEntries.reduce((sections, entry) => {
     sections[entry.section] = [...(sections[entry.section] ?? []), entry];
     return sections;
   }, {});
@@ -19,12 +31,10 @@ export function MurilloBook({ item }) {
       <div className="section-heading">
         <BookOpen aria-hidden="true" size={30} strokeWidth={2} />
         <h1>Murillo 7a edicion</h1>
-        <p>{murilloBook.note}</p>
       </div>
 
       {item ? (
-        <section className="decision-result clinical-section is-destination">
-          <h3>Referencia para {item.title}</h3>
+        <section className="clinical-section">
           {linkedEntries.length ? (
             <div className="reference-list">
               {linkedEntries.map((entry) => (
@@ -36,24 +46,25 @@ export function MurilloBook({ item }) {
                 >
                   <span>{entry.section}</span>
                   <strong>Cap. {entry.chapter}. {entry.title}</strong>
-                  <small>
-                    Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}. Abrir capitulo fuente.
-                  </small>
+                  <small>Pagina {entry.bookPage}</small>
                 </button>
               ))}
             </div>
           ) : (
-            <p>No hay capitulo Murillo vinculado de forma especifica a este modulo.</p>
+            <div className="reference-list" />
           )}
         </section>
       ) : (
-        <section className="decision-result clinical-section is-destination">
-          <h3>Indice Murillo vinculado</h3>
-          <ul className="clinical-bullets">
-            <li>Referencias internas preparadas para {mappedModules} modulos clinicos.</li>
-            <li>Cada entrada abre el capitulo fuente disponible para verificacion secundaria.</li>
-            <li>La herramienta clinica sigue estando en el protocolo NexoClx, no en este indice.</li>
-          </ul>
+        <section className="clinical-section">
+          <label className="reference-search">
+            <span>Buscar capitulo</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Buscar por capitulo, seccion o pagina"
+            />
+          </label>
         </section>
       )}
 
@@ -72,7 +83,7 @@ export function MurilloBook({ item }) {
                   >
                     <span>Capitulo {entry.chapter}</span>
                     <strong>{entry.title}</strong>
-                    <small>Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}. Abrir capitulo.</small>
+                    <small>Pagina {entry.bookPage}</small>
                   </button>
                 ))}
               </div>
