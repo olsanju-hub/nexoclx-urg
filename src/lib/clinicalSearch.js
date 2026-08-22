@@ -34,6 +34,7 @@ const conceptDictionary = [
   { concept: 'trauma craneal', type: 'diagnosis', terms: ['golpe cabeza', 'tce', 'trauma craneal', 'caida golpe cabeza'] },
   { concept: 'anticoagulacion', type: 'drug-context', terms: ['anticoagulado', 'sintrom', 'warfarina', 'acenocumarol', 'apixaban', 'rivaroxaban', 'dabigatran', 'edoxaban'] },
   { concept: 'hiperpotasemia', type: 'lab', terms: ['hiperpotasemia', 'hiperkalemia', 'hiper k', 'hiperk', 'potasio alto', 'k elevado'] },
+  { concept: 'fibrilacion auricular', type: 'diagnosis', terms: ['fa', 'fibrilacion auricular', 'flutter', 'arritmia irregular'] },
   { concept: 'enfermedad renal cronica', type: 'diagnosis', terms: ['erc', 'irc', 'insuficiencia renal cronica', 'insuf renal cron', 'fallo renal cronico'] },
   { concept: 'sindrome coronario agudo', type: 'diagnosis', terms: ['sca', 'iam', 'infarto', 'sindrome coronario', 'angina inestable'] },
   { concept: 'ictus', type: 'diagnosis', terms: ['ictus', 'acv', 'codigo ictus', 'infarto cerebral'] },
@@ -55,6 +56,7 @@ const searchPatterns = [
   { id: 'tce-anticoagulated', label: 'Caida/TCE anticoagulado', concepts: ['trauma craneal', 'anticoagulacion'], boost: 140, targets: ['tce', 'trauma-grave', 'glasgow'] },
   { id: 'hyperk-pattern', label: 'Potasio alto/hiperpotasemia', concepts: ['hiperpotasemia'], boost: 70, targets: ['electrolitos', 'renal-urologia', 'abcde'] },
   { id: 'renal-hyperk', label: 'Renal + potasio alto', concepts: ['enfermedad renal cronica', 'hiperpotasemia'], boost: 65, targets: ['electrolitos', 'renal-urologia', 'abcde'] },
+  { id: 'fa-hypotension', label: 'FA con hipotension: priorizar inestabilidad/cardioversion', concepts: ['fibrilacion auricular', 'hipotension'], boost: 150, targets: ['arritmias', 'desfibrilacion-cardioversion', 'shock', 'uci'] },
 ];
 
 const indexById = new Map(clinicalSearchIndex.map((item) => [item.moduleId, item]));

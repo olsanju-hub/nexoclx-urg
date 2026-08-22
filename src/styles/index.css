@@ -665,6 +665,60 @@ h2 {
   font-size: 0.82rem;
 }
 
+.calculator-panel {
+  gap: 0.85rem;
+}
+
+.calculator-grid {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.calculator-grid label {
+  display: grid;
+  min-width: 0;
+  gap: 0.32rem;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-weight: 720;
+}
+
+.calculator-grid input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 0.85rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.72rem 0.82rem;
+  font-size: 1rem;
+}
+
+.calculator-result {
+  border: 1px solid color-mix(in srgb, var(--color-accent) 26%, var(--color-line));
+  border-radius: 1rem;
+  background: var(--color-accent-soft);
+  padding: 0.9rem;
+}
+
+.calculator-result strong {
+  display: block;
+  color: var(--color-accent);
+  font-size: 1.1rem;
+}
+
+.calculator-result p {
+  margin: 0.28rem 0 0;
+  color: var(--color-muted);
+  line-height: var(--line-height-copy);
+}
+
+@media (min-width: 720px) {
+  .calculator-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .bottom-nav {
   position: fixed;
   right: var(--space-3);

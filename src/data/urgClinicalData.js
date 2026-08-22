@@ -32,6 +32,24 @@ const sourceRegistry = [
     supports: 'Emergencias hipertensivas y dano agudo de organo.',
   },
   {
+    id: 'esc-af-2024',
+    label: 'ESC Guidelines for the management of atrial fibrillation. 2024.',
+    url: 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/atrial-fibrillation/',
+    supports: 'Fibrilacion auricular, cardioversion, anticoagulacion y escenarios especiales.',
+  },
+  {
+    id: 'esc-hf-2021',
+    label: 'ESC Guidelines for the diagnosis and treatment of acute and chronic heart failure. 2021; focused update 2023.',
+    url: 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/acute-and-chronic-heart-failure/',
+    supports: 'Insuficiencia cardiaca aguda, edema agudo pulmonar, diureticos, nitratos y soporte ventilatorio.',
+  },
+  {
+    id: 'ukka-hyperk-2023',
+    label: 'UK Kidney Association. Clinical Practice Guideline: Treatment of Acute Hyperkalaemia in Adults. 2023.',
+    url: 'https://www.ukkidney.org/health-professionals/guidelines/treatment-acute-hyperkalaemia-adults-0',
+    supports: 'Hiperpotasemia adulta, calcio IV, insulina-glucosa, salbutamol, monitorizacion y dialisis.',
+  },
+  {
     id: 'gina-2026',
     label: 'Global Initiative for Asthma. Global Strategy for Asthma Management and Prevention. 2026.',
     url: 'https://ginasthma.org/2026-gina-strategy-report/',
@@ -163,6 +181,11 @@ const p = ({
   interpretation,
   treatment,
   doses = [],
+  quickEntry = [],
+  firstDecision = [],
+  testPlan = [],
+  medicationPlan = [],
+  specialSituations = [],
   reevaluation,
   destination = commonDestinations,
   sources = ['murillo-2023'],
@@ -190,6 +213,11 @@ const p = ({
     interpretation,
     treatment,
     doses,
+    quickEntry,
+    firstDecision,
+    testPlan,
+    medicationPlan,
+    specialSituations,
     reevaluation,
     destination,
   },
@@ -207,7 +235,7 @@ const defaultProtocol = (input) => p({
   ...input,
 });
 
-export const clinicalProtocols = [
+const rawClinicalProtocols = [
   defaultProtocol({ id: 'abcde', title: 'ABCDE / paciente critico', group: 'Paciente critico', chapters: '1-3, 18, 214-216', priority: 'P0', areas: ['criticos'], description: 'Entrada de seguridad para cualquier paciente inestable.', entry: ['critico', 'inestable', 'abcde', 'mal estado general'], synonyms: ['paciente critico', 'resucitacion', 'shock', 'via aerea'], related: ['hipotension', 'sat baja', 'confusion', 'coma'], procedures: ['via-aerea', 'intubacion-isr', 'acceso-vascular', 'ecografia-clinica'], circuits: ['uci'], treatment: ['ABCDE simultaneo, monitor, oxigeno, vias, glucemia, ECG y llamada precoz de ayuda.'], destination: { high: ['Area de criticos y UCI/circuito especifico segun causa.'] }, sources: ['murillo-2023', 'erc-2025'] }),
   defaultProtocol({ id: 'pcr-adulto', title: 'PCR adulto / SVA', group: 'Paciente critico', chapters: '1-2', priority: 'P0', areas: ['criticos'], description: 'Parada cardiorrespiratoria adulta.', entry: ['pcr', 'parada', 'no respira', 'sin pulso'], synonyms: ['rcp', 'sva', 'fibrilacion ventricular', 'asistolia'], tools: ['glasgow'], procedures: ['rcp', 'desfibrilacion-cardioversion', 'via-aerea'], circuits: ['uci'], drugs: ['adrenalina', 'amiodarona'], treatment: ['Compresiones de calidad, desfibrilar si FV/TVSP, adrenalina/amiodarona segun ritmo y buscar 4H/4T.'], doses: ['Adrenalina 1 mg IV/IO cada 3-5 min en SVA adulto.', 'Amiodarona 300 mg tras tercera descarga; 150 mg adicional si refractaria.'], sources: ['murillo-2023', 'erc-2025'] }),
   defaultProtocol({ id: 'shock', title: 'Shock', group: 'Paciente critico', chapters: '18', priority: 'P0', areas: ['criticos'], description: 'Hipoperfusion indiferenciada.', entry: ['hipotension', 'shock', 'mala perfusion', 'lactato alto'], synonyms: ['colapso', 'hipoperfusion'], related: ['ta baja', 'piel fria', 'oliguria'], tools: ['news2', 'qsofa'], procedures: ['ecografia-clinica', 'acceso-vascular'], circuits: ['uci'], treatment: ['ABCDE, monitor, lactato, fluidos o vasopresor segun fenotipo, control de causa y UCI precoz.'], sources: ['murillo-2023', 'ssc-2026'] }),
@@ -220,7 +248,7 @@ export const clinicalProtocols = [
   defaultProtocol({ id: 'disnea', title: 'Disnea aguda', group: 'Respiratorio', chapters: '37-45', priority: 'P0', areas: ['boxes', 'criticos'], description: 'Puerta de entrada a insuficiencia respiratoria, EAP, TEP, asma/EPOC, neumonia y neumotorax.', entry: ['disnea', 'falta aire', 'ahogo', 'sat baja'], synonyms: ['insuficiencia respiratoria', 'hipoxemia'], related: ['ortopnea', 'sibilancias', 'dolor pleuritico', 'fiebre'], tools: ['news2', 'wells-tep', 'curb65'], procedures: ['vmni', 'ecografia-clinica', 'via-aerea'], circuits: ['uci'], treatment: ['Oxigeno titulado o alto flujo segun gravedad, gasometria si precisa, tratar causa probable y escalar si fatiga/hipoxemia.'] }),
   defaultProtocol({ id: 'ica-eap', title: 'Insuficiencia cardiaca aguda / EAP', group: 'Respiratorio', chapters: '19-20, 37', priority: 'P0', areas: ['criticos', 'boxes'], description: 'Disnea cardiogenica, edema pulmonar y shock cardiogenico.', entry: ['eap', 'ica', 'edema pulmonar', 'ortopnea'], synonyms: ['fallo cardiaco', 'insuficiencia cardiaca'], related: ['edema piernas', 'crepitantes', 'hta', 'disnea'], procedures: ['vmni', 'ecografia-clinica'], circuits: ['uci'], drugs: ['nitroglicerina', 'furosemida'], treatment: ['Incorporar, oxigeno/VMNI si distrés, nitratos si PA permite, diuretico si congestion y tratar causa.'] }),
   defaultProtocol({ id: 'asma-epoc', title: 'Asma / EPOC agudizados', group: 'Respiratorio', chapters: '40-41, 198', priority: 'P1', areas: ['boxes', 'criticos'], description: 'Broncoespasmo, exacerbacion EPOC y fracaso ventilatorio.', entry: ['asma', 'epoc', 'sibilancias', 'broncoespasmo'], synonyms: ['crisis asmatica', 'agudizacion epoc'], related: ['hipercapnia', 'silencio auscultatorio'], tools: ['news2'], procedures: ['vmni', 'via-aerea'], drugs: ['salbutamol', 'ipratropio', 'corticoide', 'magnesio'], treatment: ['Broncodilatadores repetidos, corticoide precoz, magnesio si asma grave, antibiotico si EPOC con criterios y VMNI si acidosis/hipercapnia.'], sources: ['murillo-2023', 'gina-2026', 'gold-2026'] }),
-  defaultProtocol({ id: 'neumonia', title: 'Neumonia', group: 'Fiebre / infeccion', chapters: '42-43, 197', priority: 'P1', areas: ['boxes'], description: 'Neumonia comunitaria/nosocomial y gravedad.', entry: ['neumonia', 'tos fiebre', 'infiltrado', 'crepitantes'], synonyms: ['nac', 'neumonia nosocomial'], related: ['curb65', 'ps i', 'hipoxemia'], tools: ['curb65', 'news2'], drugs: ['antibiotico'], treatment: ['Antibiotico segun gravedad y epidemiologia, oxigeno si precisa, valorar ingreso por hipoxemia, comorbilidad o sepsis.'] }),
+  defaultProtocol({ id: 'neumonia', title: 'Neumonia', group: 'Fiebre / infeccion', chapters: '42-43, 197', priority: 'P1', areas: ['boxes'], description: 'Neumonia comunitaria/nosocomial y gravedad.', entry: ['neumonia', 'tos fiebre', 'infiltrado', 'crepitantes'], synonyms: ['nac', 'neumonia nosocomial'], related: ['curb65', 'psi', 'hipoxemia'], tools: ['curb65', 'psi', 'news2'], drugs: ['antibiotico'], treatment: ['Antibiotico segun gravedad y epidemiologia, oxigeno si precisa, valorar ingreso por hipoxemia, comorbilidad o sepsis.'] }),
   defaultProtocol({ id: 'tep', title: 'Tromboembolismo pulmonar', group: 'Respiratorio', chapters: '36, 39', priority: 'P0', areas: ['boxes', 'criticos'], description: 'TEP desde sospecha a shock.', entry: ['tep', 'embolia pulmonar', 'dolor pleuritico', 'disnea sin causa'], synonyms: ['tromboembolismo pulmonar'], related: ['tvp', 'hemoptisis', 'sincope', 'd dimero'], tools: ['wells-tep', 'perc', 'pesi'], procedures: ['ecografia-clinica'], circuits: ['uci'], drugs: ['heparina', 'trombolisis'], treatment: ['Estratificar probabilidad/riesgo. Anticoagular si indicado; si shock, soporte y valorar reperfusion urgente.'], sources: ['murillo-2023', 'aha-pe-2026'] }),
   defaultProtocol({ id: 'neumotorax-derrame', title: 'Neumotorax / derrame pleural', group: 'Respiratorio', chapters: '44-45', priority: 'P1', areas: ['boxes', 'criticos'], description: 'Dolor/disnea pleural, tension y drenaje.', entry: ['neumotorax', 'derrame pleural', 'dolor pleuritico'], synonyms: ['neumotorax espontaneo'], related: ['ausencia murmullo', 'hipotension', 'desviacion traquea'], procedures: ['drenaje-toracico', 'ecografia-clinica'], treatment: ['Si tension, descompresion inmediata. Si estable, imagen, oxigeno, analgesia y drenaje/observacion segun tamano y sintomas.'] }),
   defaultProtocol({ id: 'dolor-abdominal', title: 'Dolor abdominal agudo', group: 'Digestivo', chapters: '47-58', priority: 'P1', areas: ['boxes', 'pasillo'], description: 'Abdomen agudo y diagnostico sindromico.', entry: ['dolor abdominal', 'dolor barriga', 'abdomen agudo'], synonyms: ['dolor epigastrico', 'dolor fosa iliaca'], related: ['vomitos', 'diarrea', 'fiebre', 'embarazo'], procedures: ['ecografia-clinica'], circuits: ['cirugia-urgente'], drugs: ['analgesia', 'antiemetico'], treatment: ['Analgesia precoz, antiemetico/fluidos si precisa, descartar quirurgico, vascular, ginecologico y sepsis.'] }),
@@ -231,7 +259,7 @@ export const clinicalProtocols = [
   defaultProtocol({ id: 'sincope', title: 'Sincope', group: 'Neurologico', chapters: '61', priority: 'P1', areas: ['boxes', 'pasillo'], description: 'Perdida transitoria de conciencia y riesgo.', entry: ['sincope', 'desmayo', 'lipotimia'], synonyms: ['perdida conocimiento'], related: ['ecg anormal', 'esfuerzo', 'dolor toracico'], tools: ['news2'], circuits: ['uci'], treatment: ['ECG y constantes siempre; ingreso/observacion si cardiopatia, ECG anormal, esfuerzo, trauma, sangrado o hipotension.'] }),
   defaultProtocol({ id: 'coma', title: 'Coma / alteracion conciencia', group: 'Neurologico', chapters: '62', priority: 'P0', areas: ['criticos'], description: 'Alteracion del nivel de conciencia.', entry: ['coma', 'confusion', 'somnolencia', 'glasgow bajo'], synonyms: ['alteracion conciencia', 'bajo nivel conciencia'], related: ['hipoglucemia', 'intoxicacion', 'ictus', 'sepsis'], tools: ['glasgow'], procedures: ['via-aerea', 'intubacion-isr'], circuits: ['uci'], drugs: ['glucosa', 'naloxona'], treatment: ['ABCDE, glucemia inmediata, pupilas, temperatura, toxicos, TC si focalidad/trauma y proteger via aerea si no segura.'] }),
   defaultProtocol({ id: 'crisis-epileptica', title: 'Crisis epileptica / estatus', group: 'Neurologico', chapters: '63', priority: 'P0', areas: ['criticos', 'boxes'], description: 'Convulsion, primera crisis y estatus en adulto.', entry: ['convulsion', 'crisis epileptica', 'estatus'], synonyms: ['epilepsia', 'status epilepticus'], related: ['hipoglucemia', 'fiebre', 'embarazo'], procedures: ['via-aerea'], drugs: ['midazolam', 'diazepam', 'levetiracetam'], treatment: ['Proteger, glucemia, benzodiacepina si crisis prolongada, segunda linea si estatus y buscar causa.'] }),
-  defaultProtocol({ id: 'ictus', title: 'Ictus / Codigo Ictus', group: 'Neurologico', chapters: '64', priority: 'P0', areas: ['criticos', 'boxes'], description: 'Focalidad neurologica tiempo-dependiente.', entry: ['ictus', 'acv', 'hemiparesia', 'afasia'], synonyms: ['codigo ictus', 'infarto cerebral', 'accidente cerebrovascular'], related: ['glucemia', 'nihss', 'race', 'hora inicio'], tools: ['nihss', 'race', 'glasgow'], circuits: ['codigo-ictus', 'neurointervencionismo'], treatment: ['Hora de inicio, glucemia, NIHSS/RACE, TC urgente y activar codigo segun ventana/criterios. No antiagregar antes de neuroimagen.'], sources: ['murillo-2023', 'aha-asa-stroke-2026'] }),
+  defaultProtocol({ id: 'ictus', title: 'Ictus / Codigo Ictus', group: 'Neurologico', chapters: '64', priority: 'P0', areas: ['criticos', 'boxes'], description: 'Focalidad neurologica tiempo-dependiente.', entry: ['ictus', 'acv', 'hemiparesia', 'afasia'], synonyms: ['codigo ictus', 'infarto cerebral', 'accidente cerebrovascular'], related: ['glucemia', 'nihss', 'race', 'hora inicio'], tools: ['nihss', 'race', 'glasgow', 'abcd2'], circuits: ['codigo-ictus', 'neurointervencionismo'], treatment: ['Hora de inicio, glucemia, NIHSS/RACE, TC urgente y activar codigo segun ventana/criterios. No antiagregar antes de neuroimagen.'], sources: ['murillo-2023', 'aha-asa-stroke-2026'] }),
   defaultProtocol({ id: 'meningitis-encefalitis', title: 'Meningitis / encefalitis', group: 'Fiebre / infeccion', chapters: '66', priority: 'P0', areas: ['criticos', 'boxes'], description: 'Fiebre con rigidez, cefalea, alteracion mental o focalidad.', entry: ['cefalea fiebre rigidez cuello', 'meningitis', 'encefalitis'], synonyms: ['sindrome meningeo'], related: ['purpura', 'confusion', 'convulsion'], circuits: ['uci'], drugs: ['ceftriaxona', 'aciclovir', 'dexametasona'], treatment: ['Antibiotico/aciclovir precoz si sospecha alta, hemocultivos si no retrasan, TC antes de PL si criterios.'] }),
   defaultProtocol({ id: 'agitacion', title: 'Agitacion psicomotriz', group: 'Psiquiatria', chapters: '69', priority: 'P0', areas: ['criticos', 'boxes'], description: 'Agitacion con seguridad, causa organica y sedacion.', entry: ['agitacion', 'agresivo', 'delirium'], synonyms: ['paciente agitado', 'psicomotriz'], related: ['toxicos', 'hipoglucemia', 'fiebre'], procedures: ['sedacion', 'contencion'], circuits: ['psiquiatria', 'uci'], drugs: ['midazolam', 'haloperidol'], treatment: ['Seguridad, contencion verbal, descartar orgánico, sedacion titulada si riesgo y monitorizacion.'] }),
   defaultProtocol({ id: 'riesgo-suicida', title: 'Riesgo suicida', group: 'Psiquiatria', chapters: '71', priority: 'P1', areas: ['boxes'], description: 'Valoracion de autolisis y destino psiquiatrico.', entry: ['suicidio', 'autolisis', 'ideas muerte'], synonyms: ['riesgo suicida', 'intento autolitico'], related: ['intoxicacion', 'depresion'], circuits: ['psiquiatria'], treatment: ['No dejar solo si riesgo, tratar lesiones/intoxicacion, valorar capacidad, red de apoyo y psiquiatria urgente.'] }),
@@ -262,6 +290,170 @@ export const clinicalProtocols = [
   defaultProtocol({ id: 'donante-potencial', title: 'Donante potencial', group: 'Circuitos', chapters: '218', priority: 'P2', areas: ['criticos'], description: 'Identificacion y coordinacion de potencial donante.', entry: ['donante', 'muerte encefalica'], synonyms: ['donacion organos'], circuits: ['uci'], treatment: ['Identificar precozmente, mantener soporte y contactar coordinacion/UCI segun protocolo local.'] }),
 ];
 
+const adultUrgencyDefaults = {
+  quickEntry: ['Adulto en Urgencias: motivo actual, constantes completas, estabilidad, comorbilidad, tratamientos y alergias.'],
+  firstDecision: ['Si inestable, pasar a criticos, ABCDE, monitor, oxigeno si precisa, via IV y ayuda precoz.', 'Si estable, dirigir pruebas y tratamiento por sindrome; evitar pruebas que no cambien conducta.'],
+  testPlan: ['Qué solicitar: constantes seriadas, ECG si dolor toracico/disnea/sincope/alteracion ionica, analitica dirigida, gasometria/lactato si gravedad, imagen segun foco.', 'No olvidar: glucemia capilar en alteracion neurologica o mal estado general, embarazo solo si aplica, anticoagulacion y funcion renal antes de contraste/anticoagulantes.', 'Cambia conducta: hipoxemia, shock, lactato elevado, ECG diagnostico, anemia/sangrado, deterioro renal, alteracion ionica critica o imagen urgente positiva.'],
+  medicationPlan: ['Tratamiento inicial: medidas de soporte, analgesia/antiemetico si procede, tratamiento etiologico y reevaluacion temprana.', 'Evitar automatismos: fluidos si congestion, diureticos si hipotension, anticoagulacion si sangrado activo o procedimiento urgente.'],
+  specialSituations: ['Anciano fragil: objetivos realistas, revisar techo terapeutico y riesgo de delirium.', 'Insuficiencia renal: ajustar farmacos nefrotoxicos, contraste y anticoagulacion.', 'Anticoagulacion: documentar farmaco, ultima toma, funcion renal y sangrado/procedimiento.'],
+};
+
+const adultDestinations = {
+  low: ['Alta solo si diagnostico razonable, estabilidad mantenida, dolor/sintomas controlados, red flags ausentes, plan escrito y reevaluacion o seguimiento claro.'],
+  moderate: ['Observacion si precisa pruebas seriadas, respuesta a tratamiento, analgesia IV, monitorizacion o incertidumbre diagnostica.'],
+  high: ['Ingreso/UCI/especialista si inestabilidad, soporte organico, tratamiento IV continuo, circuito tiempo-dependiente o alto riesgo de deterioro.'],
+};
+
+const protocolEnhancements = {
+  abcde: {
+    quickEntry: ['Paciente adulto que impresiona grave, inestable o con deterioro brusco.'],
+    firstDecision: ['A: via aerea amenazada, estridor, vomito o GCS bajo -> via aerea experta.', 'B: SpO2 baja, trabajo respiratorio, silencio auscultatorio o agotamiento -> oxigeno/VMNI/intubacion segun causa.', 'C: PAS baja, piel fria, sangrado o lactato alto -> vias, fluidos/vasopresor/control de causa.', 'D: glucemia inmediata, pupilas, GCS, focalidad, convulsion.', 'E: temperatura, lesiones, exantema, sangrado oculto, exposicion controlada.'],
+    testPlan: ['Qué solicitar: ECG, glucemia, gasometria/lactato, hemograma, bioquimica, iones, coagulacion, troponina si contexto, pruebas cruzadas si sangrado, imagen dirigida.', 'No olvidar: monitor, TA seriada, diuresis, temperatura, medicacion activa y alergias.', 'Cambia conducta: hipoxemia, hipercapnia, lactato alto, K critico, ECG tiempo-dependiente, sangrado/anemia, sepsis o focalidad neurologica.'],
+    medicationPlan: ['Oxigeno titulado: objetivo habitual SpO2 94-98%; 88-92% si riesgo de retencion CO2.', 'Cristaloide balanceado 250-500 mL IV y reevaluar si hipoperfusion; evitar bolos repetidos si congestion.', 'Noradrenalina si shock con PAM <65 pese a volumen razonable o congestion/shock franco: perfusion titulada en entorno monitorizado.', 'Glucosa IV si hipoglucemia; naloxona titulada si depresión respiratoria por opioides.'],
+    specialSituations: ['Congestion/EAP: priorizar VMNI/nitratos si PA permite; evitar fluidos salvo shock claro.', 'Shock hemorragico: control de sangrado, hemoderivados y cirugia/intervencion precoz.', 'Limitacion terapeutica: documentar objetivos y avisar UCI/especialista si procede.'],
+    reevaluation: ['Reevaluar ABCDE completo cada 5-10 min hasta estabilidad, tras cada intervencion y antes de traslado interno.'],
+    destination: { high: ['Criticos inmediato. UCI/circuito especifico si requiere vasopresor, ventilacion, reperfusion, cirugia urgente o monitorizacion avanzada.'] },
+  },
+  shock: {
+    quickEntry: ['Hipotension, lactato elevado, piel fria/moteada, confusion, oliguria o mala perfusion.'],
+    firstDecision: ['Identificar fenotipo: septico/distributivo, cardiogenico, hipovolemico/hemorragico, obstructivo o anafilactico.', 'Si shock franco: criticos, monitor, 2 vias, lactato, eco a pie de cama y control de causa.'],
+    testPlan: ['Qué solicitar: ECG, gasometria con lactato, hemograma, bioquimica, iones, coagulacion, troponina/BNP si cardiaco, cultivos si infeccion, pruebas cruzadas si sangrado.', 'No olvidar: ecografia clinica dirigida: corazon, cava, pulmon, abdomen/eFAST, TVP segun sospecha.', 'Cambia conducta: lactato, sangrado, FE deprimida, taponamiento, neumotorax tension, sepsis, TEP masivo.'],
+    medicationPlan: ['Cristaloide balanceado 250-500 mL IV en bolos con reevaluacion; en sepsis considerar hasta 30 mL/kg si hipoperfusion y tolerancia.', 'Noradrenalina si PAM <65 o shock persistente; no retrasar si hipotension profunda o congestion.', 'Adrenalina IM 0,5 mg si anafilaxia.', 'Control de causa: antibiotico, hemoderivados, drenaje/descompresion, reperfusion o cirugia segun origen.'],
+    specialSituations: ['Cardiogenico/congestion: evitar fluidos repetidos; valorar inotropo/UCI.', 'Hemorragico: hemoderivados y control quirurgico/intervencionista, no normalizar PA antes de control si trauma sin TCE.', 'Obstructivo: TEP masivo, taponamiento, neumotorax tension requieren tratamiento causal inmediato.'],
+    reevaluation: ['Reevaluar PAM, FC, piel, conciencia, diuresis, lactato, ecografia y respuesta a cada bolo/vasopresor.'],
+  },
+  sepsis: {
+    quickEntry: ['Sospecha infeccion + deterioro, hipotension, confusion, FR alta, oliguria, moteado, lactato elevado o inmunosupresion.'],
+    firstDecision: ['Alto riesgo: shock, lactato elevado, qSOFA >=2, NEWS2 alto, necesidad de oxigeno o disfuncion organica -> criticos/codigo sepsis.', 'No esperar fiebre: anciano, inmunodeprimido o sepsis grave pueden estar afebriles.'],
+    testPlan: ['Qué solicitar: hemocultivos x2 si no retrasan, lactato, gasometria, hemograma, bioquimica, iones, funcion renal/hepatica, coagulacion, PCR/procalcitonina si protocolo, orina, cultivos por foco.', 'No olvidar: foco, antibioticos previos, alergias, inmunosupresion, dispositivos, piel, abdomen, orina, pulmon, SNC.', 'Cambia conducta: lactato alto o no aclara, creatinina/diuresis, plaquetas/coagulacion, hipoxemia, foco quirurgico o necesidad de drenaje.'],
+    medicationPlan: ['Antibiotico IV precoz tras cultivos si no retrasa; en shock o alta sospecha no demorar.', 'Cristaloide balanceado 500 mL IV y reevaluar; individualizar en IC/ERC/anciano. En hipoperfusion persistente, bolos sucesivos hasta objetivo o signos de sobrecarga.', 'Noradrenalina para PAM objetivo >=65 si shock persistente o fluidos no tolerados.', 'Control de foco: drenaje, cirugia, retirada/recambio de dispositivo o imagen urgente si foco no claro.'],
+    specialSituations: ['Insuficiencia cardiaca/congestion: bolos pequeños 250 mL, eco/pulmon, iniciar vasopresor antes si no tolera volumen.', 'Insuficiencia renal: ajustar antibiotico tras dosis de carga y monitorizar K/acidosis.', 'Anciano fragil: sepsis puede manifestarse como delirium/caida; evitar infratratamiento y sobrecarga.'],
+    reevaluation: ['Reevaluar a 30-60 min: TA/PAM, FR, SpO2, conciencia, piel, diuresis, lactato seriado, respuesta a fluidos y necesidad de UCI.'],
+    destination: { moderate: ['Observacion/ingreso si estable pero precisa antibiotico IV, foco no controlado, comorbilidad o vigilancia.'], high: ['Criticos/UCI si shock, vasopresor, lactato persistente, hipoxemia, fallo organico o foco quirurgico urgente.'] },
+  },
+  'dolor-toracico': {
+    quickEntry: ['Dolor/opresion toracica, epigastralgia sospechosa, disnea, sincope o sintomas vegetativos en adulto.'],
+    firstDecision: ['Inestable, dolor persistente, ECG con elevacion ST/equivalente, shock, arritmia grave o sospecha aorta/TEP -> criticos y circuito.', 'Estable: ECG <10 min, analgesia, troponina seriada y estratificacion HEART/GRACE segun sospecha.'],
+    testPlan: ['Qué solicitar: ECG 12 derivaciones <10 min y repetir si dolor cambia; troponina seriada segun protocolo; hemograma, iones, creatinina, coagulacion si anticoagular/procedimiento; Rx torax si disnea/fiebre; gasometria/lactato si inestable.', 'No olvidar: dolor a espalda, deficit neurologico, pulsos asimetricos, sincope, hemoptisis, signos TVP, uso iPDE5, anticoagulacion.', 'Cambia conducta: SCACEST/equivalente, troponina dinamica, inestabilidad, sospecha diseccion, TEP alto riesgo, anemia o K alterado.'],
+    medicationPlan: ['AAS 150-300 mg VO masticado si SCA probable y no alergia/sangrado activo.', 'Nitroglicerina SL/IV si dolor o HTA y PAS adecuada; evitar si hipotension, infarto VD o iPDE5 reciente.', 'Analgesia titulada: morfina IV en bolos pequeños si dolor refractario, monitorizando hipotension/depresion respiratoria.', 'Anticoagulacion/P2Y12 segun estrategia SCA y protocolo de hemodinamica; comprobar sangrado, peso y funcion renal.'],
+    specialSituations: ['Sospecha diseccion: no antiagregar/anticoagular empiricamente; analgesia, control FC/TA y angioTC/cirugia.', 'Dolor + sincope/hipotension: pensar SCA alto riesgo, aorta, TEP o arritmia.', 'Insuficiencia renal: ajustar anticoagulacion y valorar troponina dinamica/contexto.'],
+    reevaluation: ['Repetir ECG con dolor persistente/cambiante, controlar dolor y constantes cada 15-30 min, reevaluar troponina/riesgo antes de alta.'],
+    destination: { low: ['Alta solo si bajo riesgo validado, ECG no isquemico, troponina seriada negativa y alternativa segura.'], moderate: ['Observacion/unidad dolor toracico si riesgo intermedio, troponina pendiente o dolor no aclarado.'], high: ['Hemodinamica/UCI si SCACEST/equivalente, shock, arritmia inestable, GRACE alto o complicaciones.'] },
+  },
+  sca: {
+    quickEntry: ['SCA probable por clinica, ECG, troponina o inestabilidad.'],
+    firstDecision: ['SCACEST/equivalente: activar Codigo IAM/hemodinamica sin esperar troponina.', 'SCASEST alto riesgo: monitor, GRACE, cardiologia/hemodinamica segun riesgo.'],
+    testPlan: ['ECG inicial y seriado, troponina seriada, creatinina/eGFR, hemograma, coagulacion, iones, glucemia, perfil de sangrado.', 'Cambia conducta: ST elevado/equivalente, troponina dinamica, shock/Killip, arritmia, sangrado o insuficiencia renal.'],
+    medicationPlan: ['AAS 150-300 mg VO masticado.', 'Nitroglicerina si dolor/HTA sin contraindicaciones.', 'Anticoagulacion y P2Y12 segun protocolo de SCA/hemodinamica, ajustando por peso, funcion renal y sangrado.', 'Oxigeno solo si hipoxemia, distrés o shock; no rutinario si SpO2 normal.'],
+    specialSituations: ['Infarto VD/hipotension: evitar nitratos, valorar fluidos pequeños y reperfusion.', 'Anticoagulado: documentar farmaco/ultima toma/eGFR antes de añadir antitromboticos.', 'Sospecha aorta: detener antiagregacion/anticoagulacion hasta descartar.'],
+    reevaluation: ['Dolor, ECG, TA, arritmias, signos de IC/shock y sangrado tras antitromboticos.'],
+  },
+  disnea: {
+    quickEntry: ['Adulto con disnea, hipoxemia, aumento trabajo respiratorio, ortopnea, sibilancias, fiebre o dolor pleuritico.'],
+    firstDecision: ['FR extrema, SpO2 baja, agotamiento, confusión, silencio auscultatorio, hipotension o cianosis -> criticos.', 'Diferenciar patron: EAP/congestion, broncoespasmo, infeccion, TEP, neumotorax, acidosis/metabolico.'],
+    testPlan: ['Qué solicitar: SpO2 continua, ECG, gasometria si hipoxemia/hipercapnia/gravedad, Rx torax, hemograma, bioquimica/iones, troponina/BNP si cardiaco, D-dimero solo si probabilidad baja-intermedia, ecografia pulmon/corazon si disponible.', 'No olvidar: temperatura, dolor toracico, ortopnea, edemas, TVP, inhaladores, EPOC, anticoagulacion, inmunosupresion.', 'Cambia conducta: hipercapnia/acidosis, edema pulmonar, neumotorax, consolidacion, TEP probable, isquemia, K critico.'],
+    medicationPlan: ['Oxigeno titulado: 94-98%; 88-92% si EPOC/retencion CO2 probable.', 'EAP hipertensivo: VMNI/CPAP precoz, nitroglicerina si PAS permite, furosemida si congestion.', 'Broncoespasmo: salbutamol + ipratropio nebulizado/inhalado, corticoide precoz; magnesio IV si asma grave.', 'TEP alto riesgo: anticoagulacion si no contraindica; reperfusion/UCI si shock.'],
+    specialSituations: ['EAP hipotenso: evitar nitratos/diuresis agresiva; UCI, vasopresor/inotropo segun perfil.', 'EPOC hipercapnico con acidosis: VMNI y reevaluacion gasometrica temprana.', 'Disnea + dolor pleuritico/sincope: Wells/PERC/PESI y TEP alto riesgo.'],
+    reevaluation: ['Reevaluar FR, SpO2, trabajo respiratorio, auscultacion, TA, gasometria si VMNI/hipercapnia y necesidad de intubacion.'],
+    destination: { low: ['Alta si causa leve, SpO2 estable, sin trabajo respiratorio, tratamiento eficaz y seguimiento.'], moderate: ['Observacion/ingreso si precisa oxigeno, nebulizaciones repetidas, antibiotico IV, diuretico IV o estudio TEP.'], high: ['Criticos/UCI si VMNI, alto flujo, intubacion, shock, acidosis hipercapnica grave o hipoxemia persistente.'] },
+  },
+  'ica-eap': {
+    quickEntry: ['Disnea con ortopnea, crepitantes, edemas, HTA o ecografia compatible con congestion.'],
+    firstDecision: ['EAP con distrés: sentar, monitor, VMNI precoz si consciente/colaborador.', 'Hipotension/shock: no nitratos; UCI y soporte hemodinamico.'],
+    testPlan: ['ECG, Rx/eco pulmonar, gasometria si gravedad, troponina, BNP/NT-proBNP si duda, creatinina/eGFR, iones, hemograma.', 'Cambia conducta: SCA, arritmia, insuficiencia renal, hipokalemia/hiperkalemia, acidosis/hipercapnia.'],
+    medicationPlan: ['Furosemida IV si congestion: dosis inicial orientativa 20-40 mg IV si naive; si ya toma, al menos dosis equivalente o superior segun respuesta.', 'Nitroglicerina si PAS adecuada y EAP hipertensivo; evitar hipotension, infarto VD o iPDE5.', 'VMNI/CPAP si distrés, hipoxemia o EAP; reevaluar en 15-30 min.'],
+    specialSituations: ['Hipotension: priorizar UCI, eco, vasopresor/inotropo; evitar diuresis/nitratos agresivos.', 'ERC: diuretico puede requerir dosis mayor, monitorizar K/creatinina.', 'FA rapida: valorar si causa o consecuencia; cardioversion si inestabilidad por arritmia.'],
+    reevaluation: ['Diuresis, TA, FR, SpO2, trabajo respiratorio, crepitantes, K/creatinina y necesidad de VMNI/UCI.'],
+    sources: ['murillo-2023', 'esc-hf-2021'],
+  },
+  arritmias: {
+    quickEntry: ['Palpitaciones, FA rapida, taquicardia/bradicardia, sincope o ECG anormal.'],
+    firstDecision: ['Inestable por arritmia: hipotension, shock, dolor isquemico, EAP, sincope o alteracion conciencia -> cardioversion sincronizada o marcapasos segun ritmo.', 'Estable: clasificar QRS estrecho/ancho, regular/irregular, FA/flutter/TSV/TV y buscar causa reversible.'],
+    testPlan: ['Qué solicitar: ECG 12 derivaciones, tira ritmo, TA seriada, iones K/Mg/Ca, creatinina/eGFR, glucemia, TSH no urgente si FA nueva estable, troponina si dolor/isquemia, gasometria si shock/hipoxia.', 'No olvidar: inicio de FA, anticoagulacion, WPW/preexcitacion, IC, sepsis, hipertiroidismo, alcohol/drogas.', 'Cambia conducta: QRS ancho, WPW, K/Mg alterado, isquemia, shock, EAP, duracion >48 h o anticoagulacion insuficiente.'],
+    medicationPlan: ['Cardioversion sincronizada inmediata si inestable; sedacion si el tiempo lo permite.', 'FA estable: control frecuencia con beta-bloqueante o calcioantagonista si no IC descompensada/hipotension; digoxina/amiodarona segun contexto y protocolo.', 'Evitar verapamilo/diltiazem/betabloqueo en WPW o QRS ancho irregular.', 'Corregir K y Mg; sulfato Mg 2 g IV si torsades o hipomagnesemia relevante.'],
+    specialSituations: ['FA + hipotension: decidir si la arritmia causa inestabilidad; si si, cardioversion. Si shock por sepsis/hipovolemia, tratar causa y evitar frenado excesivo.', 'FA + EAP/congestion: cardioversion si inestable; evitar calcioantagonistas si IC sistolica/descompensada.', 'Anticoagulacion: CHA2DS2-VASc/HAS-BLED para plan, pero no retrasar cardioversion inestable.'],
+    reevaluation: ['Ritmo, FC, TA, sintomas, signos de IC, QT, electrolitos y recurrencia tras cardioversion/farmacos.'],
+    destination: { low: ['Alta solo si estable, causa banal corregida, buen control, sin alto riesgo y plan anticoagulacion/seguimiento.'], moderate: ['Observacion/ingreso si FA nueva, control incompleto, comorbilidad, cardiopatia o necesidad de anticoagulacion/eco.'], high: ['Criticos/UCI si inestabilidad, TV, bradiarritmia sintomatica, marcapasos, cardioversion urgente o farmaco IV continuo.'] },
+    sources: ['murillo-2023', 'esc-af-2024', 'erc-2025'],
+  },
+  electrolitos: {
+    quickEntry: ['Potasio alto/bajo, sodio alterado, calcio/magnesio/fosforo alterado o ECG/neurologia compatible.'],
+    firstDecision: ['HiperK con ECG alterado, K >=6,5, debilidad, arritmia o insuficiencia renal avanzada -> monitor, calcio IV y tratamiento urgente.', 'Hiponatremia con convulsion/coma -> salino hipertonico y criticos.', 'Alteracion leve/asintomatica -> confirmar, causa, medicacion y correccion prudente.'],
+    testPlan: ['Qué solicitar: repetir muestra si hemolisis posible, ECG inmediato si K alterado, gasometria, glucemia, creatinina/eGFR, urea, Na/K/Cl/HCO3, Ca/Mg/P, osmolaridad si Na/glucosa, CK si rabdomiolisis.', 'No olvidar: IECA/ARA-II/ARM, AINE, suplementos K, digoxina, diureticos, acidosis, anuria, insuficiencia renal.', 'Cambia conducta: cambios ECG, K >=6,5, acidosis, anuria, hipoglucemia previa a insulina, Na sintomatico.'],
+    medicationPlan: ['HiperK con ECG/inestabilidad: gluconato calcico 10% 30 mL IV en 5-10 min; repetir si ECG persiste.', 'Desplazar K: insulina regular 10 UI IV + glucosa 25 g IV; controlar glucemia al menos 6 h.', 'Salbutamol nebulizado 10-20 mg como adyuvante si tolera.', 'Eliminar K: diuretico si diuresis/congestion adecuada, resina/captador segun disponibilidad, dialisis si anuria/ERC grave/refractaria.', 'Hiponatremia sintomatica grave: salino hipertonico 3% en bolos segun protocolo, objetivo inicial mejora neurologica y evitar sobrecorreccion.'],
+    specialSituations: ['Digoxina: calcio si amenaza vital no debe retrasarse, pero avisar UCI/toxicologia y valorar anticuerpos anti-digoxina si intoxicacion.', 'Anuria/ERC avanzada: activar nefrologia/UCI para dialisis si hiperK grave o refractaria.', 'Glucemia baja o anciano/renal: alto riesgo hipoglucemia tras insulina; monitorizar y aportar glucosa.'],
+    reevaluation: ['ECG continuo, K y glucemia a 30-60 min y seriados, recurrencia a 4-6 h tras insulina, diuresis y necesidad de dialisis/UCI.'],
+    destination: { low: ['Alta no recomendada en hiperK verdadera moderada/grave; solo alteracion leve corregida, causa clara y control seguro.'], moderate: ['Observacion/ingreso si precisa tratamiento, monitorizacion, ajuste farmacos o causa no corregida.'], high: ['Criticos/UCI/nefrologia si ECG alterado, K >=6,5, arritmia, anuria, acidosis grave o necesidad de dialisis.'] },
+    sources: ['murillo-2023', 'ukka-hyperk-2023'],
+  },
+  ictus: {
+    quickEntry: ['Deficit neurologico focal brusco, afasia, hemiparesia, desviacion mirada, ataxia aguda o alteracion visual.'],
+    firstDecision: ['Hora inicio/ultima vez visto bien, glucemia inmediata y escala NIHSS/RACE.', 'Activar Codigo Ictus si deficit agudo y potencial tratamiento reperfusion/neurointervencion.'],
+    testPlan: ['TC craneal urgente +/- angioTC/perfusion segun circuito, glucemia, ECG, hemograma, coagulacion, creatinina, iones, anticoagulacion/ultima toma.', 'Cambia conducta: hemorragia, gran vaso, anticoagulacion, glucemia extrema, tiempo de inicio, Rankin previo.'],
+    medicationPlan: ['No antiagregar ni anticoagular antes de neuroimagen.', 'Oxigeno solo si hipoxemia; tratar fiebre e hipoglucemia/hiperglucemia marcada.', 'Control TA segun candidato a reperfusion y protocolo neurologia.'],
+    specialSituations: ['Despertar/tiempo desconocido: no excluir automaticamente; valorar imagen avanzada/circuito.', 'Anticoagulado: documentar farmaco, ultima dosis y eGFR.', 'Sospecha gran vaso RACE alto: neurointervencionismo.'],
+    reevaluation: ['NIHSS/deficit, TA, glucemia, conciencia, via aerea y deterioro neurologico durante traslado interno.'],
+  },
+  coma: {
+    quickEntry: ['Alteracion de conciencia, GCS bajo, confusion grave, somnolencia o paciente no despertable.'],
+    firstDecision: ['Via aerea no protegida, hipoxemia, shock o GCS muy bajo -> criticos y via aerea experta.', 'Glucemia inmediata en todo paciente.'],
+    testPlan: ['Glucemia, gasometria, ECG, temperatura, hemograma, bioquimica, iones, funcion renal/hepatica, toxicos segun contexto, TC craneal si trauma/focalidad/anticoagulacion/no causa clara.', 'Cambia conducta: hipoglucemia, hipercapnia, hipoxia, Na/K/Ca criticos, intoxicacion, sepsis, hemorragia intracraneal.'],
+    medicationPlan: ['Glucosa IV si hipoglucemia.', 'Naloxona titulada si sospecha opioide con depresion respiratoria.', 'Tiamina antes o junto a glucosa si alto riesgo deficit nutricional/alcoholismo, sin retrasar glucosa.', 'Benzodiacepina si convulsion activa; antibiotico/aciclovir si meningoencefalitis probable.'],
+    specialSituations: ['Anticoagulado o caida: TC urgente aunque exploracion poco fiable.', 'Hipercapnia: VMNI solo si protege via aerea; si no, intubacion.', 'Agitacion fluctuante puede ser sepsis, hipoxia, toxico o metabolico.'],
+    reevaluation: ['GCS, pupilas, glucemia, gases, temperatura, respuesta a antidotos y necesidad de intubacion/UCI.'],
+  },
+  'trauma-grave': {
+    quickEntry: ['Trauma con inestabilidad, mecanismo de alta energia, lesion anatomica grave, anticoagulacion o poblacion vulnerable adulta.'],
+    firstDecision: ['ABCDE trauma, control hemorragia masiva y activar Codigo Trauma si criterio fisiologico/anatomico/mecanismo.', 'No retrasar traslado a TC/quirofano por pruebas no esenciales si inestable.'],
+    testPlan: ['Qué solicitar: eFAST, Rx pelvis/torax si inestable, TC body si estable y criterio, gasometria/lactato, hemograma, coagulacion, fibrinogeno, pruebas cruzadas, iones/calcio.', 'No olvidar: anticoagulacion, hipotermia, acidosis, calcio, analgesia, neurovascular distal.', 'Cambia conducta: eFAST positivo, PAS baja, GCS, coagulopatia, sangrado pélvico, TCE anticoagulado.'],
+    medicationPlan: ['Control hemorragia: presion directa, torniquete si extremidad masiva, hemostatico, fijacion pélvica si sospecha.', 'Acido tranexamico 1 g IV lo antes posible si hemorragia significativa y dentro de 3 h; segundo 1 g segun protocolo.', 'Hemoderivados si shock hemorragico; evitar cristaloides excesivos.', 'Analgesia titulada, prevenir hipotermia y corregir calcio/coagulopatia.'],
+    specialSituations: ['TCE: evitar hipoxia e hipotension; objetivo PAS adecuado y TC/neurocirugia.', 'Anticoagulado: reversión segun farmaco y sangrado/TC.', 'Toracico inestable: descartar neumotorax tension y taponamiento.'],
+    reevaluation: ['ABCDE repetido, sangrado, dolor, temperatura, lactato/base deficit, coagulacion y respuesta a hemoderivados.'],
+  },
+  'piel-alergia': {
+    quickEntry: ['Urticaria, angioedema, broncoespasmo, hipotension o sintomas digestivos tras exposicion compatible.'],
+    firstDecision: ['Anafilaxia si afectacion respiratoria/circulatoria o dos sistemas -> adrenalina IM inmediata.', 'Urticaria aislada estable -> antihistaminico y observacion segun evolucion.'],
+    testPlan: ['No retrasar adrenalina por pruebas. Monitor, SpO2, TA seriada; gasometria/lactato si shock; triptasa si disponible sin retrasar tratamiento.', 'No olvidar: farmaco/alimento/picadura, beta-bloqueantes, IECA, asma, tiempo de inicio, bifasica previa.'],
+    medicationPlan: ['Adrenalina IM 0,5 mg adulto en muslo; repetir cada 5 min si persiste compromiso respiratorio/circulatorio.', 'Oxigeno alto flujo, posicion, cristaloide 500-1000 mL IV si hipotension y reevaluar.', 'Salbutamol si broncoespasmo; antihistaminico y corticoide como adyuvantes, no sustituyen adrenalina.', 'Adrenalina IV solo en entorno experto/monitorizado si shock refractario.'],
+    specialSituations: ['Beta-bloqueante: respuesta pobre a adrenalina; valorar glucagon segun protocolo.', 'Angioedema por IECA sin urticaria: adrenalina si compromiso vital, avisar UCI/ORL por via aerea.', 'Asma: mayor riesgo de deterioro respiratorio.'],
+    reevaluation: ['TA, FR, SpO2, voz/estridor, sibilancias, urticaria, necesidad de repetir adrenalina y observacion por recurrencia.'],
+    destination: { low: ['Alta solo si sintomas leves resueltos, sin criterios anafilaxia y plan/alarma.'], moderate: ['Observacion si anafilaxia resuelta, adrenalina requerida o riesgo bifasico.'], high: ['UCI/criticos si adrenalina repetida/IV, shock, via aerea, broncoespasmo grave o angioedema progresivo.'] },
+  },
+  'toxicologia': {
+    quickEntry: ['Exposicion toxica, sobredosis, intento autolitico, toxidrome, coma, convulsion o ECG anormal.'],
+    firstDecision: ['ABCDE, glucemia, ECG y toxidrome. Si coma/convulsion/QRS ancho/QT largo/shock -> criticos/toxicologia.', 'Identificar toxico, dosis, hora, formulacion retardada, coingestas e intencionalidad.'],
+    testPlan: ['ECG seriado, glucemia, gasometria, iones, funcion renal/hepatica, osmolaridad si alcoholes, paracetamol a tiempo adecuado, salicilato/litio/digoxina/antiepilepticos segun sospecha.', 'Cambia conducta: QRS >120, QT largo, acidosis, hipoglucemia, paracetamol toxico, salicilato/litio/digoxina alto.'],
+    medicationPlan: ['Carbon activado si ingesta reciente seleccionada, via aerea protegida y toxico adsorbible.', 'Naloxona titulada si opioide con depresion respiratoria.', 'Bicarbonato sodico si QRS ancho por triciclicos/bloqueadores canal Na segun protocolo.', 'N-acetilcisteina si paracetamol segun nomograma/protocolo.'],
+    specialSituations: ['Causticos/hidrocarburos: no carbon ni vomito; endoscopia/circuito si indicado.', 'Liberacion retardada: observacion prolongada y niveles seriados.', 'Intencionalidad suicida: no alta sin valoracion de riesgo cuando este medicamente apto.'],
+    reevaluation: ['Conciencia, respiracion, ECG, temperatura, glucemia, acidosis, niveles seriados y necesidad de UCI/antidoto.'],
+  },
+};
+
+const mergeProtocol = (protocol) => {
+  const enhancement = protocolEnhancements[protocol.id] ?? {};
+  const choose = (primary, secondary, fallback) => {
+    if (Array.isArray(primary) && primary.length) return primary;
+    if (Array.isArray(secondary) && secondary.length) return secondary;
+    return fallback;
+  };
+  return {
+    ...protocol,
+    clinical: {
+      ...protocol.clinical,
+      quickEntry: choose(enhancement.quickEntry, protocol.clinical.quickEntry, adultUrgencyDefaults.quickEntry),
+      firstDecision: choose(enhancement.firstDecision, protocol.clinical.firstDecision, adultUrgencyDefaults.firstDecision),
+      testPlan: choose(enhancement.testPlan, protocol.clinical.testPlan, adultUrgencyDefaults.testPlan),
+      medicationPlan: choose(enhancement.medicationPlan, protocol.clinical.medicationPlan, protocol.clinical.doses?.length ? [...protocol.clinical.treatment, ...protocol.clinical.doses] : adultUrgencyDefaults.medicationPlan),
+      specialSituations: choose(enhancement.specialSituations, protocol.clinical.specialSituations, adultUrgencyDefaults.specialSituations),
+      reevaluation: enhancement.reevaluation ?? protocol.clinical.reevaluation,
+      destination: enhancement.destination ?? protocol.clinical.destination ?? adultDestinations,
+    },
+    sources: enhancement.sources ?? protocol.sources,
+  };
+};
+
+export const clinicalProtocols = rawClinicalProtocols.map(mergeProtocol);
+
 export const clinicalTools = [
   { id: 'heart', type: 'tool', title: 'HEART', description: 'Riesgo en dolor toracico de posible SCA.', priority: 'P1', areas: ['boxes'], terms: ['heart', 'dolor toracico', 'troponina'], fields: ['Historia', 'ECG', 'Edad', 'Factores riesgo', 'Troponina'], result: 'Bajo/intermedio/alto riesgo; modifica alta, observacion o ingreso.' },
   { id: 'grace', type: 'tool', title: 'GRACE', description: 'Riesgo en SCA.', priority: 'P1', areas: ['boxes', 'criticos'], terms: ['grace', 'sca', 'infarto'], fields: ['Edad', 'FC', 'PAS', 'Creatinina', 'Killip', 'PCR', 'ST', 'troponina'], result: 'Apoya estrategia invasiva y nivel de monitorizacion.' },
@@ -269,11 +461,13 @@ export const clinicalTools = [
   { id: 'perc', type: 'tool', title: 'PERC', description: 'Descartar TEP en muy baja probabilidad.', priority: 'P2', areas: ['boxes'], terms: ['perc', 'tep'], fields: ['Edad', 'FC', 'SatO2', 'hemoptisis', 'estrogenos', 'cirugia/trauma', 'TVP/TEP', 'edema unilateral'], result: 'Si todo negativo y baja probabilidad, evita pruebas.' },
   { id: 'pesi', type: 'tool', title: 'PESI / sPESI', description: 'Riesgo en TEP confirmado.', priority: 'P1', areas: ['boxes'], terms: ['pesi', 'spesi', 'tep'], fields: ['Edad', 'cancer', 'cardiopulmonar', 'FC', 'PAS', 'SatO2'], result: 'Apoya alta seleccionada, ingreso o UCI.' },
   { id: 'curb65', type: 'tool', title: 'CURB-65', description: 'Gravedad de neumonia.', priority: 'P1', areas: ['boxes'], terms: ['curb', 'curb65', 'neumonia'], fields: ['Confusion', 'Urea', 'FR', 'PA', 'Edad'], result: 'Apoya alta, ingreso o UCI.' },
+  { id: 'psi', type: 'tool', title: 'PSI / Fine', description: 'Riesgo en neumonia comunitaria adulta.', priority: 'P2', areas: ['boxes'], terms: ['psi', 'fine', 'neumonia'], fields: ['Edad', 'Residencia', 'Comorbilidad', 'Exploracion', 'Analitica', 'Rx'], result: 'Apoya alta, observacion, ingreso o UCI junto a oxigenacion y juicio clinico.' },
   { id: 'news2', type: 'tool', title: 'NEWS2', description: 'Deterioro clinico general.', priority: 'P0', areas: ['boxes', 'criticos'], terms: ['news', 'news2', 'deterioro'], fields: ['FR', 'SatO2', 'O2', 'TA', 'FC', 'conciencia', 'temperatura'], result: 'Escala vigilancia, criticos o UCI.' },
   { id: 'qsofa', type: 'tool', title: 'qSOFA', description: 'Riesgo en infeccion; no descarta sepsis.', priority: 'P1', areas: ['boxes', 'criticos'], terms: ['qsofa', 'sepsis'], fields: ['PAS', 'FR', 'mental'], result: 'Alto riesgo si >=2; buscar lactato/disfuncion.' },
   { id: 'sofa', type: 'tool', title: 'SOFA orientativo', description: 'Disfuncion organica en sepsis.', priority: 'P1', areas: ['criticos'], terms: ['sofa', 'sepsis'], fields: ['Respiratorio', 'coagulacion', 'hepatica', 'cardiovascular', 'neurologica', 'renal'], result: 'Apoya diagnostico de sepsis y UCI.' },
   { id: 'nihss', type: 'tool', title: 'NIHSS', description: 'Deficit neurologico en ictus.', priority: 'P0', areas: ['criticos'], terms: ['nihss', 'ictus'], fields: ['Items neurologicos'], result: 'Cuantifica deficit y comunicacion con codigo ictus.' },
   { id: 'race', type: 'tool', title: 'RACE', description: 'Sospecha gran vaso.', priority: 'P0', areas: ['criticos'], terms: ['race', 'ictus', 'gran vaso'], fields: ['Cara', 'brazo', 'pierna', 'mirada', 'afasia/agnosia'], result: 'RACE >=5 eleva sospecha de oclusion gran vaso.' },
+  { id: 'abcd2', type: 'tool', title: 'ABCD2', description: 'Riesgo precoz tras AIT en adulto.', priority: 'P1', areas: ['boxes'], terms: ['abcd2', 'ait', 'tia', 'ictus transitorio'], fields: ['Edad', 'PA', 'Clinica', 'Duracion', 'Diabetes'], result: 'Riesgo de ictus tras AIT; no sustituye circuito si deficit actual o alto riesgo.' },
   { id: 'glasgow', type: 'tool', title: 'Glasgow', description: 'Nivel de conciencia en coma/trauma.', priority: 'P0', areas: ['criticos', 'boxes'], terms: ['glasgow', 'gcs', 'coma', 'tce'], fields: ['Ocular', 'verbal', 'motora'], result: 'Define gravedad, via aerea, TC y UCI.' },
   { id: 'anion-gap', type: 'tool', title: 'Anion gap', description: 'Acidosis metabolica.', priority: 'P1', areas: ['boxes', 'criticos'], terms: ['anion gap', 'gap', 'acidosis'], fields: ['Na', 'Cl', 'HCO3'], result: 'Alto: lactato, CAD, renal, toxicos.' },
   { id: 'osmolaridad', type: 'tool', title: 'Osmolaridad', description: 'Hiperosmolaridad y gap osmolar.', priority: 'P1', areas: ['boxes', 'criticos'], terms: ['osmolaridad', 'osmolar', 'ehh'], fields: ['Na', 'glucosa', 'urea'], result: 'Apoya EHH, hipernatremia o toxicos.' },
@@ -285,7 +479,7 @@ export const clinicalTools = [
   { id: 'egfr', type: 'tool', title: 'eGFR CKD-EPI', description: 'Funcion renal para dosis/contraste.', priority: 'P1', areas: ['boxes'], terms: ['egfr', 'filtrado', 'creatinina'], fields: ['Edad', 'sexo', 'creatinina'], result: 'Ajusta dosis, contraste y riesgo renal.' },
 ];
 
-export const procedureModules = [
+const rawProcedureModules = [
   { id: 'rcp', type: 'procedure', title: 'RCP / SVA', priority: 'P0', areas: ['criticos'], terms: ['rcp', 'sva', 'pcr'], indications: ['PCR o peri-parada'], contraindications: ['Orden valida de no RCP o futilidad clara segun contexto'], steps: ['Confirmar PCR', 'Compresiones', 'Monitor/desfibrilar', 'Via aerea/O2', 'Farmacos', '4H/4T'], failure: ['ROSC no obtenido: lider, calidad RCP, causas reversibles, ECMO/traslado si protocolo.'] },
   { id: 'via-aerea', type: 'procedure', title: 'Via aerea dificil', priority: 'P0', areas: ['criticos'], terms: ['via aerea', 'dificil', 'airway'], indications: ['No protege via aerea, hipoxemia, ventilacion imposible'], contraindications: ['No retrasar oxigenacion por plan complejo'], steps: ['Plan A/B/C', 'Preoxigenar', 'Aspiracion', 'Dispositivos', 'Ayuda precoz'], failure: ['No intubo/no ventilo: dispositivo supraglotico, cricotiroidotomia si extrema.'] },
   { id: 'intubacion-isr', type: 'procedure', title: 'Intubacion / secuencia rapida', priority: 'P0', areas: ['criticos'], terms: ['intubacion', 'isr', 'secuencia rapida'], indications: ['Via aerea no segura, fracaso respiratorio, coma, shock seleccionado'], contraindications: ['Prediccion de via aerea imposible sin plan de rescate'], steps: ['Preparar equipo', 'Preoxigenar', 'Inductor/relajante', 'Intubar', 'Confirmar EtCO2', 'Ventilar/proteger'], failure: ['Activar algoritmo via aerea dificil.'] },
@@ -301,7 +495,64 @@ export const procedureModules = [
   { id: 'descontaminacion', type: 'procedure', title: 'Descontaminacion toxica', priority: 'P1', areas: ['boxes', 'criticos'], terms: ['carbon activado', 'descontaminacion', 'caustico'], indications: ['Exposicion cutanea/quimica o ingesta seleccionada reciente'], contraindications: ['Via aerea no protegida para carbon, causticos/hidrocarburos'], steps: ['Proteger equipo', 'Retirar ropa/lavar', 'Valorar carbon', 'Antidoto si procede'], failure: ['Toxicologia/UCI.'] },
 ];
 
-export const circuitModules = [
+const procedureEnhancements = {
+  rcp: {
+    preparation: ['Lider, compresor, desfibrilador, via aerea, acceso IV/IO, reloj, capnografia si disponible.'],
+    medication: ['Adrenalina 1 mg IV/IO cada 3-5 min.', 'Amiodarona 300 mg tras tercera descarga; 150 mg adicional si refractaria.', 'Corregir 4H/4T: hipoxia, hipovolemia, hipo/hiperK, hipotermia, trombosis, taponamiento, tension, toxicos.'],
+    parameters: ['Compresiones 100-120/min, profundidad 5-6 cm, minimas pausas, desfibrilacion precoz si FV/TVSP.'],
+    complications: ['ROSC inestable, via aerea fallida, neumotorax, causa reversible no tratada.'],
+    reevaluation: ['Ritmo cada 2 min, calidad RCP, EtCO2, causas reversibles y decision post-ROSC/UCI.'],
+  },
+  'intubacion-isr': {
+    preparation: ['Plan A/B/C, preoxigenacion, aspiracion, monitor, capnografia, vasopresor preparado, carro via aerea dificil.'],
+    medication: ['Inductor titulado segun hemodinamia: ketamina/etomidato/propofol segun protocolo local.', 'Relajante: rocuronio o succinilcolina segun contraindicaciones.', 'Analgesia/sedacion postintubacion desde el primer minuto.'],
+    parameters: ['Confirmar con EtCO2, fijar tubo, ventilacion protectora, objetivo SpO2 y EtCO2 segun contexto.'],
+    complications: ['Hipotension postinduccion, hipoxemia, broncoaspiracion, no intubo/no ventilo.'],
+    reevaluation: ['EtCO2 continuo, TA, SpO2, auscultacion, Rx/eco si duda, sedacion y analgesia.'],
+  },
+  'via-aerea': {
+    preparation: ['Ayuda precoz, preoxigenacion, posicion, aspiracion, supraglotico y cricotiroidotomia disponibles.'],
+    medication: ['Evitar sedacion profunda sin plan de rescate; preparar vasopresor si shock.'],
+    parameters: ['Objetivo principal: oxigenar. No repetir intentos sin cambiar estrategia.'],
+    complications: ['No intubo/no ventilo, aspiracion, hipoxemia, parada periintubacion.'],
+    reevaluation: ['SpO2, EtCO2, ventilacion efectiva y necesidad de escalada quirurgica.'],
+  },
+  vmni: {
+    preparation: ['Paciente colaborador, via aerea protegida, interfaz adecuada, antiemetico si precisa, monitor y plan de intubacion.'],
+    medication: ['Tratar causa: nitratos/diuretico en EAP si PA permite; broncodilatadores/corticoide en EPOC/asma.'],
+    parameters: ['CPAP inicial 5-10 cmH2O en EAP; BiPAP orientativo IPAP 10-15 / EPAP 4-6 en hipercapnia, titular a confort, fugas y gases.'],
+    complications: ['Vomitos/aspiracion, hipotension, neumotorax, retraso de intubacion.'],
+    reevaluation: ['15-30 min: FR, SpO2, trabajo respiratorio, pH/pCO2 si hipercapnia. Fracaso -> intubacion/UCI.'],
+  },
+  'desfibrilacion-cardioversion': {
+    preparation: ['Monitor, palas/parches, via IV, sedacion si posible, sincronizar si hay pulso, analgesia posterior.'],
+    medication: ['Sedacion titulada si tiempo: midazolam/fentanilo/propofol/ketamina segun hemodinamia y protocolo.', 'Antiarrítmico si recurrencia o ritmo refractario segun ECG/contexto.'],
+    parameters: ['Cardioversion sincronizada en taquiarritmia con pulso e inestabilidad; desfibrilacion no sincronizada en FV/TVSP.'],
+    complications: ['Hipotension/sedacion, quemadura, embolia si FA no anticoagulada estable; no retrasar si inestable.'],
+    reevaluation: ['Ritmo postdescarga, TA, dolor, sedacion, recurrencia y causa desencadenante.'],
+  },
+  sedacion: {
+    preparation: ['ASA/riesgo, ayuno no debe retrasar urgencia vital, monitor, oxigeno, aspiracion, via IV, antagonistas y plan via aerea.'],
+    medication: ['Titular dosis bajas y repetir por efecto; reducir en anciano, shock, hipoxemia o fragilidad.', 'Analgesia antes de sedacion si procedimiento doloroso.'],
+    parameters: ['Objetivo: sedacion minima suficiente, mantener ventilacion y reflejos si no es ISR.'],
+    complications: ['Hipoventilacion, hipotension, broncoaspiracion, sedacion prolongada.'],
+    reevaluation: ['FR, SpO2, TA, nivel sedacion, dolor y recuperacion antes de alta/traslado.'],
+  },
+  'control-hemorragia': {
+    preparation: ['Guantes, presion directa, hemostatico, torniquete, via IV/IO, protocolo transfusion si shock.'],
+    medication: ['Acido tranexamico 1 g IV precoz si hemorragia significativa dentro de 3 h; repetir 1 g segun protocolo.', 'Analgesia titulada y calcio si transfusion masiva.'],
+    parameters: ['Torniquete alto y apretado, registrar hora, no retirar hasta control definitivo.'],
+    complications: ['Shock, hipotermia, coagulopatia, isquemia por torniquete prolongado.'],
+    reevaluation: ['Sangrado, pulsos distales si aplica, TA, lactato, temperatura, coagulacion y necesidad de cirugia.'],
+  },
+};
+
+export const procedureModules = rawProcedureModules.map((procedure) => ({
+  ...procedure,
+  ...(procedureEnhancements[procedure.id] ?? {}),
+}));
+
+const rawCircuitModules = [
   { id: 'codigo-iam', type: 'circuit', title: 'Codigo IAM / hemodinamica', priority: 'P0', areas: ['criticos', 'boxes'], terms: ['codigo iam', 'hemodinamica', 'stemi'], activate: ['SCACEST/equivalente o shock con SCA probable'], data: ['ECG', 'hora inicio', 'Killip/shock', 'contraindicaciones', 'tratamiento'], destination: ['Hemodinamica/UCI segun red local'] },
   { id: 'codigo-ictus', type: 'circuit', title: 'Codigo Ictus', priority: 'P0', areas: ['criticos', 'boxes'], terms: ['codigo ictus', 'ictus', 'acv'], activate: ['Focalidad aguda en ventana o escenario avanzado'], data: ['Hora inicio', 'glucemia', 'NIHSS/RACE', 'Rankin', 'anticoagulacion'], destination: ['TC urgente, neurologia, neurointervencionismo si procede'] },
   { id: 'codigo-sepsis', type: 'circuit', title: 'Codigo Sepsis', priority: 'P0', areas: ['criticos', 'boxes'], terms: ['codigo sepsis', 'shock septico'], activate: ['Infeccion + shock, lactato elevado o disfuncion organica'], data: ['Foco', 'lactato', 'PAM', 'qSOFA/NEWS2', 'fluidos/antibiotico'], destination: ['Criticos/UCI o observacion protocolizada'] },
@@ -318,6 +569,52 @@ export const circuitModules = [
   { id: 'neurologia', type: 'circuit', title: 'Neurologia urgente', priority: 'P0', areas: ['boxes', 'criticos'], terms: ['neurologia', 'cefalea alarma', 'convulsion', 'focalidad'], activate: ['Deficit focal, cefalea de alarma, estatus epileptico, meningitis/encefalitis o coma no explicado'], data: ['Hora inicio', 'exploracion neurologica', 'GCS/NIHSS', 'TC/analitica', 'anticoagulacion'], destination: ['Neurologia/observacion/UCI segun gravedad'] },
   { id: 'oftalmologia', type: 'circuit', title: 'Oftalmologia urgente', priority: 'P1', areas: ['fast-track', 'boxes'], terms: ['oftalmologia', 'ojo rojo', 'perdida vision', 'glaucoma'], activate: ['Perdida brusca de vision, trauma penetrante, caustico, glaucoma agudo, dolor ocular intenso o ulcera en portador de lentillas'], data: ['Agudeza visual', 'dolor', 'trauma/quimico', 'pupila', 'fluoresceina si procede'], destination: ['Oftalmologia urgente/derivacion segura'] },
 ];
+
+const defaultCircuitOps = {
+  criteria: ['Activar si el problema requiere recurso, especialista, sala, tratamiento tiempo-dependiente o destino no diferible.'],
+  tests: ['Pruebas minimas que no retrasan: constantes, ECG si procede, analitica/imagen dirigida, estado de anticoagulacion y funcion renal.'],
+  initialTreatment: ['Soporte ABCDE, analgesia, tratamiento etiologico inicial y preparacion para traslado interno seguro.'],
+  communication: ['Comunicar identificacion, diagnostico probable, gravedad, constantes, pruebas clave, tratamiento administrado, riesgos y destino solicitado.'],
+};
+
+const circuitEnhancements = {
+  'codigo-iam': {
+    criteria: ['SCACEST o equivalente, bloqueo nuevo con clinica compatible, shock/arritmia con SCA probable o SCASEST muy alto riesgo.'],
+    tests: ['ECG enviado/visible, hora inicio, troponina si no retrasa, creatinina/eGFR, sangrado/anticoagulacion.'],
+    initialTreatment: ['AAS si no contraindicado, analgesia, nitrato si PA permite, antitromboticos segun estrategia y monitorizacion.'],
+    communication: ['Hora inicio, ECG, Killip/shock, alergias, anticoagulacion, AAS/P2Y12/heparina si administrados.'],
+  },
+  'codigo-ictus': {
+    criteria: ['Focalidad neurologica aguda, deficit incapacitante, sospecha gran vaso o deterioro neurologico en ventana/criterio avanzado.'],
+    tests: ['Glucemia inmediata, NIHSS/RACE, hora inicio/ultima vez bien, Rankin previo, anticoagulacion, TC/angioTC segun circuito.'],
+    initialTreatment: ['No antiagregar/anticoagular antes de imagen, oxigeno si hipoxemia, tratar glucemia/temperatura y proteger via aerea.'],
+    communication: ['Hora, NIHSS/RACE, glucemia, TA, anticoagulante/ultima toma, Rankin, sintomas y acompanante/contacto.'],
+  },
+  'codigo-sepsis': {
+    criteria: ['Infeccion probable + shock, lactato elevado, disfuncion organica, qSOFA/NEWS2 alto o deterioro rapido.'],
+    tests: ['Lactato, cultivos si no retrasan, gasometria, hemograma, bioquimica/iones, foco e imagen si precisa.'],
+    initialTreatment: ['Antibiotico IV precoz, cristaloide reevaluado, noradrenalina si PAM <65 persistente, control de foco.'],
+    communication: ['Foco probable, lactato, PAM, fluidos, antibiotico/hora, vasopresor, alergias y necesidad UCI/foco quirurgico.'],
+  },
+  'codigo-trauma': {
+    criteria: ['PAS baja, GCS bajo, FR extrema, lesion anatomica grave, mecanismo alto riesgo, anticoagulacion con TCE o necesidad de hemoderivados.'],
+    tests: ['ABCDE, eFAST, gasometria/lactato, Hb/coagulacion/fibrinogeno, pruebas cruzadas, TC si estable.'],
+    initialTreatment: ['Control hemorragia, pelvis si sospecha, TXA si indicado, hemoderivados, analgesia, evitar hipotermia.'],
+    communication: ['Mecanismo, hora, constantes, GCS, lesiones, eFAST, anticoagulacion, TXA/hemoderivados y destino TC/quirofano/UCI.'],
+  },
+  uci: {
+    criteria: ['Ventilacion invasiva/VMNI no estable, vasopresor, shock, fallo multiorganico, coma, monitorizacion avanzada o tratamiento continuo.'],
+    tests: ['Diagnostico probable, gasometria/lactato, ECG, imagen clave, analitica critica y respuesta a tratamiento.'],
+    initialTreatment: ['Soporte organico iniciado, via segura, monitor, analgesia/sedacion si procede y objetivos terapeuticos definidos.'],
+    communication: ['Situacion basal, techo terapeutico, soporte actual, tendencia, tratamientos y decision pendiente.'],
+  },
+};
+
+export const circuitModules = rawCircuitModules.map((circuit) => ({
+  ...circuit,
+  ...defaultCircuitOps,
+  ...(circuitEnhancements[circuit.id] ?? {}),
+}));
 
 export const allClinicalItems = [...clinicalProtocols, ...clinicalTools, ...procedureModules, ...circuitModules];
 export const clinicalSearchIndex = allClinicalItems.map((item) => ({

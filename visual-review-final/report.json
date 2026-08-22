@@ -8,11 +8,12 @@
   },
   "screensReviewed": [
     "home",
-    "protocol-detail-sepsis",
-    "protocol-detail-dolor-toracico",
-    "tools",
-    "procedures",
-    "circuits",
+    "protocol-sepsis",
+    "protocol-electrolitos",
+    "protocol-arritmias",
+    "tool-anion-gap",
+    "procedure-vmni",
+    "circuit-codigo-sepsis",
     "sources"
   ],
   "mobile": {
@@ -22,21 +23,25 @@
       "documentScrollWidth": 390,
       "bodyScrollWidth": 390
     },
-    "result": "Sin scroll horizontal en viewport movil real. Home, detalle de sepsis y fuentes revisados visualmente. No se muestra Pediatria como seccion, protocolo, herramienta ni circuito."
+    "result": "Sin scroll horizontal en viewport movil real. Bloques operativos, formularios de calculadora, procedimientos y circuitos revisados visualmente."
   },
   "desktop": {
     "folder": "visual-review-final/desktop/",
-    "result": "Home y fuentes revisados visualmente en escritorio; navegacion superior y layout responsive correctos."
+    "result": "Home, protocolos, herramientas, procedimientos, circuitos y fuentes revisados en escritorio; navegacion superior y layout responsive correctos."
   },
+  "checks": [
+    "Home mantiene buscador, paciente critico, grandes sindromes y accesos secundarios.",
+    "Protocolos P0 muestran entrada rapida, primera decision, pruebas funcionales, tratamiento, situaciones especiales, reevaluacion y destino.",
+    "Herramientas metabolicas/qSOFA muestran calculadora integrada.",
+    "Procedimientos muestran preparacion, medicacion, parametros, complicaciones y reevaluacion cuando aplica.",
+    "Circuitos muestran criterios, pruebas, tratamiento inicial, comunicacion y destino.",
+    "No se muestra Pediatria como seccion, protocolo, herramienta ni circuito."
+  ],
   "issuesFound": [
     {
-      "issue": "Capturas iniciales con Chrome CLI recortaban a 390 px mientras el viewport interno era 500 px.",
-      "fix": "Repetida captura movil mediante CDP con Emulation.setDeviceMetricsOverride a 390 px."
-    },
-    {
-      "issue": "Titulo largo y placeholder del buscador con riesgo de recorte visual en movil.",
-      "fix": "Wrapping explicito de encabezados, tamano movil estable y placeholder de Home acortado."
+      "issue": "Las calculadoras en movil pueden quedar bajo el primer pliegue por contenido explicativo previo.",
+      "impact": "No bloquea uso; estan accesibles con scroll. Se acepta por mantener contexto clinico antes del calculo."
     }
   ],
-  "status": "Apto para revision final y publicacion como app adulta de Urgencias hospitalarias."
+  "status": "Apto para publicacion como asistente clinico adulto de Urgencias hospitalarias."
 }
