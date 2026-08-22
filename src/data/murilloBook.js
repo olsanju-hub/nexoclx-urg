@@ -2,7 +2,7 @@ export const murilloBook = {
   title: 'Urgencias Murillo 7a edicion',
   pdfFile: 'Urgencias Murillo 7ma.pdf',
   pdfPages: 1302,
-  note: 'Referencia documental secundaria. Abre el capitulo original del PDF cuando el archivo esta disponible en el despliegue.',
+  note: 'Referencia documental secundaria. Indica seccion, capitulo, pagina de libro y pagina PDF del Murillo original.',
   pageOffset: 4,
 };
 

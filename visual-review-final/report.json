@@ -1,47 +1,66 @@
 {
-  "date": "2026-08-22",
-  "scope": "NexoClx Urg adulto hospitalario. Pediatria queda fuera del alcance y pertenece a NexoClx Ped.",
-  "environment": {
-    "localPreview": "http://127.0.0.1:4177/nexoclx-urg/",
-    "mobileViewport": "390x844",
-    "desktopViewport": "1440x1000"
-  },
-  "screensReviewed": [
-    "home",
-    "protocol-sepsis",
-    "protocol-electrolitos",
-    "protocol-arritmias",
-    "tool-anion-gap",
-    "procedure-vmni",
-    "circuit-codigo-sepsis",
-    "sources"
+  "createdAt": "2026-08-22",
+  "scope": [
+    "Auditoria, correccion profunda y finalizacion de NexoClx Urg",
+    "Protocolos P0 obligatorios",
+    "Sistema Murillo como referencia documental secundaria sin enlaces rotos",
+    "Calculadoras integradas con explicacion de datos, calculo, interpretacion y accion"
   ],
-  "mobile": {
-    "folder": "visual-review-final/mobile/",
-    "scrollWidthCheck": {
-      "innerWidth": 390,
-      "documentScrollWidth": 390,
-      "bodyScrollWidth": 390
-    },
-    "result": "Sin scroll horizontal en viewport movil real. Bloques operativos, formularios de calculadora, procedimientos y circuitos revisados visualmente."
+  "screenshots": {
+    "mobile": [
+      "mobile/home.png",
+      "mobile/murillo-dolor-toracico.png",
+      "mobile/protocolo-dolor-toracico.png",
+      "mobile/calculadora-heart.png"
+    ],
+    "desktop": [
+      "desktop/home.png",
+      "desktop/murillo-dolor-toracico.png",
+      "desktop/protocolo-dolor-toracico.png",
+      "desktop/calculadora-heart.png"
+    ]
   },
-  "desktop": {
-    "folder": "visual-review-final/desktop/",
-    "result": "Home, protocolos, herramientas, procedimientos, circuitos y fuentes revisados en escritorio; navegacion superior y layout responsive correctos."
-  },
+  "clinicalSimulation": [
+    "Dolor toracico: encontrado por dolor pecho/sudor/nauseas; incluye decision inicial, ECG/troponina, tratamiento, especiales, reevaluacion y destino.",
+    "FA con hipotension: encontrado por FA hipotension; orienta cardioversion, causa vs consecuencia, congestion, WPW, anticoagulacion y destino.",
+    "Disnea con EAP: encontrado por disnea/edemas/ortopnea; diferencia EAP/TEP/neumonia/asma/EPOC/neumotorax y VMNI.",
+    "Sepsis con hipotension: encontrado por fiebre/hipotension/confusion; lactato, cultivos, antibiotico, fluidos, noradrenalina y especiales.",
+    "Hiperpotasemia con ECG: encontrado por potasio alto/ECG; calcio, insulina-glucosa, salbutamol, dialisis y reevaluacion.",
+    "Creatinina elevada: encontrado por creatinina/oliguria; diferencia LRA/ERC, volumen, nefrotoxicos, obstruccion, sepsis y dialisis.",
+    "Ictus: encontrado por ACV/hemiparesia/afasia; hora, glucemia, NIHSS/RACE, neuroimagen, codigo y destino.",
+    "Trauma grave: encontrado por trauma/hipotension; ABCDE, hemorragia, eFAST, TXA, hemoderivados y codigo trauma.",
+    "Intoxicacion: encontrado por sobredosis/coma/QRS; toxidrome, ECG, antidotos, carbon, NAC y destino.",
+    "Anafilaxia: encontrado por urticaria/hipotension/broncoespasmo; adrenalina IM, fluidos, broncoespasmo, observacion/UCI."
+  ],
   "checks": [
-    "Home mantiene buscador, paciente critico, grandes sindromes y accesos secundarios.",
-    "Protocolos P0 muestran entrada rapida, primera decision, pruebas funcionales, tratamiento, situaciones especiales, reevaluacion y destino.",
-    "Herramientas metabolicas/qSOFA muestran calculadora integrada.",
-    "Procedimientos muestran preparacion, medicacion, parametros, complicaciones y reevaluacion cuando aplica.",
-    "Circuitos muestran criterios, pruebas, tratamiento inicial, comunicacion y destino.",
-    "No se muestra Pediatria como seccion, protocolo, herramienta ni circuito."
-  ],
-  "issuesFound": [
     {
-      "issue": "Las calculadoras en movil pueden quedar bajo el primer pliegue por contenido explicativo previo.",
-      "impact": "No bloquea uso; estan accesibles con scroll. Se acepta por mantener contexto clinico antes del calculo."
+      "area": "Murillo",
+      "result": "ok",
+      "notes": "No abre enlaces rotos. Muestra seccion/capitulo/pagina libro/pagina PDF/archivo. Desde protocolo muestra referencias vinculadas; desde Home indice."
+    },
+    {
+      "area": "Calculadoras",
+      "result": "ok",
+      "notes": "NEWS2, Glasgow, HEART, GRACE, Wells TEP, PESI y NIHSS muestran utilidad, ayudas de campo, resultado, interpretacion y accion clinica."
+    },
+    {
+      "area": "P0",
+      "result": "ok",
+      "notes": "Los 10 escenarios obligatorios pasan busqueda y estructura clinica completa contra el objeto renderizado."
+    },
+    {
+      "area": "Build",
+      "result": "ok",
+      "notes": "npm run build correcto."
     }
   ],
-  "status": "Apto para publicacion como asistente clinico adulto de Urgencias hospitalarias."
+  "limitations": [
+    "El PDF Murillo no se publica en GitHub por peso aproximado de 128 MB y potencial restriccion de redistribucion. Se evita enlace roto y se ofrece referencia documental exacta para uso con copia autorizada."
+  ],
+  "issuesFoundAndFixed": [
+    "El icono del libro desde protocolo intentaba abrir PDF no publicado: corregido a referencia documental interna.",
+    "El indice Murillo usaba filas accionables hacia PDF: corregido a filas de referencia sin enlace.",
+    "Calculadoras sin ayuda por campo: corregido con summary, action y hints.",
+    "P0 coma, ictus, trauma y toxicologia requerian dosis/destino mas explicitos: completado."
+  ]
 }

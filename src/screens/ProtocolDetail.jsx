@@ -62,14 +62,16 @@ function DestinationBlock({ destination }) {
 
 const calculatorConfigs = {
   news2: {
+    summary: 'Estratifica deterioro fisiologico en Urgencias y activa intensidad de vigilancia/respuesta.',
+    action: 'NEWS2 alto obliga a reevaluacion urgente, monitorizacion y considerar criticos/UCI.',
     fields: [
-      { id: 'fr', label: 'FR score', unit: '0-3' },
-      { id: 'sat', label: 'SatO2 score', unit: '0-3' },
-      { id: 'oxygen', label: 'Oxigeno', unit: '0 no / 2 si' },
-      { id: 'pas', label: 'PAS score', unit: '0-3' },
-      { id: 'fc', label: 'FC score', unit: '0-3' },
-      { id: 'temp', label: 'Temp score', unit: '0-3' },
-      { id: 'mental', label: 'Conciencia', unit: '0 alerta / 3 alterada' },
+      { id: 'fr', label: 'FR score', unit: '0-3', hint: 'Puntua la frecuencia respiratoria medida, no la impresion subjetiva.' },
+      { id: 'sat', label: 'SatO2 score', unit: '0-3', hint: 'Usa la escala de saturacion aplicable al paciente.' },
+      { id: 'oxygen', label: 'Oxigeno', unit: '0 no / 2 si', hint: 'Suma 2 si precisa oxigeno suplementario.' },
+      { id: 'pas', label: 'PAS score', unit: '0-3', hint: 'Toma la presion arterial sistolica actual.' },
+      { id: 'fc', label: 'FC score', unit: '0-3', hint: 'Frecuencia cardiaca monitorizada o tomada manual.' },
+      { id: 'temp', label: 'Temp score', unit: '0-3', hint: 'Temperatura objetiva.' },
+      { id: 'mental', label: 'Conciencia', unit: '0 alerta / 3 alterada', hint: 'AVPU: alerta puntua 0; nueva confusion/respuesta a voz/dolor/no responde puntua 3.' },
     ],
     calculate: (values) => {
       const keys = ['fr', 'sat', 'oxygen', 'pas', 'fc', 'temp', 'mental'];
@@ -79,7 +81,9 @@ const calculatorConfigs = {
     },
   },
   glasgow: {
-    fields: [{ id: 'eye', label: 'Ocular', unit: '1-4' }, { id: 'verbal', label: 'Verbal', unit: '1-5' }, { id: 'motor', label: 'Motora', unit: '1-6' }],
+    summary: 'Cuantifica nivel de conciencia para coma, TCE, ictus, intoxicacion y necesidad de via aerea.',
+    action: 'GCS <=8 o deterioro obliga a proteger via aerea/criticos salvo techo terapeutico.',
+    fields: [{ id: 'eye', label: 'Ocular', unit: '1-4', hint: 'Apertura ocular espontanea, a voz, dolor o ninguna.' }, { id: 'verbal', label: 'Verbal', unit: '1-5', hint: 'Orientado, confuso, palabras, sonidos o ninguna respuesta.' }, { id: 'motor', label: 'Motora', unit: '1-6', hint: 'Obedece, localiza, retirada, flexion, extension o ninguna.' }],
     calculate: ({ eye, verbal, motor }) => {
       if ([eye, verbal, motor].some((value) => value === '')) return null;
       const result = Number(eye) + Number(verbal) + Number(motor);
@@ -87,7 +91,9 @@ const calculatorConfigs = {
     },
   },
   heart: {
-    fields: [{ id: 'history', label: 'Historia', unit: '0-2' }, { id: 'ecg', label: 'ECG', unit: '0-2' }, { id: 'age', label: 'Edad', unit: '0-2' }, { id: 'risk', label: 'Factores riesgo', unit: '0-2' }, { id: 'troponin', label: 'Troponina', unit: '0-2' }],
+    summary: 'Estima riesgo en dolor toracico con ECG y troponina disponibles.',
+    action: 'Solo apoya alta si bajo riesgo, ECG/troponina seriada concordantes y no hay diagnostico tiempo-dependiente alternativo.',
+    fields: [{ id: 'history', label: 'Historia', unit: '0-2', hint: '0 poco sospechosa, 1 intermedia, 2 muy sugestiva de SCA.' }, { id: 'ecg', label: 'ECG', unit: '0-2', hint: '0 normal, 1 cambios inespecificos, 2 cambios isquemicos significativos.' }, { id: 'age', label: 'Edad', unit: '0-2', hint: '0 <45, 1 45-64, 2 >=65 anos.' }, { id: 'risk', label: 'Factores riesgo', unit: '0-2', hint: 'HTA, DM, tabaco, dislipemia, familia, obesidad, aterosclerosis.' }, { id: 'troponin', label: 'Troponina', unit: '0-2', hint: 'Usa valor respecto al limite superior y dinamica seriada.' }],
     calculate: (values) => {
       const keys = ['history', 'ecg', 'age', 'risk', 'troponin'];
       if (keys.some((key) => values[key] === '')) return null;
@@ -96,7 +102,9 @@ const calculatorConfigs = {
     },
   },
   grace: {
-    fields: [{ id: 'age', label: 'Edad', unit: 'anos' }, { id: 'hr', label: 'FC', unit: 'lpm' }, { id: 'sbp', label: 'PAS', unit: 'mmHg' }, { id: 'creatinine', label: 'Creatinina', unit: 'mg/dL' }, { id: 'killip', label: 'Killip', unit: '1-4' }, { id: 'st', label: 'Desviacion ST', unit: '0/1' }, { id: 'troponin', label: 'Troponina positiva', unit: '0/1' }, { id: 'arrest', label: 'PCR al ingreso', unit: '0/1' }],
+    summary: 'Aproxima riesgo en SCA para decidir monitorizacion e invasiva temprana.',
+    action: 'Alto riesgo o inestabilidad: cardiologia/hemodinamica y monitorizacion, no alta.',
+    fields: [{ id: 'age', label: 'Edad', unit: 'anos', hint: 'Edad real.' }, { id: 'hr', label: 'FC', unit: 'lpm', hint: 'Frecuencia cardiaca inicial.' }, { id: 'sbp', label: 'PAS', unit: 'mmHg', hint: 'Presion sistolica inicial.' }, { id: 'creatinine', label: 'Creatinina', unit: 'mg/dL', hint: 'Creatinina inicial; convierte si el laboratorio informa en micromol/L.' }, { id: 'killip', label: 'Killip', unit: '1-4', hint: '1 sin IC; 2 crepitantes/S3; 3 EAP; 4 shock.' }, { id: 'st', label: 'Desviacion ST', unit: '0/1', hint: 'ST elevado/deprimido o equivalente isquemico.' }, { id: 'troponin', label: 'Troponina positiva', unit: '0/1', hint: 'Troponina por encima del percentil 99 o dinamica significativa.' }, { id: 'arrest', label: 'PCR al ingreso', unit: '0/1', hint: 'Parada cardiaca relacionada con el episodio actual.' }],
     calculate: ({ age, hr, sbp, creatinine, killip, st, troponin, arrest }) => {
       if ([age, hr, sbp, creatinine, killip, st, troponin, arrest].some((value) => value === '')) return null;
       const score = (Number(age) >= 75 ? 45 : Number(age) >= 65 ? 35 : Number(age) >= 55 ? 25 : 10)
@@ -111,7 +119,9 @@ const calculatorConfigs = {
     },
   },
   'wells-tep': {
-    fields: [{ id: 'dvt', label: 'Clinica TVP', unit: '0/3' }, { id: 'alternative', label: 'TEP mas probable', unit: '0/3' }, { id: 'hr', label: 'FC >100', unit: '0/1.5' }, { id: 'immobilization', label: 'Cirugia/inmovilizacion', unit: '0/1.5' }, { id: 'vte', label: 'ETV previa', unit: '0/1.5' }, { id: 'hemoptysis', label: 'Hemoptisis', unit: '0/1' }, { id: 'cancer', label: 'Cancer activo', unit: '0/1' }],
+    summary: 'Estima probabilidad clinica de TEP antes de D-dimero o angioTC.',
+    action: 'TEP probable orienta a imagen y anticoagulacion si no contraindica; TEP improbable permite D-dimero/PERC segun contexto.',
+    fields: [{ id: 'dvt', label: 'Clinica TVP', unit: '0/3', hint: 'Dolor/edema unilateral, trayecto venoso o signos objetivos.' }, { id: 'alternative', label: 'TEP mas probable', unit: '0/3', hint: 'Juicio clinico: no hay diagnostico alternativo mas probable.' }, { id: 'hr', label: 'FC >100', unit: '0/1.5', hint: 'Frecuencia cardiaca inicial.' }, { id: 'immobilization', label: 'Cirugia/inmovilizacion', unit: '0/1.5', hint: 'Cirugia reciente o inmovilizacion prolongada.' }, { id: 'vte', label: 'ETV previa', unit: '0/1.5', hint: 'TEP o TVP previos.' }, { id: 'hemoptysis', label: 'Hemoptisis', unit: '0/1', hint: 'Hemoptisis actual no explicada.' }, { id: 'cancer', label: 'Cancer activo', unit: '0/1', hint: 'Tratamiento activo, paliativo o diagnostico reciente.' }],
     calculate: (values) => {
       const keys = ['dvt', 'alternative', 'hr', 'immobilization', 'vte', 'hemoptysis', 'cancer'];
       if (keys.some((key) => values[key] === '')) return null;
@@ -120,7 +130,9 @@ const calculatorConfigs = {
     },
   },
   pesi: {
-    fields: [{ id: 'age', label: 'Edad', unit: 'anos' }, { id: 'male', label: 'Varon', unit: '0/10' }, { id: 'cancer', label: 'Cancer', unit: '0/30' }, { id: 'hf', label: 'IC', unit: '0/10' }, { id: 'lung', label: 'Enf. pulmonar', unit: '0/10' }, { id: 'hr', label: 'FC >=110', unit: '0/20' }, { id: 'sbp', label: 'PAS <100', unit: '0/30' }, { id: 'rr', label: 'FR >=30', unit: '0/20' }, { id: 'temp', label: 'Temp <36', unit: '0/20' }, { id: 'mental', label: 'Alteracion mental', unit: '0/60' }, { id: 'sat', label: 'SatO2 <90', unit: '0/20' }],
+    summary: 'Estratifica riesgo en TEP confirmado para alta seleccionada, ingreso o UCI.',
+    action: 'No usar para descartar TEP; se aplica tras diagnostico o sospecha muy alta.',
+    fields: [{ id: 'age', label: 'Edad', unit: 'anos', hint: 'Edad real, suma directamente.' }, { id: 'male', label: 'Varon', unit: '0/10', hint: 'Suma 10 si varon.' }, { id: 'cancer', label: 'Cancer', unit: '0/30', hint: 'Cancer activo.' }, { id: 'hf', label: 'IC', unit: '0/10', hint: 'Insuficiencia cardiaca previa.' }, { id: 'lung', label: 'Enf. pulmonar', unit: '0/10', hint: 'EPOC u otra enfermedad pulmonar cronica significativa.' }, { id: 'hr', label: 'FC >=110', unit: '0/20', hint: 'Frecuencia cardiaca actual.' }, { id: 'sbp', label: 'PAS <100', unit: '0/30', hint: 'Hipotension actual.' }, { id: 'rr', label: 'FR >=30', unit: '0/20', hint: 'Frecuencia respiratoria.' }, { id: 'temp', label: 'Temp <36', unit: '0/20', hint: 'Hipotermia.' }, { id: 'mental', label: 'Alteracion mental', unit: '0/60', hint: 'Confusion, somnolencia o bajo nivel de conciencia.' }, { id: 'sat', label: 'SatO2 <90', unit: '0/20', hint: 'Saturacion basal o con oxigeno segun contexto.' }],
     calculate: (values) => {
       const keys = ['age', 'male', 'cancer', 'hf', 'lung', 'hr', 'sbp', 'rr', 'temp', 'mental', 'sat'];
       if (keys.some((key) => values[key] === '')) return null;
@@ -129,7 +141,9 @@ const calculatorConfigs = {
     },
   },
   nihss: {
-    fields: [{ id: 'loc', label: 'Conciencia/preguntas/ordenes', unit: '0-7' }, { id: 'gaze', label: 'Mirada/campos', unit: '0-5' }, { id: 'face', label: 'Facial', unit: '0-3' }, { id: 'motorArm', label: 'Motor brazos', unit: '0-8' }, { id: 'motorLeg', label: 'Motor piernas', unit: '0-8' }, { id: 'ataxia', label: 'Ataxia', unit: '0-2' }, { id: 'sensory', label: 'Sensibilidad', unit: '0-2' }, { id: 'language', label: 'Lenguaje/disartria/extincion', unit: '0-8' }],
+    summary: 'Cuantifica deficit neurologico en ictus para comunicar gravedad y tendencia.',
+    action: 'No retrasa codigo ictus; deficit leve pero incapacitante tambien puede requerir circuito.',
+    fields: [{ id: 'loc', label: 'Conciencia/preguntas/ordenes', unit: '0-7', hint: 'Suma nivel de conciencia, preguntas y ordenes.' }, { id: 'gaze', label: 'Mirada/campos', unit: '0-5', hint: 'Desviacion mirada y hemianopsia.' }, { id: 'face', label: 'Facial', unit: '0-3', hint: 'Asimetria facial.' }, { id: 'motorArm', label: 'Motor brazos', unit: '0-8', hint: 'Paresia de ambos brazos.' }, { id: 'motorLeg', label: 'Motor piernas', unit: '0-8', hint: 'Paresia de ambas piernas.' }, { id: 'ataxia', label: 'Ataxia', unit: '0-2', hint: 'Ataxia de extremidades.' }, { id: 'sensory', label: 'Sensibilidad', unit: '0-2', hint: 'Hipoestesia.' }, { id: 'language', label: 'Lenguaje/disartria/extincion', unit: '0-8', hint: 'Afasia, disartria, negligencia/extincion.' }],
     calculate: (values) => {
       const keys = ['loc', 'gaze', 'face', 'motorArm', 'motorLeg', 'ataxia', 'sensory', 'language'];
       if (keys.some((key) => values[key] === '')) return null;
@@ -225,6 +239,7 @@ function CalculatorPanel({ item }) {
   return (
     <section className="decision-result clinical-section calculator-panel">
       <h3>Calculadora</h3>
+      {config.summary && <p className="calculator-summary">{config.summary}</p>}
       <div className="calculator-grid">
         {config.fields.map((field) => (
           <label key={field.id}>
@@ -235,6 +250,7 @@ function CalculatorPanel({ item }) {
               onChange={(event) => setValues((current) => ({ ...current, [field.id]: event.target.value }))}
               placeholder={field.unit}
             />
+            {field.hint && <small>{field.hint}</small>}
           </label>
         ))}
       </div>
@@ -242,6 +258,7 @@ function CalculatorPanel({ item }) {
         <div className="calculator-result">
           <strong>{result.value}</strong>
           <p>{result.interpretation}</p>
+          {config.action && <p>{config.action}</p>}
         </div>
       )}
     </section>

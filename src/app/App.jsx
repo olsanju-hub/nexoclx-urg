@@ -14,7 +14,6 @@ import { CircuitDetail } from '../screens/CircuitDetail.jsx';
 import { Calculations } from '../screens/Calculations.jsx';
 import { Sources } from '../screens/Sources.jsx';
 import { MurilloBook } from '../screens/MurilloBook.jsx';
-import { moduleBookReferences, murilloPdfUrl } from '../data/murilloBook.js';
 
 const routeTitles = {
   [routes.home]: 'Inicio',
@@ -69,11 +68,8 @@ export default function App() {
   const openItem = (id) => navigate(routes.protocolDetail, id);
   const openBookReference = () => {
     if (currentItem) {
-      const reference = moduleBookReferences[currentItem.id];
-      if (reference?.pdfPage) {
-        window.open(murilloPdfUrl(reference.pdfPage), '_blank', 'noopener,noreferrer');
-        return;
-      }
+      navigate(routes.murilloBook, currentItem.id);
+      return;
     }
     navigate(routes.murilloBook);
   };

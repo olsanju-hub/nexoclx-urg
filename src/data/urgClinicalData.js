@@ -406,17 +406,19 @@ const protocolEnhancements = {
     quickEntry: ['Deficit neurologico focal brusco, afasia, hemiparesia, desviacion mirada, ataxia aguda o alteracion visual.'],
     firstDecision: ['Hora inicio/ultima vez visto bien, glucemia inmediata y escala NIHSS/RACE.', 'Activar Codigo Ictus si deficit agudo y potencial tratamiento reperfusion/neurointervencion.'],
     testPlan: ['TC craneal urgente +/- angioTC/perfusion segun circuito, glucemia, ECG, hemograma, coagulacion, creatinina, iones, anticoagulacion/ultima toma.', 'Cambia conducta: hemorragia, gran vaso, anticoagulacion, glucemia extrema, tiempo de inicio, Rankin previo.'],
-    medicationPlan: ['No antiagregar ni anticoagular antes de neuroimagen.', 'Oxigeno solo si hipoxemia; tratar fiebre e hipoglucemia/hiperglucemia marcada.', 'Control TA segun candidato a reperfusion y protocolo neurologia.'],
+    medicationPlan: ['No antiagregar ni anticoagular antes de neuroimagen.', 'Oxigeno solo si hipoxemia; tratar fiebre e hipoglucemia/hiperglucemia marcada.', 'Glucosa IV si hipoglucemia; evitar correcciones agresivas salvo cifras extremas.', 'Control TA segun candidato a reperfusion y protocolo neurologia; no bajar TA de forma brusca sin indicacion.'],
     specialSituations: ['Despertar/tiempo desconocido: no excluir automaticamente; valorar imagen avanzada/circuito.', 'Anticoagulado: documentar farmaco, ultima dosis y eGFR.', 'Sospecha gran vaso RACE alto: neurointervencionismo.'],
     reevaluation: ['NIHSS/deficit, TA, glucemia, conciencia, via aerea y deterioro neurologico durante traslado interno.'],
+    destination: { low: ['AIT o deficit resuelto no es alta directa: observacion/neurologia segun ABCD2, riesgo y protocolo.'], moderate: ['Unidad ictus/observacion neurologica si deficit menor estable o estudio pendiente.'], high: ['Codigo Ictus, TC/angioTC urgente, neurologia/neurointervencionismo/UCI si gran vaso, deterioro, coma o necesidad de soporte.'] },
   },
   coma: {
     quickEntry: ['Alteracion de conciencia, GCS bajo, confusion grave, somnolencia o paciente no despertable.'],
     firstDecision: ['Via aerea no protegida, hipoxemia, shock o GCS muy bajo -> criticos y via aerea experta.', 'Glucemia inmediata en todo paciente.'],
     testPlan: ['Glucemia, gasometria, ECG, temperatura, hemograma, bioquimica, iones, funcion renal/hepatica, toxicos segun contexto, TC craneal si trauma/focalidad/anticoagulacion/no causa clara.', 'Cambia conducta: hipoglucemia, hipercapnia, hipoxia, Na/K/Ca criticos, intoxicacion, sepsis, hemorragia intracraneal.'],
-    medicationPlan: ['Glucosa IV si hipoglucemia.', 'Naloxona titulada si sospecha opioide con depresion respiratoria.', 'Tiamina antes o junto a glucosa si alto riesgo deficit nutricional/alcoholismo, sin retrasar glucosa.', 'Benzodiacepina si convulsion activa; antibiotico/aciclovir si meningoencefalitis probable.'],
+    medicationPlan: ['Glucosa IV si hipoglucemia: glucosa 25 g IV y reevaluar; repetir/infusion si recurre.', 'Naloxona titulada si sospecha opioide con depresion respiratoria: 0,04-0,4 mg IV/IN repetible hasta ventilacion adecuada; evitar despertar brusco si no precisa.', 'Tiamina 100 mg IV/IM antes o junto a glucosa si alto riesgo deficit nutricional/alcoholismo, sin retrasar glucosa.', 'Midazolam 2-5 mg IV/IM/IN o diazepam 5-10 mg IV si convulsion activa segun acceso y protocolo.', 'Antibiotico/aciclovir si meningoencefalitis probable tras cultivos si no retrasa.'],
     specialSituations: ['Anticoagulado o caida: TC urgente aunque exploracion poco fiable.', 'Hipercapnia: VMNI solo si protege via aerea; si no, intubacion.', 'Agitacion fluctuante puede ser sepsis, hipoxia, toxico o metabolico.'],
     reevaluation: ['GCS, pupilas, glucemia, gases, temperatura, respuesta a antidotos y necesidad de intubacion/UCI.'],
+    destination: { low: ['Alta solo si causa reversible banal resuelta, exploracion normal, sin intoxicacion/trauma/sepsis y observacion segura.'], moderate: ['Observacion/ingreso si etiologia no aclarada, recurrencia, intoxicacion, crisis, trastorno metabolico o TC pendiente.'], high: ['Criticos/UCI si GCS bajo persistente, via aerea, shock, hipercapnia, convulsiones, sepsis, focalidad o necesidad de antidoto/ventilacion.'] },
   },
   'trauma-grave': {
     quickEntry: ['Trauma con inestabilidad, mecanismo de alta energia, lesion anatomica grave, anticoagulacion o poblacion vulnerable adulta.'],
@@ -425,6 +427,7 @@ const protocolEnhancements = {
     medicationPlan: ['Control hemorragia: presion directa, torniquete si extremidad masiva, hemostatico, fijacion pélvica si sospecha.', 'Acido tranexamico 1 g IV lo antes posible si hemorragia significativa y dentro de 3 h; segundo 1 g segun protocolo.', 'Hemoderivados si shock hemorragico; evitar cristaloides excesivos.', 'Analgesia titulada, prevenir hipotermia y corregir calcio/coagulopatia.'],
     specialSituations: ['TCE: evitar hipoxia e hipotension; objetivo PAS adecuado y TC/neurocirugia.', 'Anticoagulado: reversión segun farmaco y sangrado/TC.', 'Toracico inestable: descartar neumotorax tension y taponamiento.'],
     reevaluation: ['ABCDE repetido, sangrado, dolor, temperatura, lactato/base deficit, coagulacion y respuesta a hemoderivados.'],
+    destination: { low: ['No aplica a trauma grave; si no cumple criterios, seguir protocolo de lesion especifica y alta solo con exploracion/imagen segura.'], moderate: ['Observacion/ingreso si mecanismo significativo, anticoagulacion, dolor no controlado, fractura relevante o pruebas pendientes.'], high: ['Codigo Trauma, TC/quirofano/UCI segun fisiologia, eFAST, TCE, sangrado, pelvis, torax o necesidad de hemoderivados.'] },
   },
   'piel-alergia': {
     quickEntry: ['Urticaria, angioedema, broncoespasmo, hipotension o sintomas digestivos tras exposicion compatible.'],
@@ -439,9 +442,10 @@ const protocolEnhancements = {
     quickEntry: ['Exposicion toxica, sobredosis, intento autolitico, toxidrome, coma, convulsion o ECG anormal.'],
     firstDecision: ['ABCDE, glucemia, ECG y toxidrome. Si coma/convulsion/QRS ancho/QT largo/shock -> criticos/toxicologia.', 'Identificar toxico, dosis, hora, formulacion retardada, coingestas e intencionalidad.'],
     testPlan: ['ECG seriado, glucemia, gasometria, iones, funcion renal/hepatica, osmolaridad si alcoholes, paracetamol a tiempo adecuado, salicilato/litio/digoxina/antiepilepticos segun sospecha.', 'Cambia conducta: QRS >120, QT largo, acidosis, hipoglucemia, paracetamol toxico, salicilato/litio/digoxina alto.'],
-    medicationPlan: ['Carbon activado si ingesta reciente seleccionada, via aerea protegida y toxico adsorbible.', 'Naloxona titulada si opioide con depresion respiratoria.', 'Bicarbonato sodico si QRS ancho por triciclicos/bloqueadores canal Na segun protocolo.', 'N-acetilcisteina si paracetamol segun nomograma/protocolo.'],
+    medicationPlan: ['Carbon activado 50 g VO/sonda si ingesta reciente seleccionada, via aerea protegida y toxico adsorbible; no usar en causticos/hidrocarburos.', 'Naloxona titulada si opioide con depresion respiratoria: 0,04-0,4 mg IV/IN repetible hasta ventilacion adecuada.', 'Bicarbonato sodico si QRS ancho por triciclicos/bloqueadores canal Na: bolos IV segun protocolo hasta estrechar QRS/pH objetivo, con monitor y gases.', 'N-acetilcisteina si paracetamol segun nomograma/protocolo; no retrasar si ingesta masiva, tiempo desconocido o daño hepatico.', 'Benzodiacepinas si convulsion/agitación simpaticomimetica; enfriamiento activo si hipertermia.'],
     specialSituations: ['Causticos/hidrocarburos: no carbon ni vomito; endoscopia/circuito si indicado.', 'Liberacion retardada: observacion prolongada y niveles seriados.', 'Intencionalidad suicida: no alta sin valoracion de riesgo cuando este medicamente apto.'],
     reevaluation: ['Conciencia, respiracion, ECG, temperatura, glucemia, acidosis, niveles seriados y necesidad de UCI/antidoto.'],
+    destination: { low: ['Alta solo tras observacion suficiente, toxico de bajo riesgo, exploracion/ECG normales y sin intencionalidad autolitica pendiente.'], moderate: ['Observacion/ingreso si liberacion retardada, niveles seriados, coingesta, alteracion leve ECG/metabolica o riesgo psiquiatrico.'], high: ['UCI/toxicologia si coma, convulsion, shock, hipertermia, acidosis, QRS/QT alterado, antidoto complejo o soporte ventilatorio.'] },
   },
 };
 
