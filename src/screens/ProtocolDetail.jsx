@@ -95,6 +95,48 @@ const calculatorConfigs = {
       return { value: `${result} puntos`, interpretation: result <= 3 ? 'Bajo riesgo si troponina seriada/ECG concordantes: valorar alta protocolizada.' : result <= 6 ? 'Riesgo intermedio: observacion, troponinas seriadas y valoracion.' : 'Alto riesgo: ingreso/cardiologia/estrategia invasiva segun contexto.' };
     },
   },
+  grace: {
+    fields: [{ id: 'age', label: 'Edad', unit: 'anos' }, { id: 'hr', label: 'FC', unit: 'lpm' }, { id: 'sbp', label: 'PAS', unit: 'mmHg' }, { id: 'creatinine', label: 'Creatinina', unit: 'mg/dL' }, { id: 'killip', label: 'Killip', unit: '1-4' }, { id: 'st', label: 'Desviacion ST', unit: '0/1' }, { id: 'troponin', label: 'Troponina positiva', unit: '0/1' }, { id: 'arrest', label: 'PCR al ingreso', unit: '0/1' }],
+    calculate: ({ age, hr, sbp, creatinine, killip, st, troponin, arrest }) => {
+      if ([age, hr, sbp, creatinine, killip, st, troponin, arrest].some((value) => value === '')) return null;
+      const score = (Number(age) >= 75 ? 45 : Number(age) >= 65 ? 35 : Number(age) >= 55 ? 25 : 10)
+        + (Number(hr) >= 110 ? 25 : Number(hr) >= 90 ? 15 : 5)
+        + (Number(sbp) < 90 ? 45 : Number(sbp) < 120 ? 25 : 5)
+        + (Number(creatinine) >= 2 ? 25 : Number(creatinine) >= 1.3 ? 15 : 5)
+        + (Number(killip) >= 3 ? 35 : Number(killip) === 2 ? 20 : 0)
+        + (Number(st) ? 25 : 0)
+        + (Number(troponin) ? 15 : 0)
+        + (Number(arrest) ? 40 : 0);
+      return { value: `${score} puntos orientativos`, interpretation: score >= 140 ? 'Alto/muy alto riesgo: cardiologia, monitorizacion y estrategia invasiva urgente segun ECG/clinica.' : score >= 109 ? 'Riesgo intermedio: observacion monitorizada y estrategia invasiva segun evolucion.' : 'Riesgo bajo si ECG/troponinas seriadas y clinica son concordantes.' };
+    },
+  },
+  'wells-tep': {
+    fields: [{ id: 'dvt', label: 'Clinica TVP', unit: '0/3' }, { id: 'alternative', label: 'TEP mas probable', unit: '0/3' }, { id: 'hr', label: 'FC >100', unit: '0/1.5' }, { id: 'immobilization', label: 'Cirugia/inmovilizacion', unit: '0/1.5' }, { id: 'vte', label: 'ETV previa', unit: '0/1.5' }, { id: 'hemoptysis', label: 'Hemoptisis', unit: '0/1' }, { id: 'cancer', label: 'Cancer activo', unit: '0/1' }],
+    calculate: (values) => {
+      const keys = ['dvt', 'alternative', 'hr', 'immobilization', 'vte', 'hemoptysis', 'cancer'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = keys.reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result.toFixed(1)} puntos`, interpretation: result > 4 ? 'TEP probable: angioTC/eco si shock y anticoagulacion si no contraindica.' : 'TEP improbable: PERC si muy baja probabilidad o D-dimero segun contexto.' };
+    },
+  },
+  pesi: {
+    fields: [{ id: 'age', label: 'Edad', unit: 'anos' }, { id: 'male', label: 'Varon', unit: '0/10' }, { id: 'cancer', label: 'Cancer', unit: '0/30' }, { id: 'hf', label: 'IC', unit: '0/10' }, { id: 'lung', label: 'Enf. pulmonar', unit: '0/10' }, { id: 'hr', label: 'FC >=110', unit: '0/20' }, { id: 'sbp', label: 'PAS <100', unit: '0/30' }, { id: 'rr', label: 'FR >=30', unit: '0/20' }, { id: 'temp', label: 'Temp <36', unit: '0/20' }, { id: 'mental', label: 'Alteracion mental', unit: '0/60' }, { id: 'sat', label: 'SatO2 <90', unit: '0/20' }],
+    calculate: (values) => {
+      const keys = ['age', 'male', 'cancer', 'hf', 'lung', 'hr', 'sbp', 'rr', 'temp', 'mental', 'sat'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = Number(values.age) + keys.filter((key) => key !== 'age').reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result} puntos`, interpretation: result <= 85 ? 'Bajo riesgo si TEP confirmado estable y sin contraindicaciones sociales/clinicas: valorar alta protocolizada.' : result <= 105 ? 'Riesgo intermedio: ingreso/observacion.' : 'Alto riesgo: ingreso monitorizado/UCI segun disfuncion VD, biomarcadores o shock.' };
+    },
+  },
+  nihss: {
+    fields: [{ id: 'loc', label: 'Conciencia/preguntas/ordenes', unit: '0-7' }, { id: 'gaze', label: 'Mirada/campos', unit: '0-5' }, { id: 'face', label: 'Facial', unit: '0-3' }, { id: 'motorArm', label: 'Motor brazos', unit: '0-8' }, { id: 'motorLeg', label: 'Motor piernas', unit: '0-8' }, { id: 'ataxia', label: 'Ataxia', unit: '0-2' }, { id: 'sensory', label: 'Sensibilidad', unit: '0-2' }, { id: 'language', label: 'Lenguaje/disartria/extincion', unit: '0-8' }],
+    calculate: (values) => {
+      const keys = ['loc', 'gaze', 'face', 'motorArm', 'motorLeg', 'ataxia', 'sensory', 'language'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = keys.reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result} puntos`, interpretation: result >= 15 ? 'Ictus moderado-grave: codigo ictus, neuroimagen urgente y valorar gran vaso.' : result >= 5 ? 'Deficit relevante: codigo ictus si cumple criterios y seguimiento de tendencia.' : 'Deficit leve: no excluye tratamiento si incapacitante; documentar sintomas y hora.' };
+    },
+  },
   'curb65': {
     fields: [{ id: 'confusion', label: 'Confusion', unit: '0/1' }, { id: 'urea', label: 'Urea alta', unit: '0/1' }, { id: 'fr', label: 'FR >=30', unit: '0/1' }, { id: 'bp', label: 'PA baja', unit: '0/1' }, { id: 'age', label: 'Edad >=65', unit: '0/1' }],
     calculate: (values) => {

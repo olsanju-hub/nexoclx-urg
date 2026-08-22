@@ -14,6 +14,7 @@ import { CircuitDetail } from '../screens/CircuitDetail.jsx';
 import { Calculations } from '../screens/Calculations.jsx';
 import { Sources } from '../screens/Sources.jsx';
 import { MurilloBook } from '../screens/MurilloBook.jsx';
+import { moduleBookReferences, murilloPdfUrl } from '../data/murilloBook.js';
 
 const routeTitles = {
   [routes.home]: 'Inicio',
@@ -66,6 +67,16 @@ export default function App() {
   }, []);
 
   const openItem = (id) => navigate(routes.protocolDetail, id);
+  const openBookReference = () => {
+    if (currentItem) {
+      const reference = moduleBookReferences[currentItem.id];
+      if (reference?.pdfPage) {
+        window.open(murilloPdfUrl(reference.pdfPage), '_blank', 'noopener,noreferrer');
+        return;
+      }
+    }
+    navigate(routes.murilloBook);
+  };
 
   return (
     <AppShell
@@ -75,7 +86,7 @@ export default function App() {
       primarySections={primarySections}
       secondarySections={secondarySections}
       onNavigate={navigate}
-      onBook={() => navigate(routes.murilloBook, currentItem?.id ?? null)}
+      onBook={openBookReference}
     >
       {route === routes.home && <Home app={appConfig} sections={primarySections} onNavigate={navigate} onOpen={openItem} />}
       {route === routes.protocols && <Protocols protocols={clinicalProtocols} onOpen={openItem} />}
@@ -86,7 +97,7 @@ export default function App() {
       {route === routes.circuitDetail && <CircuitDetail item={currentItem} onBack={() => navigate(routes.circuits)} />}
       {route === routes.calculations && <Calculations onOpen={openItem} />}
       {route === routes.sources && <Sources />}
-      {route === routes.murilloBook && <MurilloBook item={currentItem} onOpenItem={openItem} />}
+      {route === routes.murilloBook && <MurilloBook item={currentItem} />}
       {route === routes.more && <More sections={secondarySections} onNavigate={navigate} />}
     </AppShell>
   );

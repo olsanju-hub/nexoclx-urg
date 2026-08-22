@@ -1,0 +1,66 @@
+{
+  "createdAt": "2026-08-22",
+  "scope": [
+    "Auditoria final y correccion profunda NexoClx Urg",
+    "Sistema Murillo como referencia documental secundaria",
+    "Protocolos P0: dolor toracico/SCA, disnea, sepsis, FA/arritmias, renal/electrolitos",
+    "Calculadoras: HEART, GRACE, Wells TEP, PERC, PESI, NEWS2, Glasgow, NIHSS, RACE, anion gap, osmolaridad, sodio corregido y Parkland"
+  ],
+  "screenshots": {
+    "mobile": [
+      "mobile/home.png",
+      "mobile/murillo-index.png"
+    ],
+    "desktop": [
+      "desktop/home.png",
+      "desktop/murillo-index.png"
+    ]
+  },
+  "checks": [
+    {
+      "area": "Murillo",
+      "result": "corrected",
+      "notes": "El indice ya no redirige a modulos NexoClx. Los capitulos abren URL PDF#page. Desde Home se abre indice; desde protocolo se abre la pagina primaria si existe moduleBookReferences."
+    },
+    {
+      "area": "P0 dolor toracico/SCA",
+      "result": "corrected",
+      "notes": "Incluye ECG/troponina/pruebas, resultados que cambian conducta, antiagregacion, nitratos, analgesia, anticoagulacion segun estrategia, situaciones especiales y destino."
+    },
+    {
+      "area": "P0 disnea",
+      "result": "corrected",
+      "notes": "Diferencia EAP, TEP, neumonia, asma/EPOC, neumotorax e insuficiencia respiratoria; incorpora gasometria, VMNI, objetivos de oxigeno y tratamiento por causa."
+    },
+    {
+      "area": "P0 sepsis",
+      "result": "corrected",
+      "notes": "Incluye foco, lactato, cultivos, antibioticos, fluidoterapia reevaluada, noradrenalina, IC/ERC/anciano/inmunodeprimido y destino."
+    },
+    {
+      "area": "P0 FA/arritmias",
+      "result": "corrected",
+      "notes": "Resuelve estabilidad, hipotension, IC, congestion, WPW, anticoagulacion, cardioversion y bradicardia sintomatica."
+    },
+    {
+      "area": "Renal",
+      "result": "corrected",
+      "notes": "Transformado a flujo de decision LRA/ERC, volumen, nefrotoxicos, obstruccion, sepsis, tratamiento y criterios de nefrologia/dialisis."
+    },
+    {
+      "area": "Buscador",
+      "result": "ok",
+      "notes": "Pruebas por motor: dolor pecho sudor nauseas -> SCA; fiebre hipotension confusion -> sepsis; disnea edema piernas ortopnea -> ICA/EAP; FA hipotension -> arritmias/cardioversion/shock; creatinina alta potasio alto -> renal/electrolitos."
+    }
+  ],
+  "limitations": [
+    "El PDF Murillo pesa aproximadamente 128 MB y no se ha publicado en GitHub porque supera el limite habitual de blob Git y puede tener restricciones de redistribucion. La aplicacion queda preparada para abrir Urgencias%20Murillo%207ma.pdf#page=N cuando el archivo se sirva como asset autorizado.",
+    "El mapa Murillo incluye capitulos clinicamente mapeados a NexoClx Urg; no se ha inventado un indice completo de 218 capitulos sin verificacion de paginas."
+  ],
+  "issuesFound": [
+    "El mapa previo redirigia desde Murillo a modulos internos.",
+    "moduleBookReferences sobrescribia referencias con el ultimo capitulo relacionado; corregido con referencia primaria explicita y referencias relacionadas.",
+    "Faltaban calculadoras funcionales para GRACE, Wells TEP, PESI y NIHSS."
+  ],
+  "build": "npm run build correcto"
+}

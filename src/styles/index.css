@@ -739,6 +739,36 @@ h2 {
   line-height: var(--line-height-copy);
 }
 
+.reference-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.reference-link {
+  display: grid;
+  width: 100%;
+  gap: 0.22rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 18%, var(--color-line));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 94%, var(--color-accent-soft) 6%);
+  color: var(--color-text);
+  padding: 0.9rem;
+  text-align: left;
+}
+
+.reference-link span,
+.reference-link small {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.reference-link strong {
+  font-size: 0.94rem;
+  line-height: 1.25;
+}
+
 @media (min-width: 720px) {
   .calculator-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
