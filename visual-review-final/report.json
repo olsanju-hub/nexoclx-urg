@@ -1,66 +1,43 @@
 {
-  "createdAt": "2026-08-22",
-  "scope": [
-    "Auditoria, correccion profunda y finalizacion de NexoClx Urg",
-    "Protocolos P0 obligatorios",
-    "Sistema Murillo como referencia documental secundaria sin enlaces rotos",
-    "Calculadoras integradas con explicacion de datos, calculo, interpretacion y accion"
-  ],
-  "screenshots": {
-    "mobile": [
-      "mobile/home.png",
-      "mobile/murillo-dolor-toracico.png",
-      "mobile/protocolo-dolor-toracico.png",
-      "mobile/calculadora-heart.png"
-    ],
-    "desktop": [
-      "desktop/home.png",
-      "desktop/murillo-dolor-toracico.png",
-      "desktop/protocolo-dolor-toracico.png",
-      "desktop/calculadora-heart.png"
-    ]
-  },
-  "clinicalSimulation": [
-    "Dolor toracico: encontrado por dolor pecho/sudor/nauseas; incluye decision inicial, ECG/troponina, tratamiento, especiales, reevaluacion y destino.",
-    "FA con hipotension: encontrado por FA hipotension; orienta cardioversion, causa vs consecuencia, congestion, WPW, anticoagulacion y destino.",
-    "Disnea con EAP: encontrado por disnea/edemas/ortopnea; diferencia EAP/TEP/neumonia/asma/EPOC/neumotorax y VMNI.",
-    "Sepsis con hipotension: encontrado por fiebre/hipotension/confusion; lactato, cultivos, antibiotico, fluidos, noradrenalina y especiales.",
-    "Hiperpotasemia con ECG: encontrado por potasio alto/ECG; calcio, insulina-glucosa, salbutamol, dialisis y reevaluacion.",
-    "Creatinina elevada: encontrado por creatinina/oliguria; diferencia LRA/ERC, volumen, nefrotoxicos, obstruccion, sepsis y dialisis.",
-    "Ictus: encontrado por ACV/hemiparesia/afasia; hora, glucemia, NIHSS/RACE, neuroimagen, codigo y destino.",
-    "Trauma grave: encontrado por trauma/hipotension; ABCDE, hemorragia, eFAST, TXA, hemoderivados y codigo trauma.",
-    "Intoxicacion: encontrado por sobredosis/coma/QRS; toxidrome, ECG, antidotos, carbon, NAC y destino.",
-    "Anafilaxia: encontrado por urticaria/hipotension/broncoespasmo; adrenalina IM, fluidos, broncoespasmo, observacion/UCI."
-  ],
-  "checks": [
+  "date": "2026-08-22",
+  "scope": "Correccion final del sistema bibliografico Murillo y validacion visual de NexoClx Urg",
+  "localUrl": "http://127.0.0.1:4173/nexoclx-urg/",
+  "screensReviewed": [
     {
-      "area": "Murillo",
-      "result": "ok",
-      "notes": "No abre enlaces rotos. Muestra seccion/capitulo/pagina libro/pagina PDF/archivo. Desde protocolo muestra referencias vinculadas; desde Home indice."
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "screens": [
+        "home",
+        "murillo-index",
+        "protocol-dolor-toracico",
+        "protocol-renal-urologia"
+      ]
     },
     {
-      "area": "Calculadoras",
-      "result": "ok",
-      "notes": "NEWS2, Glasgow, HEART, GRACE, Wells TEP, PESI y NIHSS muestran utilidad, ayudas de campo, resultado, interpretacion y accion clinica."
-    },
-    {
-      "area": "P0",
-      "result": "ok",
-      "notes": "Los 10 escenarios obligatorios pasan busqueda y estructura clinica completa contra el objeto renderizado."
-    },
-    {
-      "area": "Build",
-      "result": "ok",
-      "notes": "npm run build correcto."
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 1100,
+      "screens": [
+        "home",
+        "murillo-index",
+        "protocol-dolor-toracico",
+        "protocol-renal-urologia"
+      ]
     }
   ],
-  "limitations": [
-    "El PDF Murillo no se publica en GitHub por peso aproximado de 128 MB y potencial restriccion de redistribucion. Se evita enlace roto y se ofrece referencia documental exacta para uso con copia autorizada."
-  ],
-  "issuesFoundAndFixed": [
-    "El icono del libro desde protocolo intentaba abrir PDF no publicado: corregido a referencia documental interna.",
-    "El indice Murillo usaba filas accionables hacia PDF: corregido a filas de referencia sin enlace.",
-    "Calculadoras sin ayuda por campo: corregido con summary, action y hints.",
-    "P0 coma, ictus, trauma y toxicologia requerian dosis/destino mas explicitos: completado."
-  ]
+  "bibliographyChecks": {
+    "murilloChapterResources": 52,
+    "missingResources": 0,
+    "maxChapterSizeMb": 10.2,
+    "sampleChapter": "cap-025-dolor-toracico-agudo.pdf",
+    "sampleResult": "El PDF abre en la pagina inicial del Capitulo 25 Dolor toracico agudo."
+  },
+  "clinicalAccessChecks": {
+    "guardScenariosTested": 10,
+    "searchFailures": 0,
+    "correctedIssue": "La busqueda creatinina elevada oliguria no priorizaba renal-urologia; se corrigio con conceptos deterioro renal y oliguria."
+  },
+  "issues": [],
+  "summary": "Sin incidencias visuales bloqueantes en las pantallas revisadas. El sistema Murillo funciona como recurso secundario consultable y no sustituye a los protocolos."
 }

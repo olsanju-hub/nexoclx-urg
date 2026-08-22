@@ -1,9 +1,18 @@
 import { BookOpen } from 'lucide-react';
 import { murilloBook, murilloIndex, getMurilloEntriesForItem } from '../data/murilloBook.js';
 
+const openResource = (entry) => {
+  if (!entry.resourceAvailable || !entry.resource) return;
+  window.open(entry.resource, '_blank', 'noopener,noreferrer');
+};
+
 export function MurilloBook({ item }) {
   const linkedEntries = item ? getMurilloEntriesForItem(item.id) : [];
   const mappedModules = new Set(murilloIndex.flatMap((entry) => entry.moduleIds)).size;
+  const entriesBySection = murilloIndex.reduce((sections, entry) => {
+    sections[entry.section] = [...(sections[entry.section] ?? []), entry];
+    return sections;
+  }, {});
 
   return (
     <div className="screen">
@@ -11,7 +20,6 @@ export function MurilloBook({ item }) {
         <BookOpen aria-hidden="true" size={30} strokeWidth={2} />
         <h1>Murillo 7a edicion</h1>
         <p>{murilloBook.note}</p>
-        <p className="reference-warning">{murilloBook.unavailableReason}</p>
       </div>
 
       {item ? (
@@ -20,11 +28,18 @@ export function MurilloBook({ item }) {
           {linkedEntries.length ? (
             <div className="reference-list">
               {linkedEntries.map((entry) => (
-                <article className="reference-link" key={`${entry.chapter}-${entry.title}`}>
+                <button
+                  className="reference-link"
+                  key={`${entry.chapter}-${entry.title}`}
+                  onClick={() => openResource(entry)}
+                  type="button"
+                >
                   <span>{entry.section}</span>
                   <strong>Cap. {entry.chapter}. {entry.title}</strong>
-                  <small>Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}; recurso no disponible en produccion.</small>
-                </article>
+                  <small>
+                    Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}. Abrir capitulo fuente.
+                  </small>
+                </button>
               ))}
             </div>
           ) : (
@@ -33,13 +48,37 @@ export function MurilloBook({ item }) {
         </section>
       ) : (
         <section className="decision-result clinical-section is-destination">
-          <h3>Estado del recurso</h3>
+          <h3>Indice Murillo vinculado</h3>
           <ul className="clinical-bullets">
             <li>Referencias internas preparadas para {mappedModules} modulos clinicos.</li>
-            <li>No hay recurso Murillo autorizado configurado para visualizacion de capitulos.</li>
-            <li>El icono de libro desde un protocolo muestra el capitulo Murillo correspondiente y sus paginas.</li>
+            <li>Cada entrada abre el capitulo fuente disponible para verificacion secundaria.</li>
+            <li>La herramienta clinica sigue estando en el protocolo NexoClx, no en este indice.</li>
           </ul>
         </section>
+      )}
+
+      {!item && (
+        <div className="reference-list">
+          {Object.entries(entriesBySection).map(([section, entries]) => (
+            <section className="clinical-section" key={section}>
+              <h3>{section}</h3>
+              <div className="reference-list">
+                {entries.map((entry) => (
+                  <button
+                    className="reference-link"
+                    key={`${entry.chapter}-${entry.title}`}
+                    onClick={() => openResource(entry)}
+                    type="button"
+                  >
+                    <span>Capitulo {entry.chapter}</span>
+                    <strong>{entry.title}</strong>
+                    <small>Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}. Abrir capitulo.</small>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       )}
     </div>
   );

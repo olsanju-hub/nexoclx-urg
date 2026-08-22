@@ -14,6 +14,7 @@ import { CircuitDetail } from '../screens/CircuitDetail.jsx';
 import { Calculations } from '../screens/Calculations.jsx';
 import { Sources } from '../screens/Sources.jsx';
 import { MurilloBook } from '../screens/MurilloBook.jsx';
+import { getMurilloEntriesForItem } from '../data/murilloBook.js';
 
 const routeTitles = {
   [routes.home]: 'Inicio',
@@ -68,6 +69,11 @@ export default function App() {
   const openItem = (id) => navigate(routes.protocolDetail, id);
   const openBookReference = () => {
     if (currentItem) {
+      const [primaryReference] = getMurilloEntriesForItem(currentItem.id);
+      if (primaryReference?.resourceAvailable && primaryReference.resource) {
+        window.open(primaryReference.resource, '_blank', 'noopener,noreferrer');
+        return;
+      }
       navigate(routes.murilloBook, currentItem.id);
       return;
     }
