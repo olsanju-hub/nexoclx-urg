@@ -6,9 +6,7 @@ export const murilloBook = {
   note: 'Referencia documental secundaria. Indica seccion, capitulo, pagina de libro y pagina PDF del Murillo original.',
   pageOffset: 4,
   resourceAvailable: false,
-  unavailableReason: 'PDF no publicado en GitHub Pages por tamaño aproximado de 128 MB y potencial restriccion de redistribucion.',
-  officialSourceUrl: 'https://shop.elsevier.com/books/medicina-de-urgencias-y-emergencias/montero-perez/978-84-1382-004-0',
-  officialSourceLabel: 'Ficha editorial oficial Elsevier',
+  unavailableReason: 'Contenido fuente no disponible en produccion. Requiere recurso autorizado para visualizar el capitulo.',
 };
 
 const c = (section, chapter, title, bookPage, moduleIds = []) => ({
@@ -98,7 +96,6 @@ const entryToReference = (moduleId, entry) => ({
   resource: null,
   resourceAvailable: murilloBook.resourceAvailable,
   unavailableReason: murilloBook.unavailableReason,
-  officialSourceUrl: murilloBook.officialSourceUrl,
 });
 
 export const moduleBookReferences = murilloIndex.reduce((references, entry) => {

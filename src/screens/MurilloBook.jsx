@@ -9,9 +9,9 @@ export function MurilloBook({ item }) {
     <div className="screen">
       <div className="section-heading">
         <BookOpen aria-hidden="true" size={30} strokeWidth={2} />
-        <h1>Indice Murillo 7a edicion</h1>
+        <h1>Murillo 7a edicion</h1>
         <p>{murilloBook.note}</p>
-        <p className="reference-warning">{murilloBook.unavailableReason} Usa pagina libro y pagina PDF para abrir una copia autorizada en entorno local o documental.</p>
+        <p className="reference-warning">{murilloBook.unavailableReason}</p>
       </div>
 
       {item ? (
@@ -36,12 +36,9 @@ export function MurilloBook({ item }) {
           <h3>Estado del recurso</h3>
           <ul className="clinical-bullets">
             <li>Referencias internas preparadas para {mappedModules} modulos clinicos.</li>
-            <li>No se publica PDF ni capitulos en GitHub Pages sin recurso autorizado.</li>
+            <li>No hay recurso Murillo autorizado configurado para visualizacion de capitulos.</li>
             <li>El icono de libro desde un protocolo muestra el capitulo Murillo correspondiente y sus paginas.</li>
           </ul>
-          <a className="reference-official-link" href={murilloBook.officialSourceUrl} target="_blank" rel="noreferrer">
-            {murilloBook.officialSourceLabel}
-          </a>
         </section>
       )}
     </div>
