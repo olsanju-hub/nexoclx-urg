@@ -1,9 +1,12 @@
 export const murilloBook = {
+  application: 'NexoClx Urg',
   title: 'Urgencias Murillo 7a edicion',
   pdfFile: 'Urgencias Murillo 7ma.pdf',
   pdfPages: 1302,
   note: 'Referencia documental secundaria. Indica seccion, capitulo, pagina de libro y pagina PDF del Murillo original.',
   pageOffset: 4,
+  resourceAvailable: false,
+  unavailableReason: 'PDF no publicado en GitHub Pages por tamaño aproximado de 128 MB y potencial restriccion de redistribucion.',
 };
 
 const c = (section, chapter, title, bookPage, moduleIds = []) => ({
@@ -81,14 +84,18 @@ const primaryReferenceChapters = {
 };
 
 const entryToReference = (moduleId, entry) => ({
+  application: murilloBook.application,
   moduleId,
   book: murilloBook.title,
   section: entry.section,
   chapter: entry.title,
   chapterNumber: entry.chapter,
-  bookPage: entry.bookPage,
+  printedPage: entry.bookPage,
   pdfPage: entry.pdfPage,
   pdfFile: murilloBook.pdfFile,
+  resource: null,
+  resourceAvailable: murilloBook.resourceAvailable,
+  unavailableReason: murilloBook.unavailableReason,
 });
 
 export const moduleBookReferences = murilloIndex.reduce((references, entry) => {
@@ -111,4 +118,14 @@ export const moduleBookReferences = murilloIndex.reduce((references, entry) => {
 
 export const getMurilloEntriesForItem = (itemId) => murilloIndex.filter((entry) => entry.moduleIds.includes(itemId));
 
-export const murilloPdfUrl = (pdfPage) => `${encodeURI(murilloBook.pdfFile)}#page=${pdfPage}`;
+export const bibliographicReferenceShape = {
+  application: 'NexoClx AP | NexoClx Ped | NexoClx Urg | NexoClx 061',
+  moduleId: 'module-id',
+  book: 'Titulo de la fuente',
+  chapter: 'Capitulo fuente',
+  chapterNumber: 'numero-capitulo',
+  printedPage: 'pagina impresa',
+  pdfPage: 'pagina PDF',
+  resource: 'URL autorizada o null',
+  resourceAvailable: false,
+};

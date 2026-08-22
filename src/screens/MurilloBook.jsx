@@ -20,7 +20,7 @@ export function MurilloBook({ item }) {
         <BookOpen aria-hidden="true" size={30} strokeWidth={2} />
         <h1>Indice Murillo 7a edicion</h1>
         <p>{murilloBook.note}</p>
-        <p className="reference-warning">PDF no publicado en GitHub por tamaño/licencia. Usa pagina libro y pagina PDF para abrir el archivo autorizado en entorno local o documental.</p>
+        <p className="reference-warning">{murilloBook.unavailableReason} Usa pagina libro y pagina PDF para abrir una copia autorizada en entorno local o documental.</p>
       </div>
 
       {item && (
@@ -32,7 +32,7 @@ export function MurilloBook({ item }) {
                 <article className="reference-link" key={`${entry.chapter}-${entry.title}`}>
                   <span>{entry.section}</span>
                   <strong>Cap. {entry.chapter}. {entry.title}</strong>
-                  <small>Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}; archivo {murilloBook.pdfFile}.</small>
+                  <small>Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}; recurso no disponible en produccion.</small>
                 </article>
               ))}
             </div>
@@ -49,7 +49,7 @@ export function MurilloBook({ item }) {
           <article className="reference-row" key={`${entry.chapter}-${entry.title}`}>
             <span className="row-meta">Murillo</span>
             <strong>{entry.section} · Cap. {entry.chapter}. {entry.title}</strong>
-            <small>Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}; archivo {murilloBook.pdfFile}.</small>
+            <small>Pagina libro {entry.bookPage}; pagina PDF {entry.pdfPage}; recurso no disponible en produccion.</small>
           </article>
         ))}
       </CompactList>
