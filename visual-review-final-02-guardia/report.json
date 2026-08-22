@@ -1,0 +1,60 @@
+{
+  "createdAt": "2026-08-22",
+  "scope": [
+    "NexoClx Urg: home, acceso Murillo, buscador global y rutas modificadas",
+    "NexoClx 061: home y acceso secundario al libro SAMU061 Balears"
+  ],
+  "viewports": {
+    "mobile": "390x844",
+    "desktop": "1365x900"
+  },
+  "screenshots": {
+    "mobile": [
+      "mobile/urg-home.png",
+      "mobile/urg-murillo.png",
+      "mobile/061-home.png",
+      "mobile/061-samu-book.png"
+    ],
+    "desktop": [
+      "desktop/urg-home.png",
+      "desktop/urg-murillo.png",
+      "desktop/061-home.png",
+      "desktop/061-samu-book.png"
+    ]
+  },
+  "checks": [
+    {
+      "area": "Home Urg",
+      "result": "ok",
+      "notes": "Mantiene buscador, paciente crítico, grandes síndromes y accesos secundarios sin lista extensa de módulos."
+    },
+    {
+      "area": "Índice Murillo",
+      "result": "ok",
+      "notes": "Acceso secundario mediante icono de libro. No compite con navegación principal ni con buscador clínico."
+    },
+    {
+      "area": "Home 061",
+      "result": "ok",
+      "notes": "El icono SAMU061 queda arriba a la derecha y no modifica el enfoque SVA Ibiza-Formentera."
+    },
+    {
+      "area": "Índice SAMU061",
+      "result": "ok",
+      "notes": "Incluye los 48 capítulos del PDF con página PDF de inicio localizada y vínculo al módulo clínico cuando existe."
+    },
+    {
+      "area": "Buscador multisíntoma Urg",
+      "result": "ok",
+      "notes": "Pruebas por motor: dolor pecho sudor nauseas -> SCA; fiebre hipotension confusion -> sepsis/shock; disnea edema piernas ortopnea -> ICA/EAP; FA hipotension -> arritmias/cardioversión/shock; caida anticoagulado golpe cabeza -> TCE."
+    }
+  ],
+  "limitations": [
+    "El navegador integrado no estuvo disponible; se usó Playwright CLI temporal con npx para capturas.",
+    "La captura interactiva por script Node no pudo resolver el paquete Playwright desde npx; la validación de búsqueda se ejecutó directamente contra el motor clinicalSearch."
+  ],
+  "issuesFound": [],
+  "correctionsApplied": [
+    "Se repitieron capturas con espera de 1200 ms porque la primera captura móvil coincidía con la animación de entrada."
+  ]
+}

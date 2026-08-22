@@ -8,5 +8,6 @@ export const routes = {
   circuitDetail: 'circuit-detail',
   calculations: 'calculations',
   sources: 'sources',
+  murilloBook: 'murillo-book',
   more: 'more',
 };

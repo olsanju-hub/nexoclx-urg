@@ -61,6 +61,67 @@ function DestinationBlock({ destination }) {
 }
 
 const calculatorConfigs = {
+  news2: {
+    fields: [
+      { id: 'fr', label: 'FR score', unit: '0-3' },
+      { id: 'sat', label: 'SatO2 score', unit: '0-3' },
+      { id: 'oxygen', label: 'Oxigeno', unit: '0 no / 2 si' },
+      { id: 'pas', label: 'PAS score', unit: '0-3' },
+      { id: 'fc', label: 'FC score', unit: '0-3' },
+      { id: 'temp', label: 'Temp score', unit: '0-3' },
+      { id: 'mental', label: 'Conciencia', unit: '0 alerta / 3 alterada' },
+    ],
+    calculate: (values) => {
+      const keys = ['fr', 'sat', 'oxygen', 'pas', 'fc', 'temp', 'mental'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = keys.reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result} puntos`, interpretation: result >= 7 ? 'Alto riesgo: criticos/UCI y reevaluacion urgente.' : result >= 5 ? 'Riesgo medio-alto: respuesta clinica urgente y monitorizacion.' : result >= 1 ? 'Riesgo bajo-intermedio: vigilancia segun contexto.' : 'Bajo riesgo si clinica concordante.' };
+    },
+  },
+  glasgow: {
+    fields: [{ id: 'eye', label: 'Ocular', unit: '1-4' }, { id: 'verbal', label: 'Verbal', unit: '1-5' }, { id: 'motor', label: 'Motora', unit: '1-6' }],
+    calculate: ({ eye, verbal, motor }) => {
+      if ([eye, verbal, motor].some((value) => value === '')) return null;
+      const result = Number(eye) + Number(verbal) + Number(motor);
+      return { value: `${result}/15`, interpretation: result <= 8 ? 'Coma grave: proteger via aerea y criticos.' : result <= 12 ? 'Alteracion moderada: TC/monitorizacion segun causa.' : 'Leve si estable; reevaluar tendencia.' };
+    },
+  },
+  heart: {
+    fields: [{ id: 'history', label: 'Historia', unit: '0-2' }, { id: 'ecg', label: 'ECG', unit: '0-2' }, { id: 'age', label: 'Edad', unit: '0-2' }, { id: 'risk', label: 'Factores riesgo', unit: '0-2' }, { id: 'troponin', label: 'Troponina', unit: '0-2' }],
+    calculate: (values) => {
+      const keys = ['history', 'ecg', 'age', 'risk', 'troponin'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = keys.reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result} puntos`, interpretation: result <= 3 ? 'Bajo riesgo si troponina seriada/ECG concordantes: valorar alta protocolizada.' : result <= 6 ? 'Riesgo intermedio: observacion, troponinas seriadas y valoracion.' : 'Alto riesgo: ingreso/cardiologia/estrategia invasiva segun contexto.' };
+    },
+  },
+  'curb65': {
+    fields: [{ id: 'confusion', label: 'Confusion', unit: '0/1' }, { id: 'urea', label: 'Urea alta', unit: '0/1' }, { id: 'fr', label: 'FR >=30', unit: '0/1' }, { id: 'bp', label: 'PA baja', unit: '0/1' }, { id: 'age', label: 'Edad >=65', unit: '0/1' }],
+    calculate: (values) => {
+      const keys = ['confusion', 'urea', 'fr', 'bp', 'age'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = keys.reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result} puntos`, interpretation: result >= 3 ? 'Neumonia grave: ingreso y valorar UCI.' : result === 2 ? 'Riesgo intermedio: ingreso/observacion.' : 'Bajo riesgo si no hay hipoxemia, comorbilidad ni mala situacion social.' };
+    },
+  },
+  perc: {
+    fields: [{ id: 'age', label: 'Edad <50', unit: '1 si cumple' }, { id: 'hr', label: 'FC <100', unit: '1' }, { id: 'sat', label: 'SatO2 >=95', unit: '1' }, { id: 'hemoptysis', label: 'Sin hemoptisis', unit: '1' }, { id: 'estrogen', label: 'Sin estrogenos', unit: '1' }, { id: 'surgery', label: 'Sin cirugia/trauma', unit: '1' }, { id: 'vte', label: 'Sin ETV previa', unit: '1' }, { id: 'leg', label: 'Sin edema unilateral', unit: '1' }],
+    calculate: (values) => {
+      const keys = ['age', 'hr', 'sat', 'hemoptysis', 'estrogen', 'surgery', 'vte', 'leg'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = keys.reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result}/8 criterios negativos`, interpretation: result === 8 ? 'Si probabilidad clinica muy baja: puede evitar D-dimero/TC.' : 'PERC positivo: no descarta TEP; usar Wells/D-dimero/imagen segun probabilidad.' };
+    },
+  },
+  race: {
+    fields: [{ id: 'face', label: 'Cara', unit: '0-2' }, { id: 'arm', label: 'Brazo', unit: '0-2' }, { id: 'leg', label: 'Pierna', unit: '0-2' }, { id: 'gaze', label: 'Mirada', unit: '0-1' }, { id: 'aphasia', label: 'Afasia/agnosia', unit: '0-2' }],
+    calculate: (values) => {
+      const keys = ['face', 'arm', 'leg', 'gaze', 'aphasia'];
+      if (keys.some((key) => values[key] === '')) return null;
+      const result = keys.reduce((sum, key) => sum + Number(values[key]), 0);
+      return { value: `${result} puntos`, interpretation: result >= 5 ? 'Alta sospecha de gran vaso: activar neurointervencionismo segun circuito.' : 'Menor probabilidad de gran vaso; no excluye codigo ictus.' };
+    },
+  },
   'anion-gap': {
     fields: [{ id: 'na', label: 'Na', unit: 'mmol/L' }, { id: 'cl', label: 'Cl', unit: 'mmol/L' }, { id: 'hco3', label: 'HCO3', unit: 'mmol/L' }],
     calculate: ({ na, cl, hco3 }) => {

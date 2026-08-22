@@ -13,6 +13,7 @@ import { Circuits } from '../screens/Circuits.jsx';
 import { CircuitDetail } from '../screens/CircuitDetail.jsx';
 import { Calculations } from '../screens/Calculations.jsx';
 import { Sources } from '../screens/Sources.jsx';
+import { MurilloBook } from '../screens/MurilloBook.jsx';
 
 const routeTitles = {
   [routes.home]: 'Inicio',
@@ -24,6 +25,7 @@ const routeTitles = {
   [routes.circuitDetail]: 'Circuito',
   [routes.calculations]: 'Cálculos',
   [routes.sources]: 'Fuentes',
+  [routes.murilloBook]: 'Murillo',
   [routes.more]: 'Más',
 };
 
@@ -73,6 +75,7 @@ export default function App() {
       primarySections={primarySections}
       secondarySections={secondarySections}
       onNavigate={navigate}
+      onBook={() => navigate(routes.murilloBook, currentItem?.id ?? null)}
     >
       {route === routes.home && <Home app={appConfig} sections={primarySections} onNavigate={navigate} onOpen={openItem} />}
       {route === routes.protocols && <Protocols protocols={clinicalProtocols} onOpen={openItem} />}
@@ -83,6 +86,7 @@ export default function App() {
       {route === routes.circuitDetail && <CircuitDetail item={currentItem} onBack={() => navigate(routes.circuits)} />}
       {route === routes.calculations && <Calculations onOpen={openItem} />}
       {route === routes.sources && <Sources />}
+      {route === routes.murilloBook && <MurilloBook item={currentItem} onOpenItem={openItem} />}
       {route === routes.more && <More sections={secondarySections} onNavigate={navigate} />}
     </AppShell>
   );

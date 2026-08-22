@@ -4,12 +4,12 @@ import { AppHeader } from './AppHeader.jsx';
 import { BottomNav } from '../navigation/BottomNav.jsx';
 import { DesktopNav } from '../navigation/DesktopNav.jsx';
 
-export function AppShell({ app, route, title, primarySections, secondarySections, onNavigate, children }) {
+export function AppShell({ app, route, title, primarySections, secondarySections, onNavigate, onBook, children }) {
   const isHome = route === routes.home;
 
   return (
     <div className="app-shell">
-      <AppHeader app={app} title={title} isHome={isHome} onHome={() => onNavigate(routes.home)}>
+      <AppHeader app={app} title={title} isHome={isHome} onHome={() => onNavigate(routes.home)} onBook={onBook}>
         <DesktopNav items={desktopNavItems} activeRoute={route} onNavigate={onNavigate} />
       </AppHeader>
       <main className={`app-main ${isHome ? 'app-main-home' : 'app-main-inner'}`}>{children}</main>

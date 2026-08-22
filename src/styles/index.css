@@ -118,6 +118,32 @@ button {
   display: none;
 }
 
+.header-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: end;
+}
+
+.book-reference-button {
+  display: grid;
+  width: 2.28rem;
+  height: 2.28rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--color-line) 90%, transparent);
+  border-radius: 0.78rem;
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-accent-soft) 8%);
+  color: var(--color-muted);
+  box-shadow: 0 8px 20px -18px rgba(23, 33, 36, 0.35);
+}
+
+.book-reference-button:hover {
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-line));
+}
+
 .desktop-nav {
   display: none;
 }

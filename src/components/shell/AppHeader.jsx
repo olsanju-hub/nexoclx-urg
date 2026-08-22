@@ -1,4 +1,6 @@
-export function AppHeader({ app, title, isHome, onHome, children }) {
+import { BookOpen } from 'lucide-react';
+
+export function AppHeader({ app, title, isHome, onHome, onBook, children }) {
   return (
     <header className="app-header">
       <div className="header-inner">
@@ -12,7 +14,12 @@ export function AppHeader({ app, title, isHome, onHome, children }) {
         <div className="header-route" aria-hidden={isHome ? 'true' : 'false'}>
           {!isHome && <span>{title}</span>}
         </div>
-        {children}
+        <div className="header-actions">
+          {children}
+          <button className="book-reference-button" type="button" onClick={onBook} aria-label="Abrir indice Murillo">
+            <BookOpen aria-hidden="true" size={18} strokeWidth={2} />
+          </button>
+        </div>
       </div>
     </header>
   );
